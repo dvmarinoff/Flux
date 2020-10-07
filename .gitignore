@@ -1,3 +1,5 @@
 /ble-spec/
 /dist/
 /node_modules/
+.cache
+notes.txt
