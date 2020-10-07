@@ -1,0 +1,276 @@
+/* RESET */
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+nav ul, ul.clean {
+    margin-left: 0;
+    list-style-type: none!important;
+}
+a, a:visited {
+    text-decoration: none;
+}
+h1, h2 {
+    font-weight: normal;
+}
+h3, h4, h5, h6 {
+    font-weight: normal;
+}
+a:focus {
+    outline: none;
+}
+a::-moz-focus-inner {
+    border: 0;
+}
+input, select, textarea {
+    outline: 0;
+}
+input[type="button"] {
+    outline: none;
+}
+input[type="button"]::-moz-focus-inner {
+    border: 0;
+}
+button {
+    outline: none;
+}
+button::-moz-focus-inner {
+    border: 0;
+}
+img {
+    outline: 0!important;
+    border: 0!important;
+}
+
+/* DEFAULTS */
+body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    line-height: 1.4em;
+    background-color: #fff;
+}
+.wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.inner-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    padding-bottom: 0px;
+}
+header, footer, section, article, nav {
+    display: block;
+}
+
+/* CLEARFIX */
+.cf:before, .cf:after {
+    content: " ";
+    display: table;
+}
+.cf:after {
+    clear: both;
+}
+.cf {
+    *zoom: 1;
+    /*For IE 6/7 only*/
+}
+
+/* Color */
+.yellow {
+   color:  #F6E400
+}
+.black {
+    color: #000;
+}
+.white {
+    color: #fff;
+}
+.gray {
+    color: #d1d1d1;
+}
+.yellow-bg {
+    background-color:  #F6E400
+}
+.black-bg {
+    background-color: #000;
+}
+.white-bg {
+    background-color: #fff;
+}
+.gray-bg {
+    background-color: #d1d1d1;
+}
+
+/* Font */
+.h1 {
+    font-family: serif;
+    font-size: 42px;
+    line-height: 46px;
+}
+.h2 {
+    font-family: serif;
+    font-size: 32px;
+    line-height: 34px;
+}
+.h3 {
+    font-family: sans-serif;
+    font-size: 13px;
+    line-height: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+}
+.t1 {
+    font-family: sans-serif;
+    font-size: 17px;
+    line-spacing: 26px;
+    line-height: 22px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    height: 40px;
+    padding: 0 40px;
+    color: #000;
+    background-color: #fff;
+    font-family: sans-serif;
+    font-size: 13px;
+    line-height: 36px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid rgba(0, 0, 0, 1);
+    /* -webkit-transition: all 0.2s ease-in-out 0s; */
+    /* transition: all 0.2s ease-in-out 0s; */
+}
+.btn.black {
+    color: #121212;
+}
+.btn:hover {
+    color: #fff;
+    background-color: #000;
+    /* border: 1px solid #fff; */
+    /* box-shadow: 0px 0px 2px 1px rgba(0, 2, 10, 0); */
+    /* -webkit-transition: all 0.3s ease-in-out 0s; */
+    /* transition: all 0.3s ease-in-out 0s; */
+    cursor: pointer;
+}
+
+/* Links */
+.a {
+    font-family: serif;
+    font-size: 12px;
+    /* letter-spacing: 1.5; */
+    text-transform: uppercase;
+    color: #121212;
+    text-decoration: none;
+    cursor: pointer;
+}
+.u {
+    position: relative;
+    text-decoration: none;
+    line-height: 40px;
+}
+.u:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: #000;
+    visibility: hidden;
+    -webkit-transform: scaleX(0);
+    transform: scaleX(0);
+    -webkit-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
+}
+.u:hover:before {
+    visibility: visible;
+    -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+}
+.a.video :before {
+    content: "";
+}
+.a.link span {
+    font-size: 14px;
+    margin-left: 5px;
+}
+.pipe {
+    display: inline-block;
+    vertical-align: middle;
+    width: 1px;
+    height: 40px;
+    margin: 0 23px;
+    background-color: #d1d1d1;
+}
+.re {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.data-screen {
+}
+.data-screen-value {
+}
+.connection-screen {
+}
+.control-screen {
+}
+
+.connection-screen, .data-screen, .control-screen {
+    /* visibility: hidden; */
+}
+
+.graph-screen {
+    position: relative;
+    height: 100px;
+    width: 100%;
+    overflow: hidden;
+}
+.graph {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-end;
+    position: absolute;
+    height: 100px;
+    left: 0px;
+    bottom: 0px;
+    padding: 0;
+}
+.graph-bar {
+    margin: 0;
+    padding: 0;
+    width: 1px;
+    height: 100px;
+}
+
+.gray-zone {
+    background-color: #636468;
+}
+.blue-zone {
+    background-color: #328AFF;
+}
+.green-zone {
+    background-color: #57C057;
+}
+.yellow-zone {
+    background-color: #F8C73A;
+}
+.orange-zone {
+    background-color: #FF663A;
+}
+.red-zone {
+    background-color: #FE340B;
+}

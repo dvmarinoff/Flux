@@ -1,0 +1,15 @@
+{
+  "name": "flux",
+  "version": "1.0.0",
+  "description": "",
+  "main": "flux.js",
+  "scripts": {
+    "dev": "parcel index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "regenerator-runtime": "^0.13.7"
+  }
+}

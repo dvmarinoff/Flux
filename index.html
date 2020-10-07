@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Flux</title>
+        <link href="flux.css" rel="stylesheet"/>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="flux-connection-screen" class="connection-screen">
+                <h1>Controllable</h1>
+                <button class="connect-btn">Connect</button>
+                <button class="disconnect-btn">Disconnect</button>
+                <button class="start-notifications-btn">Start</button>
+                <button class="stop-notifications-btn">Stop</button>
+            </div>
+            <div id="hrb-connection-screen" class="connection-screen">
+                <h1>hrb</h1>
+                <button class="connect-btn">Connect</button>
+                <button class="disconnect-btn">Disconnect</button>
+                <button class="start-notifications-btn">Start</button>
+                <button class="stop-notifications-btn">Stop</button>
+            </div>
+            <div class="data-screen">
+                <div id="power" class="data-screen-value">-- W</div>
+                <div id="cadence" class="data-screen-value">-- rpm</div>
+                <div id="speed" class="data-screen-value">-- km/h</div>
+                <div id="heart-rate" class="data-screen-value">-- bpm</div>
+            </div>
+            <div class="control-screen">
+                <input id="power-target-value" name="" type="text" value="100"/>
+                <button id="set-power-btn">set</button>
+            </div>
+            <div class="graph-screen" id="graph-hr">
+                Hr
+                <div class="graph cf">
+                </div>
+            </div>
+            <br/>
+            <div class="graph-screen" id="graph-power">
+                Power
+                <div  class="graph cf">
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script src="index.js"></script>
+
+    <!-- <div class="wrapper">
+         <button id="inc-btn"> + </button>
+         <input  id="value" name="value" type="text" value="0"/>
+         <button id="dec-btn"> - </button>
+         </div> -->
+    <!-- <script src="modern.js"></script> -->
+</html>
