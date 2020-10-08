@@ -1,4 +1,4 @@
-import { xf, DB } from './xf.js';
+import { xf, DB } from '../xf.js';
 
 function DataMock(args) {
     let hr = [

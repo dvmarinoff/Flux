@@ -9,23 +9,46 @@ function ConnectionScreen(args) {
     xf.sub('pointerup', e => device.stopNotifications(), dom.stopBtn);
 }
 
+function secondsToHms(elapsed, compact = false) {
+    let hour = Math.floor(elapsed / 3600);
+    let min  = Math.floor(elapsed % 3600 / 60);
+    let sec  = elapsed % 60;
+    let sD = (sec < 10)  ? `0${sec}`  : `${sec}`;
+    let mD = (min < 10)  ? `0${min}`  : `${min}`;
+    let hD = (hour < 10) ? `0${hour}` : `${hour}`;
+    return compact ? `${mD}:${sD}` : `${hD}:${mD}:${sD}`;
+}
+
 function DataScreen(args) {
     let dom = args.dom;
     xf.sub('db:hr', e => {
         let hr = e.detail.data.hr;
-        dom.heartRate.textContent = `${hr} bpm`;
+        dom.heartRate.textContent = `${hr}`;
     });
     xf.sub('db:pwr', e => {
         let pwr = e.detail.data.pwr;
-        dom.power.textContent = `${pwr} W`;
+        dom.power.textContent = `${pwr}`;
     });
     xf.sub('db:spd', e => {
         let spd = e.detail.data.spd;
-        dom.speed.textContent = `${spd} km/h`;
+        dom.speed.textContent = `${spd}`;
     });
     xf.sub('db:cad', e => {
         let cad = e.detail.data.cad;
-        dom.cadence.textContent = `${cad} rpm`;
+        dom.cadence.textContent = `${cad}`;
+    });
+    xf.sub('db:elapsed', e => {
+        let elapsed = e.detail.data.elapsed;
+        dom.time.textContent = secondsToHms(elapsed);
+    });
+    xf.sub('db:interval', e => {
+        let interval = e.detail.data.interval;
+        dom.interval.textContent = secondsToHms(interval, true);
+    });
+    xf.sub('db:targetPwr', e => {
+        console.log('db:targetPwr');
+        console.log(e.detail.data);
+        dom.targetPwr.textContent = e.detail.data.targetPwr;
     });
 }
 
@@ -107,15 +130,43 @@ function GraphHr(args) {
 function ControlScreen(args) {
     let device = args.device;
     let dom = args.dom;
-    let db = args.db;
-    let pwr = 100;
-        xf.sub('change', e => {
-            xf.dispatch('ui:target-pwr', e.target.value);
-            pwr = e.target.value;
-        }, dom.input);
-    // xf.sub('db:targetPwr', e => console.log(e.detail.data.targetPwr));
+    let watch = args.watch;
+    let targetPwr = 100;
+    let workPwr = 235;
+    let restPwr = 100;
 
-    xf.sub('pointerup', e => device.setTargetPower(pwr), dom.setBtn);
+    xf.sub('change', e => {
+        targetPwr = e.target.value;
+    }, dom.input);
+
+    xf.sub('change', e => {
+        workPwr = e.target.value;
+    }, dom.workPower);
+
+    xf.sub('change', e => {
+        restPwr = e.target.value;
+    }, dom.restPower);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:target-pwr', targetPwr);
+        device.setTargetPower(targetPwr);
+    }, dom.setBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:target-pwr', workPwr);
+        device.setTargetPower(workPwr);
+    }, dom.startWorkInterval);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:target-pwr', restPwr);
+        device.setTargetPower(restPwr);
+    }, dom.startRestInterval);
+
+    xf.sub('pointerup', e => watch.start(),  dom.watch.start);
+    xf.sub('pointerup', e => watch.pause(),  dom.watch.pause);
+    xf.sub('pointerup', e => watch.resume(), dom.watch.resume);
+    xf.sub('pointerup', e => watch.lap(),    dom.watch.lap);
+    xf.sub('pointerup', e => watch.stop(),   dom.watch.stop);
 }
 
 export {

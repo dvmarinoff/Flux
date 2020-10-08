@@ -1,4 +1,4 @@
-import { xf } from './xf.js';
+import { xf } from '../xf.js';
 
 var services =
 	  {fitnessMachine:

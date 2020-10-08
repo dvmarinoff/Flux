@@ -217,15 +217,121 @@ header, footer, section, article, nav {
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
 }
+.line {
+    display: inline-block;
+    vertical-align: middle;
+    width: 100%;
+    height: 1px;
+    margin: 10px 10px;
+    background-color: #d1d1d1;
 
-.data-screen {
 }
-.data-screen-value {
+
+.wrapper {
+    /* color: #fff; */
+    /* background-color: #28272D; */
+    width: 480px;
+}
+button {
+    padding: 3px 5px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #000;
+    /* background-color: #fff; */
+    border: 1px solid #fff;
+    border-radius: 2px;
+}
+button:hover {
+    border: 1px solid #000;
+}
+input {
+    width: 80px;
+    height: 20px;
+    text-align: center;
+    /* border: 1px solid #000; */
+}
+
+.devices {
+    width: 100%;
+    padding: 5px 10px 0 10px;
+    text-align: center;
 }
 .connection-screen {
+    float: left;
+    width: 50%;
 }
+.connection-screen h2 {
+    font-size: 12px;
+    font-family: sans-serif;
+    text-transform: uppercase;
+}
+
+.data-screen {
+    width: 100%;
+}
+.data-tile {
+    float: left;
+    width: 33.3333%;
+    padding: 10px;
+    text-align: center;
+}
+.data-tile h2 {
+    font-size: 18px;
+    font-family: sans-serif;
+    text-transform: uppercase;
+}
+.tile-value {
+    font-size: 18px;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+}
+.data-tile-small {
+    float: left;
+    width: 50%;
+    padding: 10px;
+    text-align: center;
+}
+.data-tile-small h2 {
+    font-size: 12px;
+    font-family: sans-serif;
+    text-transform: uppercase;
+}
+.data-screen-value {
+    font-size: 30px;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.data-screen-value-small {
+    font-size: 20px;
+}
+
 .control-screen {
 }
+.watch {
+    text-align: center;
+}
+.control-point {
+}
+.control-point .tile {
+    float: left;
+    width: 33.33%;
+}
+.control-point .tile input {
+    display: block;
+    margin: 3px auto;
+    height: 25px;
+}
+.control-point .tile button {
+    display: block;
+    margin: 3px auto;
+    width: 80px;
+    height: 25px;
+}
+
 
 .connection-screen, .data-screen, .control-screen {
     /* visibility: hidden; */
@@ -233,7 +339,7 @@ header, footer, section, article, nav {
 
 .graph-screen {
     position: relative;
-    height: 100px;
+    height: 120px;
     width: 100%;
     overflow: hidden;
 }
@@ -249,11 +355,25 @@ header, footer, section, article, nav {
     bottom: 0px;
     padding: 0;
 }
+.ftp-line {
+    position: absolute;
+    bottom: 52%;
+    width: 100%;
+    height: 1px;
+    background-color: #eee;
+}
 .graph-bar {
     margin: 0;
     padding: 0;
     width: 1px;
     height: 100px;
+}
+.graph-screen h2 {
+    text-align: center;
+    font-size: 10px;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 .gray-zone {
