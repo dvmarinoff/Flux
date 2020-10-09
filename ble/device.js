@@ -21,6 +21,7 @@ let instCadence    = dataview => (dataview.getUint16(4, true) / 2);
 let instPower      = dataview => dataview.getUint16(6, true);
 let requestControl = _        => new Uint8Array([0x00]);
 let setTargetPower = value    => new Uint8Array([0x05,0xe6]);
+let hex            = n        => '0x' + parseInt(n).toString(16).toUpperCase();
 
 function indoorBikeDataFlags(dataview) {
     let f = dataview.getUint16(0, true);
@@ -48,17 +49,22 @@ class Device {
         this.services = {};
         this.characteristics = {};
         this.control = false;
+        this.connected = false;
         this.filter = args.filter; // service uuid -> services.fitnessMachine.uuid
     }
     async connect() {
         let self = this;
         self.device = await navigator.bluetooth.requestDevice({ filters: [{ services: [self.filter] }] });
         self.server = await self.device.gatt.connect();
+        this.connected = true;
+        xf.dispatch('device:connection', true);
         console.log(`Connected ${self.device.name}.`);
     }
     async disconnect() {
         let self = this;
         self.device.gatt.disconnect();
+        this.connected = false;
+        xf.dispatch('device:connection', false);
         console.log(`Disconnected ${self.device.name}.`);
     }
     async getService(service) {
@@ -148,7 +154,7 @@ class Hrb {
     }
 }
 
-class Flux {
+class Controllable {
     constructor(args) {
         this.device = new Device({filter: services.fitnessMachine.uuid});
     }
@@ -183,8 +189,8 @@ class Flux {
     }
     async setTargetPower(value) {
         let self = this;
-        let b = new Uint8Array([0x05, new Int16Array([value]), 0x00]);
-        console.log(`set target power: ${value}`);
+        let b = new Uint8Array([0x05, hex(value), 0x00]);
+        console.log(`set target power: ${value} ${hex(value)}`);
         let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, b.buffer);
 
     }
@@ -224,4 +230,4 @@ class Flux {
     }
 }
 
-export { Device, Hrb, Flux };
+export { Device, Hrb, Controllable };

@@ -108,59 +108,112 @@ header, footer, section, article, nav {
     background-color: #d1d1d1;
 }
 
+/* Theme */
+#theme.dark {
+    color: #fff;
+    /* background-color: #000; */
+    background-color: #28272D;
+}
+#theme.dark .btn {
+    /* background-color: #fff; */
+}
+#theme.dark .connect {
+    color: #fff;
+    /* background-color: #000; */
+    background-color: #28272D;
+    border: 0px;
+}
+
 /* Font */
 .h1 {
-    font-family: serif;
-    font-size: 42px;
-    line-height: 46px;
+    font-size: 24px;
+    font-family: sans-serif;
+    text-transform: uppercase;
 }
 .h2 {
-    font-family: serif;
-    font-size: 32px;
-    line-height: 34px;
+    font-size: 18px;
+    font-family: sans-serif;
+    text-transform: uppercase;
 }
 .h3 {
+    font-size: 12px;
     font-family: sans-serif;
-    font-size: 13px;
-    line-height: 30px;
     text-transform: uppercase;
-    letter-spacing: 1.3px;
+}
+.h4 {
+    font-size: 10px;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 .t1 {
+    font-size: 34px;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.t2 {
+}
+.t3 {
     font-family: sans-serif;
     font-size: 17px;
     line-spacing: 26px;
     line-height: 22px;
 }
+.t5 {
+    font-family: sans-serif;
+    font-size: 10px;
+    line-height: 18px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
 
 /* Buttons */
-.btn {
+
+.connect {
     display: inline-block;
-    height: 40px;
-    padding: 0 40px;
+    position: relative;
+    height: 30px;
+    padding: 0 15px 0 15px;
     color: #000;
     background-color: #fff;
     font-family: sans-serif;
-    font-size: 13px;
-    line-height: 36px;
-    letter-spacing: 1.5px;
+    font-size: 11px;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    border: 1px solid rgba(0, 0, 0, 1);
-    /* -webkit-transition: all 0.2s ease-in-out 0s; */
-    /* transition: all 0.2s ease-in-out 0s; */
+    border-radius: 15px;
+    border: 1px solid #fff;
+    -webkit-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
 }
-.btn.black {
-    color: #121212;
-}
-.btn:hover {
-    color: #fff;
-    background-color: #000;
-    /* border: 1px solid #fff; */
-    /* box-shadow: 0px 0px 2px 1px rgba(0, 2, 10, 0); */
-    /* -webkit-transition: all 0.3s ease-in-out 0s; */
-    /* transition: all 0.3s ease-in-out 0s; */
+.connect:hover {
+    /* color: #fff; */
+    /* background-color: #000; */
+    background-color: #EFEFEF;
+    box-shadow: 0px 0px 2px 1px rgba(0, 2, 10, 0);
     cursor: pointer;
 }
+.connect .text {
+    display: inline-block;
+    vertical-align: middle;
+}
+.connect .switch {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0px 10px 0px 0px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+}
+.connect .on {
+    background-color: #40FF70;
+}
+.connect .off {
+    background-color: #FF495F;
+}
+
+
+
 
 /* Links */
 .a {
@@ -196,13 +249,6 @@ header, footer, section, article, nav {
     -webkit-transform: scaleX(1);
     transform: scaleX(1);
 }
-.a.video :before {
-    content: "";
-}
-.a.link span {
-    font-size: 14px;
-    margin-left: 5px;
-}
 .pipe {
     display: inline-block;
     vertical-align: middle;
@@ -211,61 +257,32 @@ header, footer, section, article, nav {
     margin: 0 23px;
     background-color: #d1d1d1;
 }
-.re {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-}
 .line {
-    display: inline-block;
+    display: block;
     vertical-align: middle;
     width: 100%;
     height: 1px;
-    margin: 10px 10px;
+    margin: 0 auto;
     background-color: #d1d1d1;
-
 }
 
-.wrapper {
-    /* color: #fff; */
-    /* background-color: #28272D; */
-    width: 480px;
-}
-button {
-    padding: 3px 5px;
-    font-size: 10px;
-    letter-spacing: 1px;
-    color: #000;
-    /* background-color: #fff; */
-    border: 1px solid #fff;
-    border-radius: 2px;
-}
-button:hover {
-    border: 1px solid #000;
-}
-input {
-    width: 80px;
-    height: 20px;
-    text-align: center;
-    /* border: 1px solid #000; */
-}
 
+
+/* Connection Screen */
 .devices {
     width: 100%;
-    padding: 5px 10px 0 10px;
+    padding: 5px 10px 5px 10px;
     text-align: center;
 }
 .connection-screen {
     float: left;
     width: 50%;
 }
-.connection-screen h2 {
-    font-size: 12px;
-    font-family: sans-serif;
-    text-transform: uppercase;
-}
 
+
+
+
+/* Data Screen */
 .data-screen {
     width: 100%;
 }
@@ -275,14 +292,7 @@ input {
     padding: 10px;
     text-align: center;
 }
-.data-tile h2 {
-    font-size: 18px;
-    font-family: sans-serif;
-    text-transform: uppercase;
-}
 .tile-value {
-    font-size: 18px;
-    font-family: sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -299,44 +309,82 @@ input {
     font-family: sans-serif;
     text-transform: uppercase;
 }
-.data-screen-value {
-    font-size: 30px;
-    font-family: sans-serif;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-.data-screen-value-small {
-    font-size: 20px;
-}
 
+
+
+
+/* Control Screen */
 .control-screen {
+    padding: 10px 0;
+    text-align: center;
 }
 .watch {
-    text-align: center;
+    margin: 10px 0 14px;
 }
 .control-point {
 }
 .control-point .tile {
-    float: left;
-    width: 33.33%;
+    display: inline-block;
+    vertical-align: middle;
+}
+.watch .btn {
+    margin: 0px 2px;
 }
 .control-point .tile input {
     display: block;
-    margin: 3px auto;
-    height: 25px;
+    margin: 5px 2px;
 }
-.control-point .tile button {
+.control-point .tile .btn {
     display: block;
     margin: 3px auto;
-    width: 80px;
-    height: 25px;
+    width: 105px;
+}
+#dark-mode {
+    display: inline-block;
+    margin: 3px auto;
+    width: 105px;
+}
+
+.btn {
+    display: inline-block;
+    height: 30px;
+    padding: 0 15px;
+    font-family: sans-serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    /* line-height: 30px; */
+    /* text-transform: uppercase; */
+
+    color: #000;
+    /* background-color: #fff; */
+
+    background-color: #EFEFEF;
+    border: 0px solid #d1d1d1;
+
+    border-radius: 3px;
+    -webkit-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
+}
+.btn:hover {
+    color: #fff;
+    background-color: #000;
+    /* background-color: #fff; */
+    /* border: 1px solid #fff; */
+    cursor: pointer;
+}
+
+.input {
+    width: 105px;
+    height: 30px;
+    text-align: center;
+    border: 1px solid #d1d1d1;
 }
 
 
-.connection-screen, .data-screen, .control-screen {
-    /* visibility: hidden; */
-}
 
+
+
+/* Graph */
 .graph-screen {
     position: relative;
     height: 120px;
@@ -355,6 +403,9 @@ input {
     bottom: 0px;
     padding: 0;
 }
+.graph-heading {
+    text-align: center;
+}
 .ftp-line {
     position: absolute;
     bottom: 52%;
@@ -362,18 +413,17 @@ input {
     height: 1px;
     background-color: #eee;
 }
+.ftp {
+    position: absolute;
+    top: -16px;
+    right: 10px;
+    color: #d1d1d1;
+}
 .graph-bar {
     margin: 0;
     padding: 0;
     width: 1px;
     height: 100px;
-}
-.graph-screen h2 {
-    text-align: center;
-    font-size: 10px;
-    font-family: sans-serif;
-    text-transform: uppercase;
-    font-weight: bold;
 }
 
 .gray-zone {
@@ -393,4 +443,105 @@ input {
 }
 .red-zone {
     background-color: #FE340B;
+}
+
+@media all and (min-width: 1800px) {
+}
+@media all and (min-width: 1600px) {
+}
+@media all and (max-width: 1250px) {
+}
+@media all and (max-width: 980px) {
+}
+@media all and (max-width: 768px) {
+}
+@media all and (max-width: 600px) {
+}
+@media all and (max-width: 414px) {
+    /* IPHONE X */
+    .t1 {
+        font-size: 32px;
+    }
+    .h2 {
+        font-size: 10px;
+    }
+    .h3 {
+        font-size: 10px;
+    }
+    .t2 {
+        font-size: 20px;
+    }
+    .watch {
+        margin: 10px 0 14px;
+    }
+}
+@media all and (max-width: 360px) {
+    /* Galaxy S (Older)*/
+}
+@media all and (max-width: 350px) {
+    /* IPhone 5 */
+    /* Low-end Android */
+    .btn {
+        padding: 0 12px;
+    }
+    .connect {
+        padding: 0 10px 0 10px;
+    }
+    .input {
+        width: 95px;
+    }
+    .control-point .tile .btn {
+        width: 95px;
+    }
+    #dark-mode {
+        width: 95px;
+    }
+}
+
+/* Mobile Device Specific Queries */
+
+/* Portrait and Landscape Tablets */
+
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (-webkit-min-device-pixel-ratio: 1) {
+    /* iPad 1, 2, Mini, Air */
+}
+
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    /* iPad Pro 3, 4, Pro 9.7 inch */
+}
+
+@media only screen
+and (min-device-width: 834px)
+and (max-device-width: 1112px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    /* iPad Pro 10.5 inch */
+}
+@media only screen
+and (min-device-width: 1024px)
+and (max-device-width: 1366px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    /* iPad Pro 12.9 inch */
+}
+
+/* Portrait and Landscape Phones */
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 869px) {
+}
+
+/* Landscape Phones */
+@media only screen
+and (min-device-width: 360px)
+and (max-device-width: 869px)
+and (orientation: landscape) {
+    /* iPhone 5, 6, 6S, 7, 8 */
+    /* iPhone 6+, 7+, 8+ */
+    /* iPhone X */
+    /* Galaxy S6-10 */
 }

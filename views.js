@@ -4,9 +4,22 @@ function ConnectionScreen(args) {
     let device = args.device;
     let dom = args.dom;
     xf.sub('pointerup', e => device.connect(), dom.connectBtn);
-    xf.sub('pointerup', e => device.disconnect(), dom.disconnectBtn);
-    xf.sub('pointerup', e => device.startNotifications(), dom.startBtn);
-    xf.sub('pointerup', e => device.stopNotifications(), dom.stopBtn);
+    xf.sub('device:connection', e => {
+        let connected = device.device.connected;
+        console.log(device.device.connected);
+        if(connected) {
+            console.log('connected screen');
+            dom.switch.classList.remove('off');
+            dom.switch.classList.add('on');
+        } else {
+            console.log('disconnected screen');
+            dom.switch.classList.remove('on');
+            dom.switch.classList.add('off');
+        }
+    });
+    // xf.sub('pointerup', e => device.disconnect(), dom.disconnectBtn);
+    // xf.sub('pointerup', e => device.startNotifications(), dom.startBtn);
+    // xf.sub('pointerup', e => device.stopNotifications(), dom.stopBtn);
 }
 
 function secondsToHms(elapsed, compact = false) {
@@ -46,8 +59,6 @@ function DataScreen(args) {
         dom.interval.textContent = secondsToHms(interval, true);
     });
     xf.sub('db:targetPwr', e => {
-        console.log('db:targetPwr');
-        console.log(e.detail.data);
         dom.targetPwr.textContent = e.detail.data.targetPwr;
     });
 }
@@ -137,7 +148,7 @@ function ControlScreen(args) {
 
     xf.sub('change', e => {
         targetPwr = e.target.value;
-    }, dom.input);
+    }, dom.targetPower);
 
     xf.sub('change', e => {
         workPwr = e.target.value;
@@ -150,7 +161,7 @@ function ControlScreen(args) {
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', targetPwr);
         device.setTargetPower(targetPwr);
-    }, dom.setBtn);
+    }, dom.setTargetPower);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', workPwr);
@@ -162,6 +173,19 @@ function ControlScreen(args) {
         device.setTargetPower(restPwr);
     }, dom.startRestInterval);
 
+    xf.sub('db:darkMode', e => {
+        let mode = e.detail.data.darkMode;
+        console.log(mode);
+        if(mode) {
+            dom.theme.classList.remove('light');
+            dom.theme.classList.add('dark');
+        } else {
+            dom.theme.classList.remove('dark');
+            dom.theme.classList.add('light');
+        }
+    });
+
+    xf.sub('pointerup', e => xf.dispatch('ui:darkMode'), dom.darkMode);
     xf.sub('pointerup', e => watch.start(),  dom.watch.start);
     xf.sub('pointerup', e => watch.pause(),  dom.watch.pause);
     xf.sub('pointerup', e => watch.resume(), dom.watch.resume);

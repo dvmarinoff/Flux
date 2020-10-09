@@ -1,5 +1,5 @@
 import 'regenerator-runtime/runtime';
-import { Device, Hrb, Flux } from './ble/device.js';
+import { Device, Hrb, Controllable } from './ble/device.js';
 import { StopWatch } from './workout.js';
 import { ConnectionScreen, DataScreen, GraphHr, GraphPower, ControlScreen } from './views.js';
 import { DataMock } from './test/mock.js';
@@ -13,36 +13,37 @@ let db = DB({
     pwr: [],
     spd: [],
     cad: [],
-    targetPwr: 140,
+    targetPwr: 100,
     elapsed: 0,
-    interval: 0
+    interval: 0,
+    darkMode: false,
 });
 
 xf.reg('device:hr',  e => db.hr  = e.detail.data);
 xf.reg('device:pwr', e => db.pwr = e.detail.data);
 xf.reg('device:spd', e => db.spd = e.detail.data);
 xf.reg('device:cad', e => db.cad = e.detail.data);
-xf.reg('ui:target-pwr',   e => {
-    console.log('ui:target-pwr');
-    console.log(e.detail.data);
-    db.targetPwr = e.detail.data;
-});
+xf.reg('ui:target-pwr', e => db.targetPwr = e.detail.data);
+xf.reg('ui:darkMode',   e => db.darkMode ? db.darkMode = false : db.darkMode = true);
 xf.reg('workout:elapsed',  e => db.elapsed   = e.detail.data);
 xf.reg('workout:interval', e => db.interval  = e.detail.data);
 
 
 let dom = {
     hrbConnectionScreen: {
-        connectBtn:    document.querySelector('#hrb-connection-screen .connect-btn'),
-        disconnectBtn: document.querySelector('#hrb-connection-screen .disconnect-btn'),
-        startBtn:      document.querySelector('#hrb-connection-screen .start-notifications-btn'),
-        stopBtn:       document.querySelector('#hrb-connection-screen .stop-notifications-btn')
+        connectBtn:    document.querySelector('#hrb-connection-screen .connect'),
+        connectSwitch: document.querySelector('#hrb-connection-screen .connect .switch'),
+        disconnectBtn: document.querySelector('#hrb-connection-screen .disconnect'),
+        startBtn:      document.querySelector('#hrb-connection-screen .start-notifications'),
+        stopBtn:       document.querySelector('#hrb-connection-screen .stop-notifications'),
+        switch:        document.querySelector('#hrb-connection-screen .switch'),
     },
     fluxConnectionScreen: {
-        connectBtn:    document.querySelector('#flux-connection-screen .connect-btn'),
-        disconnectBtn: document.querySelector('#flux-connection-screen .disconnect-btn'),
-        startBtn:      document.querySelector('#flux-connection-screen .start-notifications-btn'),
-        stopBtn:       document.querySelector('#flux-connection-screen .stop-notifications-btn')
+        connectBtn:    document.querySelector('#flux-connection-screen .connect'),
+        disconnectBtn: document.querySelector('#flux-connection-screen .disconnect'),
+        startBtn:      document.querySelector('#flux-connection-screen .start-notifications'),
+        stopBtn:       document.querySelector('#flux-connection-screen .stop-notifications'),
+        switch:        document.querySelector('#flux-connection-screen .switch'),
     },
     datascreen: {
         time:      document.querySelector('#time'),
@@ -55,18 +56,20 @@ let dom = {
     },
     controlscreen: {
         watch: {
-            start:  document.querySelector('#watch-start-btn'),
-            pause:  document.querySelector('#watch-pause-btn'),
-            resume: document.querySelector('#watch-resume-btn'),
-            lap:    document.querySelector('#watch-lap-btn'),
-            stop:   document.querySelector('#watch-stop-btn'),
+            start:  document.querySelector('#watch-start'),
+            pause:  document.querySelector('#watch-pause'),
+            resume: document.querySelector('#watch-resume'),
+            lap:    document.querySelector('#watch-lap'),
+            stop:   document.querySelector('#watch-stop'),
         },
-        input:  document.querySelector('#power-target-value'),
-        setBtn: document.querySelector('#set-power-btn'),
-        workPower: document.querySelector('#work-power-value'),
-        restPower: document.querySelector('#rest-power-value'),
-        startWorkInterval: document.querySelector('#start-work-interval-btn'),
-        startRestInterval: document.querySelector('#start-rest-interval-btn'),
+        darkMode:    document.querySelector('#dark-mode'),
+        theme:     document.querySelector('#theme'),
+        targetPower: document.querySelector('#target-power-value'),
+        workPower:   document.querySelector('#work-power-value'),
+        restPower:   document.querySelector('#rest-power-value'),
+        setTargetPower:    document.querySelector('#set-target-power'),
+        startWorkInterval: document.querySelector('#start-work-interval'),
+        startRestInterval: document.querySelector('#start-rest-interval'),
     },
     graphHr: {
         cont:  document.querySelector('#graph-hr'),
@@ -79,12 +82,12 @@ let dom = {
 };
 
 function start() {
-    let hrb = new Hrb();
-    let flux = new Flux();
+    let hrb   = new Hrb();
+    let flux  = new Controllable();
     let watch = new StopWatch();
 
-    ConnectionScreen({device: hrb, dom: dom.hrbConnectionScreen});
-    ConnectionScreen({device: flux, dom: dom.fluxConnectionScreen});
+    ConnectionScreen({device: hrb, name: 'hrb',dom: dom.hrbConnectionScreen});
+    ConnectionScreen({device: flux, name: 'controllable', dom: dom.fluxConnectionScreen});
     DataScreen({dom: dom.datascreen});
     // GraphHr({dom: dom.graphHr});
     GraphPower({dom: dom.graphPower});
