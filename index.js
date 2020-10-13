@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime';
 import { Device, Hrb, Controllable } from './ble/device.js';
 import { StopWatch } from './workout.js';
 import { ConnectionScreen, DataScreen, GraphHr, GraphPower, ControlScreen } from './views.js';
