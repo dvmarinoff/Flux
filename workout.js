@@ -7,9 +7,61 @@ let data =
         {repeat: 1, steps: [{duration: 3, target: 100}]},
     ];
 
+let ws = `
+<workout_file>
+    <author>Marinov</author>
+    <name>4x10 min Sweet Spot</name>
+    <description>A Classic sweet spot workout.</description>
+    <sportType>bike</sportType>
+    <tags>
+        <tag name="sweet"/>
+        <tag name="spot"/>
+    </tags>
+    <workout>
+        <Warmup Duration="300" PowerLow="0.25" PowerHigh="0.75"/>
+        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.92" OffPower="0.39"/>
+        <SteadyState Duration="180" Power="0.39"/>
+        <IntervalsT Repeat="4" OnDuration="600" OffDuration="300" OnPower="0.92" OffPower="0.39"/>
+        <Cooldown Duration="600" PowerLow="0.47" PowerHigh="0.25"/>
+    </workout>
+</workout_file>
+`;
 
+function handleTag(tag) {
+    console.log(`${tag.tagName} ${tag.tagName == 'Warmup'}`);
+    switch(tag.tagName) {
+    case 'Warmup': return {duration: parseInt(tag.getAttribute('Duration'))};
+        break;
+    case 'IntervalsT': return {duration:
+                        (parseInt(tag.getAttribute('OnDuration')) +
+                         parseInt(tag.getAttribute('OffDuration'))) *
+                        parseInt(tag.getAttribute('Repeat'))
+                       };
+        break;
+    case 'SteadyState': return {duration: parseInt(tag.getAttribute('Duration'))};
+        break;
+    case 'Cooldown': return {duration: parseInt(tag.getAttribute('Duration'))};
+        break;
+    }
+}
 
+function parseZwo(zwo) {
+    let parser = new DOMParser();
+    let doc = parser.parseFromString(zwo, 'text/xml');
 
+    let workout = doc.querySelector('workout');
+    let steps = Array.from(workout.children);
+    let w = [];
+
+    console.log(doc);
+    console.log(workout);
+    console.log(steps.length);
+
+    steps.forEach(step => {
+        w.push(handleTag(step));
+    });
+    console.log(w);
+}
 
 class StopWatch {
     constructor(args) {
