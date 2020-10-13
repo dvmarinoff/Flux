@@ -379,7 +379,25 @@ header, footer, section, article, nav {
     text-align: center;
     border: 1px solid #d1d1d1;
 }
+.laps {
+    margin: 20px auto;
+}
+.laps .heading {
+    text-align: center;
+}
+.laps .list {
+}
 
+.laps .heading div {
+    display: inline-block;
+    width: 100px;
+    text-align: left;
+}
+.laps .list div {
+    display: inline-block;
+    width: 100px;
+    text-align: left;
+}
 
 
 
@@ -544,4 +562,13 @@ and (orientation: landscape) {
     /* iPhone 6+, 7+, 8+ */
     /* iPhone X */
     /* Galaxy S6-10 */
+}
+.connection-screen {
+    /* visibility: hidden; */
+}
+.data-screen {
+    /* visibility: hidden; */
+}
+.laps {
+    visibility: hidden;
 }

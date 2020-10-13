@@ -63,13 +63,14 @@ let dom = {
             stop:   document.querySelector('#watch-stop'),
         },
         darkMode:    document.querySelector('#dark-mode'),
-        theme:     document.querySelector('#theme'),
+        theme:       document.querySelector('#theme'),
         targetPower: document.querySelector('#target-power-value'),
         workPower:   document.querySelector('#work-power-value'),
         restPower:   document.querySelector('#rest-power-value'),
         setTargetPower:    document.querySelector('#set-target-power'),
         startWorkInterval: document.querySelector('#start-work-interval'),
         startRestInterval: document.querySelector('#start-rest-interval'),
+        laps: document.querySelector('#laps'),
     },
     graphHr: {
         cont:  document.querySelector('#graph-hr'),
@@ -81,9 +82,65 @@ let dom = {
     }
 };
 
+let ws = `
+<workout_file>
+    <author>Marinov</author>
+    <name>4x10 min Sweet Spot</name>
+    <description>A Classic sweet spot workout.</description>
+    <sportType>bike</sportType>
+    <tags>
+        <tag name="sweet"/>
+        <tag name="spot"/>
+    </tags>
+    <workout>
+        <Warmup Duration="300" PowerLow="0.25" PowerHigh="0.75"/>
+        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.92" OffPower="0.39"/>
+        <SteadyState Duration="180" Power="0.39"/>
+        <IntervalsT Repeat="4" OnDuration="600" OffDuration="300" OnPower="0.92" OffPower="0.39"/>
+        <Cooldown Duration="600" PowerLow="0.47" PowerHigh="0.25"/>
+    </workout>
+</workout_file>
+`;
+
+function handleTag(tag) {
+    console.log(`${tag.tagName} ${tag.tagName == 'Warmup'}`);
+    switch(tag.tagName) {
+    case 'Warmup': return {duration: parseInt(tag.getAttribute('Duration'))};
+        break;
+    case 'IntervalsT': return {duration:
+                        (parseInt(tag.getAttribute('OnDuration')) +
+                         parseInt(tag.getAttribute('OffDuration'))) *
+                        parseInt(tag.getAttribute('Repeat'))
+                       };
+        break;
+    case 'SteadyState': return {duration: parseInt(tag.getAttribute('Duration'))};
+        break;
+    case 'Cooldown': return {duration: parseInt(tag.getAttribute('Duration'))};
+        break;
+    }
+}
+
+function parseZwo(zwo) {
+    let parser = new DOMParser();
+    let doc = parser.parseFromString(zwo, 'text/xml');
+
+    let workout = doc.querySelector('workout');
+    let steps = Array.from(workout.children);
+    let w = [];
+
+    console.log(doc);
+    console.log(workout);
+    console.log(steps.length);
+
+    steps.forEach(step => {
+        w.push(handleTag(step));
+    });
+    console.log(w);
+}
+
 function start() {
-    let hrb   = new Hrb();
-    let flux  = new Controllable();
+    let hrb   = new Hrb({name: 'hrb'});
+    let flux  = new Controllable({name: 'controllable'});
     let watch = new StopWatch();
 
     ConnectionScreen({device: hrb, name: 'hrb',dom: dom.hrbConnectionScreen});
@@ -97,6 +154,8 @@ function start() {
                    watch: watch});
 
     // DataMock({hr: true, pwr: true});
+    parseZwo(ws);
+
 };
 
 start();

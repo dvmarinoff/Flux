@@ -7,6 +7,10 @@ let data =
         {repeat: 1, steps: [{duration: 3, target: 100}]},
     ];
 
+
+
+
+
 class StopWatch {
     constructor(args) {
         this.interval = undefined;

@@ -48,6 +48,7 @@ class Device {
         this.server = {};
         this.services = {};
         this.characteristics = {};
+        this.name = args.name || 'device';
         this.control = false;
         this.connected = false;
         this.filter = args.filter; // service uuid -> services.fitnessMachine.uuid
@@ -56,15 +57,21 @@ class Device {
         let self = this;
         self.device = await navigator.bluetooth.requestDevice({ filters: [{ services: [self.filter] }] });
         self.server = await self.device.gatt.connect();
-        this.connected = true;
-        xf.dispatch('device:connection', true);
+        self.connected = true;
+        xf.dispatch(`${self.name}:connection`, true);
         console.log(`Connected ${self.device.name}.`);
+        self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
     }
     async disconnect() {
         let self = this;
         self.device.gatt.disconnect();
-        this.connected = false;
-        xf.dispatch('device:connection', false);
+        self.onDisconnect();
+    }
+    onDisconnect() {
+        let self = this;
+        self.connected = false;
+        xf.dispatch(`${self.name}:connection`, false);
+        self.device.removeEventListener('gattserverdisconnected', e => e);
         console.log(`Disconnected ${self.device.name}.`);
     }
     async getService(service) {
@@ -109,11 +116,11 @@ class Device {
         await self.getCharacteristic(service, characteristic);
         await self.startNotifications(characteristic, handler);
     }
-    async writeCharacteristic(characteristic, value) {
+    async writeCharacteristic(characteristic, value, response = false) {
         let self = this;
         let res = undefined;
         try{
-            res = await self.characteristics[characteristic].writeValueWithResponse(value);
+            res = await self.characteristics[characteristic].writeValue(value);
         } catch(e) {
             console.log(`ERROR: device.writeCharacteristic: ${e}`);
         }
@@ -149,7 +156,6 @@ class Hrb {
         let data = {
             flags: dataview.getUint8(0, true),
             hr:    dataview.getUint8(1, true)};
-        // console.log(`${data.hr} bpm`);
         xf.dispatch('device:hr', data.hr);
     }
 }
@@ -188,10 +194,36 @@ class Controllable {
         return res;
     }
     async setTargetPower(value) {
-        let self = this;
-        let b = new Uint8Array([0x05, hex(value), 0x00]);
+        let self   = this;
+        let OpCode = 0x05;
+        let buffer = new ArrayBuffer(3);
+        let view   = new DataView(buffer);
+        view.setUint8(0, 0x05, true);
+        view.setInt16(1, hex(value), true);
+        // view.setUint8(3, 0x00, true);
         console.log(`set target power: ${value} ${hex(value)}`);
-        let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, b.buffer);
+        let res =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+
+    }
+    async setSimulationParameters(args) {
+        let self  = this;
+        let OpCode = 0x11;
+        let wind  = args.wind  || 0; // mps  - 0.001
+        let grade = args.grade || 0; // %    - 0.01
+        let crr   = args.crr   || 0; // null - 0.001
+        let drag  = args.drag  || 0; // kg/m - 0.01
+
+        let buffer = new ArrayBuffer(6);
+        let view   = new DataView(buffer);
+        view.setInt16(0, hex(wind),  true);
+        view.setInt16(2, hex(grade), true);
+        view.setUint8(4, hex(crr),   true);
+        view.setUint8(5, hex(drag),  true);
+        console.log(`set simulation: ${wind} ${grade} ${crr} ${drag}`);
+        console.log(buffer);
+        let res =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
 
     }
     onIndoorBikeData (e) {

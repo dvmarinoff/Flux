@@ -3,10 +3,17 @@ import { xf } from './xf.js';
 function ConnectionScreen(args) {
     let device = args.device;
     let dom = args.dom;
-    xf.sub('pointerup', e => device.connect(), dom.connectBtn);
+    xf.sub('pointerup', e => {
+        console.log(`pointerup: ${device.device.connected}`);
+        if(device.device.connected) {
+            device.disconnect();
+        } else {
+            device.connect();
+        }
+    }, dom.connectBtn);
     xf.sub('device:connection', e => {
         let connected = device.device.connected;
-        console.log(device.device.connected);
+        // console.log(device.device.connected);
         if(connected) {
             console.log('connected screen');
             dom.switch.classList.remove('off');
@@ -166,11 +173,13 @@ function ControlScreen(args) {
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', workPwr);
         device.setTargetPower(workPwr);
+        watch.lap();
     }, dom.startWorkInterval);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', restPwr);
         device.setTargetPower(restPwr);
+        watch.lap();
     }, dom.startRestInterval);
 
     xf.sub('db:darkMode', e => {
@@ -191,6 +200,15 @@ function ControlScreen(args) {
     xf.sub('pointerup', e => watch.resume(), dom.watch.resume);
     xf.sub('pointerup', e => watch.lap(),    dom.watch.lap);
     xf.sub('pointerup', e => watch.stop(),   dom.watch.stop);
+
+    xf.sub('watch:interval', e => {
+        let lap = watch.laps[watch.laps.length - 1];
+        let time = lap.lapTime;
+        let start = lap.start;
+        let end = lap.end;
+        dom.laps.insertAdjacentHTML('beforeend',
+                                    `<div class="lap"><div>${time}</div><div>${start}</div><div>${end}</div>></div>`);
+    });
 }
 
 export {
