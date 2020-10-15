@@ -1,32 +1,33 @@
 import { xf } from './xf.js';
 
-function ConnectionScreen(args) {
-    let device = args.device;
+function ControllableConnectionView(args) {
     let dom = args.dom;
-    xf.sub('pointerup', e => {
-        console.log(`pointerup: ${device.device.connected}`);
-        if(device.device.connected) {
-            device.disconnect();
-        } else {
-            device.connect();
-        }
-    }, dom.connectBtn);
-    xf.sub('device:connection', e => {
-        let connected = device.device.connected;
-        // console.log(device.device.connected);
-        if(connected) {
-            console.log('connected screen');
-            dom.switch.classList.remove('off');
-            dom.switch.classList.add('on');
-        } else {
-            console.log('disconnected screen');
-            dom.switch.classList.remove('on');
-            dom.switch.classList.add('off');
-        }
+    xf.sub('pointerup', e => xf.dispatch('ui:controllableSwitch'), dom.switchBtn);
+
+    xf.sub('controllable:connected', e => {
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.add('on');
     });
-    // xf.sub('pointerup', e => device.disconnect(), dom.disconnectBtn);
-    // xf.sub('pointerup', e => device.startNotifications(), dom.startBtn);
-    // xf.sub('pointerup', e => device.stopNotifications(), dom.stopBtn);
+
+    xf.sub('controllable:disconnected', e => {
+        dom.indicator.classList.remove('on');
+        dom.indicator.classList.add('off');
+    });
+}
+
+function HrbConnectionView(args) {
+    let dom = args.dom;
+    xf.sub('pointerup', e => xf.dispatch('ui:hrbSwitch'), dom.switchBtn);
+
+    xf.sub('hrb:connected', e => {
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.add('on');
+    });
+
+    xf.sub('hrb:disconnected', e => {
+        dom.indicator.classList.remove('on');
+        dom.indicator.classList.add('off');
+    });
 }
 
 function secondsToHms(elapsed, compact = false) {
@@ -145,42 +146,35 @@ function GraphHr(args) {
     });
 }
 
-function ControlScreen(args) {
-    let device = args.device;
-    let dom = args.dom;
-    let watch = args.watch;
+function ControlView(args) {
+    let dom       = args.dom;
     let targetPwr = 100;
-    let workPwr = 235;
-    let restPwr = 100;
+    let workPwr   = 235;
+    let restPwr   = 100;
 
-    xf.sub('change', e => {
-        targetPwr = e.target.value;
-    }, dom.targetPower);
+    xf.sub('change', e => { targetPwr = e.target.value; }, dom.targetPower);
+    xf.sub('change', e => { workPwr = e.target.value; },   dom.workPower);
+    xf.sub('change', e => { restPwr = e.target.value; },   dom.restPower);
 
-    xf.sub('change', e => {
-        workPwr = e.target.value;
-    }, dom.workPower);
-
-    xf.sub('change', e => {
-        restPwr = e.target.value;
-    }, dom.restPower);
-
-    xf.sub('pointerup', e => {
-        xf.dispatch('ui:target-pwr', targetPwr);
-        device.setTargetPower(targetPwr);
-    }, dom.setTargetPower);
+    xf.sub('pointerup', e => { xf.dispatch('ui:target-pwr', targetPwr); }, dom.setTargetPower);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', workPwr);
-        device.setTargetPower(workPwr);
-        watch.lap();
+        xf.dispatch('ui:watchLap');
     }, dom.startWorkInterval);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', restPwr);
-        device.setTargetPower(restPwr);
-        watch.lap();
+        xf.dispatch('ui:watchLap');
     }, dom.startRestInterval);
+
+    xf.sub('pointerup', e => xf.dispatch('ui:darkMode'),    dom.darkMode);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),  dom.watch.start);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),  dom.watch.pause);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchResume'), dom.watch.resume);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),    dom.watch.lap);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),   dom.watch.stop);
+    xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.startWorkout);
 
     xf.sub('db:darkMode', e => {
         let mode = e.detail.data.darkMode;
@@ -194,28 +188,33 @@ function ControlScreen(args) {
         }
     });
 
-    xf.sub('pointerup', e => xf.dispatch('ui:darkMode'), dom.darkMode);
-    xf.sub('pointerup', e => watch.start(),  dom.watch.start);
-    xf.sub('pointerup', e => watch.pause(),  dom.watch.pause);
-    xf.sub('pointerup', e => watch.resume(), dom.watch.resume);
-    xf.sub('pointerup', e => watch.lap(),    dom.watch.lap);
-    xf.sub('pointerup', e => watch.stop(),   dom.watch.stop);
+    // xf.sub('watch:lap', e => {
+    //     let lap = e.detail.data;
+    //     console.log(lap);
+    //     let time = lap.lapTime;
+    //     let start = lap.start;
+    //     let end = lap.end;
+    //     // dom.laps.insertAdjacentHTML('beforeend',
+    //     //                             `<div class="lap"><div>${time}</div><div>${start}</div><div>${end}</div>></div>`);
+    // });
+}
 
-    xf.sub('watch:interval', e => {
-        let lap = watch.laps[watch.laps.length - 1];
-        let time = lap.lapTime;
-        let start = lap.start;
-        let end = lap.end;
-        dom.laps.insertAdjacentHTML('beforeend',
-                                    `<div class="lap"><div>${time}</div><div>${start}</div><div>${end}</div>></div>`);
-    });
+function LoadWorkoutView(args) {
+    let dom = args.dom;
+    xf.sub('change', e => {
+        let file = e.target.files[0];
+        console.log(file);
+        xf.dispatch('ui:workoutFile', file);
+    }, dom.loadBtn);
 }
 
 export {
-    ConnectionScreen,
+    ControllableConnectionView,
+    HrbConnectionView,
     DataScreen,
     GraphHr,
     GraphPower,
-    ControlScreen
+    ControlView,
+    LoadWorkoutView,
 };
 

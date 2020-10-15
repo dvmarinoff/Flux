@@ -58,8 +58,8 @@ class Device {
         self.device = await navigator.bluetooth.requestDevice({ filters: [{ services: [self.filter] }] });
         self.server = await self.device.gatt.connect();
         self.connected = true;
-        xf.dispatch(`${self.name}:connection`, true);
-        console.log(`Connected ${self.device.name}.`);
+        xf.dispatch(`${self.name}:connected`);
+        console.log(`Connected ${self.device.name} ${self.name}.`);
         self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
     }
     async disconnect() {
@@ -70,7 +70,7 @@ class Device {
     onDisconnect() {
         let self = this;
         self.connected = false;
-        xf.dispatch(`${self.name}:connection`, false);
+        xf.dispatch(`${self.name}:disconnected`);
         self.device.removeEventListener('gattserverdisconnected', e => e);
         console.log(`Disconnected ${self.device.name}.`);
     }
@@ -130,7 +130,7 @@ class Device {
 
 class Hrb {
     constructor(args) {
-        this.device = new Device({filter: services.heartRate.uuid});
+        this.device = new Device({filter: services.heartRate.uuid, name: args.name});
     }
     async connect() {
         let self = this;
@@ -162,7 +162,7 @@ class Hrb {
 
 class Controllable {
     constructor(args) {
-        this.device = new Device({filter: services.fitnessMachine.uuid});
+        this.device = new Device({filter: services.fitnessMachine.uuid, name: args.name});
     }
     async connect() {
         let self = this;

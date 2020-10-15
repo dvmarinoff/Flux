@@ -11,20 +11,18 @@
             <header>
                 <div class="devices cf">
                     <div id="flux-connection-screen" class="connection-screen">
-                        <button type="button" class="connect">
-                            <div class="switch off"></div>
+                        <button type="button" class="switch">
+                            <div class="indicator off"></div>
                             <div class="text">Controllable</div>
                         </button>
-                        <!-- <button type="button" class="disconnect btn">Disconnect</button> -->
                         <!-- <button type="button" class="start-notifications btn">Start</button>
                              <button type="button" class="stop-notifications btn">Stop</button> -->
                     </div>
                     <div id="hrb-connection-screen" class="connection-screen">
-                        <button type="button" class="connect">
-                            <div class="switch off"></div>
+                        <button type="button" class="switch">
+                            <div class="indicator off"></div>
                             <div class="text">HRB</div>
                         </button>
-                        <!-- <button type="button" class="disconnect btn">Disconnect</button> -->
                         <!-- <button type="button" class="start-notifications btn">Start</button>
                              <button type="button" class="stop-notifications btn">Stop</button> -->
                     </div>
@@ -100,9 +98,9 @@
             <div class="control-screen">
                 <div class="watch cf">
                     <button type="button" id="watch-start"  class="btn">Start</button>
-                    <button type="button" id="watch-stop"   class="btn">Stop</button>
                     <button type="button" id="watch-pause"  class="btn">Pause</button>
                     <button type="button" id="watch-resume" class="btn">Resume</button>
+                    <button type="button" id="watch-stop"   class="btn">Stop</button>
                     <button type="button" id="watch-lap"    class="btn">Lap</button>
                 </div>
 
@@ -120,7 +118,17 @@
                         <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
                     </div>
                 </div>
+
                 <button type="button" id="dark-mode" class="btn">Dark Mode</button>
+
+                <div class="file">
+                    <div class="file-btn">
+                        <label for="workout-file" class="label-btn btn">Select workout</label>
+                        <input id="workout-file" class="native-btn" name="workout-file" type="file" value=""/>
+                    </div>
+                </div>
+                <button type="button" id="start-workout" class="btn">Start Workout</button>
+
                 <div id="laps" class="laps">
                     <div class="heading h4">
                         <div class="time">Time</div>
