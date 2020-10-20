@@ -2,7 +2,7 @@ function readWarmup(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
     let powerLow  = parseFloat(el.getAttribute('PowerLow'));
     let powerHigh = parseFloat(el.getAttribute('PowerHigh'));
-    return {tag: 'Warmup',
+    return {tag:       'Warmup',
             duration:  duration,
             powerLow:  powerLow,
             powerHigh: powerHigh};
@@ -14,8 +14,8 @@ function readIntervalsT(el) {
     let duration    = (onDuration + offDuration) * repeat;
     let onPower     = parseFloat(el.getAttribute('OnPower'));
     let offPower    = parseFloat(el.getAttribute('OffPower'));
-    return {tag: 'IntervalsT',
-            repeat: repeat,
+    return {tag:        'IntervalsT',
+            repeat:      repeat,
             onDuration:  onDuration,
             offDuration: offDuration,
             onPower:     onPower,
@@ -24,7 +24,7 @@ function readIntervalsT(el) {
 function readSteadyState(el) {
     let duration = parseInt(el.getAttribute('Duration'));
     let power    = parseFloat(el.getAttribute('Power'));
-    return {tag: 'SteadyState',
+    return {tag:      'SteadyState',
             duration: duration,
             power:    power};
 }
@@ -32,10 +32,15 @@ function readCooldown(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
     let powerLow  = parseFloat(el.getAttribute('PowerLow'));
     let powerHigh = parseFloat(el.getAttribute('PowerHigh'));
-    return {tag: 'Cooldown',
+    return {tag:       'Cooldown',
             duration:  duration,
             powerLow:  powerLow,
             powerHigh: powerHigh};
+}
+function readFreeRide(el) {
+    let duration  = parseInt(el.getAttribute('Duration'));
+    return {tag:      'FreeRide',
+            duration: duration};
 }
 function unknownEl(el) {
     console.error(`Unknown Element in .zwo workout: ${el}`);
@@ -47,6 +52,7 @@ function readZwoElement(el) {
     case 'IntervalsT':  return readIntervalsT(el); break;
     case 'SteadyState': return readSteadyState(el); break;
     case 'Cooldown':    return readCooldown(el); break;
+    case 'FreeRide':    return readFreeRide(el); break;
     default:            return unknownEl(el); break;
     }
 }
@@ -91,6 +97,10 @@ function cooldownToInterval(step) {
     };
     return intervals;
 }
+function freeRideToInterval(step) {
+    return {duration: step.duration,
+            power:    0};
+}
 function unknownStep(step) {
     console.error(`Unknown Step in .zwo workout: ${step}`);
     return {duration: 0, power: 0};
@@ -102,6 +112,7 @@ function stepToInterval(step) {
     case 'IntervalsT':  return intervalsTToInterval(step); break;
     case 'SteadyState': return steadyStateToInterval(step); break;
     case 'Cooldown':    return cooldownToInterval(step); break;
+    case 'FreeRide':    return freeRideToInterval(step); break;
     default:            return unknownStep(step); break;
     }
 }
