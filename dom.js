@@ -42,6 +42,11 @@ let dom = {
     file: {
         fileBtn: document.querySelector('#workout-file'),
     },
+    workouts: {
+        workouts: document.querySelector('#workouts'),
+        list:     document.querySelector('#workouts .list'),
+        items: [],
+    },
     graphHr: {
         cont:  document.querySelector('#graph-hr'),
         graph: document.querySelector('#graph-hr .graph')

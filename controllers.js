@@ -16,7 +16,6 @@ function DeviceController(args) {
     xf.sub('ui:watchLap',    e => { watch.lap();    });
     xf.sub('ui:watchStop',   e => { watch.stop();   });
 
-
     xf.sub('ui:controllableSwitch', e => {
         if(controllable.device.connected) {
             controllable.disconnect();
@@ -46,7 +45,11 @@ function FileController() {
     });
 }
 
-function WorkoutController() {
+function WorkoutsController() {
+
+    // workouts.forEach( w => {
+    //     xf.dispatch('file:workout', workouts[]);
+    // });
 }
 
 export { DeviceController, FileController };

@@ -10,7 +10,8 @@ import { ControllableConnectionView,
          GraphHr,
          GraphPower,
          ControlView,
-         LoadWorkoutView
+         LoadWorkoutView,
+         WorkoutsView
        } from './views.js';
 import { DeviceController, FileController } from './controllers.js';
 import { DataMock } from './test/mock.js';
@@ -18,6 +19,7 @@ import { xf, DB } from './xf.js';
 
 
 'use strict';
+
 
 let db = DB({
     hr: [],
@@ -31,6 +33,7 @@ let db = DB({
     laps: [],
     workout: [],
     workoutFile: '',
+    workouts: {},
     darkMode: false,
 });
 
@@ -58,7 +61,6 @@ xf.reg('watch:nextWorkoutInterval', e => {
     db.targetPwr = targetPwr;
 });
 
-
 function start() {
     let hrb   = new Hrb({name: 'hrb'});
     let flux  = new Controllable({name: 'controllable'});
@@ -73,6 +75,7 @@ function start() {
 
     ControlView({dom: dom.controlscreen});
     LoadWorkoutView({dom: dom.file});
+    WorkoutsView({dom: dom.workouts, workouts: workouts});
 
     DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
@@ -80,7 +83,7 @@ function start() {
     // DataMock({hr: false, pwr: true});
 
     // Default Workout:
-    xf.dispatch('file:workout', workouts['zwo-test-ramp']);
+    xf.dispatch('file:workout', workouts[0].xml);
 };
 
 start();

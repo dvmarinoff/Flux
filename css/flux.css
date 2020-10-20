@@ -167,6 +167,12 @@ header, footer, section, article, nav {
     line-spacing: 26px;
     line-height: 22px;
 }
+.t4 {
+    font-family: sans-serif;
+    font-size: 14px;
+    line-spacing: 26px;
+    line-height: 18px;
+}
 .t5 {
     font-family: sans-serif;
     font-size: 10px;
@@ -489,6 +495,33 @@ header, footer, section, article, nav {
 .red-zone {
     background-color: #FE340B;
 }
+
+.workouts {}
+.buildin-workouts {}
+.workouts .list {
+}
+
+.workouts .list-item {
+    padding: 0 0 5px 0;
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(0,0,0, 0.4);
+}
+.workouts .list-item div {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: left;
+}
+.workouts .list-item .name {
+    width: 160px;
+}
+.workouts .list-item .type {
+    width: 80px;
+}
+.workouts .list-item .time {
+    width: 80px;
+}
+.workouts .list-item .select {}
+.workouts .btn {}
 
 @media all and (min-width: 1800px) {
 }

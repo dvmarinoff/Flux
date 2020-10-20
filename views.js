@@ -199,6 +199,33 @@ function ControlView(args) {
     // });
 }
 
+
+function WorkoutsView(args) {
+    let dom = args.dom;
+    let workouts = args.workouts;
+
+    workouts.forEach( (w, i) => {
+        let item = `
+            <div class='list-item cf'>
+                <div class="name t4">${w.name}</div>
+                <div class="type t4">${w.type}</div>
+                <div class="time t4">${w.duration} min</div>
+                <div class="select" id="li${i}"><button class="btn">Select</button></div>
+            </div>`;
+
+        dom.list.insertAdjacentHTML('beforeend', item);
+
+        dom.items.push(document.querySelector(`.list #li${i}`));
+
+        xf.sub('click', e => {
+            xf.dispatch('ui:workouts:select', i);
+            xf.dispatch('file:workout', workouts[i].xml);
+        }, dom.items[i]);
+    });
+
+
+}
+
 function LoadWorkoutView(args) {
     let dom = args.dom;
     xf.sub('change', e => {
@@ -216,5 +243,6 @@ export {
     GraphPower,
     ControlView,
     LoadWorkoutView,
+    WorkoutsView,
 };
 
