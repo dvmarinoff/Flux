@@ -1,4 +1,5 @@
 import { xf } from './xf.js';
+import { File } from './file.js';
 
 function DeviceController(args) {
     let controllable = args.controllable;
@@ -38,22 +39,14 @@ function DeviceController(args) {
 
 function FileController() {
 
-    let reader = new FileReader();
-
     xf.sub('db:workoutFile', e => {
-        let file = e.detail.data.workoutFile;
-        reader.readAsText(file);
-        reader.onload = _ => {
-            let res = reader.result;
-            console.log(res);
-            xf.dispatch('file:workout', res);
-        };
-        reader.onerror = _ => {
-            let err = reader.error;
-            console.error(`Error reading local file: `);
-            console.error(reader.error);
-        };
+        let workoutFile = e.detail.data.workoutFile;
+        let fileHandler = new File();
+        fileHandler.readFile(workoutFile);
     });
+}
+
+function WorkoutController() {
 }
 
 export { DeviceController, FileController };

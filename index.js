@@ -1,7 +1,8 @@
 import 'regenerator-runtime/runtime';
 import { dom } from './dom.js';
 import { Device, Hrb, Controllable } from './ble/device.js';
-import { StopWatch, parseZwo } from './workout.js';
+import { parseZwo } from './parser.js';
+import { StopWatch } from './workout.js';
 import { workouts } from './workouts/workouts.js';
 import { ControllableConnectionView,
          HrbConnectionView,
@@ -76,7 +77,7 @@ function start() {
     DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
 
-    // DataMock({hr: true, pwr: true});
+    // DataMock({hr: false, pwr: true});
 
     // Default Workout:
     xf.dispatch('file:workout', workouts['zwo-test-ramp']);
