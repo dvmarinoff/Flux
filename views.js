@@ -170,8 +170,6 @@ function ControlView(args) {
 
     xf.sub('pointerup', e => xf.dispatch('ui:darkMode'),    dom.darkMode);
     xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),  dom.watch.start);
-    // xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),  dom.watch.pause);
-    // xf.sub('pointerup', e => xf.dispatch('ui:watchResume'), dom.watch.resume);
     xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),    dom.watch.lap);
     xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),   dom.watch.stop);
     xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.startWorkout);
@@ -216,21 +214,40 @@ function WorkoutsView(args) {
 
     workouts.forEach( (w, i) => {
         let item = `
-            <div class='list-item cf'>
-                <div class="name t4">${w.name}</div>
-                <div class="type t4">${w.type}</div>
-                <div class="time t4">${w.duration} min</div>
-                <div class="select" id="li${i}"><button class="btn">Select</button></div>
-            </div>`;
+            <div class='workout list-item cf' id="li${i}">
+                <div class="first-row">
+                    <div class="name t4">${w.name}</div>
+                    <div class="type t4">${w.type}</div>
+                    <div class="time t4">${w.duration} min</div>
+                    <div class="select" id="btn${i}"><button class="btn">Select</button></div>
+                </div>
+                <div class="second-row">
+                    <div class="desc"><div class="content t4">${w.description}</div></div>
+                </div>
+            </div>
+`;
 
         dom.list.insertAdjacentHTML('beforeend', item);
 
-        dom.items.push(document.querySelector(`.list #li${i}`));
+        dom.items.push(document.querySelector(`.list #li${i} .first-row`));
+        dom.select.push(document.querySelector(`.list #btn${i}`));
+        dom.descriptions.push(document.querySelector(`.list #li${i} .desc`));
 
         xf.sub('click', e => {
+            xf.dispatch('ui:workouts:desc:show', i);
+            let display = dom.descriptions[i].style.display;
+            if(display === 'none') {
+                dom.descriptions[i].style.display = 'block';
+            } else {
+                dom.descriptions[i].style.display = 'none';
+            }
+        }, dom.items[i]);
+
+        xf.sub('click', e => {
+            e.stopPropagation();
             xf.dispatch('ui:workouts:select', i);
             xf.dispatch('file:workout', workouts[i].xml);
-        }, dom.items[i]);
+        }, dom.select[i]);
     });
 
 

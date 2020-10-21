@@ -35,6 +35,7 @@ let db = DB({
     workout: [],
     workoutFile: '',
     workouts: {},
+    fitMsgs:  [],
     darkMode: false,
 });
 

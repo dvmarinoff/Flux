@@ -46,6 +46,8 @@ let dom = {
         workouts: document.querySelector('#workouts'),
         list:     document.querySelector('#workouts .list'),
         items: [],
+        select: [],
+        descriptions: [],
     },
     graphHr: {
         cont:  document.querySelector('#graph-hr'),

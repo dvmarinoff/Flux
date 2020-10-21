@@ -318,12 +318,6 @@ header, footer, section, article, nav {
     padding: 10px;
     text-align: center;
 }
-.data-tile-small h2 {
-    font-size: 12px;
-    font-family: sans-serif;
-    text-transform: uppercase;
-}
-
 
 
 
@@ -509,34 +503,47 @@ header, footer, section, article, nav {
     margin: 10px auto;
 }
 .buildin-workouts {}
-.workouts .list-item {
+.workouts .list-item .first-row {
     display: flex;
     flex-diretion: row;
     justify-content: center;
     align-items: center;
     align-content: center;
     text-align: left;
-    padding: 0 5px 5px 5px;
-    margin-bottom: 5px;
-    border-bottom: 1px solid rgba(0,0,0, 0.4);
 
     /* font-weight: bold; */
 }
-.workouts .list .div {
-
+.workout {
+    padding: 0 5px 5px 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(0,0,0, 0.4);
 }
-.workouts .list-item .name {
+.workout .first-row {
+    cursor: pointer;
+}
+.workout .name {
     min-width: 200px;
     padding-right: 8px;
 }
-.workouts .list-item .type {
+.workout .type {
     min-width: 120px;
     font-weight: bold;
 }
-.workouts .list-item .time {
+.workout  .time {
     width: 80px;
 }
 .workouts .list-item .select {
+}
+
+.workout .desc {
+    display: none;
+    /* display: block; */
+    padding: 10px;
+}
+.workout .desc .content {
+    text-align: left;
+    max-width: 470px;
+    margin: 0 auto;
 }
 
 @media all and (min-width: 1800px) {
@@ -578,13 +585,13 @@ header, footer, section, article, nav {
         padding: 10px 10px 10px 10px;
     }
 
-    .workouts .list-item .name {
+    .workout .name {
         min-width: 140px;
     }
-    .workouts .list-item .type {
+    .workout .type {
         min-width: 80px;
     }
-    .workouts .list-item .time {
+    .workout .time {
         width: 55px;
     }
 }

@@ -1,8 +1,8 @@
 let workouts =
 [
-{ name: 'zwo test ramp',
+{ name: 'Maple (ramp)',
   type: 'Sweet Spot',
-  description: '',
+  description: '4 times 10 min Sweet Spot intervals with 5 min recovery in between and warm-up Ramp.',
   duration: 80,
   xml:
 `<workout_file>
@@ -23,9 +23,9 @@ let workouts =
     </workout>
 </workout_file>`
 },
-{ name: '4x10 min Sweet Spot',
+{ name: 'Maple',
   type: 'Sweet Spot',
-  description: '',
+  description: '4 times 10 min Sweet Spot intervals with 5 min recovery in between.',
   duration: 80,
   xml:
 `<workout_file>
@@ -44,9 +44,9 @@ let workouts =
     </workout>
 </workout_file>`
 },
-{ name: '2x20min 98%',
+{ name: 'Pasta',
   type: 'Threshold',
-  description: '',
+  description: 'A Classic 2 times 20 min at almost FTP. Make sure you had some pasta before this session. You will need it!',
   duration: 70,
   xml:
 `<workout_file>
@@ -72,9 +72,9 @@ let workouts =
     </workout>
 </workout_file>`
 },
-{ name: '60/60s 131%',
+{ name: 'Dijon',
   type: 'VO2 Max',
-  description: '',
+  description: '60/60s or 60 sec ON at 131% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.',
   duration: 57,
   xml:
 `<workout_file>
@@ -101,9 +101,9 @@ let workouts =
 </workout_file>
 `
 },
-{ name: '40/20s 121%',
+{ name: 'Chili Pepper',
   type: 'VO2 Max',
-  description: '',
+  description: '40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each.',
   duration: 45,
   xml:
 `<workout_file>
@@ -130,9 +130,9 @@ let workouts =
 </workout_file>
 `
 },
-{ name: '40/20s 131%',
+{ name: 'Chili Pepper +1',
   type: 'VO2 Max',
-  description: '',
+  description: 'Short but tough, this is the hardest workout ever. It\'s gonna burn!',
   duration: 45,
   xml:
 `<workout_file>
@@ -158,9 +158,9 @@ let workouts =
     </workout>
 </workout_file>
 `},
-{ name: '6x10min z1-2',
+{ name: 'Butter',
   type: 'Base',
-  description: '',
+  description: 'The bread and butter of Endurance training with efforts in Zone 1 and 2.',
   duration: 110,
   xml:
 `<workout_file>
@@ -188,9 +188,9 @@ let workouts =
     </workout>
 </workout_file>`
 },
-{ name: '6x10min z2',
+{ name: 'Butter +1',
   type: 'Base',
-  description: '',
+  description: 'The bread and butter of Endurance training, with efforts in Zone 2.',
   duration: 110,
   xml:
 `<workout_file>
