@@ -410,6 +410,9 @@ header, footer, section, article, nav {
 #start-work-interval {
     padding: 0;
 }
+#watch-start {
+    min-width: 71px;
+}
 
 .input {
     width: 105px;
@@ -502,7 +505,9 @@ header, footer, section, article, nav {
     background-color: #FE340B;
 }
 
-.workouts {}
+.workouts .h2 {
+    margin: 10px auto;
+}
 .buildin-workouts {}
 .workouts .list-item {
     display: flex;

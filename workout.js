@@ -30,8 +30,9 @@ class StopWatch {
             self.pause();
         } else {
             self.interval = setInterval(self.onTick.bind(self), 1000);
+            self.started = true;
+            xf.dispatch('watch:started');
         }
-        self.started = true;
     }
     lap() {
         let self = this;
@@ -42,12 +43,19 @@ class StopWatch {
         self.lapTime = 0;
         self.currentLapStart = self.elapsed;
 
-        if(self.workoutStarted &&  self.workoutIntervalIndex < self.workout.length) {
+        if(self.workoutStarted && self.workoutIntervalIndex < self.workout.length) {
             self.workoutCurrentIntervalDuration = self.workout[self.workoutIntervalIndex].duration;
             xf.dispatch('watch:nextWorkoutInterval', self.workoutIntervalIndex);
             self.workoutIntervalIndex +=1;
 
             Object.assign(lap, {power: self.workout[self.workoutIntervalIndex].power});
+
+            console.log(self.workoutCurrentIntervalDuration);
+            xf.dispatch('watch:interval', self.workoutCurrentIntervalDuration);
+            self.lapTime = self.workoutCurrentIntervalDuration;
+        } else {
+
+            xf.dispatch('watch:interval', 0);
         }
 
         if(self.workoutIntervalIndex >= self.workout.length && self.workoutStarted) {
@@ -55,17 +63,20 @@ class StopWatch {
         }
 
         self.laps.push();
-        xf.dispatch('watch:interval', 0);
         xf.dispatch('watch:lap', lap);
     }
     pause() {
         let self = this;
         clearInterval(self.interval);
         self.started = false;
+        xf.dispatch('watch:paused');
     }
     resume() {
         let self = this;
-        self.interval = setInterval(self.onTick.bind(self), 1000);
+        if(!self.started) {
+            self.interval = setInterval(self.onTick.bind(self), 1000);
+            self.started = true;
+        }
     }
     stop () {
         let self = this;
@@ -75,16 +86,25 @@ class StopWatch {
         self.started = false;
         xf.dispatch('watch:elapsed', 0);
         xf.dispatch('watch:interval', 0);
+        xf.dispatch('watch:stopped');
     }
     onTick() {
         let self = this;
         self.elapsed += 1;
-        self.lapTime += 1;
+        // if((self.workoutStarted) && (self.lapTime === self.workoutCurrentIntervalDuration)) {
+        //     self.lap();
+        // }
+        if(self.workoutStarted) {
+            self.lapTime -= 1;
+        } else {
+            self.lapTime += 1;
+        }
+        if((self.workoutStarted) && (self.lapTime === 0)) {
+            self.lap();
+        } else {
+        }
         xf.dispatch('watch:elapsed',  self.elapsed);
         xf.dispatch('watch:interval', self.lapTime);
-        if((self.workoutStarted) && (self.lapTime === self.workoutCurrentIntervalDuration)) {
-            self.lap();
-        }
     }
     setWorkout(workout) {
         let self = this;

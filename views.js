@@ -170,8 +170,8 @@ function ControlView(args) {
 
     xf.sub('pointerup', e => xf.dispatch('ui:darkMode'),    dom.darkMode);
     xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),  dom.watch.start);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),  dom.watch.pause);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchResume'), dom.watch.resume);
+    // xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),  dom.watch.pause);
+    // xf.sub('pointerup', e => xf.dispatch('ui:watchResume'), dom.watch.resume);
     xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),    dom.watch.lap);
     xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),   dom.watch.stop);
     xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.startWorkout);
@@ -186,6 +186,16 @@ function ControlView(args) {
             dom.theme.classList.remove('dark');
             dom.theme.classList.add('light');
         }
+    });
+
+    xf.sub('watch:started', e => {
+        dom.watch.start.textContent = 'Pause';
+    });
+    xf.sub('watch:paused', e => {
+        dom.watch.start.textContent = 'Resume';
+    });
+    xf.sub('watch:stopped', e => {
+        dom.watch.start.textContent = 'Start';
     });
 
     // xf.sub('watch:lap', e => {
