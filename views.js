@@ -245,7 +245,7 @@ function WorkoutsView(args) {
             let display = window.getComputedStyle(dom.descriptions[i])
                                 .getPropertyValue('display');
 
-            if(display === "none") {
+            if(display === 'none') {
                 dom.descriptions[i].style.display = 'block';
             } else {
                 dom.descriptions[i].style.display = 'none';
