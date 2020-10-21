@@ -520,6 +520,8 @@ header, footer, section, article, nav {
 }
 .workout .first-row {
     cursor: pointer;
+    -webkit-touch-callout: none;
+    user-select: none;
 }
 .workout .name {
     min-width: 200px;
