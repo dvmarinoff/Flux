@@ -56,14 +56,9 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
-.inner-wrapper {
-    position: relative;
-    width: 100%;
-    margin: 0 auto;
-    padding-bottom: 0px;
-}
+
 header, footer, section, article, nav {
     display: block;
 }
@@ -120,14 +115,76 @@ header, footer, section, article, nav {
 #theme.light .graph-bar {
     border-top: 2px solid rgba(255,255,255, 0.7);
 }
+#theme.light .devices {
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0, 0.1);
+}
+#theme.light .switch {
+}
+#theme.light .line {
+    /* background-color: #d1d1d1; */
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0, 0.1);
+}
+#theme.light .page{
+    background-color: #fff;
+}
+
 #theme.dark {
     color: #fff;
     background-color: #28272D;
 }
+#theme.dark .devices {
+    background-color: #35363a;
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0, 0.1);
+}
 #theme.dark .switch {
     color: #fff;
     border: 0px;
+    /* background-color: #28272D; */
+    background-color: #35363a;
 }
+#theme.dark .line {
+    /* background-color: #d1d1d1; */
+    background-color: rgba(0,0,0, 0.4);
+    /* box-shadow: 1px 1px 1px 1px rgba(0,0,0, 0.1); */
+}
+#theme.dark .page{
+    background-color: #28272D;
+}
+
+.chrome {
+    background-color: #35363a;
+}
+.samsung-light {
+    background-color: #fff;
+}
+.samsung-dark {
+    background-color: #000;
+}
+
+
+
+/* Page */
+.wrapper {
+    overflow: hidden;
+}
+.page {
+    /* float: left; */
+    /* position: absolute; */
+    /* width: 100%; */
+    /* width: 360px; */
+    /* height: 731px; */
+}
+#main-page {
+    z-index: 1;
+}
+#workouts-page {
+    z-index: 0;
+}
+#stat-page {
+    z-index: 0;
+}
+
+
 
 /* Font */
 .h1 {
@@ -186,9 +243,7 @@ header, footer, section, article, nav {
     position: relative;
     height: 30px;
     padding: 0 15px 0 15px;
-
     color: #fff;
-    background-color: #28272D;
     font-family: sans-serif;
     font-size: 11px;
     letter-spacing: 1px;
@@ -275,8 +330,6 @@ header, footer, section, article, nav {
     width: 100%;
     height: 1px;
     margin: 0 auto;
-    /* background-color: #d1d1d1; */
-    background-color: rgba(0,0,0, 0.4);
 }
 
 
@@ -380,6 +433,14 @@ header, footer, section, article, nav {
     background-color: #fff;
     cursor: pointer;
 }
+
+
+
+/* Workouts Screen */
+.workouts {
+    text-align: center;
+}
+
 .file-btn {
     position: relative;
     height: 30px;
@@ -393,11 +454,9 @@ header, footer, section, article, nav {
 .native-btn {
     position: relative;
     margin-left: 32px;
-    /* margin-top: 4px; */
     line-height: 27px;
     height: 30px;
     z-index: 0;
-    /* border: 1px solid #EFEFEF; */
     border: 1px solid #000;
 }
 #start-work-interval {
@@ -497,9 +556,6 @@ header, footer, section, article, nav {
 .red-zone {
     background-color: #FE340B;
 }
-.samsung-dark {
-    background-color: #35363a;
-}
 
 .workouts .h2 {
     margin: 10px auto;
@@ -549,6 +605,8 @@ header, footer, section, article, nav {
     margin: 0 auto;
 }
 
+
+
 @media all and (min-width: 1800px) {
 }
 @media all and (min-width: 1600px) {
@@ -596,6 +654,10 @@ header, footer, section, article, nav {
     }
     .workout .time {
         width: 55px;
+    }
+
+    .native-btn {
+        margin-left: 35px;
     }
 }
 @media all and (max-width: 360px) {

@@ -1,0 +1,22 @@
+{
+  "name": "Flux",
+  "short_name": "Flux",
+  "description": "Cycling Structured Training",
+  "icons": [
+    {
+      "src":   "./images/icons/ic_launcher_xxxhdpi.png",
+      "type":  "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src":   "/images/icons/playstore.png",
+      "type":  "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#35363a",
+  "display": "fullscreen",
+  "scope": "/",
+  "theme_color": "#35363a"
+}

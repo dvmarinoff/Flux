@@ -3,6 +3,7 @@ import { dom } from './dom.js';
 import { Device, Hrb, Controllable } from './ble/device.js';
 import { parseZwo } from './parser.js';
 import { StopWatch } from './workout.js';
+import { WakeLock } from './lock.js';
 import { workouts } from './workouts/workouts.js';
 import { ControllableConnectionView,
          HrbConnectionView,
@@ -13,7 +14,9 @@ import { ControllableConnectionView,
          LoadWorkoutView,
          WorkoutsView
        } from './views.js';
-import { DeviceController, FileController } from './controllers.js';
+import { DeviceController,
+         FileController,
+         Vibrate } from './controllers.js';
 import { DataMock } from './test/mock.js';
 import { xf, DB } from './xf.js';
 
@@ -30,13 +33,13 @@ let db = DB({
     ftp: 256,
     targetPwr: 100,
     elapsed: 0,
-    interval: 0,
+    lapTime: 0,
     laps: [],
     workout: [],
     workoutFile: '',
     workouts: {},
     fitMsgs:  [],
-    darkMode: false,
+    darkMode: true,
 });
 
 xf.reg('device:hr',  e => db.hr  = e.detail.data);
@@ -46,8 +49,8 @@ xf.reg('device:cad', e => db.cad = e.detail.data);
 xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
 xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
 xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
-xf.reg('watch:elapsed',  e => db.elapsed   = e.detail.data);
-xf.reg('watch:interval', e => db.interval  = e.detail.data);
+xf.reg('watch:elapsed',  e => db.elapsed = e.detail.data);
+xf.reg('watch:lapTime',  e => db.lapTime = e.detail.data);
 xf.reg('watch:lap',      e => db.laps.push(e.detail.data));
 xf.reg('file:workout',   e => {
     let workout = e.detail.data;
@@ -67,6 +70,7 @@ function start() {
     let hrb   = new Hrb({name: 'hrb'});
     let flux  = new Controllable({name: 'controllable'});
     let watch = new StopWatch();
+    let lock  = new WakeLock();
 
     ControllableConnectionView({dom: dom.controllableConnectionScreen});
     HrbConnectionView({dom: dom.hrbConnectionScreen});
@@ -81,6 +85,8 @@ function start() {
 
     DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
+
+    Vibrate({vibrate: false, long: false});
 
     // DataMock({hr: false, pwr: true});
 

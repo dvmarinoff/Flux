@@ -62,9 +62,15 @@ function DataScreen(args) {
         let elapsed = e.detail.data.elapsed;
         dom.time.textContent = secondsToHms(elapsed);
     });
-    xf.sub('db:interval', e => {
-        let interval = e.detail.data.interval;
-        dom.interval.textContent = secondsToHms(interval, true);
+    xf.sub('db:lapTime', e => {
+        let lapTime = e.detail.data.lapTime;
+        if(!Number.isInteger(lapTime)) {
+            lapTime = 0;
+        }
+        if(lapTime < 0) {
+            lapTime = 0;
+        }
+        dom.interval.textContent = secondsToHms(lapTime, true);
     });
     xf.sub('db:targetPwr', e => {
         dom.targetPwr.textContent = e.detail.data.targetPwr;
@@ -161,6 +167,8 @@ function ControlView(args) {
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', workPwr);
         xf.dispatch('ui:watchLap');
+
+        let res2 = window.navigator.vibrate([200, 800, 200, 800, 200, 800, 1000]);
     }, dom.startWorkInterval);
 
     xf.sub('pointerup', e => {

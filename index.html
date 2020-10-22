@@ -3,127 +3,131 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
         <title>Flux</title>
         <link href="css/flux.css" rel="stylesheet"/>
+        <link rel="manifest" href="./manifest.webmanifest">
     </head>
     <body id="theme" class="dark">
         <div class="wrapper">
-            <header>
-                <div class="devices cf">
-                    <div id="flux-connection-screen" class="connection-screen">
-                        <button type="button" class="switch">
-                            <div class="indicator off"></div>
-                            <div class="text">Controllable</div>
-                        </button>
-                        <!-- <button type="button" class="start-notifications btn">Start</button>
-                             <button type="button" class="stop-notifications btn">Stop</button> -->
+            <div class="page" id="main-page">
+                <header>
+                    <div class="devices cf">
+                        <div id="flux-connection-screen" class="connection-screen">
+                            <button type="button" class="switch">
+                                <div class="indicator off"></div>
+                                <div class="text">Controllable</div>
+                            </button>
+                            <!-- <button type="button" class="start-notifications btn">Start</button>
+                                <button type="button" class="stop-notifications btn">Stop</button> -->
+                        </div>
+                        <div id="hrb-connection-screen" class="connection-screen">
+                            <button type="button" class="switch">
+                                <div class="indicator off"></div>
+                                <div class="text">HRB</div>
+                            </button>
+                            <!-- <button type="button" class="start-notifications btn">Start</button>
+                                <button type="button" class="stop-notifications btn">Stop</button> -->
+                        </div>
                     </div>
-                    <div id="hrb-connection-screen" class="connection-screen">
-                        <button type="button" class="switch">
-                            <div class="indicator off"></div>
-                            <div class="text">HRB</div>
-                        </button>
-                        <!-- <button type="button" class="start-notifications btn">Start</button>
-                             <button type="button" class="stop-notifications btn">Stop</button> -->
+                </header>
+                <div class="data-screen cf">
+                    <div class="data-tile">
+                        <h2 class="tile-heading h2">Power</h2>
+                        <div class="tile-value">
+                            <div id="power" class="data-screen-value t1">--</div>
+                        </div>
+                    </div>
+                    <div class="data-tile">
+                        <h2 class="tile-heading h2">Interval Time</h2>
+                        <div class="tile-value">
+                            <div id="interval-time" class="data-screen-value t1">--:--</div>
+                        </div>
+                    </div>
+                    <div class="data-tile">
+                        <h2 class="tile-heading h2">Heart Rate</h2>
+                        <div class="tile-value">
+                            <div id="heart-rate" class="data-screen-value t1">--</div>
+                        </div>
+                    </div>
+                    <div class="data-tile">
+                        <h2 class="tile-heading h2">Target</h2>
+                        <div class="tile-value">
+                            <div id="target-power" class="data-screen-value t1">--</div>
+                        </div>
+                    </div>
+                    <div class="data-tile">
+                        <h2 class="tile-heading h2">Elapsed Time</h2>
+                        <div class="tile-value">
+                            <div id="time" class="data-screen-value t1">--:--:--</div>
+                        </div>
+                    </div>
+                    <div class="data-tile">
+                        <h2 class="tile-heading h2">Cadence</h2>
+                        <div class="tile-value">
+                            <div id="cadence" class="data-screen-value t1">--</div>
+                        </div>
                     </div>
                 </div>
-            </header>
-            <div class="line"></div>
-            <div class="data-screen cf">
-                <div class="data-tile">
-                    <h2 class="tile-heading h2">Power</h2>
-                    <div class="tile-value">
-                        <div id="power" class="data-screen-value t1">--</div>
+                <div class="data-screen cf">
+                    <div class="data-tile-small">
+                        <h2 class="tile-heading h3">Speed</h2>
+                        <div class="tile-value">
+                            <div id="speed" class="data-screen-value-small t3">--</div>
+                        </div>
+                    </div>
+                    <div class="data-tile-small">
+                        <h2 class="tile-heading h3">Distance</h2>
+                        <div class="tile-value">
+                            <div id="distance" class="data-screen-value-small t3">--</div>
+                        </div>
                     </div>
                 </div>
-                <div class="data-tile">
-                    <h2 class="tile-heading h2">Interval Time</h2>
-                    <div class="tile-value">
-                        <div id="interval-time" class="data-screen-value t1">--:--</div>
+                <div class="line"></div>
+                <div class="graphs">
+                    <div class="graph-screen" id="graph-power">
+                        <h4 class="graph-heading h4">Power</h4>
+                        <div class="ftp-line"><div class="ftp t5">FTP 256</div></div>
+                        <div class="graph cf">
+                        </div>
                     </div>
+                    <!-- <div class="graph-screen" id="graph-hr">
+                        <h4 class="graph-heading h4">Hr</h4>
+                        <div class="graph cf"></div>
+                        </div> -->
                 </div>
-                <div class="data-tile">
-                    <h2 class="tile-heading h2">Heart Rate</h2>
-                    <div class="tile-value">
-                        <div id="heart-rate" class="data-screen-value t1">--</div>
+                <div class="line"></div>
+                <div class="control-screen">
+                    <div class="watch cf">
+                        <button type="button" id="watch-start"  class="btn">Start</button>
+                        <!-- <button type="button" id="watch-pause"  class="btn">Pause</button> -->
+                        <!-- <button type="button" id="watch-resume" class="btn">Resume</button> -->
+                        <button type="button" id="watch-stop"   class="btn">Stop</button>
+                        <button type="button" id="watch-lap"    class="btn">Lap</button>
+                        <button type="button" id="start-workout" class="btn">Do Workout</button>
                     </div>
-                </div>
-                <div class="data-tile">
-                    <h2 class="tile-heading h2">Target</h2>
-                    <div class="tile-value">
-                        <div id="target-power" class="data-screen-value t1">--</div>
+
+                    <div class="control-point cf">
+                        <div class="tile cf">
+                            <input id="target-power-value" class="input" name="target" type="text" value="100"/>
+                            <button type="button" id="set-target-power" class="btn">Target</button>
+                        </div>
+                        <div class="tile cf">
+                            <input id="work-power-value"" class="input" name="work" type="text" value="235"/>
+                            <button type="button" id="start-work-interval" class="btn">Work Interval</button>
+                        </div>
+                        <div class="tile cf">
+                            <input id="rest-power-value"" class="input" name="rest" type="text" value="100"/>
+                            <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
+                        </div>
                     </div>
-                </div>
-                <div class="data-tile">
-                    <h2 class="tile-heading h2">Elapsed Time</h2>
-                    <div class="tile-value">
-                        <div id="time" class="data-screen-value t1">--:--:--</div>
-                    </div>
-                </div>
-                <div class="data-tile">
-                    <h2 class="tile-heading h2">Cadence</h2>
-                    <div class="tile-value">
-                        <div id="cadence" class="data-screen-value t1">--</div>
-                    </div>
+
+                    <button type="button" id="dark-mode" class="btn">Light Mode</button>
                 </div>
             </div>
-            <div class="data-screen cf">
-                <div class="data-tile-small">
-                    <h2 class="tile-heading h3">Speed</h2>
-                    <div class="tile-value">
-                        <div id="speed" class="data-screen-value-small t3">--</div>
-                    </div>
-                </div>
-                <div class="data-tile-small">
-                    <h2 class="tile-heading h3">Distance</h2>
-                    <div class="tile-value">
-                        <div id="distance" class="data-screen-value-small t3">--</div>
-                    </div>
-                </div>
-            </div>
-            <div class="line"></div>
-            <div class="graphs">
-                <div class="graph-screen" id="graph-power">
-                    <h4 class="graph-heading h4">Power</h4>
-                    <div class="ftp-line"><div class="ftp t5">FTP 256</div></div>
-                    <div class="graph cf">
-                    </div>
-                </div>
-                <!-- <div class="graph-screen" id="graph-hr">
-                     <h4 class="graph-heading h4">Hr</h4>
-                     <div class="graph cf"></div>
-                     </div> -->
-            </div>
-            <div class="line"></div>
-            <div class="control-screen">
-                <div class="watch cf">
-                    <button type="button" id="watch-start"  class="btn">Start</button>
-                    <!-- <button type="button" id="watch-pause"  class="btn">Pause</button> -->
-                    <!-- <button type="button" id="watch-resume" class="btn">Resume</button> -->
-                    <button type="button" id="watch-stop"   class="btn">Stop</button>
-                    <button type="button" id="watch-lap"    class="btn">Lap</button>
-                    <button type="button" id="start-workout" class="btn">Do Workout</button>
-                </div>
-
-                <div class="control-point cf">
-                    <div class="tile cf">
-                        <input id="target-power-value" class="input" name="target" type="text" value="100"/>
-                        <button type="button" id="set-target-power" class="btn">Target</button>
-                    </div>
-                    <div class="tile cf">
-                        <input id="work-power-value"" class="input" name="work" type="text" value="235"/>
-                        <button type="button" id="start-work-interval" class="btn">Work Interval</button>
-                    </div>
-                    <div class="tile cf">
-                        <input id="rest-power-value"" class="input" name="rest" type="text" value="100"/>
-                        <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
-                    </div>
-                </div>
-
-                <button type="button" id="dark-mode" class="btn">Dark Mode</button>
-
-                <br/>
-                <br/><br/>
+            <div class="page" id="workouts-page">
+                <br/><br/><br/>
 
                 <div class="workouts" id="workouts">
                     <div class="buildin-workouts">
@@ -131,7 +135,8 @@
                         <div class="list">
                         </div>
                     </div>
-                    <div class="file">
+
+                    <div class="workout-load-file">
                         <h2 class="h2">Load workout:</h2>
                         <div class="file-btn">
                             <label for="workout-file" class="label-btn btn">Select</label>
@@ -139,7 +144,8 @@
                         </div>
                     </div>
                 </div>
-
+            </div>
+            <div class="page" id="stat-page">
                 <div id="laps" class="laps">
                     <div class="heading h4">
                         <div class="time">Time</div>
