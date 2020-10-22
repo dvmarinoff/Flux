@@ -233,17 +233,18 @@ function WorkoutsView(args) {
         dom.select.push(document.querySelector(`.list #btn${i}`));
         dom.descriptions.push(document.querySelector(`.list #li${i} .desc`));
 
-        xf.sub('click', e => {
-            xf.dispatch('ui:workouts:desc:show', i);
-            let display = dom.descriptions[i].style.display;
-            if(display === 'none') {
+        xf.sub('pointerup', e => {
+            let display = window.getComputedStyle(dom.descriptions[i])
+                                .getPropertyValue('display');
+
+            if(display === "none") {
                 dom.descriptions[i].style.display = 'block';
             } else {
                 dom.descriptions[i].style.display = 'none';
             }
         }, dom.items[i]);
 
-        xf.sub('click', e => {
+        xf.sub('pointerup', e => {
             e.stopPropagation();
             xf.dispatch('ui:workouts:select', i);
             xf.dispatch('file:workout', workouts[i].xml);

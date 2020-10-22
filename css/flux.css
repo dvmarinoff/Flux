@@ -498,6 +498,9 @@ header, footer, section, article, nav {
 .red-zone {
     background-color: #FE340B;
 }
+.samsung-dark {
+    background-color: #35363a;
+}
 
 .workouts .h2 {
     margin: 10px auto;
@@ -519,6 +522,8 @@ header, footer, section, article, nav {
     border-bottom: 1px solid rgba(0,0,0, 0.4);
 }
 .workout .first-row {
+    -webkit-user-select: none;
+    user-select: none;
     cursor: pointer;
 }
 .workout .name {
@@ -537,7 +542,6 @@ header, footer, section, article, nav {
 
 .workout .desc {
     display: none;
-    /* display: block; */
     padding: 10px;
 }
 .workout .desc .content {
