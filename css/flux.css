@@ -51,7 +51,6 @@ body {
     width: 100%;
     height: 100%;
     line-height: 1.4em;
-    background-color: #fff;
 }
 .wrapper {
     position: relative;
@@ -109,26 +108,25 @@ header, footer, section, article, nav {
 }
 
 /* Theme */
+#theme.light {
+    color: #000;
+    background-color: #fff;
+}
+#theme.light .switch {
+    color: #000;
+    background-color: #fff;
+    border: 0px;
+}
+#theme.light .graph-bar {
+    border-top: 2px solid rgba(255,255,255, 0.7);
+}
 #theme.dark {
     color: #fff;
-    /* background-color: #000; */
     background-color: #28272D;
-}
-#theme.dark .btn {
-    /* background-color: #fff; */
 }
 #theme.dark .switch {
     color: #fff;
-    /* background-color: #000; */
-    background-color: #28272D;
     border: 0px;
-}
-#theme.dark .line {
-    /* background-color: #fff; */
-}
-
-#theme.dark .graph-bar {
-    border-top: 2px solid rgba(255,255,255, 0.7);
 }
 
 /* Font */
@@ -188,8 +186,9 @@ header, footer, section, article, nav {
     position: relative;
     height: 30px;
     padding: 0 15px 0 15px;
-    color: #000;
-    background-color: #fff;
+
+    color: #fff;
+    background-color: #28272D;
     font-family: sans-serif;
     font-size: 11px;
     letter-spacing: 1px;
