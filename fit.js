@@ -97,6 +97,30 @@ let hrFieldDefinition      = FieldDefinition({fieldNumber: 0, size: 0, baseType:
 
 function Msg() {}
 
+function FitFileHeader() {
+    let buffer = new ArrayBuffer(12); // size is 12 or 14
+    let view   = new DataView(buffer);
+    let headerSize      = 12;
+    let protocolVersion = 20;
+    let profileVersion  = 10;         // ?
+    let dataSize        = 0;
+    let dataTypeByte    = [46, 70, 73, 84]; // ASCII values for ".FIT"
+    let crc             = 0x0000;           // optional
+
+    view.setUint8( 0, headerSize,      true);
+    view.setUint8( 1, protocolVersion, true);
+    view.setUint16(2, profileVersion,  true);
+    view.setInt32( 4, dataSize,        true);
+    view.setUint8( 8, dataTypeByte[0], true);
+    view.setUint8( 9, dataTypeByte[1], true);
+    view.setUint8(10, dataTypeByte[2], true);
+    view.setUint8(11, dataTypeByte[3], true);
+    // view.setUint16(12, crc,             true);
+
+    return buffer;
+}
+
+
 function Encode() {
     let startTime = new Date.now();      // 1603377421339
     let timestamp = new Date(startTime); // Thu Oct 22 2020 17:36:34 GMT+0300 (Eastern European Summer Time)
