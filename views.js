@@ -39,6 +39,11 @@ function secondsToHms(elapsed, compact = false) {
     let hD = (hour < 10) ? `0${hour}` : `${hour}`;
     return compact ? `${mD}:${sD}` : `${hD}:${mD}:${sD}`;
 }
+function metersToDistance(meters) {
+    let km = (meters / 1000);
+    let s = (meters < 1000) ? `${meters} m`  : `${km.toFixed(2)} km`;
+    return s;
+}
 
 function DataScreen(args) {
     let dom = args.dom;
@@ -50,13 +55,21 @@ function DataScreen(args) {
         let pwr = e.detail.data.pwr;
         dom.power.textContent = `${pwr}`;
     });
+    xf.sub('db:vspd', e => {
+        let vspd = e.detail.data.vspd;
+        dom.speed.textContent = `${vspd.toFixed(1)}`;
+    });
+    xf.sub('db:vdis', e => {
+        let vdis = e.detail.data.vdis;
+        dom.distance.textContent = `${metersToDistance(vdis)}`;
+    });
     xf.sub('db:spd', e => {
         let spd = e.detail.data.spd;
-        dom.speed.textContent = `${spd}`;
+        // dom.speed.textContent = `${spd.toFixed(1)}`;
     });
     xf.sub('db:cad', e => {
         let cad = e.detail.data.cad;
-        dom.cadence.textContent = `${cad}`;
+        // dom.cadence.textContent = `${cad}`;
     });
     xf.sub('db:elapsed', e => {
         let elapsed = e.detail.data.elapsed;
@@ -245,7 +258,7 @@ function WorkoutsView(args) {
             let display = window.getComputedStyle(dom.descriptions[i])
                                 .getPropertyValue('display');
 
-            if(display === "none") {
+            if(display === 'none') {
                 dom.descriptions[i].style.display = 'block';
             } else {
                 dom.descriptions[i].style.display = 'none';

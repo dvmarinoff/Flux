@@ -18,6 +18,7 @@ let dom = {
         power:     document.querySelector('#power'),
         cadence:   document.querySelector('#cadence'),
         speed:     document.querySelector('#speed'),
+        distance:  document.querySelector('#distance'),
         heartRate: document.querySelector('#heart-rate')
     },
     controlscreen: {
