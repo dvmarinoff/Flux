@@ -120,6 +120,74 @@ function FitFileHeader() {
     return buffer;
 }
 
+function MsgHeader(args) {
+    let header          = 0b00000000;
+
+    let normalHeader    = 0b10000000;  // bit 7 = 1
+    let timestampHeader = 0b00000000;  // bit 7 = 0
+    let definitionMsg   = 0b01000000;  // bit 6 = 1
+    let dataMsg         = 0b00000000;  // bit 6 = 0
+    let hasDevData      = 0b00100000;  // bit 5 = 0
+    let noDevData       = 0b00000000;  // bit 5 = 0
+    let localMsgType    = args.localMsgType || 0b00000000; // bit 3-0 values (0...15)
+
+    header |= args.localMsgType;
+
+    if(args.headerType === 'normal')    header |= normalHeader;
+    if(args.headerType === 'timestamp') header |= timestampHeader;
+    if(args.msgType === 'definition')   header |= definitionMsg;
+    if(args.msgType === 'data')         header |= dataMsg;
+    if(args.developerDataFlag)          header |= hasDevData;
+    if(!args.developerDataFlag)         header |= noDevData;
+    if(!args.developerDataFlag)         header |= noDevData;
+
+    return header;
+}
+
+function DataMsgHeader() {
+    return MsgHeader({headerType: 'normal', msgType: 'data', developerDataFlag: false});
+}
+function DataMsgContent() {
+    let buffer = new ArrayBuffer();
+    let view   = new DataView(buffer);
+}
+
+function DefinitionMsgHeader() {
+    return MsgHeader({headerType: 'normal', msgType: 'definition', developerDataFlag: false});
+}
+function DefinitionMsgContent(args) {
+    let buffer = new ArrayBuffer(); // size is 12 or 14
+    let view   = new DataView(buffer);
+    let architecture    = 0; // 0 LittleEndian, 1 BigEndian
+    let globalMsgNumber = args.globalMsgNumber || 0;
+    let numberOfFields  = args.numberOfFields || 0;
+
+    view.setUint8( 0, 0,               true);
+    view.setUint8( 1, architecture,    true);
+    view.setUint16(2, globalMsgNumber, true);
+    view.setUint8( 4, numberOfFields,  true);
+    // ...
+}
+function DefinitionMsg(args) {
+    let header   = DefinitionMsgHeader();
+    let contents = DefinitionMsgContent();
+}
+
+let getBitField = (field, bit) => (field >> bit) & 1;
+
+function FitFileExample() {
+    let buffer = new ArrayBuffer();
+    let view   = new DataView(buffer);
+
+    let header = FitFileHeader();
+
+    let record1 = DefinitionMsg();
+
+    return buffer;
+}
+
+
+
 
 function Encode() {
     let startTime = new Date.now();      // 1603377421339
