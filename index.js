@@ -3,6 +3,7 @@ import { Device, Hrb, Controllable } from './ble/device.js';
 import { parseZwo } from './parser.js';
 import { StopWatch } from './workout.js';
 import { WakeLock } from './lock.js';
+import { speedFromPower } from './speed.js';
 import { workouts } from './workouts/workouts.js';
 import { ControllableConnectionView,
          HrbConnectionView,
@@ -29,20 +30,48 @@ let db = DB({
     pwr: [],
     spd: [],
     cad: [],
+    vspd: [],
+    vdis: 0,
     ftp: 256,
     targetPwr: 100,
     elapsed: 0,
     lapTime: 0,
+    timestamp: new Date(),
     laps: [],
     workout: [],
     workoutFile: '',
     workouts: {},
     fitMsgs:  [],
     darkMode: true,
+    env: {
+        riderWeight: 73,
+        bikeWeight: 7.7,
+        totalWeight: 80.7,
+        cda: 0.3451,
+        loss: 0,
+        crr: 0.005,
+        wind: 0,
+        grade: 0,
+        g: 9.8067,
+        rho: 1.2251781195947158,
+        temperature: 20,
+        elevation: 100,
+        airPressure: 1018,
+        dewPoint: 7.5,
+    }
 });
 
 xf.reg('device:hr',  e => db.hr  = e.detail.data);
-xf.reg('device:pwr', e => db.pwr = e.detail.data);
+xf.reg('device:pwr', e => {
+    let newTimestamp = new Date();
+    let oldTimestamp = db.timestamp;
+    let time = (newTimestamp.getTime() - oldTimestamp.getTime()) / 1000;
+    db.timestamp = newTimestamp;
+    db.pwr = e.detail.data;
+    db.vspd = speedFromPower(e.detail.data, db.env);
+    db.vdis += parseInt((db.vspd / 3.6) * time);
+    console.log(time);
+});
 xf.reg('device:spd', e => db.spd = e.detail.data);
 xf.reg('device:cad', e => db.cad = e.detail.data);
 xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
