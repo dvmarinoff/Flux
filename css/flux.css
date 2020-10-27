@@ -538,6 +538,18 @@ header, footer, section, article, nav {
     /* border-top: 2px solid rgba(0,0,0, 0.1);; */
 }
 
+.workout-graph-cont {
+}
+.workout-graph {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-end;
+    height: 100px;
+    padding: 0;
+}
+
 .gray-zone {
     background-color: #636468;
 }

@@ -1,4 +1,11 @@
 import { xf } from './xf.js';
+import { avgOfArray,
+         powerToColor,
+         hrToColor,
+         valueToHeight,
+         secondsToHms,
+         metersToDistance } from './functions.js';
+import { parseZwo, intervalsToGraph } from './parser.js';
 
 function ControllableConnectionView(args) {
     let dom = args.dom;
@@ -30,21 +37,6 @@ function HrbConnectionView(args) {
     });
 }
 
-function secondsToHms(elapsed, compact = false) {
-    let hour = Math.floor(elapsed / 3600);
-    let min  = Math.floor(elapsed % 3600 / 60);
-    let sec  = elapsed % 60;
-    let sD = (sec < 10)  ? `0${sec}`  : `${sec}`;
-    let mD = (min < 10)  ? `0${min}`  : `${min}`;
-    let hD = (hour < 10) ? `0${hour}` : `${hour}`;
-    return compact ? `${mD}:${sD}` : `${hD}:${mD}:${sD}`;
-}
-function metersToDistance(meters) {
-    let km = (meters / 1000);
-    let s = (meters < 1000) ? `${meters} m`  : `${km.toFixed(2)} km`;
-    return s;
-}
-
 function DataScreen(args) {
     let dom = args.dom;
     xf.sub('db:hr', e => {
@@ -65,11 +57,11 @@ function DataScreen(args) {
     });
     xf.sub('db:spd', e => {
         let spd = e.detail.data.spd;
-        // dom.speed.textContent = `${spd.toFixed(1)}`;
+        dom.speed.textContent = `${spd.toFixed(1)}`;
     });
     xf.sub('db:cad', e => {
         let cad = e.detail.data.cad;
-        // dom.cadence.textContent = `${cad}`;
+        dom.cadence.textContent = `${cad}`;
     });
     xf.sub('db:elapsed', e => {
         let elapsed = e.detail.data.elapsed;
@@ -90,54 +82,16 @@ function DataScreen(args) {
     });
 }
 
-function hrToColor(value) {
-    let color = 'gray';
-    if(value < 100) {
-        color = 'gray';
-    } else if(value < 120) {
-        color = 'blue';
-    } else if(value < 160) {
-        color = 'green';
-    } else if(value < 175) {
-        color = 'yellow';
-    } else if(value < 190) {
-        color = 'orange';
-    } else {
-        color = 'red';
-    }
-    return color;
-}
-
-function pwrToColor(value) {
-    let color = 'gray';
-    let ftp = 256;
-    if(value < (ftp * 0.55)) {
-        color = 'gray';
-    } else if(value < (ftp * 0.76)) {
-        color = 'blue';
-    } else if(value < (ftp * 0.88)) {
-        color = 'green';
-    } else if(value < (ftp * 0.95)) {
-        color = 'yellow';
-    } else if(value < (ftp * 1.06)) {
-        color = 'yellow';
-    } else if (value < (ftp * 1.20)) {
-        color = 'orange';
-    } else {
-        color = 'red';
-    }
-    return color;
-}
-
-function valueToHeight(max, value) {
-    return 100 * (value/max);
-}
-
 function GraphPower(args) {
     let dom = args.dom;
+    let ftp = 100;
     let size = dom.cont.getBoundingClientRect().width;
     let count = 0;
     let scale = 400;
+
+    xf.sub('db:ftp', e => {
+        ftp = e.detail.data.ftp;
+    });
     xf.sub('db:pwr', e => {
         let pwr = e.detail.data.pwr;
         let h = valueToHeight(scale, pwr);
@@ -145,9 +99,10 @@ function GraphPower(args) {
         if(count >= size) {
             dom.graph.removeChild(dom.graph.childNodes[0]);
         }
-        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${pwrToColor(pwr)}-zone" style="height: ${h}%"></div>`);
+        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${(powerToColor(pwr, ftp)).name}-zone" style="height: ${h}%"></div>`);
     });
 }
+
 function GraphHr(args) {
     let dom = args.dom;
     let count = 0;
@@ -233,7 +188,18 @@ function WorkoutsView(args) {
     let dom = args.dom;
     let workouts = args.workouts;
 
+    xf.reg('db:workoutName', e => {
+        dom.currentName.textContent = e.detail.data.workoutName;
+    });
+    xf.reg('db:currentWorkoutGraph', e => {
+        dom.currentGraph.innerHTML = ``;
+        dom.currentGraph.insertAdjacentHTML('beforeend', e.detail.data.currentWorkoutGraph);
+    });
+
     workouts.forEach( (w, i) => {
+        // let graph = intervalsToGraph(parseZwo(w.xml));
+        // <div class="workout-graph">${graph}</div>
+
         let item = `
             <div class='workout list-item cf' id="li${i}">
                 <div class="first-row">
@@ -243,10 +209,10 @@ function WorkoutsView(args) {
                     <div class="select" id="btn${i}"><button class="btn">Select</button></div>
                 </div>
                 <div class="second-row">
-                    <div class="desc"><div class="content t4">${w.description}</div></div>
+                    <div class="desc">
+                        <div class="content t4">${w.description}</div></div>
                 </div>
-            </div>
-`;
+            </div>`;
 
         dom.list.insertAdjacentHTML('beforeend', item);
 
@@ -269,11 +235,13 @@ function WorkoutsView(args) {
             e.stopPropagation();
             xf.dispatch('ui:workouts:select', i);
             xf.dispatch('file:workout', workouts[i].xml);
+            xf.dispatch('workout:name', workouts[i].name);
         }, dom.select[i]);
     });
 
 
 }
+
 
 function LoadWorkoutView(args) {
     let dom = args.dom;

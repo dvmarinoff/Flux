@@ -44,8 +44,10 @@ let dom = {
         fileBtn: document.querySelector('#workout-file'),
     },
     workouts: {
-        workouts: document.querySelector('#workouts'),
-        list:     document.querySelector('#workouts .list'),
+        currentName:  document.querySelector('#current-workout-name'),
+        currentGraph: document.querySelector('#current-workout-graph'),
+        workouts:     document.querySelector('#workouts'),
+        list:         document.querySelector('#workouts .list'),
         items: [],
         select: [],
         descriptions: [],

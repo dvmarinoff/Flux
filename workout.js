@@ -87,6 +87,7 @@ class StopWatch {
         xf.dispatch('watch:lapTime', 0);
         xf.dispatch('watch:stopped');
     }
+
     onTick() {
         let self = this;
         self.elapsed += 1;
@@ -96,7 +97,7 @@ class StopWatch {
         } else {
             self.lapTime += 1;
         }
-        xf.dispatch('watch:elapsed',  self.elapsed);
+        xf.dispatch('watch:elapsed', self.elapsed);
         xf.dispatch('watch:lapTime', self.lapTime);
         if((self.workoutStarted) && (self.lapTime === 0)) {
             self.lap();

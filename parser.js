@@ -1,3 +1,7 @@
+import { powerToColor,
+         hrToColor,
+         valueToHeight } from './functions.js';
+
 function readWarmup(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
     let powerLow  = parseFloat(el.getAttribute('PowerLow'));
@@ -139,4 +143,16 @@ function parseZwo(zwo) {
     return intervals;
 }
 
-export { parseZwo };
+function intervalsToGraph(intervals) {
+    let scale = 400;
+    return intervals.reduce( (acc, interval) => {
+        let width = (interval.duration / 10) < 1 ? 1 : parseInt(Math.round(interval.duration / 10));
+        let height = valueToHeight(scale, (interval.power === 0) ? 80 : interval.power);
+
+        return acc +
+            // `<polygon points="100,100 150,25 150,75 200,0" fill="${(powerToColor(interval.target)).hex}" />`;
+        `<div class="graph-bar ${(powerToColor(interval.power)).name}-zone" style="height: ${height}%; width: ${width}px"></div>`;
+    }, ``);
+}
+
+export { parseZwo, intervalsToGraph };

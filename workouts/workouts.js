@@ -1,14 +1,14 @@
 let workouts =
 [
-{ name: 'Maple (ramp)',
+{ name: 'Maple',
   type: 'Sweet Spot',
   description: '4 times 10 min Sweet Spot intervals with 5 min recovery in between and warm-up Ramp.',
   duration: 80,
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>4x10 min Sweet Spot</name>
-    <description>A Classic sweet spot workout.</description>
+    <name>Maple</name>
+    <description>4 times 10 min Sweet Spot intervals with 5 min recovery in between and warm-up Ramp.</description>
     <sportType>bike</sportType>
     <tags>
         <tag name="sweet"/>
@@ -23,15 +23,15 @@ let workouts =
     </workout>
 </workout_file>`
 },
-{ name: 'Maple',
+{ name: 'Maple (flat)',
   type: 'Sweet Spot',
   description: '4 times 10 min Sweet Spot intervals with 5 min recovery in between.',
   duration: 80,
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>4x10 min Sweet Spot</name>
-    <description>A Classic sweet spot workout.</description>
+    <name>Maple</name>
+    <description>4 times 10 min Sweet Spot intervals with 5 min recovery in between.</description>
     <sportType>bike</sportType>
     <workout>
         <SteadyState Duration="60" Power="0.30"/>
@@ -51,8 +51,8 @@ let workouts =
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>2x20min 98%</name>
-    <description>A Classic Threshold workout.</description>
+    <name>Pasta</name>
+    <description>A Classic 2 times 20 min at almost FTP. Make sure you had some pasta before this session. You will need it!</description>
     <sportType>bike</sportType>
     <tags>
     </tags>
@@ -79,8 +79,8 @@ let workouts =
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>60/60s 131%</name>
-    <description></description>
+    <name>Dijon</name>
+    <description>60/60s or 60 sec ON at 131% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.</description>
     <sportType>bike</sportType>
     <tags>
     </tags>
@@ -108,8 +108,8 @@ let workouts =
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>40/20s 121%</name>
-    <description></description>
+    <name>Chili Pepper</name>
+    <description>40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each.</description>
     <sportType>bike</sportType>
     <tags>
     </tags>
@@ -137,8 +137,8 @@ let workouts =
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>40/20s 131%</name>
-    <description></description>
+    <name>Chili Pepper +1</name>
+    <description>Short but tough, this is the hardest workout ever. It\'s gonna burn!</description>
     <sportType>bike</sportType>
     <tags>
     </tags>
@@ -158,15 +158,15 @@ let workouts =
     </workout>
 </workout_file>
 `},
-{ name: 'Butter',
+{ name: 'Baguette',
   type: 'Base',
   description: 'The bread and butter of Endurance training with efforts in Zone 1 and 2.',
-  duration: 110,
+  duration: 105,
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>6x z1-2</name>
-    <description>Enduarance workout in Zone 1 and 2.</description>
+    <name>Baguette</name>
+    <description>The bread and butter of Endurance training with efforts in Zone 1 and 2.</description>
     <sportType>bike</sportType>
     <tags>
     </tags>
@@ -183,20 +183,19 @@ let workouts =
         <SteadyState Duration="600" Power="0.63"/>
         <SteadyState Duration="300" Power="0.51"/>
         <SteadyState Duration="600" Power="0.59"/>
-        <SteadyState Duration="300" Power="0.51"/>
         <FreeRide Duration="600" FlatRoad="1"/>
     </workout>
 </workout_file>`
 },
-{ name: 'Butter +1',
+{ name: 'Baguette +1',
   type: 'Base',
   description: 'The bread and butter of Endurance training, with efforts in Zone 2.',
-  duration: 110,
+  duration: 105,
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>6x z2</name>
-    <description>Enduarance workout in Zone 2.</description>
+    <name>Baguette</name>
+    <description>The bread and butter of Endurance training, with efforts in Zone 2.</description>
     <sportType>bike</sportType>
     <tags>
     </tags>
@@ -213,7 +212,6 @@ let workouts =
         <SteadyState Duration="600" Power="0.67"/>
         <SteadyState Duration="300" Power="0.55"/>
         <SteadyState Duration="600" Power="0.63"/>
-        <SteadyState Duration="300" Power="0.55"/>
         <FreeRide Duration="600" FlatRoad="1"/>
     </workout>
 </workout_file>`

@@ -1,6 +1,8 @@
+import 'regenerator-runtime/runtime';
 import { dom } from './dom.js';
 import { Device, Hrb, Controllable } from './ble/device.js';
-import { parseZwo } from './parser.js';
+import { avgOfArray } from './functions.js';
+import { parseZwo, intervalsToGraph } from './parser.js';
 import { StopWatch } from './workout.js';
 import { WakeLock } from './lock.js';
 import { speedFromPower } from './speed.js';
@@ -26,11 +28,13 @@ import { xf, DB } from './xf.js';
 
 
 let db = DB({
-    hr: [],
-    pwr: [],
-    spd: [],
-    cad: [],
-    vspd: [],
+    hr: 0,
+    pwr: 0,
+    pwrRecords: [],
+    pwrAvgBuffer: [],
+    spd: 0,
+    vspd: 0,
+    cad: 0,
     vdis: 0,
     ftp: 256,
     targetPwr: 100,
@@ -39,6 +43,8 @@ let db = DB({
     timestamp: new Date(),
     laps: [],
     workout: [],
+    workoutName: '',
+    currentWorkoutGraph: ``,
     workoutFile: '',
     workouts: {},
     fitMsgs:  [],
@@ -60,23 +66,32 @@ let db = DB({
         dewPoint: 7.5,
     }
 });
-
 xf.reg('device:hr',  e => db.hr  = e.detail.data);
 xf.reg('device:pwr', e => {
-    let newTimestamp = new Date();
-    let oldTimestamp = db.timestamp;
-    let time = (newTimestamp.getTime() - oldTimestamp.getTime()) / 1000;
-    db.timestamp = newTimestamp;
     db.pwr = e.detail.data;
-    db.vspd = speedFromPower(e.detail.data, db.env);
-    db.vdis += parseInt((db.vspd / 3.6) * time);
-    console.log(time);
+    db.pwrAvgBuffer.push(e.detail.data);
+});
+xf.reg('watch:elapsed', e => {
+    let watchTime = e.detail.data;
+    let timestamp = 0;
+    let pwrAvg = 0;
+    let powerSmoothInterval = 3;
+    let powerRecordInterval = 1;
+
+    if(watchTime % powerRecordInterval === 0) {
+        pwrAvg = parseInt(avgOfArray(db.pwrAvgBuffer));
+        timestamp = new Date();
+        db.pwrRecords.push({pwr: pwrAvg, timestamp: timestamp});
+        db.pwrAvgBuffer = [];
+    }
+    if(watchTime % powerSmoothInterval === 0) {}
 });
 xf.reg('device:spd', e => db.spd = e.detail.data);
 xf.reg('device:cad', e => db.cad = e.detail.data);
 xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
 xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
 xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
+xf.reg('ui:ftp',         e => db.ftp = e.detail.data);
 xf.reg('watch:elapsed',  e => db.elapsed = e.detail.data);
 xf.reg('watch:lapTime',  e => db.lapTime = e.detail.data);
 xf.reg('watch:lap',      e => db.laps.push(e.detail.data));
@@ -87,6 +102,11 @@ xf.reg('file:workout',   e => {
     workout.forEach( x => x.power = Math.round(ftp * x.power));
     console.log(workout);
     db.workout = workout;
+    let workoutGraph = intervalsToGraph(workout);
+    db.currentWorkoutGraph = workoutGraph;
+});
+xf.reg('workout:name', e => {
+    db.workoutName = e.detail.data;
 });
 
 xf.reg('watch:nextWorkoutInterval', e => {
@@ -120,6 +140,8 @@ function start() {
 
     // Default Workout:
     xf.dispatch('file:workout', workouts[0].xml);
+    xf.dispatch('workout:name', workouts[0].name);
+    xf.dispatch('ui:ftp', 256);
 };
 
 start();
