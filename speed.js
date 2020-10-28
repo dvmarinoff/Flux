@@ -1,12 +1,12 @@
-let sin    = x => Math.sin(x);
-let cos    = x => Math.cos(x);
-let arctan = x => Math.atan(x);
-let abs    = x => Math.abs(x);
-let sqr    = x => x * x;
-let exp    = x => Math.exp(x);
-let avg    = (x, y) => (x + y) / 2;
-let mps    = kph => kph / 3.6;
-let kph    = mps => 3.6 * mps;
+import { sin,
+         cos,
+         arctan,
+         abs,
+         sqr,
+         exp,
+         mps,
+         kph,
+         avg } from './functions.js';
 
 function rho(temp, elevation) {
     return (1.293 - 0.00426 * temp) * exp(elevation / 7000);
@@ -35,7 +35,7 @@ function powerWind(dragConst, velocity) {
 function newton(f, fprime, guess = 20, iter = 10, epsilon = 0.05) {
 		for (let i = 1; i < iter; i++) {
 			  let nextGuess = guess - f(guess) / fprime(guess);
-			  if (Math.abs(nextGuess - guess) < epsilon) {
+			  if (abs(nextGuess - guess) < epsilon) {
             return nextGuess;
         }
 			  guess = nextGuess;

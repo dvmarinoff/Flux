@@ -1,6 +1,7 @@
 import { dom } from './dom.js';
 import { Device, Hrb, Controllable } from './ble/device.js';
-import { parseZwo } from './parser.js';
+import { avgOfArray } from './functions.js';
+import { parseZwo, intervalsToGraph } from './parser.js';
 import { StopWatch } from './workout.js';
 import { WakeLock } from './lock.js';
 import { speedFromPower } from './speed.js';
@@ -10,12 +11,15 @@ import { ControllableConnectionView,
          DataScreen,
          GraphHr,
          GraphPower,
+         GraphWorkout,
          ControlView,
          LoadWorkoutView,
          WorkoutsView
        } from './views.js';
 import { DeviceController,
          FileController,
+         WorkoutController,
+         Screen,
          Vibrate } from './controllers.js';
 import { DataMock } from './test/mock.js';
 import { xf, DB } from './xf.js';
@@ -26,11 +30,13 @@ import { xf, DB } from './xf.js';
 
 
 let db = DB({
-    hr: [],
-    pwr: [],
-    spd: [],
-    cad: [],
-    vspd: [],
+    hr: 0,
+    pwr: 0,
+    pwrRecords: [],
+    pwrAvgBuffer: [],
+    spd: 0,
+    vspd: 0,
+    cad: 0,
     vdis: 0,
     ftp: 256,
     targetPwr: 100,
@@ -40,7 +46,7 @@ let db = DB({
     laps: [],
     workout: [],
     workoutFile: '',
-    workouts: {},
+    workouts: [],
     fitMsgs:  [],
     darkMode: true,
     env: {
@@ -60,35 +66,37 @@ let db = DB({
         dewPoint: 7.5,
     }
 });
-
 xf.reg('device:hr',  e => db.hr  = e.detail.data);
 xf.reg('device:pwr', e => {
-    let newTimestamp = new Date();
-    let oldTimestamp = db.timestamp;
-    let time = (newTimestamp.getTime() - oldTimestamp.getTime()) / 1000;
-    db.timestamp = newTimestamp;
     db.pwr = e.detail.data;
-    db.vspd = speedFromPower(e.detail.data, db.env);
-    db.vdis += parseInt((db.vspd / 3.6) * time);
-    console.log(time);
+    db.pwrAvgBuffer.push(e.detail.data);
+});
+xf.reg('watch:elapsed', e => {
+    let watchTime = e.detail.data;
+    let timestamp = 0;
+    let pwrAvg = 0;
+    let powerSmoothInterval = 3;
+    let powerRecordInterval = 1;
+
+    if(watchTime % powerRecordInterval === 0) {
+        pwrAvg = parseInt(avgOfArray(db.pwrAvgBuffer));
+        timestamp = new Date();
+        db.pwrRecords.push({pwr: pwrAvg, timestamp: timestamp});
+        db.pwrAvgBuffer = [];
+    }
+    if(watchTime % powerSmoothInterval === 0) {}
 });
 xf.reg('device:spd', e => db.spd = e.detail.data);
 xf.reg('device:cad', e => db.cad = e.detail.data);
-xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
-xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
-xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
 xf.reg('watch:elapsed',  e => db.elapsed = e.detail.data);
 xf.reg('watch:lapTime',  e => db.lapTime = e.detail.data);
 xf.reg('watch:lap',      e => db.laps.push(e.detail.data));
-xf.reg('file:workout',   e => {
-    let workout = e.detail.data;
-    let ftp = db.ftp;
-    workout = parseZwo(workout); // move parsing out
-    workout.forEach( x => x.power = Math.round(ftp * x.power));
-    console.log(workout);
-    db.workout = workout;
-});
-
+xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
+xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
+xf.reg('ui:ftp',         e => db.ftp = e.detail.data);
+xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
+xf.reg('ui:workout:set', e => db.workout = db.workouts[e.detail.data]);
+xf.reg('workout:add',    e => {console.log(db.workouts); db.workouts.push(e.detail.data)});
 xf.reg('watch:nextWorkoutInterval', e => {
     let targetPwr = db.workout[e.detail.data].power;
     db.targetPwr = targetPwr;
@@ -105,7 +113,7 @@ function start() {
 
     DataScreen({dom: dom.datascreen});
     GraphPower({dom: dom.graphPower});
-    // GraphHr({dom: dom.graphHr});
+    GraphWorkout({dom: dom.graphWorkout});
 
     ControlView({dom: dom.controlscreen});
     LoadWorkoutView({dom: dom.file});
@@ -113,13 +121,12 @@ function start() {
 
     DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
+    WorkoutController();
 
+    Screen();
     Vibrate({vibrate: false, long: false});
 
     // DataMock({hr: false, pwr: true});
-
-    // Default Workout:
-    xf.dispatch('file:workout', workouts[0].xml);
 };
 
 start();

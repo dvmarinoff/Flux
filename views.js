@@ -1,4 +1,11 @@
 import { xf } from './xf.js';
+import { avgOfArray,
+         powerToColor,
+         hrToColor,
+         valueToHeight,
+         secondsToHms,
+         metersToDistance } from './functions.js';
+import { parseZwo, intervalsToGraph } from './parser.js';
 
 function ControllableConnectionView(args) {
     let dom = args.dom;
@@ -30,21 +37,6 @@ function HrbConnectionView(args) {
     });
 }
 
-function secondsToHms(elapsed, compact = false) {
-    let hour = Math.floor(elapsed / 3600);
-    let min  = Math.floor(elapsed % 3600 / 60);
-    let sec  = elapsed % 60;
-    let sD = (sec < 10)  ? `0${sec}`  : `${sec}`;
-    let mD = (min < 10)  ? `0${min}`  : `${min}`;
-    let hD = (hour < 10) ? `0${hour}` : `${hour}`;
-    return compact ? `${mD}:${sD}` : `${hD}:${mD}:${sD}`;
-}
-function metersToDistance(meters) {
-    let km = (meters / 1000);
-    let s = (meters < 1000) ? `${meters} m`  : `${km.toFixed(2)} km`;
-    return s;
-}
-
 function DataScreen(args) {
     let dom = args.dom;
     xf.sub('db:hr', e => {
@@ -65,11 +57,11 @@ function DataScreen(args) {
     });
     xf.sub('db:spd', e => {
         let spd = e.detail.data.spd;
-        // dom.speed.textContent = `${spd.toFixed(1)}`;
+        dom.speed.textContent = `${spd.toFixed(1)}`;
     });
     xf.sub('db:cad', e => {
         let cad = e.detail.data.cad;
-        // dom.cadence.textContent = `${cad}`;
+        dom.cadence.textContent = `${cad}`;
     });
     xf.sub('db:elapsed', e => {
         let elapsed = e.detail.data.elapsed;
@@ -90,54 +82,16 @@ function DataScreen(args) {
     });
 }
 
-function hrToColor(value) {
-    let color = 'gray';
-    if(value < 100) {
-        color = 'gray';
-    } else if(value < 120) {
-        color = 'blue';
-    } else if(value < 160) {
-        color = 'green';
-    } else if(value < 175) {
-        color = 'yellow';
-    } else if(value < 190) {
-        color = 'orange';
-    } else {
-        color = 'red';
-    }
-    return color;
-}
-
-function pwrToColor(value) {
-    let color = 'gray';
-    let ftp = 256;
-    if(value < (ftp * 0.55)) {
-        color = 'gray';
-    } else if(value < (ftp * 0.76)) {
-        color = 'blue';
-    } else if(value < (ftp * 0.88)) {
-        color = 'green';
-    } else if(value < (ftp * 0.95)) {
-        color = 'yellow';
-    } else if(value < (ftp * 1.06)) {
-        color = 'yellow';
-    } else if (value < (ftp * 1.20)) {
-        color = 'orange';
-    } else {
-        color = 'red';
-    }
-    return color;
-}
-
-function valueToHeight(max, value) {
-    return 100 * (value/max);
-}
-
 function GraphPower(args) {
     let dom = args.dom;
+    let ftp = 100;
     let size = dom.cont.getBoundingClientRect().width;
     let count = 0;
     let scale = 400;
+
+    xf.sub('db:ftp', e => {
+        ftp = e.detail.data.ftp;
+    });
     xf.sub('db:pwr', e => {
         let pwr = e.detail.data.pwr;
         let h = valueToHeight(scale, pwr);
@@ -145,9 +99,10 @@ function GraphPower(args) {
         if(count >= size) {
             dom.graph.removeChild(dom.graph.childNodes[0]);
         }
-        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${pwrToColor(pwr)}-zone" style="height: ${h}%"></div>`);
+        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${(powerToColor(pwr, ftp)).name}-zone" style="height: ${h}%"></div>`);
     });
 }
+
 function GraphHr(args) {
     let dom = args.dom;
     let count = 0;
@@ -162,6 +117,41 @@ function GraphHr(args) {
             dom.graph.removeChild(dom.graph.childNodes[0]); // shift and replace
         }
         dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${hrToColor(hr)}-zone" style="height: ${h}%"></div>`);
+    });
+}
+
+function GraphWorkout(args) {
+    let dom = args.dom;
+    let index = 0;
+    let setProgress = index => {
+        let rect = dom.intervals[index].getBoundingClientRect();
+        dom.active.style.left    = `${rect.left}px`;
+        dom.active.style.width   = `${rect.width}px`;
+        // dom.progress.style.width = `${rect.left}px`;
+    };
+
+    xf.reg('db:workout', e => {
+        let workout = e.detail.data.workout;
+        dom.name.textContent = workout.name;
+
+        dom.graph.innerHTML = ``;
+        dom.graph.insertAdjacentHTML('beforeend',
+                                     `<div id="progress" class="progress"></div>
+                                      <div id="progress-active"></div>
+                                      ${workout.graph}`);
+
+        dom.progress  = document.querySelector('#progress');
+        dom.active    = document.querySelector('#progress-active');
+        dom.intervals = document.querySelectorAll('#current-workout-graph .graph-bar');
+    });
+
+    xf.reg('watch:nextWorkoutInterval', e => {
+        index = e.detail.data;
+        setProgress(index);
+    });
+
+    xf.reg('screen:change', e => {
+        setProgress(index);
     });
 }
 
@@ -216,64 +206,56 @@ function ControlView(args) {
     xf.sub('watch:stopped', e => {
         dom.watch.start.textContent = 'Start';
     });
-
-    // xf.sub('watch:lap', e => {
-    //     let lap = e.detail.data;
-    //     console.log(lap);
-    //     let time = lap.lapTime;
-    //     let start = lap.start;
-    //     let end = lap.end;
-    //     // dom.laps.insertAdjacentHTML('beforeend',
-    //     //                             `<div class="lap"><div>${time}</div><div>${start}</div><div>${end}</div>></div>`);
-    // });
 }
 
 
 function WorkoutsView(args) {
     let dom = args.dom;
-    let workouts = args.workouts;
 
-    workouts.forEach( (w, i) => {
+    xf.reg('workout:add', e => {
+        let w = e.detail.data;
+
         let item = `
-            <div class='workout list-item cf' id="li${i}">
+            <div class='workout list-item cf' id="li${w.id}">
                 <div class="first-row">
                     <div class="name t4">${w.name}</div>
                     <div class="type t4">${w.type}</div>
                     <div class="time t4">${w.duration} min</div>
-                    <div class="select" id="btn${i}"><button class="btn">Select</button></div>
+                    <div class="select" id="btn${w.id}"><button class="btn">Select</button></div>
                 </div>
                 <div class="second-row">
-                    <div class="desc"><div class="content t4">${w.description}</div></div>
+                    <div class="desc">
+                        <div class="workout-graph">${w.graph}</div>
+                        <div class="content t4">${w.description}</div>
+                    </div>
                 </div>
-            </div>
-`;
+            </div>`;
 
         dom.list.insertAdjacentHTML('beforeend', item);
 
-        dom.items.push(document.querySelector(`.list #li${i} .first-row`));
-        dom.select.push(document.querySelector(`.list #btn${i}`));
-        dom.descriptions.push(document.querySelector(`.list #li${i} .desc`));
+        dom.items.push(document.querySelector(`.list #li${w.id} .first-row`));
+        dom.select.push(document.querySelector(`.list #btn${w.id}`));
+        dom.descriptions.push(document.querySelector(`.list #li${w.id} .desc`));
 
         xf.sub('pointerup', e => {
-            let display = window.getComputedStyle(dom.descriptions[i])
-                                .getPropertyValue('display');
+            let display = window.getComputedStyle(dom.descriptions[w.id])
+                .getPropertyValue('display');
 
             if(display === 'none') {
-                dom.descriptions[i].style.display = 'block';
+                dom.descriptions[w.id].style.display = 'block';
             } else {
-                dom.descriptions[i].style.display = 'none';
+                dom.descriptions[w.id].style.display = 'none';
             }
-        }, dom.items[i]);
+        }, dom.items[w.id]);
 
         xf.sub('pointerup', e => {
             e.stopPropagation();
-            xf.dispatch('ui:workouts:select', i);
-            xf.dispatch('file:workout', workouts[i].xml);
-        }, dom.select[i]);
+            xf.dispatch('ui:workout:set', w.id);
+        }, dom.select[w.id]);
+
     });
-
-
 }
+
 
 function LoadWorkoutView(args) {
     let dom = args.dom;
@@ -290,6 +272,7 @@ export {
     DataScreen,
     GraphHr,
     GraphPower,
+    GraphWorkout,
     ControlView,
     LoadWorkoutView,
     WorkoutsView,

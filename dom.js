@@ -44,11 +44,17 @@ let dom = {
         fileBtn: document.querySelector('#workout-file'),
     },
     workouts: {
-        workouts: document.querySelector('#workouts'),
-        list:     document.querySelector('#workouts .list'),
+        workouts:     document.querySelector('#workouts'),
+        list:         document.querySelector('#workouts .list'),
         items: [],
         select: [],
         descriptions: [],
+    },
+    graphWorkout: {
+        progress:  document.querySelector('#progress'),
+        name:      document.querySelector('#current-workout-name'),
+        graph:     document.querySelector('#current-workout-graph'),
+        intervals: [],
     },
     graphHr: {
         cont:  document.querySelector('#graph-hr'),
