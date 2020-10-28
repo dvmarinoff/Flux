@@ -1,5 +1,7 @@
 import { xf } from './xf.js';
 import { File } from './file.js';
+import { workouts } from './workouts/workouts.js';
+import { parseZwo, intervalsToGraph } from './parser.js';
 
 function DeviceController(args) {
     let controllable = args.controllable;
@@ -55,6 +57,15 @@ function Vibrate(args) {
     });
 }
 
+function Screen() {
+    window.addEventListener('orientationchange', e => {
+        xf.dispatch('screen:change', e.target);
+    });
+    window.addEventListener('resize', e => {
+        xf.dispatch('screen:change', e.target);
+    });
+}
+
 function FileController() {
 
     xf.sub('db:workoutFile', e => {
@@ -64,11 +75,55 @@ function FileController() {
     });
 }
 
-function WorkoutsController() {
+function WorkoutController() {
+    let ftp = 80;
+    let index = 0;
+    let workout = {};
 
-    // workouts.forEach( w => {
-    //     xf.dispatch('file:workout', workouts[]);
-    // });
+    xf.reg('db:ftp', e => {
+        ftp = e.detail.data.ftp;
+    });
+
+    xf.reg('file:upload:workout', e => {
+        let graph = ``;
+        let workout = {};
+        let xml = e.detail.data;
+        console.log('file:upload:workout');
+        let intervals = parseZwo(xml);
+        intervals.forEach( x => x.power = Math.round(ftp * x.power));
+
+        workout.id = index;
+        workout.name = `Custom ${index}`;
+        workout.type = 'Custom';
+        workout.description = 'Custom workout';
+        workout.xml = xml;
+        workout.intervals = intervals;
+        workout.duration = 0;//intervals.reduce( (acc, x) => acc + (x.duration / 60), 0);
+        workout.graph = intervalsToGraph(intervals);
+
+        console.log(workout);
+        xf.dispatch('workout:add', workout);
+        index += 1;
+    });
+
+    xf.reg('workouts:init', e => {
+        let workoutFiles = e.detail.data;
+        workoutFiles.forEach( w => {
+            let intervals = parseZwo(w.xml);
+            intervals.forEach( x => x.power = Math.round(ftp * x.power));
+            let graph = intervalsToGraph(intervals);
+            w.intervals = intervals;
+            w.id = index;
+            w.graph = graph;
+            xf.dispatch('workout:add', w);
+            index += 1;
+        });
+    });
+
+    //Set defaults and init the build in collection:
+    xf.dispatch('ui:ftp', 256);
+    xf.dispatch('workouts:init', workouts);
+    xf.dispatch('ui:workout:set', 0);
 }
 
-export { DeviceController, FileController, Vibrate };
+export { DeviceController, FileController, WorkoutController, Screen, Vibrate };

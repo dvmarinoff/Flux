@@ -1,7 +1,33 @@
 import { xf } from './xf.js';
+import { parseZwo, intervalsToGraph } from './parser.js';
 
 class Workout {
-    constructor() {}
+    constructor(args) {
+        this.name = args.name || 'Custom';
+        this.type = args.type || 'Custom';
+        this.description = args.description || 'A custom workout.';
+        this.duration = args.duration || 0;
+        this.xml = args.xml || ``;
+        this.intervals = args.intervals || [];
+        this.ftp = args.ftp || 80;
+        this.init();
+    }
+    init() {
+        xf.reg('db:ftp', e => {
+            this.ftp = e.details.data.ftp;
+        });
+    }
+    toIntervals(workout, ftp) {
+        let intervals = parseZwo(w.xml);
+        intervals.forEach( x => x.power = Math.round(ftp * x.power));
+        return intervals;
+    }
+    toGraph(intervals) {
+        return intervalsToGraph(intervals);
+    }
+    fromZwo(xml) {
+        let self = this;
+    }
 }
 
 class StopWatch {
@@ -16,6 +42,8 @@ class StopWatch {
         this.workoutIntervalIndex = 0;
         this.workoutCurrentIntervalDuration = 0;
         this.workoutStarted = false;
+        this.progress = 0;
+        this.workoutDuration = 0;
         this.init();
     }
     init() {

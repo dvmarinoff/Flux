@@ -146,7 +146,7 @@ function parseZwo(zwo) {
 function intervalsToGraph(intervals) {
     let scale = 400;
     return intervals.reduce( (acc, interval) => {
-        let width = (interval.duration / 10) < 1 ? 1 : parseInt(Math.round(interval.duration / 10));
+        let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration));
         let height = valueToHeight(scale, (interval.power === 0) ? 80 : interval.power);
 
         return acc +

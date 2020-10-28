@@ -9,7 +9,7 @@ class File {
         reader.onload = _ => {
             let res = reader.result;
             console.log(res);
-            xf.dispatch('file:workout', res);
+            xf.dispatch('file:upload:workout', res);
         };
         reader.onerror = _ => {
             let err = reader.error;

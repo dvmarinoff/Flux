@@ -12,12 +12,15 @@ import { ControllableConnectionView,
          DataScreen,
          GraphHr,
          GraphPower,
+         GraphWorkout,
          ControlView,
          LoadWorkoutView,
          WorkoutsView
        } from './views.js';
 import { DeviceController,
          FileController,
+         WorkoutController,
+         Screen,
          Vibrate } from './controllers.js';
 import { DataMock } from './test/mock.js';
 import { xf, DB } from './xf.js';
@@ -43,10 +46,8 @@ let db = DB({
     timestamp: new Date(),
     laps: [],
     workout: [],
-    workoutName: '',
-    currentWorkoutGraph: ``,
     workoutFile: '',
-    workouts: {},
+    workouts: [],
     fitMsgs:  [],
     darkMode: true,
     env: {
@@ -88,27 +89,15 @@ xf.reg('watch:elapsed', e => {
 });
 xf.reg('device:spd', e => db.spd = e.detail.data);
 xf.reg('device:cad', e => db.cad = e.detail.data);
-xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
-xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
-xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
-xf.reg('ui:ftp',         e => db.ftp = e.detail.data);
 xf.reg('watch:elapsed',  e => db.elapsed = e.detail.data);
 xf.reg('watch:lapTime',  e => db.lapTime = e.detail.data);
 xf.reg('watch:lap',      e => db.laps.push(e.detail.data));
-xf.reg('file:workout',   e => {
-    let workout = e.detail.data;
-    let ftp = db.ftp;
-    workout = parseZwo(workout); // move parsing out
-    workout.forEach( x => x.power = Math.round(ftp * x.power));
-    console.log(workout);
-    db.workout = workout;
-    let workoutGraph = intervalsToGraph(workout);
-    db.currentWorkoutGraph = workoutGraph;
-});
-xf.reg('workout:name', e => {
-    db.workoutName = e.detail.data;
-});
-
+xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
+xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
+xf.reg('ui:ftp',         e => db.ftp = e.detail.data);
+xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
+xf.reg('ui:workout:set', e => db.workout = db.workouts[e.detail.data]);
+xf.reg('workout:add',    e => {console.log(db.workouts); db.workouts.push(e.detail.data)});
 xf.reg('watch:nextWorkoutInterval', e => {
     let targetPwr = db.workout[e.detail.data].power;
     db.targetPwr = targetPwr;
@@ -125,7 +114,7 @@ function start() {
 
     DataScreen({dom: dom.datascreen});
     GraphPower({dom: dom.graphPower});
-    // GraphHr({dom: dom.graphHr});
+    GraphWorkout({dom: dom.graphWorkout});
 
     ControlView({dom: dom.controlscreen});
     LoadWorkoutView({dom: dom.file});
@@ -133,15 +122,12 @@ function start() {
 
     DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
+    WorkoutController();
 
+    Screen();
     Vibrate({vibrate: false, long: false});
 
     // DataMock({hr: false, pwr: true});
-
-    // Default Workout:
-    xf.dispatch('file:workout', workouts[0].xml);
-    xf.dispatch('workout:name', workouts[0].name);
-    xf.dispatch('ui:ftp', 256);
 };
 
 start();

@@ -120,6 +120,41 @@ function GraphHr(args) {
     });
 }
 
+function GraphWorkout(args) {
+    let dom = args.dom;
+    let index = 0;
+    let setProgress = index => {
+        let rect = dom.intervals[index].getBoundingClientRect();
+        dom.active.style.left    = `${rect.left}px`;
+        dom.active.style.width   = `${rect.width}px`;
+        // dom.progress.style.width = `${rect.left}px`;
+    };
+
+    xf.reg('db:workout', e => {
+        let workout = e.detail.data.workout;
+        dom.name.textContent = workout.name;
+
+        dom.graph.innerHTML = ``;
+        dom.graph.insertAdjacentHTML('beforeend',
+                                     `<div id="progress" class="progress"></div>
+                                      <div id="progress-active"></div>
+                                      ${workout.graph}`);
+
+        dom.progress  = document.querySelector('#progress');
+        dom.active    = document.querySelector('#progress-active');
+        dom.intervals = document.querySelectorAll('#current-workout-graph .graph-bar');
+    });
+
+    xf.reg('watch:nextWorkoutInterval', e => {
+        index = e.detail.data;
+        setProgress(index);
+    });
+
+    xf.reg('screen:change', e => {
+        setProgress(index);
+    });
+}
+
 function ControlView(args) {
     let dom       = args.dom;
     let targetPwr = 100;
@@ -171,75 +206,54 @@ function ControlView(args) {
     xf.sub('watch:stopped', e => {
         dom.watch.start.textContent = 'Start';
     });
-
-    // xf.sub('watch:lap', e => {
-    //     let lap = e.detail.data;
-    //     console.log(lap);
-    //     let time = lap.lapTime;
-    //     let start = lap.start;
-    //     let end = lap.end;
-    //     // dom.laps.insertAdjacentHTML('beforeend',
-    //     //                             `<div class="lap"><div>${time}</div><div>${start}</div><div>${end}</div>></div>`);
-    // });
 }
 
 
 function WorkoutsView(args) {
     let dom = args.dom;
-    let workouts = args.workouts;
 
-    xf.reg('db:workoutName', e => {
-        dom.currentName.textContent = e.detail.data.workoutName;
-    });
-    xf.reg('db:currentWorkoutGraph', e => {
-        dom.currentGraph.innerHTML = ``;
-        dom.currentGraph.insertAdjacentHTML('beforeend', e.detail.data.currentWorkoutGraph);
-    });
-
-    workouts.forEach( (w, i) => {
-        // let graph = intervalsToGraph(parseZwo(w.xml));
-        // <div class="workout-graph">${graph}</div>
+    xf.reg('workout:add', e => {
+        let w = e.detail.data;
 
         let item = `
-            <div class='workout list-item cf' id="li${i}">
+            <div class='workout list-item cf' id="li${w.id}">
                 <div class="first-row">
                     <div class="name t4">${w.name}</div>
                     <div class="type t4">${w.type}</div>
                     <div class="time t4">${w.duration} min</div>
-                    <div class="select" id="btn${i}"><button class="btn">Select</button></div>
+                    <div class="select" id="btn${w.id}"><button class="btn">Select</button></div>
                 </div>
                 <div class="second-row">
                     <div class="desc">
-                        <div class="content t4">${w.description}</div></div>
+                        <div class="workout-graph">${w.graph}</div>
+                        <div class="content t4">${w.description}</div>
+                    </div>
                 </div>
             </div>`;
 
         dom.list.insertAdjacentHTML('beforeend', item);
 
-        dom.items.push(document.querySelector(`.list #li${i} .first-row`));
-        dom.select.push(document.querySelector(`.list #btn${i}`));
-        dom.descriptions.push(document.querySelector(`.list #li${i} .desc`));
+        dom.items.push(document.querySelector(`.list #li${w.id} .first-row`));
+        dom.select.push(document.querySelector(`.list #btn${w.id}`));
+        dom.descriptions.push(document.querySelector(`.list #li${w.id} .desc`));
 
         xf.sub('pointerup', e => {
-            let display = window.getComputedStyle(dom.descriptions[i])
-                                .getPropertyValue('display');
+            let display = window.getComputedStyle(dom.descriptions[w.id])
+                .getPropertyValue('display');
 
             if(display === 'none') {
-                dom.descriptions[i].style.display = 'block';
+                dom.descriptions[w.id].style.display = 'block';
             } else {
-                dom.descriptions[i].style.display = 'none';
+                dom.descriptions[w.id].style.display = 'none';
             }
-        }, dom.items[i]);
+        }, dom.items[w.id]);
 
         xf.sub('pointerup', e => {
             e.stopPropagation();
-            xf.dispatch('ui:workouts:select', i);
-            xf.dispatch('file:workout', workouts[i].xml);
-            xf.dispatch('workout:name', workouts[i].name);
-        }, dom.select[i]);
+            xf.dispatch('ui:workout:set', w.id);
+        }, dom.select[w.id]);
+
     });
-
-
 }
 
 
@@ -258,6 +272,7 @@ export {
     DataScreen,
     GraphHr,
     GraphPower,
+    GraphWorkout,
     ControlView,
     LoadWorkoutView,
     WorkoutsView,
