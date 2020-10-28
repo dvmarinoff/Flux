@@ -88,7 +88,6 @@ function WorkoutController() {
         let graph = ``;
         let workout = {};
         let xml = e.detail.data;
-        console.log('file:upload:workout');
         let intervals = parseZwo(xml);
         intervals.forEach( x => x.power = Math.round(ftp * x.power));
 
@@ -100,8 +99,6 @@ function WorkoutController() {
         workout.intervals = intervals;
         workout.duration = 0;//intervals.reduce( (acc, x) => acc + (x.duration / 60), 0);
         workout.graph = intervalsToGraph(intervals);
-
-        console.log(workout);
         xf.dispatch('workout:add', workout);
         index += 1;
     });

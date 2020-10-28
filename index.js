@@ -96,9 +96,9 @@ xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = 
 xf.reg('ui:ftp',         e => db.ftp = e.detail.data);
 xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
 xf.reg('ui:workout:set', e => db.workout = db.workouts[e.detail.data]);
-xf.reg('workout:add',    e => {console.log(db.workouts); db.workouts.push(e.detail.data)});
+xf.reg('workout:add',    e => db.workouts.push(e.detail.data));
 xf.reg('watch:nextWorkoutInterval', e => {
-    let targetPwr = db.workout[e.detail.data].power;
+    let targetPwr = db.workout.intervals[e.detail.data].power;
     db.targetPwr = targetPwr;
 });
 
