@@ -49,7 +49,7 @@ class StopWatch {
     init() {
         let self = this;
         xf.sub('db:workout', e => {
-            self.workout = e.detail.data.workout;
+            self.workout = e.detail.data.workout.intervals;
         });
     }
     start() {
