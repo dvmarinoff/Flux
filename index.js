@@ -7,6 +7,7 @@ import { StopWatch } from './workout.js';
 import { WakeLock } from './lock.js';
 import { speedFromPower } from './speed.js';
 import { workouts } from './workouts/workouts.js';
+import { FitFileExample } from './fit.js';
 import { ControllableConnectionView,
          HrbConnectionView,
          DataScreen,
@@ -128,6 +129,7 @@ function start() {
     Vibrate({vibrate: false, long: false});
 
     // DataMock({hr: false, pwr: true});
+    FitFileExample();
 };
 
 start();

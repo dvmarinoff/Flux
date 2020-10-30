@@ -51,80 +51,97 @@ let types = {
     }
 };
 
-function SessionMsg() {
-    let globalMessageNumber = 18;
-}
-function LapMsg() {
-    let globalMessageNumber = 19;
-}
-function RecordMsg(args) {
-    let globalMessageNumber = 20;
-    let { timeStamp, hr, cad, distance, spd, pwr } = args;
-    return {timeStamp: timeStamp,
-            hr: hr,
-            cad: cad,
-            distance: distance,
-            spd: spd,
-            pwr: pwr};
-}
-function EventMsg() {
-    let globalMessageNumber = 21;
-}
-function ActivityMsg() {
-    let globalMessageNumber = 34;
-}
+let globalMsgNumbers = {
+    product:   0, //?
+    session:  18,
+    lap:      19,
+    record:   20,
+    event:    21,
+    activity: 34,
+};
 
+let basetypes  = {
+    'enum':    {base_type_number:  0, base_type_field: 0x00, endian_ability: 0, size: 1, invalid_value: 0xFF},
+    'sint8':   {base_type_number:  1, base_type_field: 0x01, endian_ability: 0, size: 1, invalid_value: 0x7F},
+    'uint8':   {base_type_number:  2, base_type_field: 0x02, endian_ability: 0, size: 1, invalid_value: 0xFF},
+    'sint16':  {base_type_number:  3, base_type_field: 0x83, endian_ability: 0, size: 2, invalid_value: 0x7FFF},
+    'uint16':  {base_type_number:  4, base_type_field: 0x84, endian_ability: 0, size: 2, invalid_value: 0xFFFF},
+    'sint32':  {base_type_number:  5, base_type_field: 0x85, endian_ability: 0, size: 4, invalid_value: 0x7FFFFFFF},
+    'uint32':  {base_type_number:  6, base_type_field: 0x86, endian_ability: 0, size: 4, invalid_value: 0xFFFFFFFF},
+    'string':  {base_type_number:  7, base_type_field: 0x07, endian_ability: 0, size: 1, invalid_value: 0x00},
+    'float32': {base_type_number:  8, base_type_field: 0x88, endian_ability: 0, size: 4, invalid_value: 0xFFFFFFFF},
+    'float64': {base_type_number:  9, base_type_field: 0x89, endian_ability: 0, size: 8, invalid_value: 0xFFFFFFFFFFFFFFFF},
+    'uint8z':  {base_type_number: 10, base_type_field: 0x0A, endian_ability: 0, size: 1, invalid_value: 0x00},
+    'uint16z': {base_type_number: 11, base_type_field: 0x8B, endian_ability: 0, size: 2, invalid_value: 0x0000},
+    'uint32z': {base_type_number: 12, base_type_field: 0x8C, endian_ability: 0, size: 4, invalid_value: 0x00000000},
+    'byte':    {base_type_number: 13, base_type_field: 0x0D, endian_ability: 0, size: 1, invalid_value: 0xFF},
+    'sint64':  {base_type_number: 14, base_type_field: 0x8E, endian_ability: 0, size: 8, invalid_value: 0x7FFFFFFFFFFFFFFF},
+    'uint64':  {base_type_number: 15, base_type_field: 0x8F, endian_ability: 0, size: 8, invalid_value: 0xFFFFFFFFFFFFFFFF},
+    'uint64z': {base_type_number: 16, base_type_field: 0x90, endian_ability: 0, size: 8, invalid_value: 0x0000000000000000},
+
+    // SDK types
+    'date_time': {base_type_number:  6, base_type_field: 0x86, endian_ability: 0, size: 4, invalid_value: 0xFFFFFFFF},
+    'sport':     {base_type_number:  7, base_type_field: 0x07, endian_ability: 0, size: 1, invalid_value: 0x00},
+    'sub_sport': {base_type_number:  7, base_type_field: 0x07, endian_ability: 0, size: 1, invalid_value: 0x00},
+};
+
+let getBitField = (field, bit) => (field >> bit) & 1;
+let readUint16  = (blob, start) => blob[start]+(blob[start+1] << 8);
+let readUint32  = (blob, start) => blob[start]+ (blob[start+1] << 8) + (blob[start+2] << 16) + (blob[start+3] << 24);
 
 function FieldDefinition(args) {
-    let fieldDefinitionNumber = args.fieldNumber; // Defined in the Global FIT profile
-    let size = args.size;         // Size (bytes) of the specified FIT message’s field
-    let baseType = args.baseType; // Base type (unsigned char, signed short, ...)
+    let type      = args.type;   // type (from base type table)
+    let number    = args.number; // Defined in the Global FIT profile
+    let size      = basetypes[type].size;
+    let base_type = basetypes[type].base_type_field;
 
     let buffer = new ArrayBuffer(3);
     let view   = new DataView(buffer);
 
-    view.setUint8(0, fieldDefinitionNumber , true);
-    view.setInt16(1, size, true);
-    view.setInt16(2, baseType, true);
-    return buffer;
+    view.setUint8(0, number,    true);
+    view.setUint8(1, size,      true);
+    view.setUint8(2, base_type, true);
+
+    return {view: view, buffer: buffer};
 }
 
-let powerFieldDefinition   = FieldDefinition({fieldNumber: 0, size: 0, baseType: 4});
-let cadenceFieldDefinition = FieldDefinition({fieldNumber: 0, size: 0, baseType: 2});
-let hrFieldDefinition      = FieldDefinition({fieldNumber: 0, size: 0, baseType: 2});
+let fieldDefinitions = {
+    // id
+    type:          FieldDefinition({number: 0, type: 'enum'}),   // 4 activity, 5 workout
+    manufacturer:  FieldDefinition({number: 1, type: 'uint16'}), // 255 development, 15 dynastream, 0 0, zft 260
+    product:       FieldDefinition({number: 2, type: 'uint16'}), // favero 0, grmn 1,
+    serial_number: FieldDefinition({number: 3, type: 'uint32z'}), // originaly 'uint32z'
+    time_created:  FieldDefinition({number: 4, type: 'date_time'}),
+    product_name:  FieldDefinition({number: 8, type: 'string'}),
 
+    // record
+    timestamp:  FieldDefinition({number: 253, type: 'date_time'}),
+    power:      FieldDefinition({number:   7, type: 'uint16'}),
+    heart_rate: FieldDefinition({number:   3, type: 'uint8'}),
+    cadence:    FieldDefinition({number:   4, type: 'uint8'}),
+    speed:      FieldDefinition({number:   6, type: 'uint16'}),
+    distance:   FieldDefinition({number:   5, type: 'uint32'}),
 
+    //session
+    start_time:         FieldDefinition({number:  2, type: 'date_time'}),
+    sport:              FieldDefinition({number:  5, type: 'sport'}),
+    sub_sport:          FieldDefinition({number:  6, type: 'sub_sport'}),
+    total_elapsed_time: FieldDefinition({number:  7, type: 'uint32'}),
+    total_timer_time:   FieldDefinition({number:  8, type: 'uint32'}),
+    total_distance:     FieldDefinition({number:  9, type: 'uint32'}),
+    first_lap_index:    FieldDefinition({number: 25, type: 'uint16'}),
+    num_laps:           FieldDefinition({number: 26, type: 'uint16'}),
 
-function Msg() {}
-
-function FitFileHeader() {
-    let buffer = new ArrayBuffer(12); // size is 12 or 14
-    let view   = new DataView(buffer);
-    let headerSize      = 12;
-    let protocolVersion = 20;
-    let profileVersion  = 10;         // ?
-    let dataSize        = 0;
-    let dataTypeByte    = [46, 70, 73, 84]; // ASCII values for ".FIT"
-    let crc             = 0x0000;           // optional
-
-    view.setUint8( 0, headerSize,      true);
-    view.setUint8( 1, protocolVersion, true);
-    view.setUint16(2, profileVersion,  true);
-    view.setInt32( 4, dataSize,        true);
-    view.setUint8( 8, dataTypeByte[0], true);
-    view.setUint8( 9, dataTypeByte[1], true);
-    view.setUint8(10, dataTypeByte[2], true);
-    view.setUint8(11, dataTypeByte[3], true);
-    // view.setUint16(12, crc,             true);
-
-    return buffer;
-}
+    // activity
+    num_sessions:    FieldDefinition({number: 1, type: 'uint16'}),
+    local_timestamp: FieldDefinition({number: 5, type: 'date_time'}),
+};
 
 function MsgHeader(args) {
     let header          = 0b00000000;
 
-    let normalHeader    = 0b10000000;  // bit 7 = 1
-    let timestampHeader = 0b00000000;  // bit 7 = 0
+    let normalHeader    = 0b00000000;  // bit 7 = 1
+    let timestampHeader = 0b10000000;  // bit 7 = 0
     let definitionMsg   = 0b01000000;  // bit 6 = 1
     let dataMsg         = 0b00000000;  // bit 6 = 0
     let hasDevData      = 0b00100000;  // bit 5 = 0
@@ -143,137 +160,199 @@ function MsgHeader(args) {
 
     return header;
 }
-
-function DataMsgHeader() {
-    return MsgHeader({headerType: 'normal', msgType: 'data', developerDataFlag: false});
-}
-function DataMsgContent() {
-    let buffer = new ArrayBuffer();
-    let view   = new DataView(buffer);
-}
-
 function DefinitionMsgHeader() {
     return MsgHeader({headerType: 'normal', msgType: 'definition', developerDataFlag: false});
 }
-function DefinitionMsgContent(args) {
-    let buffer = new ArrayBuffer(); // size is 12 or 14
-    let view   = new DataView(buffer);
+function DataMsgHeader() {
+    return MsgHeader({headerType: 'normal', msgType: 'data', developerDataFlag: false});
+}
+
+
+
+function DefinitionMsg(args) {
+    let header   = DefinitionMsgHeader(); // 0b01000000 = 64
+
     let architecture    = 0; // 0 LittleEndian, 1 BigEndian
     let globalMsgNumber = args.globalMsgNumber || 0;
-    let numberOfFields  = args.numberOfFields || 0;
+    let numberOfFields  = args.fields.length;
+    let fields          = args.fields;
 
-    view.setUint8( 0, 0,               true);
-    view.setUint8( 1, architecture,    true);
-    view.setUint16(2, globalMsgNumber, true);
-    view.setUint8( 4, numberOfFields,  true);
-    // ...
-}
-function DefinitionMsg(args) {
-    let header   = DefinitionMsgHeader();
-    let contents = DefinitionMsgContent();
-}
+    let i = 6;
+    let fieldDefinitionLength = 3;
+    let size = i + (numberOfFields * fieldDefinitionLength);
 
-let getBitField = (field, bit) => (field >> bit) & 1;
-
-function FitFileExample() {
-    let buffer = new ArrayBuffer();
+    let buffer = new ArrayBuffer(size);
     let view   = new DataView(buffer);
 
-    let header = FitFileHeader();
+    view.setUint8( 0, header,          true);
+    view.setUint8( 1, 0,               true); // reserved
+    view.setUint8( 2, architecture,    true);
+    view.setUint16(3, globalMsgNumber, true);
+    view.setUint8( 5, numberOfFields,  true);
 
-    let record1 = DefinitionMsg();
+    for(let field=0; field < numberOfFields; field++) {
+        for(let fdi=0; fdi < fieldDefinitionLength; fdi++) {
+            view.setUint8(i, fields[field].view.getUint8(fdi), true);
+            i++;
+        }
+    }
 
-    return buffer;
+    return {view: view, buffer: buffer};
 }
 
+function DataMsg(args) {
+    let header    = DataMsgHeader();
 
+    let buffer = new ArrayBuffer(7);
+    let view   = new DataView(buffer);
 
+    view.setUint8( 0, header,            true);
+    view.setUint16(1, (args.power || 0), true);
+    view.setUint32(3, args.timestamp,    true);
 
-function Encode() {
-    let startTime = new Date.now();      // 1603377421339
-    let timestamp = new Date(startTime); // Thu Oct 22 2020 17:36:34 GMT+0300 (Eastern European Summer Time)
-    let messages = [];
-
-    // Record
-    let recordMsg = new RecordMsg();
-    recordMsg.setTimestamp(timestamp); // 253, 0, DateTime        // units: s , lap end time
-    recordMsg.setHR(140);              //   3, 0, byte?    Uint8  // units: bpm
-    recordMsg.setCad(80);              //   4, 0, byte?    Uint8  // units: rpm
-    recordMsg.setDistance(1);          //   5, 0, float?   4bytes // units: m
-    recordMsg.setSpd(34);              //   6, 0, float?   4bytes // units: m/s
-    recordMsg.setPwr(235);             //   7, 0, ushort?  Uint16 // units: watts
-
-    messages.push(recordMsg);
-
-    // Lap
-    let lapMsg = new LapMsg();
-    lapMsg.setTimestamp(timestamp);        // 253, 0, DateTime // units: s , lap end time
-    lapMsg.setStartTime(startTime);        //   2, 0, DateTime // units: s
-    lapMsg.setTotalElapsedTime(timestamp); //   7, 0, float?   // units: s , includes pauses
-    lapMsg.setTotalTimerTime(timestamp);   //   8, 0, float?   // units: s , excludes pauses
-
-    messages.push(lapMsg);
-
-    // Session
-    let sessionMsg = new SessionMsg();
-    sessionMsg.setTimestamp(timestamp);        // 253, 0, DateTime // units: s, session end time
-    sessionMsg.setStartTime(startTime);        //   2, 0, DateTime // units: s,
-    sessionMsg.setSport(2);                    //   5, 0, Sport? -> byte // SetFieldValue(5, 0, sport_, Fit.SubfieldIndexMainField);
-    sessionMsg.setSubSport(6);                 //   6, 0, Sport? -> byte
-    sessionMsg.setTotalElapsedTime(timestamp); //   7, 0, float?   // units: s, includes pauses
-    sessionMsg.setTotalTimerTime(timestamp);   //   8, 0, float?   // units: s, excludes pauses
-    sessionMsg.setFirstLapIndex(0);            //  25, 0, ushort?
-    sessionMsg.setNumLaps(1);                  //  26, 0, ushort?
-
-    messages.push(sessionMsg);
-
-    // Activity
-    let activityMsg = new ActivityMsg();
-    let timezoneOffset = new Date(Date.now()).getTimezoneOffset(); // TotalSeconds
-    activityMsg.setTimestamp(timestamp);                           // 253, 0, DateTime // units: s, session end time
-    activityMsg.setNumSessions(1);                                 //   1, 0, ushort?
-    activityMsg.setLocalTimestamp(timestamp + timezoneOffset);     //   5, 0, uint?
-
-    messages.push(activityMsg);
-
-    // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
-    // eventMesgStart.SetTimestamp(startTime);
-    // eventMesgStart.SetEvent(Event.Timer);
-    // eventMesgStart.SetEventType(EventType.Start);
-    // messages.Add(eventMesgStart);
-
-    // recordMsg.SetPower((ushort)(i)); // Square
-    // recordMsg.SetHeartRate((byte)(i)); // Sine
-    // recordMesg.SetCadence((byte)(i % 255)); // Sawtooth
-    // recordMesg.SetDistance(i); // Ramp
-    // recordMesg.SetSpeed(1); // Flatline
-
-    // lapMesg.SetTimestamp(timestamp);
-    // lapMesg.SetStartTime(startTime);
-    // lapMesg.SetTotalElapsedTime(timestamp.GetTimeStamp() - startTime.GetTimeStamp());
-    // lapMesg.SetTotalTimerTime(timestamp.GetTimeStamp() - startTime.GetTimeStamp());
-    // messages.Add(lapMesg);
-
-    // sessionMesg.SetTimestamp(timestamp);
-    // sessionMesg.SetStartTime(startTime);
-    // sessionMesg.SetTotalElapsedTime(timestamp.GetTimeStamp() - startTime.GetTimeStamp());
-    // sessionMesg.SetTotalTimerTime(timestamp.GetTimeStamp() - startTime.GetTimeStamp());
-    // sessionMesg.SetSport(Sport.Cycling);
-    // sessionMesg.SetSubSport(SubSport.IndoorCycling);
-    // sessionMesg.SetFirstLapIndex(0);
-    // sessionMesg.SetNumLaps(1);
-
-
-    // activityMesg.SetTimestamp(timestamp);
-    // activityMesg.SetNumSessions(1);
-    // var timezoneOffset = (int)TimeZoneInfo.Local.BaseUtcOffset.TotalSeconds;
-    // activityMesg.SetLocalTimestamp((uint)((int)timestamp.GetTimeStamp() + timezoneOffset));
-    // messages.Add(activityMesg);
-
-    // SetFieldValue(5, 0, sport_, Fit.SubfieldIndexMainField); ->
-    //
-    // Field field = GetField(fieldNum);
-    // field.SetValue(fieldArrayIndex, value, subfieldIndex);
+    return {view: view, buffer: buffer};
 }
 
-export { Encode }
+function FileIdMsg() {
+    let header       = DataMsgHeader();
+    let type         = 4;
+    let manufacturer = 255; //15;
+    let product      = 0;   //22;
+    let serialNumber = 1234;
+    let timeCreated  = 1603996083000;
+
+    // let buffer = new ArrayBuffer(14);
+    // let buffer = new ArrayBuffer(10);
+    let buffer = new ArrayBuffer(6);
+    let view   = new DataView(buffer);
+
+    view.setUint8(  0, header,       true);
+    view.setUint8(  1, type,         true);
+    view.setUint16( 2, manufacturer, true);
+    view.setUint16( 4, product,      true);
+    // view.setUint32( 6, serialNumber, true);
+    // view.setUint32(6, timeCreated,  true);
+    // view.setUint32(10, timeCreated,  true);
+
+    return {view: view, buffer: buffer};
+}
+
+function calculateCRC(blob, start, end) {
+    const crcTable = [
+        0x0000, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
+        0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400,
+    ];
+
+    let crc = 0;
+    for (let i = start; i < end; i++) {
+        const byte = blob[i];
+        let tmp = crcTable[crc & 0xF];
+        crc = (crc >> 4) & 0x0FFF;
+        crc = crc ^ tmp ^ crcTable[byte & 0xF];
+        tmp = crcTable[crc & 0xF];
+        crc = (crc >> 4) & 0x0FFF;
+        crc = crc ^ tmp ^ crcTable[(byte >> 4) & 0xF];
+    }
+
+    return crc;
+}
+
+function FitFileHeader(args) {
+    let headerSize      = 14;                         // size is 12(depricated) or 14
+    let protocolVersion = 32;                         // 16 v1, 32 v2
+    let profileVersion  = 2140;                       // v21.40
+    let dataSize        = args.size - headerSize - 2; // without header and crc
+    let dataTypeByte    = [46, 70, 73, 84];           // ASCII values for ".FIT"
+    let crc             = 0x0000;                     // optional, crc of the header 0-11 bytes
+
+    let buffer = new ArrayBuffer(headerSize); // size is 12 or 14
+    let view   = new DataView(buffer);
+
+    view.setUint8( 0, headerSize,      true);
+    view.setUint8( 1, protocolVersion, true);
+    view.setUint16(2, profileVersion,  true);
+    view.setInt32( 4, dataSize,        true);
+    view.setUint8( 8, dataTypeByte[0], true);
+    view.setUint8( 9, dataTypeByte[1], true);
+    view.setUint8(10, dataTypeByte[2], true);
+    view.setUint8(11, dataTypeByte[3], true);
+
+    crc = calculateCRC(new Uint8Array(buffer), 0, 12);
+
+    view.setUint16(12, crc,            true);
+
+    return {view: view, buffer: buffer};
+}
+
+function FitFileExample() {
+
+    let data = [
+        {power: 300, timestamp: 1603996083000},
+        {power: 301, timestamp: 1603996084000},
+        {power: 300, timestamp: 1603996085000},
+        {power: 301, timestamp: 1603996086000},
+    ];
+
+    let record1 = DefinitionMsg({globalMsgNumber: 0,
+                                 fields: [fieldDefinitions.type,
+                                          fieldDefinitions.manufacturer,
+                                          fieldDefinitions.product,
+                                          // fieldDefinitions.serial_number,
+                                          // fieldDefinitions.time_created,
+                                         ]});
+    let record2 = FileIdMsg();
+
+    let record3 = DefinitionMsg({globalMsgNumber: 20,
+                                 fields: [fieldDefinitions.power,
+                                          fieldDefinitions.timestamp]});
+    let record4 = DataMsg(data[0]);
+
+
+    let len = 14 + record1.view.byteLength + record2.view.byteLength + record3.view.byteLength + record4.view.byteLength + 2;
+    let buffer = new ArrayBuffer(len);
+    let view   = new DataView(buffer);
+    let header = FitFileHeader({size: len});
+    let i = 0;
+
+    let records = [header, record1, record2, record3, record4];
+
+    for(let r= 0; r < records.length; r++) {
+        for(let v= 0; v < records[r].view.byteLength; v++) {
+            view.setUint8(i, records[r].view.getUint8(v), true);
+            i++;
+        }
+    }
+    let crc = calculateCRC(new Uint8Array(view.buffer.slice(14, len - 2)), 0, len-16);
+    view.setUint16( i, crc, true);
+
+    // console.log(header.buffer);
+    // console.log(record1.buffer);
+    // console.log(record2.buffer);
+    // console.log(record3.buffer);
+    // console.log(record4.buffer);
+    // console.log(len);
+    // console.log(crc);
+    // console.log(view.buffer);
+
+    var activity = view.buffer;
+
+    var saveByteArray = (function () {
+        var a = document.createElement('a');
+        document.body.appendChild(a);
+        a.style = 'display: none';
+        return function (data, name) {
+            var blob = new Blob(data, {type: 'application/octet-stream'}),
+                url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = name;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
+
+    // saveByteArray([activity], 'minexample.fit');
+}
+
+function Encode() {}
+
+export { FitFileExample, Encode }
