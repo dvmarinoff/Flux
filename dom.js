@@ -50,6 +50,9 @@ let dom = {
         select: [],
         descriptions: [],
     },
+    activity: {
+        saveBtn: document.querySelector('#activity-save'),
+    },
     graphWorkout: {
         progress:  document.querySelector('#progress'),
         name:      document.querySelector('#current-workout-name'),

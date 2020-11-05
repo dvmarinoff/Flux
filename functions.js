@@ -6,8 +6,37 @@ let sqr    = x => x * x;
 let exp    = x => Math.exp(x);
 let mps    = kph => kph / 3.6;
 let kph    = mps => 3.6 * mps;
-let avg        = (x, y) => (x + y) / 2;
-let avgOfArray = xs => xs.reduce( (p,c,i) => p+(c-p)/(i+1), 0);
+let avg    = (x, y) => (x + y) / 2;
+let round  = x => Math.round(x);
+let floor  = x => Math.floor(x);
+let ceil   = x => Math.ceil(x);
+let last   = xs => xs[xs.length - 1];
+let first  = xs => xs[0];
+
+function avgOfArray(xs, prop = false) {
+    if(prop !== false) {
+        return xs.reduce( (acc,v,i) => acc+(v[prop]-acc)/(i+1), 0);
+    } else {
+        return xs.reduce( (acc,v,i) => acc+(v-acc)/(i+1), 0);
+    }
+}
+
+function maxOfArray(xs, prop = false) {
+    if(prop !== false) {
+        return xs.reduce( (acc,v,i) => v[prop] > acc ? v[prop] : acc, 0);
+    } else {
+        return xs.reduce( (acc,v,i) => v > acc ? v : acc, 0);
+    }
+};
+
+function sum(xs, prop = false) {
+    if(prop !== false) {
+        return xs.reduce( (acc,v,i) => acc + v[prop], 0);
+    } else {
+        return xs.reduce( (acc,v,i) => acc + v, 0);
+    }
+};
+
 
 function powerToColor(value, ftp = 256) {
     let color = 'gray';
@@ -52,6 +81,11 @@ function hrToColor(value) {
     return color;
 }
 
+function timeDiff(timestamp1, timestamp2) {
+    let difference = (timestamp1 / 1000) - (timestamp2 / 1000);
+    return round(abs(difference));
+};
+
 function secondsToHms(elapsed, compact = false) {
     let hour = Math.floor(elapsed / 3600);
     let min  = Math.floor(elapsed % 3600 / 60);
@@ -79,8 +113,16 @@ export {
     kph,
     avg,
     avgOfArray,
+    maxOfArray,
+    sum,
+    first,
+    last,
+    round,
+    floor,
+    ceil,
     powerToColor,
     hrToColor,
     valueToHeight,
+    timeDiff,
     secondsToHms,
     metersToDistance };

@@ -1,6 +1,6 @@
 import { xf } from './xf.js';
 
-class File {
+class FileHandler {
     constructor(args) {}
     async readTextFile(file) {
         let self = this;
@@ -34,6 +34,28 @@ class File {
             default: self.unsupportedFormat();     break;
         }
     }
+    saveFile() {
+        let self = this;
+        let a = document.createElement('a');
+        document.body.appendChild(a);
+        a.style = 'display: none';
+        return function (blob, name) {
+            let url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = name;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    };
+    downloadActivity(activity) {
+        let self = this;
+        let blob = new Blob([activity], {type: 'application/octet-stream'});
+        let date = new Date();
+        let fileDate =
+            `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}-${date.getHours()}${date.getMinutes()}`;
+
+        self.saveFile()(blob,`ex${fileDate}.fit`);
+    }
 }
 
-export { File };
+export { FileHandler };

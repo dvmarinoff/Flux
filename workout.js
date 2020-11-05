@@ -67,7 +67,7 @@ class StopWatch {
         let lap = {start:   self.currentLapStart,
                    end:     self.elapsed,
                    lapTime: (self.elapsed - self.currentLapStart),
-                   total:   self.elapsed,};
+                   total:   self.elapsed};
         self.lapTime = 0;
         self.currentLapStart = self.elapsed;
 
@@ -109,8 +109,8 @@ class StopWatch {
         let self = this;
         clearInterval(self.interval);
         self.elapsed = 0;
-        self.lapTime = 0;
         self.started = false;
+        self.lap();
         xf.dispatch('watch:elapsed', 0);
         xf.dispatch('watch:lapTime', 0);
         xf.dispatch('watch:stopped');

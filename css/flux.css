@@ -60,6 +60,8 @@ body {
 
     -webkit-user-select: none;
     user-select: none;
+
+    /* visibility: hidden; */
 }
 
 header, footer, section, article, nav {
