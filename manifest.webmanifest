@@ -14,9 +14,9 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "/",
-  "background_color": "#35363a",
+  "start_url": "/Flux",
   "display": "fullscreen",
   "scope": "/",
-  "theme_color": "#35363a"
+  "theme_color": "#35363a",
+  "background_color": "#35363a"
 }

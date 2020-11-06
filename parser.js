@@ -66,56 +66,53 @@ function toDecimalPoint (x, point = 2) {
 }
 
 function warmupToInterval(step) {
-    let intervals  = [];
+    let interval   = {duration: step.duration, steps: []};
+    let powerDiff  = Math.round((step.powerHigh * 100) - (step.powerLow * 100));
     let powerDx    = 0.01;
-    let steps      = Math.round((step.powerHigh-step.powerLow) / powerDx);
-    let durationDx = Math.round(step.duration/steps);
+    let steps      = powerDiff;
+    let remainder  = (step.duration % steps);
+    let durationDx = remainder > 0 ? remainder : step.duration / steps;
     let power      = step.powerLow;
-    let stepsLen   = steps + 1;
-    let isLap = false;
-    for(let i = 0; i < stepsLen; i++) {
-        isLap =  (i === stepsLen - 1) ? true : false;
-        intervals.push({duration: durationDx, power: power, lap: isLap});
+    for(let i = 0; i < steps; i++) {
+        interval.steps.push({duration: i === 0 ? durationDx + remainder : durationDx, power: power});
         power = toDecimalPoint(power + powerDx);
     };
-    return intervals;
+    return [interval];
 }
 function intervalsTToInterval(step) {
     let intervals = [];
     for(let i = 0; i < step.repeat; i++) {
-        intervals.push({duration: step.onDuration, power: step.onPower, lap: true});
-        intervals.push({duration: step.offDuration, power: step.offPower, lap: true});
+        intervals.push({duration: step.onDuration,  steps: [{duration: step.onDuration,  power: step.onPower}]});
+        intervals.push({duration: step.offDuration, steps: [{duration: step.offDuration, power: step.offPower}]});
     };
     return intervals;
 }
 function steadyStateToInterval(step) {
     return {duration: step.duration,
-            power:    step.power,
-            lap:      true};
+            steps: [{duration: step.duration,
+                     power:    step.power}]};
 }
 function cooldownToInterval(step) {
-    let intervals  = [];
+    let interval  = {duration: step.duration, steps: []};
     let powerDx    = 0.01;
     let steps      = Math.round((step.powerHigh-step.powerLow) / powerDx);
     let durationDx = Math.round(step.duration/steps);
     let power      = step.powerHigh;
     let stepsLen   = steps + 1;
-    let isLap = false;
     for(let i = 0; i < stepsLen; i++) {
-        isLap =  (i === stepsLen - 1) ? true : false;
-        intervals.push({duration: durationDx, power: power, lap: isLap});
+        interval.steps.push({duration: durationDx, power: power});
         power = toDecimalPoint(power - powerDx);
     };
-    return intervals;
+    return [interval];
 }
 function freeRideToInterval(step) {
     return {duration: step.duration,
-            power:    0,
-            lap:      true};
+            steps: [{duration: step.duration,
+                     power:    0}]};
 }
 function unknownStep(step) {
     console.error(`Unknown Step in .zwo workout: ${step}`);
-    return {duration: 0, power: 0, lap: false};
+    return {duration: 0, steps: [{duration: 0, power: 0}]};
 }
 
 function stepToInterval(step) {
@@ -154,12 +151,13 @@ function parseZwo(zwo) {
 function intervalsToGraph(intervals) {
     let scale = 400;
     return intervals.reduce( (acc, interval) => {
-        let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration));
-        let height = valueToHeight(scale, (interval.power === 0) ? 80 : interval.power);
+        return interval.steps.reduce((_, step) => {
+            let width = (step.duration) < 1 ? 1 : parseInt(Math.round(step.duration));
+            let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
+            return acc +
+                `<div class="graph-bar ${(powerToColor(step.power)).name}-zone" style="height: ${height}%; width: ${width}px"></div>`;
+        }, ``);
 
-        return acc +
-            // `<polygon points="100,100 150,25 150,75 200,0" fill="${(powerToColor(interval.target)).hex}" />`;
-        `<div class="graph-bar ${(powerToColor(interval.power)).name}-zone" style="height: ${height}%; width: ${width}px"></div>`;
     }, ``);
 }
 

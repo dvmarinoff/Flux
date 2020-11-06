@@ -179,10 +179,10 @@ function ControlView(args) {
         xf.dispatch('ui:watchLap');
     }, dom.startRestInterval);
 
-    xf.sub('pointerup', e => xf.dispatch('ui:darkMode'),    dom.darkMode);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),  dom.watch.start);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),    dom.watch.lap);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),   dom.watch.stop);
+    xf.sub('pointerup', e => xf.dispatch('ui:darkMode'),     dom.darkMode);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),   dom.watch.start);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),     dom.watch.lap);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.watch.stop);
     xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.startWorkout);
 
     xf.sub('db:darkMode', e => {
