@@ -266,6 +266,13 @@ function LoadWorkoutView(args) {
     }, dom.loadBtn);
 }
 
+function ActivityView(args) {
+    let dom = args.dom;
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:activity:save');
+    }, dom.saveBtn);
+}
+
 export {
     ControllableConnectionView,
     HrbConnectionView,
@@ -276,5 +283,6 @@ export {
     ControlView,
     LoadWorkoutView,
     WorkoutsView,
+    ActivityView,
 };
 

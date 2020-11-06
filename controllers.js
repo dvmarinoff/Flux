@@ -1,7 +1,8 @@
 import { xf } from './xf.js';
-import { File } from './file.js';
+import { FileHandler } from './file.js';
 import { workouts } from './workouts/workouts.js';
 import { parseZwo, intervalsToGraph } from './parser.js';
+import { RecordedData, RecordedLaps } from './test/mock.js';
 
 function DeviceController(args) {
     let controllable = args.controllable;
@@ -70,7 +71,7 @@ function FileController() {
 
     xf.sub('db:workoutFile', e => {
         let workoutFile = e.detail.data.workoutFile;
-        let fileHandler = new File();
+        let fileHandler = new FileHandler();
         fileHandler.readFile(workoutFile);
     });
 }
@@ -108,6 +109,7 @@ function WorkoutController() {
         workoutFiles.forEach( w => {
             let intervals = parseZwo(w.xml);
             intervals.forEach( x => x.power = Math.round(ftp * x.power));
+            // console.log(intervals);
             let graph = intervalsToGraph(intervals);
             w.intervals = intervals;
             w.id = index;

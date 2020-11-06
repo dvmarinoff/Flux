@@ -66,13 +66,16 @@ function toDecimalPoint (x, point = 2) {
 }
 
 function warmupToInterval(step) {
-    let intervals = [];
-    let powerDx = 0.01;
-    let steps = Math.round((step.powerHigh-step.powerLow) / powerDx);
+    let intervals  = [];
+    let powerDx    = 0.01;
+    let steps      = Math.round((step.powerHigh-step.powerLow) / powerDx);
     let durationDx = Math.round(step.duration/steps);
-    let power = step.powerLow;
-    for(let i = 0; i < steps + 1; i++) {
-        intervals.push({duration: durationDx, power: power});
+    let power      = step.powerLow;
+    let stepsLen   = steps + 1;
+    let isLap = false;
+    for(let i = 0; i < stepsLen; i++) {
+        isLap =  (i === stepsLen - 1) ? true : false;
+        intervals.push({duration: durationDx, power: power, lap: isLap});
         power = toDecimalPoint(power + powerDx);
     };
     return intervals;
@@ -80,34 +83,39 @@ function warmupToInterval(step) {
 function intervalsTToInterval(step) {
     let intervals = [];
     for(let i = 0; i < step.repeat; i++) {
-        intervals.push({duration: step.onDuration, power: step.onPower});
-        intervals.push({duration: step.offDuration, power: step.offPower});
+        intervals.push({duration: step.onDuration, power: step.onPower, lap: true});
+        intervals.push({duration: step.offDuration, power: step.offPower, lap: true});
     };
     return intervals;
 }
 function steadyStateToInterval(step) {
     return {duration: step.duration,
-            power:    step.power};
+            power:    step.power,
+            lap:      true};
 }
 function cooldownToInterval(step) {
-    let intervals = [];
-    let powerDx = 0.01;
-    let steps = Math.round((step.powerHigh-step.powerLow) / powerDx);
+    let intervals  = [];
+    let powerDx    = 0.01;
+    let steps      = Math.round((step.powerHigh-step.powerLow) / powerDx);
     let durationDx = Math.round(step.duration/steps);
-    let power = step.powerHigh;
-    for(let i = 0; i < steps + 1; i++) {
-        intervals.push({duration: durationDx, power: power});
+    let power      = step.powerHigh;
+    let stepsLen   = steps + 1;
+    let isLap = false;
+    for(let i = 0; i < stepsLen; i++) {
+        isLap =  (i === stepsLen - 1) ? true : false;
+        intervals.push({duration: durationDx, power: power, lap: isLap});
         power = toDecimalPoint(power - powerDx);
     };
     return intervals;
 }
 function freeRideToInterval(step) {
     return {duration: step.duration,
-            power:    0};
+            power:    0,
+            lap:      true};
 }
 function unknownStep(step) {
     console.error(`Unknown Step in .zwo workout: ${step}`);
-    return {duration: 0, power: 0};
+    return {duration: 0, power: 0, lap: false};
 }
 
 function stepToInterval(step) {
