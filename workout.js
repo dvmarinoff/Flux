@@ -35,7 +35,6 @@ class StopWatch {
         this.interval = undefined;
         this.elapsed = 0;
         this.lapTime = 0;
-        this.laps = [];
         this.started = false;
         this.currentLapStart = 0;
         this.workout = [];
@@ -64,10 +63,6 @@ class StopWatch {
     }
     lap() {
         let self = this;
-        let lap = {start:   self.currentLapStart,
-                   end:     self.elapsed,
-                   lapTime: (self.elapsed - self.currentLapStart),
-                   total:   self.elapsed};
         self.lapTime = 0;
         self.currentLapStart = self.elapsed;
 
@@ -76,7 +71,6 @@ class StopWatch {
                 self.workoutCurrentIntervalDuration = self.workout[self.workoutIntervalIndex].duration;
                 xf.dispatch('watch:nextWorkoutInterval', self.workoutIntervalIndex);
 
-                Object.assign(lap, {power: self.workout[self.workoutIntervalIndex].power});
                 console.log(`duration: ${self.workoutCurrentIntervalDuration}`);
 
                 self.workoutIntervalIndex +=1;
@@ -88,9 +82,7 @@ class StopWatch {
                 console.log("Workout Done.");
             }
         }
-
-        self.laps.push();
-        xf.dispatch('watch:lap', lap);
+        xf.dispatch('watch:lap');
     }
     pause() {
         let self = this;
@@ -107,13 +99,16 @@ class StopWatch {
     }
     stop () {
         let self = this;
-        clearInterval(self.interval);
-        self.elapsed = 0;
-        self.started = false;
-        self.lap();
-        xf.dispatch('watch:elapsed', 0);
-        xf.dispatch('watch:lapTime', 0);
-        xf.dispatch('watch:stopped');
+        if(self.started) {
+            clearInterval(self.interval);
+            self.elapsed = 0;
+            self.started = false;
+            self.lap();
+            self.workoutIntervalIndex = 0;
+            xf.dispatch('watch:elapsed', 0);
+            xf.dispatch('watch:lapTime', 0);
+            xf.dispatch('watch:stopped');
+        }
     }
 
     onTick() {
@@ -142,8 +137,8 @@ class StopWatch {
         self.workoutCurrentIntervalDuration = self.workout[self.workoutIntervalIndex].duration;
         if(!self.started) {
             self.start();
+            self.lap();
         }
-        self.lap();
     }
 }
 

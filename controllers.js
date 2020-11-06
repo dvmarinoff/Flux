@@ -109,6 +109,7 @@ function WorkoutController() {
         workoutFiles.forEach( w => {
             let intervals = parseZwo(w.xml);
             intervals.forEach( x => x.power = Math.round(ftp * x.power));
+            // console.log(intervals);
             let graph = intervalsToGraph(intervals);
             w.intervals = intervals;
             w.id = index;

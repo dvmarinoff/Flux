@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime';
 import { dom } from './dom.js';
 import { Device, Hrb, Controllable } from './ble/device.js';
 import { parseZwo, intervalsToGraph } from './parser.js';
@@ -49,6 +48,7 @@ let db = DB({
     lap:     [],
     laps:    [],
     lapStartTime: Date.now(),
+    workoutIntervalIndex: 0,
     elapsed: 0,
     lapTime: 0,
     targetPwr: 100,
@@ -102,21 +102,25 @@ xf.reg('watch:elapsed',  e => {
     db.lap.push(record);
 });
 xf.reg('watch:lap', e => {
-    let watchData = e.detail.data;
     let timeEnd   = Date.now();
     let timeStart = db.lapStartTime;
     let elapsed   = timeDiff(timeStart, timeEnd);
 
-    db.laps.push({timestamp:        timeEnd,
-                  startTime:        timeStart,
-                  totalElapsedTime: elapsed,
-                  avgPower:         round(avgOfArray(db.lap, 'power')),
-                  maxPower:         maxOfArray(db.lap, 'power')});
+    if(elapsed > 0) {
+        db.laps.push({timestamp:        timeEnd,
+                      startTime:        timeStart,
+                      totalElapsedTime: elapsed,
+                      avgPower:         round(avgOfArray(db.lap, 'power')),
+                      maxPower:         maxOfArray(db.lap, 'power')});
+    }
+
     db.lap = [];
     db.lapStartTime = timeEnd + 0;
 });
 xf.reg('watch:nextWorkoutInterval', e => {
-    let targetPwr = db.workout.intervals[e.detail.data].power;
+    let index = e.detail.data;
+    let targetPwr = db.workout.intervals[index].power;
+    db.workoutIntervalIndex = index;
     db.targetPwr = targetPwr;
 });
 xf.sub('ui:activity:save', e => {
@@ -150,7 +154,7 @@ function start() {
     Screen();
     Vibrate({vibrate: false, long: false});
 
-    DataMock({hr: false, pwr: true});
+    // DataMock({hr: false, pwr: true});
 };
 
 start();
