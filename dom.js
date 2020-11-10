@@ -58,6 +58,7 @@ let dom = {
         name:      document.querySelector('#current-workout-name'),
         graph:     document.querySelector('#current-workout-graph'),
         intervals: [],
+        steps: [],
     },
     graphHr: {
         cont:  document.querySelector('#graph-hr'),

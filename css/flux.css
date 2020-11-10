@@ -516,6 +516,15 @@ header, footer, section, article, nav {
     bottom: 0px;
     padding: 0;
 }
+.graph-interval {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-end;
+    height: 100px;
+    padding: 0;
+}
 .graph-heading {
     text-align: center;
 }

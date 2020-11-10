@@ -151,12 +151,15 @@ function parseZwo(zwo) {
 function intervalsToGraph(intervals) {
     let scale = 400;
     return intervals.reduce( (acc, interval) => {
-        return interval.steps.reduce((_, step) => {
-            let width = (step.duration) < 1 ? 1 : parseInt(Math.round(step.duration));
+        let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration));
+        let len = interval.steps.length;
+        return acc + `</div>` + interval.steps.reduce((a, step) => {
+            // let width = (step.duration) < 1 ? 1 : parseInt(Math.round(step.duration));
+            let width = 100 / len;
             let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
-            return acc +
-                `<div class="graph-bar ${(powerToColor(step.power)).name}-zone" style="height: ${height}%; width: ${width}px"></div>`;
-        }, ``);
+            return a +
+                `<div class="graph-bar ${(powerToColor(step.power)).name}-zone" style="height: ${height}%; width: ${width}%"></div>`;
+        }, `<div class="graph-interval" style="width: ${width}px">`);
 
     }, ``);
 }

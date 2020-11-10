@@ -33,15 +33,17 @@ class Workout {
 class StopWatch {
     constructor(args) {
         this.interval = undefined;
-        this.elapsed = 0;
-        this.lapTime = 0;
-        this.started = false;
-        this.currentLapStart = 0;
-        this.workout = [];
-        this.workoutIntervalIndex = 0;
-        this.workoutCurrentIntervalDuration = 0;
-        this.workoutStarted = false;
-        this.progress = 0;
+        this.elapsed  = 0;           // elapsed time in sec
+        this.lapTime  = 0;           // lap count down time
+        this.stepTime = 0;           // step count down time
+        this.started  = false;       // elapsed timer started
+        this.workoutStarted = false; // workout is in progress
+        this.workout = [];           // intervals with steps of a workout
+        this.workoutLapIndex  = 0;
+        this.workoutStepIndex = 0;
+        this.workoutCurrentLapDuration  = 0;
+        this.workoutCurrentStepDuration = 0;
+        this.progress = 0;            // index of current point in workout
         this.workoutDuration = 0;
         this.init();
     }
@@ -57,33 +59,110 @@ class StopWatch {
         if(self.started) {
             self.pause();
         } else {
-            self.interval = setInterval(self.onTick.bind(self), 1000);
-            self.started = true;
+            // self.interval = setInterval(self.onTick.bind(self), 1000);
+            self.interval = setInterval(self.onTick.bind(self), 250);
+            self.started  = true;
             xf.dispatch('watch:started');
         }
     }
+    workoutDone() {
+        let self = this;
+
+        self.lapTime        = 0;
+        self.stepTime       = 0;
+        self.workoutStarted = false;
+        xf.dispatch('watch:lap');
+        xf.dispatch('watch:lapTime', 0);
+        xf.dispatch('watch:stepTime', 0);
+        console.log("Workout Done.");
+    }
     lap() {
         let self = this;
-        self.lapTime = 0;
-        self.currentLapStart = self.elapsed;
 
         if(self.workoutStarted) {
-            if(self.workoutIntervalIndex < self.workout.length) {
-                self.workoutCurrentIntervalDuration = self.workout[self.workoutIntervalIndex].duration;
-                xf.dispatch('watch:nextWorkoutInterval', self.workoutIntervalIndex);
+            let l        = self.workoutLapIndex;
+            let s        = self.workoutStepIndex;
+            let laps     = self.workout;
+            let moreLaps = l < (laps.length - 1);
 
-                console.log(`duration: ${self.workoutCurrentIntervalDuration}`);
+            if(moreLaps) {
+                l += 1;
+                s  = 0;
 
-                self.workoutIntervalIndex +=1;
-                self.lapTime = self.workoutCurrentIntervalDuration;
-                xf.dispatch('watch:lapTime', self.workoutCurrentIntervalDuration);
-                xf.dispatch('watch:lapTime', 0);
+                self.workoutLapIndex  = l;
+                self.workoutStepIndex = s;
+
+                self.nextLap();
+                self.nextStep();
             } else {
-                self.workoutStarted = false;
-                console.log("Workout Done.");
+                self.workoutDone();
             }
+        } else {
+            self.lapTime  = 0;
+            xf.dispatch('watch:lap');
+            xf.dispatch('watch:lapTime', 0);
         }
+    }
+    nextLap() {
+        let self = this;
+
+        let l           = self.workoutLapIndex;
+        let laps        = self.workout;
+        let lapDuration = laps[l].duration;
+
+        self.workoutCurrentLapDuration = lapDuration;
+        self.lapTime = lapDuration;
+
+        xf.dispatch('watch:nextWorkoutInterval', l);
+        xf.dispatch('watch:lapTime', lapDuration);
         xf.dispatch('watch:lap');
+    }
+    nextStep() {
+        let self = this;
+
+        console.log(`nextStep: ${self.workoutLapIndex}, step: ${self.workoutStepIndex}/${self.workout[self.workoutLapIndex].steps.length}`);
+
+        let l            = self.workoutLapIndex;
+        let s            = self.workoutStepIndex;
+        let steps        = self.workout[l].steps;
+        let stepDuration = steps[s].duration;
+
+        self.stepTime = stepDuration;
+        self.workoutCurrentStepDuration = stepDuration;
+
+
+        xf.dispatch('watch:nextWorkoutStep', s);
+        xf.dispatch('watch:stepTime', stepDuration);
+        xf.dispatch('watch:step');
+    }
+    step() {
+        let self = this;
+
+        let l         = self.workoutLapIndex;
+        let s         = self.workoutStepIndex;
+        let laps      = self.workout;
+        let steps     = laps[l].steps;
+        let moreLaps  = l < (laps.length  - 1);
+        let moreSteps = s < (steps.length - 1);
+
+        if(moreSteps) {
+            s += 1;
+            self.workoutStepIndex = s;
+            self.nextStep();
+
+        } else if (moreLaps) {
+            l += 1;
+            s  = 0;
+            self.workoutLapIndex  = l;
+            self.workoutStepIndex = s;
+
+            self.nextLap();
+            self.nextStep();
+
+        } else {
+            self.workoutStarted = false;
+            console.log("Workout Done.");
+        }
     }
     pause() {
         let self = this;
@@ -95,7 +174,7 @@ class StopWatch {
         let self = this;
         if(!self.started) {
             self.interval = setInterval(self.onTick.bind(self), 1000);
-            self.started = true;
+            self.started  = true;
         }
     }
     stop () {
@@ -105,7 +184,8 @@ class StopWatch {
             self.elapsed = 0;
             self.started = false;
             self.lap();
-            self.workoutIntervalIndex = 0;
+            self.workoutLapIndex = 0;
+            self.workoutStepIndex = 0;
             xf.dispatch('watch:elapsed', 0);
             xf.dispatch('watch:lapTime', 0);
             xf.dispatch('watch:stopped');
@@ -117,14 +197,17 @@ class StopWatch {
         self.elapsed += 1;
 
         if(self.workoutStarted) {
-            self.lapTime -= 1;
+            self.lapTime  -= 1;
+            self.stepTime -= 1;
         } else {
-            self.lapTime += 1;
+            self.lapTime  += 1;
         }
-        xf.dispatch('watch:elapsed', self.elapsed);
-        xf.dispatch('watch:lapTime', self.lapTime);
-        if((self.workoutStarted) && (self.lapTime === 0)) {
-            self.lap();
+        xf.dispatch('watch:elapsed',  self.elapsed);
+        xf.dispatch('watch:lapTime',  self.lapTime);
+        xf.dispatch('watch:stepTime', self.stepTime);
+
+        if((self.workoutStarted) && (self.stepTime === 0)) {
+            self.step();
         }
     }
     setWorkout(workout) {
@@ -134,11 +217,20 @@ class StopWatch {
     startWorkout() {
         let self = this;
         self.workoutStarted = true;
-        self.workoutIntervalIndex = 0;
-        self.workoutCurrentIntervalDuration = self.workout[self.workoutIntervalIndex].duration;
+
+        self.workoutLapIndex = 0;
+        self.workoutStepIndex = 0;
+        self.workoutCurrentLapDuration  = self.workout[0].duration;
+        self.workoutCurrentStepDuration = self.workout[0].steps[0].duration;
+
+        self.lapTime  = self.workout[0].duration;
+        self.stepTime = self.workout[0].steps[0].duration;
+
+        xf.dispatch('watch:nextWorkoutInterval', 0);
+        xf.dispatch('watch:nextWorkoutStep', 0);
+
         if(!self.started) {
             self.start();
-            self.lap();
         }
     }
 }

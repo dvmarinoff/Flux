@@ -47,14 +47,18 @@ function DataScreen(args) {
         let pwr = e.detail.data.pwr;
         dom.power.textContent = `${pwr}`;
     });
+    xf.sub('db:distance', e => {
+        let dis = e.detail.data.distance;
+        dom.distance.textContent = `${metersToDistance(dis)}`;
+    });
     xf.sub('db:vspd', e => {
         let vspd = e.detail.data.vspd;
         dom.speed.textContent = `${vspd.toFixed(1)}`;
     });
-    xf.sub('db:vdis', e => {
-        let vdis = e.detail.data.vdis;
-        dom.distance.textContent = `${metersToDistance(vdis)}`;
-    });
+    // xf.sub('db:vdis', e => {
+    //     let vdis = e.detail.data.vdis;
+    //     dom.distance.textContent = `${metersToDistance(vdis)}`;
+    // });
     xf.sub('db:spd', e => {
         let spd = e.detail.data.spd;
         dom.speed.textContent = `${spd.toFixed(1)}`;
@@ -121,9 +125,11 @@ function GraphHr(args) {
 }
 
 function GraphWorkout(args) {
-    let dom = args.dom;
-    let index = 0;
-    let setProgress = index => {
+    let dom      = args.dom;
+    let interval = 0;
+    let step     = 0;
+    let index    = 0;
+    let setProgress = (index) => {
         let rect = dom.intervals[index].getBoundingClientRect();
         dom.active.style.left    = `${rect.left}px`;
         dom.active.style.width   = `${rect.width}px`;
@@ -142,12 +148,20 @@ function GraphWorkout(args) {
 
         dom.progress  = document.querySelector('#progress');
         dom.active    = document.querySelector('#progress-active');
-        dom.intervals = document.querySelectorAll('#current-workout-graph .graph-bar');
+        dom.intervals = document.querySelectorAll('#current-workout-graph .graph-interval');
+        dom.steps     = document.querySelectorAll('#current-workout-graph .graph-bar');
     });
 
     xf.reg('watch:nextWorkoutInterval', e => {
-        index = e.detail.data;
-        setProgress(index);
+        interval = e.detail.data;
+        setProgress(interval);
+    });
+    xf.reg('watch:nextWorkoutStep', e => {
+        step = e.detail.data;
+        // if(interval+step !== 0) {
+        //     index += 1;
+        // }
+        // setProgress(index);
     });
 
     xf.reg('screen:change', e => {
