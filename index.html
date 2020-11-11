@@ -13,12 +13,12 @@
     <body id="theme" class="dark">
         <div class="wrapper">
             <div class="page" id="main-page">
-                <header>
-                    <div class="devices cf">
+                <header class="">
+                    <div class="devices page-header cf">
                         <div id="flux-connection-screen" class="connection-screen">
                             <button type="button" class="switch">
                                 <div class="indicator off"></div>
-                                <div class="text">Controllable</div>
+                                <div class="text t2">Controllable</div>
                             </button>
                             <!-- <button type="button" class="start-notifications btn">Start</button>
                                 <button type="button" class="stop-notifications btn">Stop</button> -->
@@ -26,7 +26,7 @@
                         <div id="hrb-connection-screen" class="connection-screen">
                             <button type="button" class="switch">
                                 <div class="indicator off"></div>
-                                <div class="text">HRB</div>
+                                <div class="text t2">HRM</div>
                             </button>
                             <!-- <button type="button" class="start-notifications btn">Start</button>
                                 <button type="button" class="stop-notifications btn">Stop</button> -->
@@ -111,11 +111,10 @@
                 <div class="control-screen">
                     <div class="watch cf">
                         <button type="button" id="watch-start"  class="btn">Start</button>
-                        <!-- <button type="button" id="watch-pause"  class="btn">Pause</button> -->
-                        <!-- <button type="button" id="watch-resume" class="btn">Resume</button> -->
                         <button type="button" id="watch-stop"   class="btn">Stop</button>
                         <button type="button" id="watch-lap"    class="btn">Lap</button>
                         <button type="button" id="start-workout" class="btn">Do Workout</button>
+                        <button type="button" id="activity-save" class="btn">Save</button>
                     </div>
 
                     <div class="control-point cf">
@@ -133,18 +132,17 @@
                         </div>
                     </div>
 
-                    <button type="button" id="dark-mode" class="btn">Light Mode</button>
-
+                    <!-- <button type="button" id="dark-mode" class="btn">Light Mode</button> -->
                     <br/>
-                    <button type="button" id="activity-save" class="btn">Save</button>
                 </div>
-            </div>
+            </div> <!-- page -->
             <div class="page" id="workouts-page">
-                <br/><br/><br/>
-
-                <div class="workouts" id="workouts">
+                <div class="workouts-list" id="workouts">
+                    <header class="page-header">
+                        <h2 class="t2">Workouts</h2>
+                    </header>
                     <div class="buildin-workouts">
-                        <h2 class="h2">Workouts:</h2>
+
                         <div class="list">
                         </div>
                     </div>
@@ -156,23 +154,35 @@
                             <input id="workout-file" class="native-btn" name="workout-file" type="file" value=""/>
                         </div>
                     </div>
-
                 </div>
-
-                <br/><br/><br/>
-
-            </div>
-            <div class="page" id="stat-page">
-                <div id="laps" class="laps">
-                    <div class="heading h4">
-                        <div class="time">Time</div>
-                        <div class="start">Start</div>
-                        <div class="end">End</div>
+            </div> <!-- page -->
+            <div class="page" id="settings-page">
+                <header class="page-header">
+                    <h2 class="t2">Settings</h2>
+                </header>
+                <div class="card controllable">
+                    Controllable
+                </div>
+                <div class="card hr">
+                    HRM
+                </div>
+                <div id="ftp-settings" class="settings-row">
+                    <label for="" class="t2">FTP</label>
+                    <div class="row">
+                        <input id="ftp-value" class="input" name="ftp-value" type="text" value=" 256"/>
+                        <button type="button" id="ftp-set" class="btn">Set FTP</button>
                     </div>
-                    <div class="list t2"></div>
                 </div>
-            </div>
-        </div>
+            </div> <!-- page -->
+
+            <div id="menu" class="menu">
+                <div class="menu-cont h3">
+                    <div class="settings tab-btn" data-index="2">Settings</div>
+                    <div class="home tab-btn active" data-index="0">Home</div>
+                    <div class="workouts tab-btn" data-index="1">Workouts</div>
+                </div>
+            </div> <!-- menu -->
+        </div> <!-- wrapper -->
     </body>
 
     <script type="module" src="index.js"></script>

@@ -40,6 +40,11 @@ let dom = {
         laps: document.querySelector('#laps'),
         startWorkout: document.querySelector('#start-workout'),
     },
+    navigation: {
+        menu:    document.querySelector('.menu-cont'),
+        tabBtns: document.querySelectorAll('.menu .tab-btn'),
+        pages:   document.querySelectorAll('.page'),
+    },
     file: {
         fileBtn: document.querySelector('#workout-file'),
     },

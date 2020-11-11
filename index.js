@@ -27,7 +27,8 @@ import { ControllableConnectionView,
          ControlView,
          LoadWorkoutView,
          WorkoutsView,
-         ActivityView
+         ActivityView,
+         NavigationWidget
        } from './views.js';
 import { DeviceController,
          FileController,
@@ -141,6 +142,11 @@ xf.sub('ui:activity:save', e => {
     let fileHndler = new FileHandler();
     fileHndler.downloadActivity(activity);
 });
+xf.sub('ui:tab', e => {
+    let i = e.detail.data;
+    db.tab = i;
+});
+
 
 function start() {
     let hrb   = new Hrb({name: 'hrb'});
@@ -159,13 +165,14 @@ function start() {
     LoadWorkoutView({dom: dom.file});
     WorkoutsView({dom: dom.workouts, workouts: workouts});
     ActivityView({dom: dom.activity});
+    NavigationWidget({dom: dom.navigation});
 
     DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
     WorkoutController();
 
     Screen();
-    Vibrate({vibrate: true, long: false});
+    // Vibrate({vibrate: true, long: false});
 
     // DataMock({hr: true, pwr: true});
 };

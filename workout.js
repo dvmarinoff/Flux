@@ -59,8 +59,7 @@ class StopWatch {
         if(self.started) {
             self.pause();
         } else {
-            // self.interval = setInterval(self.onTick.bind(self), 1000);
-            self.interval = setInterval(self.onTick.bind(self), 250);
+            self.interval = setInterval(self.onTick.bind(self), 1000);
             self.started  = true;
             xf.dispatch('watch:started');
         }
@@ -119,8 +118,6 @@ class StopWatch {
     }
     nextStep() {
         let self = this;
-
-        console.log(`nextStep: ${self.workoutLapIndex}, step: ${self.workoutStepIndex}/${self.workout[self.workoutLapIndex].steps.length}`);
 
         let l            = self.workoutLapIndex;
         let s            = self.workoutStepIndex;

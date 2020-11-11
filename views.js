@@ -133,7 +133,6 @@ function GraphWorkout(args) {
         let rect = dom.intervals[index].getBoundingClientRect();
         dom.active.style.left    = `${rect.left}px`;
         dom.active.style.width   = `${rect.width}px`;
-        // dom.progress.style.width = `${rect.left}px`;
     };
 
     xf.reg('db:workout', e => {
@@ -158,15 +157,35 @@ function GraphWorkout(args) {
     });
     xf.reg('watch:nextWorkoutStep', e => {
         step = e.detail.data;
-        // if(interval+step !== 0) {
-        //     index += 1;
-        // }
-        // setProgress(index);
     });
 
     xf.reg('screen:change', e => {
         setProgress(index);
     });
+}
+
+function NavigationWidget(args) {
+    let dom   = args.dom;
+    let pages = args.dom.pages;
+    let tabs  = args.dom.tabBtns;
+    let active = 0;
+    let activeTab = tabs[1];
+
+    xf.sub('pointerup', e => {
+        let i = e.target.getAttribute('data-index');
+
+        pages[active].style.display = 'none';
+        pages[i].style.display = 'block';
+
+        activeTab.classList.remove('active');
+        e.target.classList.add('active');
+
+        active = i;
+        activeTab = e.target;
+
+        xf.dispatch('ui:tab', i);
+    }, dom.menu);
+
 }
 
 function ControlView(args) {
@@ -199,17 +218,16 @@ function ControlView(args) {
     xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.watch.stop);
     xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.startWorkout);
 
-    xf.sub('db:darkMode', e => {
-        let mode = e.detail.data.darkMode;
-        console.log(mode);
-        if(mode) {
-            dom.theme.classList.remove('light');
-            dom.theme.classList.add('dark');
-        } else {
-            dom.theme.classList.remove('dark');
-            dom.theme.classList.add('light');
-        }
-    });
+    // xf.sub('db:darkMode', e => {
+    //     let mode = e.detail.data.darkMode;
+    //     if(mode) {
+    //         dom.theme.classList.remove('light');
+    //         dom.theme.classList.add('dark');
+    //     } else {
+    //         dom.theme.classList.remove('dark');
+    //         dom.theme.classList.add('light');
+    //     }
+    // });
 
     xf.sub('watch:started', e => {
         dom.watch.start.textContent = 'Pause';
@@ -298,5 +316,6 @@ export {
     LoadWorkoutView,
     WorkoutsView,
     ActivityView,
+    NavigationWidget
 };
 

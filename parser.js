@@ -153,13 +153,13 @@ function intervalsToGraph(intervals) {
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration));
         let len = interval.steps.length;
-        return acc + `</div>` + interval.steps.reduce((a, step) => {
+        return acc + interval.steps.reduce((a, step) => {
             // let width = (step.duration) < 1 ? 1 : parseInt(Math.round(step.duration));
             let width = 100 / len;
             let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
             return a +
-                `<div class="graph-bar ${(powerToColor(step.power)).name}-zone" style="height: ${height}%; width: ${width}%"></div>`;
-        }, `<div class="graph-interval" style="width: ${width}px">`);
+                `<div class="graph-bar ${(powerToColor(step.power)).name}-zone" style="height: ${height}%; width: ${width}%"><div class="graph-info t4">${step.power}</div></div>`;
+        }, `<div class="graph-interval" style="width: ${width}px">`) + `</div>`;
 
     }, ``);
 }
