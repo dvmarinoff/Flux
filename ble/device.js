@@ -26,19 +26,19 @@ let hex            = n        => '0x' + parseInt(n).toString(16).toUpperCase();
 function indoorBikeDataFlags(dataview) {
     let f = dataview.getUint16(0, true);
     return [
-        {MoreData:             (!!(f >>> 0 & 1))},
-        {AverageSpeed:         (!!(f >>> 1 & 1))},
-        {InstantaneousCadence: (!!(f >>> 2 & 1))},
-        {AverageCandence:      (!!(f >>> 3 & 1))},
-        {TotalDistance:        (!!(f >>> 4 & 1))},
-        {ResistanceLevel:      (!!(f >>> 5 & 1))},
-        {InstantaneousPower:   (!!(f >>> 6 & 1))},
-        {AveragePower:         (!!(f >>> 7 & 1))},
-        {ExpendedEnergy:       (!!(f >>> 8 & 1))},
-        {HeartRate:            (!!(f >>> 9 & 1))},
-        {MetabolicEquivalent:  (!!(f >>> 10 & 1))},
-        {ElapsedTime:          (!!(f >>> 11 & 1))},
-        {RemainingTime:        (!!(f >>> 12 & 1))}
+        {MoreData:             (!!(f >>> 0 & 1))},  // 0 present,
+        {AverageSpeed:         (!!(f >>> 1 & 1))},  // 1 present,
+        {InstantaneousCadence: (!!(f >>> 2 & 1))},  // 0 present,
+        {AverageCandence:      (!!(f >>> 3 & 1))},  // 1 present,
+        {TotalDistance:        (!!(f >>> 4 & 1))},  // 1 present,
+        {ResistanceLevel:      (!!(f >>> 5 & 1))},  // 1 present,
+        {InstantaneousPower:   (!!(f >>> 6 & 1))},  // 1 present,
+        {AveragePower:         (!!(f >>> 7 & 1))},  // 1 present,
+        {ExpendedEnergy:       (!!(f >>> 8 & 1))},  // 1 present,
+        {HeartRate:            (!!(f >>> 9 & 1))},  // 1 present,
+        {MetabolicEquivalent:  (!!(f >>> 10 & 1))}, // 1 present,
+        {ElapsedTime:          (!!(f >>> 11 & 1))}, // 1 present,
+        {RemainingTime:        (!!(f >>> 12 & 1))}  // 1 present,
     ];
 }
 

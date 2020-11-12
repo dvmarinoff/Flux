@@ -137,7 +137,7 @@ function GraphWorkout(args) {
 
     xf.reg('db:workout', e => {
         let workout = e.detail.data.workout;
-        dom.name.textContent = workout.name;
+        // dom.name.textContent = workout.name;
 
         dom.graph.innerHTML = ``;
         dom.graph.insertAdjacentHTML('beforeend',
@@ -165,26 +165,69 @@ function GraphWorkout(args) {
 }
 
 function NavigationWidget(args) {
-    let dom   = args.dom;
-    let pages = args.dom.pages;
-    let tabs  = args.dom.tabBtns;
-    let active = 0;
-    let activeTab = tabs[1];
+    let dom = args.dom;
+    let i   = 1;
 
     xf.sub('pointerup', e => {
-        let i = e.target.getAttribute('data-index');
+        i = dom.homeBtn.getAttribute('date-index');
+        dom.settingsPage.style.display = 'none';
+        dom.workoutsPage.style.display = 'none';
+        dom.homePage.style.display = 'block';
 
-        pages[active].style.display = 'none';
-        pages[i].style.display = 'block';
+        // dom.settingsPage.style.left = 1000;
+        // dom.workoutsPage.style.left = 1000;
+        // dom.homePage.style.left     = 0;
 
-        activeTab.classList.remove('active');
-        e.target.classList.add('active');
+        // dom.settingsPage.style.zIndex = '0';
+        // dom.workoutsPage.style.zIndex = '0';
+        // dom.homePage.style.zIndex     = '1';
 
-        active = i;
-        activeTab = e.target;
+        dom.settingsBtn.classList.remove('active');
+        dom.homeBtn.classList.add('active');
+        dom.workoutsBtn.classList.remove('active');
+
+        dom.menu.classList.remove('active');
 
         xf.dispatch('ui:tab', i);
-    }, dom.menu);
+    }, dom.homeBtn);
+
+    xf.sub('pointerup', e => {
+        i = dom.settingsBtn.getAttribute('date-index');
+        dom.homePage.style.display = 'none';
+        dom.workoutsPage.style.display = 'none';
+        dom.settingsPage.style.display = 'block';
+
+        // dom.settingsPage.style.left = 0;
+        // dom.workoutsPage.style.left = 1000;
+        // dom.homePage.style.left     = 1000;
+
+        // dom.workoutsPage.style.zIndex = '0';
+        // dom.homePage.style.zIndex     = '0';
+        // dom.settingsPage.style.zIndex = '1';
+
+        dom.settingsBtn.classList.add('active');
+        dom.homeBtn.classList.remove('active');
+        dom.workoutsBtn.classList.remove('active');
+
+        dom.menu.classList.add('active');
+
+        xf.dispatch('ui:tab', i);
+    }, dom.settingsBtn);
+
+    xf.sub('pointerup', e => {
+        i = dom.workoutsBtn.getAttribute('date-index');
+        dom.homePage.style.display = 'none';
+        dom.settingsPage.style.display = 'none';
+        dom.workoutsPage.style.display = 'block';
+
+        dom.settingsBtn.classList.remove('active');
+        dom.homeBtn.classList.remove('active');
+        dom.workoutsBtn.classList.add('active');
+
+        dom.menu.classList.add('active');
+
+        xf.dispatch('ui:tab', i);
+    }, dom.workoutsBtn);
 
 }
 
@@ -203,8 +246,6 @@ function ControlView(args) {
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', workPwr);
         xf.dispatch('ui:watchLap');
-
-        let res2 = window.navigator.vibrate([200, 800, 200, 800, 200, 800, 1000]);
     }, dom.startWorkInterval);
 
     xf.sub('pointerup', e => {
@@ -214,6 +255,7 @@ function ControlView(args) {
 
     xf.sub('pointerup', e => xf.dispatch('ui:darkMode'),     dom.darkMode);
     xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),   dom.watch.start);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),   dom.watch.pause);
     xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),     dom.watch.lap);
     xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.watch.stop);
     xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.startWorkout);
@@ -229,20 +271,64 @@ function ControlView(args) {
     //     }
     // });
 
+    xf.reg('db:workout', e => {
+        let workout = e.detail.data.workout;
+        dom.workoutName.textContent = workout.name;
+    });
+
+    dom.watch.pause.style.display = 'none';
+    dom.watch.stop.style.display = 'none';
+    dom.watch.save.style.display = 'none';
+    dom.watch.lap.style.display = 'none';
+
     xf.sub('watch:started', e => {
-        dom.watch.start.textContent = 'Pause';
+        // dom.watch.start.textContent = 'Pause';
+        dom.watch.start.style.display = 'none';
+        dom.watch.save.style.display  = 'none';
+        dom.watch.pause.style.display = 'inline-block';
+        dom.watch.lap.style.display   = 'inline-block';
+        // dom.watch.stop.style.display  = 'none';
+        dom.watch.stop.style.display  = 'inline-block';
     });
     xf.sub('watch:paused', e => {
-        dom.watch.start.textContent = 'Resume';
+        // dom.watch.start.textContent = 'Resume';
+        dom.watch.pause.style.display = 'none';
+        dom.watch.start.style.display = 'inline-block';
+        // dom.watch.stop.style.display  = 'inline-block';
     });
     xf.sub('watch:stopped', e => {
-        dom.watch.start.textContent = 'Start';
+        // dom.watch.start.textContent = 'Start';
+        dom.watch.pause.style.display   = 'none';
+        dom.watch.lap.style.display     = 'none';
+        dom.watch.stop.style.display    = 'none';
+        dom.watch.save.style.display    = 'inline-block';
+        dom.watch.workout.style.display = 'inline-block';
+        dom.watch.start.style.display    = 'inline-block';
+    });
+    xf.sub('watch:workoutStarted', e => {
+        dom.watch.workout.style.display = 'none';
     });
 }
 
 
 function WorkoutsView(args) {
     let dom = args.dom;
+    let id  = 0;
+
+    let off = `
+        <svg class="radio radio-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+            <path d="M0 0h24v24H0V0z" fill="none"/>
+            <path fill="#fff" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12
+                    2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+        </svg>`;
+
+    let on = `
+        <svg class="radio radio-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+            <path d="M0 0h24v24H0V0z" fill="none"/>
+            <path fill="#fff" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0
+                    18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+            <circle fill="#fff" cx="12" cy="12" r="5"/>
+        </svg>`;
 
     xf.reg('workout:add', e => {
         let w = e.detail.data;
@@ -253,7 +339,7 @@ function WorkoutsView(args) {
                     <div class="name t4">${w.name}</div>
                     <div class="type t4">${w.type}</div>
                     <div class="time t4">${w.duration} min</div>
-                    <div class="select" id="btn${w.id}"><button class="btn">Select</button></div>
+                    <div class="select" id="btn${w.id}">${w.id === 0 ? on : off}</div>
                 </div>
                 <div class="second-row">
                     <div class="desc">
@@ -282,7 +368,10 @@ function WorkoutsView(args) {
 
         xf.sub('pointerup', e => {
             e.stopPropagation();
+            dom.select[id].innerHTML   = off;
+            dom.select[w.id].innerHTML = on;
             xf.dispatch('ui:workout:set', w.id);
+            id = w.id;
         }, dom.select[w.id]);
 
     });

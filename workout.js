@@ -225,6 +225,7 @@ class StopWatch {
 
         xf.dispatch('watch:nextWorkoutInterval', 0);
         xf.dispatch('watch:nextWorkoutStep', 0);
+        xf.dispatch('watch:workoutStarted');
 
         if(!self.started) {
             self.start();
