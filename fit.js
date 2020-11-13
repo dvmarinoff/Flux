@@ -1,5 +1,6 @@
 import { avgOfArray,
          maxOfArray,
+         mps,
          sum,
          first,
          last,
@@ -325,23 +326,25 @@ function EventMsg(args = {}) {
 }
 
 function RecordMsg(args) {
-    let header    = DataMsgHeader();
-    let timestamp = args.timestamp || now();
-    let power     = args.power     || 0;
-    let speed     = args.speed     || 0;
-    let cadence   = args.cadence   || 0;
+    let header     = DataMsgHeader();
+    let timestamp  = args.timestamp  || now();
+    let power      = args.power      || 0;
+    let speed      = args.speed      || 0;
+    let cadence    = args.cadence    || 0;
+    let heart_rate = args.heart_rate || 0;
+    let distance   = args.distance   || 0;
 
 
-    let buffer = new ArrayBuffer(10);
+    let buffer = new ArrayBuffer(15);
     let view   = new DataView(buffer);
 
-    view.setUint8( 0, header,     true);
-    view.setUint32(1, timestamp,  true);
-    view.setUint16(5, power,      true);
-    view.setUint16(7, speed,      true);
-    view.setUint8( 9, cadence,    true);
-    // view.setUint8( 9, heart_rate, true);
-    // view.setUint32( 9, distance,  true);
+    view.setUint8(  0, header,     true);
+    view.setUint32( 1, timestamp,  true);
+    view.setUint16( 5, power,      true);
+    view.setUint16( 7, speed,      true);
+    view.setUint8(  9, cadence,    true);
+    view.setUint8( 10, heart_rate, true);
+    view.setUint32(11, distance,   true);
 
     return {view: view, buffer: buffer};
 }
@@ -459,6 +462,8 @@ let definitionMsgs = {
                                     field_definitions.record.power,
                                     field_definitions.record.speed,
                                     field_definitions.record.cadence,
+                                    field_definitions.record.heart_rate,
+                                    field_definitions.record.distance,
                                    ]}),
 
     lap:    DefinitionMsg({globalMsgNumber: global_msg_numbers.lap,
@@ -560,11 +565,12 @@ function dataToRecords(args) {
     records[5] = definitionMsgs.record;
 
     for(let d=0; d < data.length; d++) {
-        records.push(RecordMsg({timestamp: toFitTimestamp(data[d].timestamp),
-                                power:     data[d].power,
-                                speed:     (data[d].speed / 3.6) * 1000,
-                                cadence:   data[d].cadence,
-                                // distance:  data[d].distance * 100,
+        records.push(RecordMsg({timestamp:  toFitTimestamp(data[d].timestamp),
+                                power:      data[d].power,
+                                speed:      (data[d].speed / 3.6) * 1000,
+                                cadence:    data[d].cadence,
+                                heart_rate: data[d].hr,
+                                distance:   data[d].distance * 100,
                                }));
     }
 

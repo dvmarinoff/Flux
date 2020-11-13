@@ -83,6 +83,8 @@ function WorkoutController() {
 
     xf.reg('db:ftp', e => {
         ftp = e.detail.data.ftp;
+        xf.dispatch('workouts:init', workouts);
+        xf.dispatch('ui:workout:set', 0);
     });
 
     xf.reg('file:upload:workout', e => {
@@ -99,7 +101,7 @@ function WorkoutController() {
         workout.xml = xml;
         workout.intervals = intervals;
         workout.duration = 0;//intervals.reduce( (acc, x) => acc + (x.duration / 60), 0);
-        workout.graph = intervalsToGraph(intervals);
+        workout.graph = intervalsToGraph(intervals, ftp);
         xf.dispatch('workout:add', workout);
         index += 1;
     });
@@ -108,9 +110,12 @@ function WorkoutController() {
         let workoutFiles = e.detail.data;
         workoutFiles.forEach( w => {
             let intervals = parseZwo(w.xml);
-            intervals.forEach( x => x.power = Math.round(ftp * x.power));
-            // console.log(intervals);
-            let graph = intervalsToGraph(intervals);
+            intervals.forEach( interval => {
+                interval.steps.forEach( step => {
+                    step.power = Math.round(ftp * step.power);
+                });
+            });
+            let graph = intervalsToGraph(intervals, ftp);
             w.intervals = intervals;
             w.id = index;
             w.graph = graph;
@@ -121,8 +126,6 @@ function WorkoutController() {
 
     //Set defaults and init the build in collection:
     xf.dispatch('ui:ftp', 256);
-    xf.dispatch('workouts:init', workouts);
-    xf.dispatch('ui:workout:set', 0);
 }
 
 export { DeviceController, FileController, WorkoutController, Screen, Vibrate };

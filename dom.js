@@ -13,7 +13,7 @@ let dom = {
     },
     datascreen: {
         time:      document.querySelector('#time'),
-        interval:   document.querySelector('#interval-time'),
+        interval:  document.querySelector('#interval-time'),
         targetPwr: document.querySelector('#target-power'),
         power:     document.querySelector('#power'),
         cadence:   document.querySelector('#cadence'),
@@ -23,14 +23,16 @@ let dom = {
     },
     controlscreen: {
         watch: {
-            start:  document.querySelector('#watch-start'),
-            pause:  document.querySelector('#watch-pause'),
-            resume: document.querySelector('#watch-resume'),
-            lap:    document.querySelector('#watch-lap'),
-            stop:   document.querySelector('#watch-stop'),
+            start:   document.querySelector('#watch-start'),
+            pause:   document.querySelector('#watch-pause'),
+            resume:  document.querySelector('#watch-resume'),
+            lap:     document.querySelector('#watch-lap'),
+            stop:    document.querySelector('#watch-stop'),
+            save:    document.querySelector('#activity-save'),
+            workout: document.querySelector('#start-workout'),
+            cont:    document.querySelector('#watch'),
         },
-        darkMode:    document.querySelector('#dark-mode'),
-        theme:       document.querySelector('#theme'),
+        workoutName: document.querySelector('#workout-name'),
         targetPower: document.querySelector('#target-power-value'),
         workPower:   document.querySelector('#work-power-value'),
         restPower:   document.querySelector('#rest-power-value'),
@@ -39,6 +41,24 @@ let dom = {
         startRestInterval: document.querySelector('#start-rest-interval'),
         laps: document.querySelector('#laps'),
         startWorkout: document.querySelector('#start-workout'),
+    },
+    settings: {
+        ftp:      document.querySelector('#ftp-value'),
+        ftpBtn:   document.querySelector('#ftp-btn'),
+        darkMode: document.querySelector('#dark-mode'),
+        theme:    document.querySelector('#theme'),
+    },
+    navigation: {
+        menu:         document.querySelector('.menu-cont'),
+        tabBtns:      document.querySelectorAll('.menu .tab-btn'),
+        pages:        document.querySelectorAll('.page'),
+        homeBtn:      document.querySelector('#home-tab-btn'),
+        settingsBtn:  document.querySelector('#settings-tab-btn'),
+        workoutsBtn:  document.querySelector('#workouts-tab-btn'),
+        homePage:     document.querySelector('#home-page'),
+        settingsPage: document.querySelector('#settings-page'),
+        workoutsPage: document.querySelector('#workouts-page'),
+        controls:     document.querySelector('.control-screen'),
     },
     file: {
         fileBtn: document.querySelector('#workout-file'),
@@ -58,6 +78,7 @@ let dom = {
         name:      document.querySelector('#current-workout-name'),
         graph:     document.querySelector('#current-workout-graph'),
         intervals: [],
+        steps: [],
     },
     graphHr: {
         cont:  document.querySelector('#graph-hr'),
@@ -65,7 +86,8 @@ let dom = {
     },
     graphPower: {
         cont:  document.querySelector('#graph-power'),
-        graph: document.querySelector('#graph-power .graph')
+        graph: document.querySelector('#graph-power .graph'),
+        ftp:   document.querySelector('#ftp-line-value')
     }
 };
 

@@ -10,6 +10,8 @@ import { workouts } from './workouts/workouts.js';
 import { avgOfArray,
          maxOfArray,
          sum,
+         mps,
+         kph,
          first,
          last,
          round,
@@ -23,7 +25,9 @@ import { ControllableConnectionView,
          ControlView,
          LoadWorkoutView,
          WorkoutsView,
-         ActivityView
+         ActivityView,
+         NavigationWidget,
+         SettingsView
        } from './views.js';
 import { DeviceController,
          FileController,
@@ -53,7 +57,7 @@ let db = DB({
     lapTime: 0,
     targetPwr: 100,
     ftp: 256,
-    timestamp: new Date(),
+    timestamp: Date.now(),
     workout:  [],
     workoutFile: '',
     workouts: [],
@@ -81,6 +85,7 @@ xf.reg('device:hr',      e => db.hr  = e.detail.data);
 xf.reg('device:pwr',     e => db.pwr = e.detail.data);
 xf.reg('device:spd',     e => db.spd = e.detail.data);
 xf.reg('device:cad',     e => db.cad = e.detail.data);
+xf.reg('device:dist',    e => db.distance = e.detail.data);
 xf.reg('watch:started',  e => db.lapStartTime = Date.now());
 xf.reg('watch:elapsed',  e => db.elapsed = e.detail.data);
 xf.reg('watch:lapTime',  e => db.lapTime = e.detail.data);
@@ -92,12 +97,13 @@ xf.reg('ui:workout:set', e => db.workout = db.workouts[e.detail.data]);
 xf.reg('workout:add',    e => db.workouts.push(e.detail.data));
 xf.reg('watch:elapsed',  e => {
     let watchTime = e.detail.data;
+    db.distance  += 1 * mps(db.spd);
     let record = { timestamp: Date.now(),
                    power:     db.pwr,
                    cadence:   db.cad,
-                   speed:     db.speed,
-                   distance:  db.distance,
-                   hr:        db.hr };
+                   speed:     db.spd,
+                   hr:        db.hr,
+                   distance:  db.distance};
     db.records.push(record);
     db.lap.push(record);
 });
@@ -119,15 +125,27 @@ xf.reg('watch:lap', e => {
 });
 xf.reg('watch:nextWorkoutInterval', e => {
     let index = e.detail.data;
-    let targetPwr = db.workout.intervals[index].power;
+    // let targetPwr = db.workout.intervals[index].power;
     db.workoutIntervalIndex = index;
-    db.targetPwr = targetPwr;
+    // db.targetPwr = targetPwr;
+});
+xf.reg('watch:nextWorkoutStep', e => {
+    let step      = e.detail.data;
+    let interval  = db.workoutIntervalIndex;
+    let targetPwr = db.workout.intervals[interval].steps[step].power;
+    db.workoutStepIndex = step;
+    db.targetPwr  = targetPwr;
 });
 xf.sub('ui:activity:save', e => {
     let activity   = Encode({data: db.records, laps: db.laps});
     let fileHndler = new FileHandler();
     fileHndler.downloadActivity(activity);
 });
+xf.sub('ui:tab', e => {
+    let i = e.detail.data;
+    db.tab = i;
+});
+
 
 function start() {
     let hrb   = new Hrb({name: 'hrb'});
@@ -146,15 +164,17 @@ function start() {
     LoadWorkoutView({dom: dom.file});
     WorkoutsView({dom: dom.workouts, workouts: workouts});
     ActivityView({dom: dom.activity});
+    NavigationWidget({dom: dom.navigation});
+    SettingsView({dom: dom.settings});
 
     DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
     WorkoutController();
 
     Screen();
-    Vibrate({vibrate: false, long: false});
+    // Vibrate({vibrate: true, long: false});
 
-    // DataMock({hr: false, pwr: true});
+    // DataMock({hr: true, pwr: true});
 };
 
 start();

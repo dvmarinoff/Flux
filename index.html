@@ -12,13 +12,13 @@
     </head>
     <body id="theme" class="dark">
         <div class="wrapper">
-            <div class="page" id="main-page">
-                <header>
-                    <div class="devices cf">
+            <div class="page" id="home-page">
+                <header class="">
+                    <div class="devices page-header cf">
                         <div id="flux-connection-screen" class="connection-screen">
                             <button type="button" class="switch">
                                 <div class="indicator off"></div>
-                                <div class="text">Controllable</div>
+                                <div class="text t2">Controllable</div>
                             </button>
                             <!-- <button type="button" class="start-notifications btn">Start</button>
                                 <button type="button" class="stop-notifications btn">Stop</button> -->
@@ -26,7 +26,7 @@
                         <div id="hrb-connection-screen" class="connection-screen">
                             <button type="button" class="switch">
                                 <div class="indicator off"></div>
-                                <div class="text">HRB</div>
+                                <div class="text t2">HRM</div>
                             </button>
                             <!-- <button type="button" class="start-notifications btn">Start</button>
                                 <button type="button" class="stop-notifications btn">Stop</button> -->
@@ -89,7 +89,7 @@
                 <div class="graphs">
                     <div class="graph-screen" id="graph-power">
                         <h4 class="graph-heading h4">Power</h4>
-                        <div class="ftp-line"><div class="ftp t5">FTP 256</div></div>
+                        <div class="ftp-line"><div id="ftp-line-value" class="ftp t5">FTP</div></div>
                         <div class="graph cf">
                         </div>
                     </div>
@@ -108,45 +108,46 @@
 
                 <div class="line"></div>
 
-                <div class="control-screen">
-                    <div class="watch cf">
-                        <button type="button" id="watch-start"  class="btn">Start</button>
-                        <!-- <button type="button" id="watch-pause"  class="btn">Pause</button> -->
-                        <!-- <button type="button" id="watch-resume" class="btn">Resume</button> -->
-                        <button type="button" id="watch-stop"   class="btn">Stop</button>
-                        <button type="button" id="watch-lap"    class="btn">Lap</button>
-                        <button type="button" id="start-workout" class="btn">Do Workout</button>
-                    </div>
-
-                    <div class="control-point cf">
-                        <div class="tile cf">
-                            <input id="target-power-value" class="input" name="target" type="text" value="100"/>
-                            <button type="button" id="set-target-power" class="btn">Target</button>
-                        </div>
-                        <div class="tile cf">
-                            <input id="work-power-value"" class="input" name="work" type="text" value="235"/>
-                            <button type="button" id="start-work-interval" class="btn">Work Interval</button>
-                        </div>
-                        <div class="tile cf">
-                            <input id="rest-power-value"" class="input" name="rest" type="text" value="100"/>
-                            <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
-                        </div>
-                    </div>
-
-                    <button type="button" id="dark-mode" class="btn">Light Mode</button>
-
-                    <br/>
-                    <button type="button" id="activity-save" class="btn">Save</button>
+                <div id="mode-selector" class="mode-selector">
+                    <div id="mode-erg-btn" class="mode active">ERG</div>
+                    <div id="mode-resistance-btn" class="mode">Resistance</div>
+                    <div id="mode-slope-btn" class="mode">Slope</div>
+                    <div id="mode-free-btn" class="mode">Free</div>
                 </div>
-            </div>
-            <div class="page" id="workouts-page">
-                <br/><br/><br/>
 
-                <div class="workouts" id="workouts">
+                <!-- <div class="slope-mode">
+                     <div class="h2">Slope</div>
+                     <div class="number-btn">
+                     <div class="inc">-</div>
+                     <input id="slope-value"" class="value" name="slope-value" type="text" value="0"/>
+                     <div class="dec">+</div>
+                     </div>
+                     </div> -->
+
+                <div class="control-point cf">
+                    <div class="tile cf">
+                        <input id="target-power-value" class="input" name="target" type="text" value="100"/>
+                        <button type="button" id="set-target-power" class="btn">Target</button>
+                    </div>
+                    <div class="tile cf">
+                        <input id="work-power-value"" class="input" name="work" type="text" value="235"/>
+                        <button type="button" id="start-work-interval" class="btn">Work Interval</button>
+                    </div>
+                    <div class="tile cf">
+                        <input id="rest-power-value"" class="input" name="rest" type="text" value="100"/>
+                        <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
+                    </div>
+                </div>
+
+            </div> <!-- page -->
+            <div class="page" id="workouts-page">
+                <div class="workouts-list" id="workouts">
+                    <header class="page-header">
+                        <h2 class="t2">Workouts</h2>
+                    </header>
+
                     <div class="buildin-workouts">
-                        <h2 class="h2">Workouts:</h2>
-                        <div class="list">
-                        </div>
+                        <div class="list"> </div>
                     </div>
 
                     <div class="workout-load-file">
@@ -156,23 +157,121 @@
                             <input id="workout-file" class="native-btn" name="workout-file" type="file" value=""/>
                         </div>
                     </div>
-
+                    <br/><br/><br/>
                 </div>
-
-                <br/><br/><br/>
-
-            </div>
-            <div class="page" id="stat-page">
-                <div id="laps" class="laps">
-                    <div class="heading h4">
-                        <div class="time">Time</div>
-                        <div class="start">Start</div>
-                        <div class="end">End</div>
+            </div> <!-- page -->
+            <div class="page" id="settings-page">
+                <header class="page-header">
+                    <h2 class="t2">Settings</h2>
+                </header>
+                <div class="card controllable">
+                    <h2 class="h2">Controllable</h2>
+                </div>
+                <div class="card hr">
+                    <h2 class="h2">HRM</h2>
+                </div>
+                <!-- <button type="button" id="dark-mode" class="btn">Light Mode</button> -->
+                <div id="ftp-settings" class="settings-row">
+                    <label for="" class="h2">FTP</label>
+                    <div class="row">
+                        <input id="ftp-value" class="input" name="ftp-value" type="text" value=" 256"/>
+                        <button type="button" id="ftp-btn" class="btn">Set FTP</button>
                     </div>
-                    <div class="list t2"></div>
+                </div>
+            </div> <!-- page -->
+
+            <div class="control-screen">
+                <div id="watch" class="watch cf">
+                    <div id="workout-name">Free ride</div>
+                    <div id="start-workout" class="control-btn">
+                        <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
+                                        10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                        </svg>
+                    </div>
+
+                    <div id="watch-start" class="control-btn">
+                        <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M8 5v14l11-7L8 5z"/>
+                        </svg>
+                    </div>
+
+                    <div id="watch-pause" class="control-btn">
+                        <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </div>
+
+                    <div id="watch-lap" class="control-btn">
+                        <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M15 1H9v2h6V1zm-4
+                                        13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42
+                                        1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03
+                                        9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7
+                                        7-7 7 3.13 7 7-3.13 7-7 7z"/>
+                    </div>
+
+                    <div id="watch-stop" class="control-btn">
+                        <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M6 6h12v12H6V6z"/>
+                        </svg>
+                    </div>
+
+                    <div id="activity-save" class="control-btn">
+                        <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M19 12v7H5v-7H3v9h18v-9h-2zm-6 .67l2.59-2.58L17
+                                        11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+                        </svg>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div id="menu" class="menu">
+                <div class="menu-cont">
+                    <div id="settings-tab-btn" class="settings tab-btn icon-btn" data-index="2">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path class="icon-fill" d="M19.44 12.99l-.01.02c.04-.33.08-.67.08-1.01
+                                         0-.34-.03-.66-.07-.99l.01.02 2.44-1.92-2.43-4.22-2.87
+                                         1.16.01.01c-.52-.4-1.09-.74-1.71-1h.01L14.44 2H9.57l-.44
+                                         3.07h.01c-.62.26-1.19.6-1.71 1l.01-.01-2.88-1.17-2.44 4.22 2.44
+                                         1.92.01-.02c-.04.33-.07.65-.07.99 0 .34.03.68.08 1.01l-.01-.02-2.1
+                                         1.65-.33.26 2.43 4.2 2.88-1.15-.02-.04c.53.41 1.1.75 1.73 1.01h-.03L9.58
+                                         22h4.85s.03-.18.06-.42l.38-2.65h-.01c.62-.26 1.2-.6 1.73-1.01l-.02.04
+                                         2.88 1.15 2.43-4.2s-.14-.12-.33-.26l-2.11-1.66zM12 15.5c-1.93
+                                         0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+                        </svg>
+                        <div class="text">Settings</div>
+                    </div>
+                    <div id="home-tab-btn" class="home tab-btn active icon-btn" data-index="0">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path class="icon-fill" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z" />
+                        </svg>
+                        <div class="text">Home</div>
+                    </div>
+                    <div id="workouts-tab-btn" class="workouts tab-btn icon-btn" data-index="1">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path class="icon-fill" fill="#aaa" d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/>
+                        </svg>
+                        <div class="text">Workouts</div>
+                    </div>
+                </div>
+            </div> <!-- menu -->
+        </div> <!-- wrapper -->
     </body>
 
     <script type="module" src="index.js"></script>

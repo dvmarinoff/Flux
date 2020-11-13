@@ -2,16 +2,17 @@ let sin    = x => Math.sin(x);
 let cos    = x => Math.cos(x);
 let arctan = x => Math.atan(x);
 let abs    = x => Math.abs(x);
-let sqr    = x => x * x;
-let exp    = x => Math.exp(x);
-let mps    = kph => kph / 3.6;
-let kph    = mps => 3.6 * mps;
-let avg    = (x, y) => (x + y) / 2;
 let round  = x => Math.round(x);
 let floor  = x => Math.floor(x);
 let ceil   = x => Math.ceil(x);
+let exp    = x => Math.exp(x);
+let sqr    = x => x * x;
+let avg    = (x, y) => (x + y) / 2;
 let last   = xs => xs[xs.length - 1];
 let first  = xs => xs[0];
+let format = (x, precision = 1000) => round(x * precision) / precision;
+let mps    = kph => format(kph / 3.6);
+let kph    = mps => 3.6 * mps;
 
 function avgOfArray(xs, prop = false) {
     if(prop !== false) {
@@ -98,7 +99,7 @@ function secondsToHms(elapsed, compact = false) {
 
 function metersToDistance(meters) {
     let km = (meters / 1000);
-    let s = (meters < 1000) ? `${meters} m`  : `${km.toFixed(2)} km`;
+    let s = (meters < 1000) ? `${meters.toFixed(0)} m`  : `${km.toFixed(2)} km`;
     return s;
 }
 

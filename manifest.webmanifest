@@ -4,12 +4,12 @@
   "description": "Cycling Structured Training",
   "icons": [
     {
-      "src":   "images/icons/ic_launcher_xxxhdpi.png",
+      "src":   "./images/icons/ic_launcher_xxxhdpi.png",
       "type":  "image/png",
       "sizes": "192x192"
     },
     {
-      "src":   "images/icons/playstore.png",
+      "src":   "/images/icons/playstore.png",
       "type":  "image/png",
       "sizes": "512x512"
     }

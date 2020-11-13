@@ -2,6 +2,8 @@ import { xf, DB } from '../xf.js';
 import { avgOfArray,
          maxOfArray,
          sum,
+         mps,
+         kph,
          first,
          last,
          round,
@@ -14,19 +16,27 @@ function DataMock(args) {
     xf.sub('watch:started', e => {
 
         interval = setInterval(function() {
-            let power = (count % 60) < 30 ? 100 : 300;
-            let hr    = (count % 60) < 30 ? 120 : 160;
+            let power    = (count % 60) < 30 ?  100 : 300;
+            let hr       = (count % 60) < 30 ?  120 : 160;
+            let cadence  = (count % 60) < 30 ?   75 : 90;
+            let speed    = (count % 60) < 30 ? 27.0 : 39.0;
+            // let distance = count * mps(speed);
+
             if(args.hr) {
                 xf.dispatch('device:hr', hr);
             }
             if(args.pwr) {
-                xf.dispatch('device:pwr', power);
+                xf.dispatch('device:pwr',  power);
+                xf.dispatch('device:cad',  cadence);
+                xf.dispatch('device:spd',  speed);
+                // xf.dispatch('device:dist', distance);
             }
             count += 1;
         }, 1000);
     });
 
     xf.sub('watch:stopped', e => {
+        count = 0;
         clearInterval(interval);
     });
 
