@@ -172,30 +172,30 @@ header, footer, section, article, nav {
     align-content: center;
 }
 .page {
-    position: absolute;
-    top: 0;
+    /* position: absolute; */
+    /* top: 0; */
     width: 100vw;
     min-height: 110vh;
 }
 #home-page {
-    left: 0;
+    /* left: 0; */
     padding-bottom: 80px;
 
-    -webkit-transition: all 0.1s ease-in-out 0s;
-    transition: all 0.1s ease-in-out 0s;
+    -webkit-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
     z-index: 1;
 }
 #workouts-page {
-    /* display: none; */
-    left: 100vw;
-    -webkit-transition: all 0.1s ease-in-out 0s;
-    transition: all 0.1s ease-in-out 0s;
+    display: none;
+    /* left: 100vw; */
+    -webkit-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
 }
 #settings-page {
-    /* display: none; */
-    left: -100vw;
-    -webkit-transition: all 0.1s ease-in-out 0s;
-    transition: all 0.1s ease-in-out 0s;
+    display: none;
+    /* left: -100vw; */
+    -webkit-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
 }
 #workouts-page .page-header {
     margin-bottom: 40px;

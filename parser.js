@@ -148,7 +148,7 @@ function parseZwo(zwo) {
     return intervals;
 }
 
-function intervalsToGraph(intervals) {
+function intervalsToGraph(intervals, ftp) {
     let scale = 400;
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration));
@@ -158,7 +158,7 @@ function intervalsToGraph(intervals) {
             let width = 100 / len;
             let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
             return a +
-                `<div class="graph-bar ${(powerToColor(step.power)).name}-zone" style="height: ${height}%; width: ${width}%"><div class="graph-info t4">${step.power}</div></div>`;
+                `<div class="graph-bar ${(powerToColor(step.power, ftp)).name}-zone" style="height: ${height}%; width: ${width}%"><div class="graph-info t4">${step.power}</div></div>`;
         }, `<div class="graph-interval" style="width: ${width}px">`) + `</div>`;
 
     }, ``);

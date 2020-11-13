@@ -95,6 +95,7 @@ function GraphPower(args) {
 
     xf.sub('db:ftp', e => {
         ftp = e.detail.data.ftp;
+        dom.ftp.textContent = `FTP ${ftp}`;
     });
     xf.sub('db:pwr', e => {
         let pwr = e.detail.data.pwr;
@@ -170,15 +171,10 @@ function NavigationWidget(args) {
 
     xf.sub('pointerup', e => {
         i = dom.homeBtn.getAttribute('date-index');
-        // dom.homePage.style.display     = 'block';
-        // dom.settingsPage.style.display = 'none';
-        // dom.workoutsPage.style.display = 'none';
-
-        dom.settingsPage.style.left    = '-100vw';
-        dom.workoutsPage.style.left    = '100vw';
-        dom.homePage.style.left        = '0px';
-        dom.controls.style.display   = 'block';
-
+        dom.homePage.style.display     = 'block';
+        dom.settingsPage.style.display = 'none';
+        dom.workoutsPage.style.display = 'none';
+        dom.controls.style.display     = 'block';
 
         dom.settingsBtn.classList.remove('active');
         dom.homeBtn.classList.add('active');
@@ -191,15 +187,10 @@ function NavigationWidget(args) {
 
     xf.sub('pointerup', e => {
         i = dom.settingsBtn.getAttribute('date-index');
-        // dom.settingsPage.style.display = 'block';
-        // dom.homePage.style.display     = 'none';
-        // dom.workoutsPage.style.display = 'none';
-
-        dom.workoutsPage.style.left    = '100vw';
-        dom.homePage.style.left        = '100vw';
-        dom.settingsPage.style.left    = '0px';
-        dom.controls.style.display   = 'none';
-
+        dom.settingsPage.style.display = 'block';
+        dom.homePage.style.display     = 'none';
+        dom.workoutsPage.style.display = 'none';
+        dom.controls.style.display     = 'none';
 
         dom.settingsBtn.classList.add('active');
         dom.homeBtn.classList.remove('active');
@@ -212,13 +203,9 @@ function NavigationWidget(args) {
 
     xf.sub('pointerup', e => {
         i = dom.workoutsBtn.getAttribute('date-index');
-        // dom.workoutsPage.style.display = 'block';
-        // dom.homePage.style.display     = 'none';
-        // dom.settingsPage.style.display = 'none';
-
-        dom.settingsPage.style.left    = '-100vw';
-        dom.homePage.style.left        = '-100vw';
-        dom.workoutsPage.style.left    = '0px';
+        dom.workoutsPage.style.display = 'block';
+        dom.homePage.style.display     = 'none';
+        dom.settingsPage.style.display = 'none';
         dom.controls.style.display     = 'block';
 
         dom.settingsBtn.classList.remove('active');
@@ -232,15 +219,37 @@ function NavigationWidget(args) {
 
 }
 
+function SettingsView(args) {
+    let dom = args.dom;
+    let ftp = 256;
+
+    // xf.sub('db:darkMode', e => {
+    //     let mode = e.detail.data.darkMode;
+    //     if(mode) {
+    //         dom.theme.classList.remove('light');
+    //         dom.theme.classList.add('dark');
+    //     } else {
+    //         dom.theme.classList.remove('dark');
+    //         dom.theme.classList.add('light');
+    //     }
+    // });
+
+    xf.sub('change', e => { ftp = parseInt(e.target.value); }, dom.ftp);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:ftp', ftp);
+    }, dom.ftpBtn);
+}
+
 function ControlView(args) {
     let dom       = args.dom;
     let targetPwr = 100;
     let workPwr   = 235;
     let restPwr   = 100;
 
-    xf.sub('change', e => { targetPwr = e.target.value; }, dom.targetPower);
-    xf.sub('change', e => { workPwr = e.target.value; },   dom.workPower);
-    xf.sub('change', e => { restPwr = e.target.value; },   dom.restPower);
+    xf.sub('change', e => { targetPwr = parseInt(e.target.value); }, dom.targetPower);
+    xf.sub('change', e => { workPwr   = parseInt(e.target.value); }, dom.workPower);
+    xf.sub('change', e => { restPwr   = parseInt(e.target.value); }, dom.restPower);
 
     xf.sub('pointerup', e => { xf.dispatch('ui:target-pwr', targetPwr); }, dom.setTargetPower);
 
@@ -260,17 +269,6 @@ function ControlView(args) {
     xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),     dom.watch.lap);
     xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.watch.stop);
     xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.startWorkout);
-
-    // xf.sub('db:darkMode', e => {
-    //     let mode = e.detail.data.darkMode;
-    //     if(mode) {
-    //         dom.theme.classList.remove('light');
-    //         dom.theme.classList.add('dark');
-    //     } else {
-    //         dom.theme.classList.remove('dark');
-    //         dom.theme.classList.add('light');
-    //     }
-    // });
 
     xf.reg('db:workout', e => {
         let workout = e.detail.data.workout;
@@ -330,6 +328,9 @@ function WorkoutsView(args) {
                     18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
             <circle fill="#fff" cx="12" cy="12" r="5"/>
         </svg>`;
+    xf.reg('workouts:init', e => {
+        dom.list.innerHTML = '';
+    });
 
     xf.reg('workout:add', e => {
         let w = e.detail.data;
@@ -378,7 +379,6 @@ function WorkoutsView(args) {
     });
 }
 
-
 function LoadWorkoutView(args) {
     let dom = args.dom;
     xf.sub('change', e => {
@@ -406,6 +406,7 @@ export {
     LoadWorkoutView,
     WorkoutsView,
     ActivityView,
-    NavigationWidget
+    NavigationWidget,
+    SettingsView
 };
 

@@ -33,8 +33,6 @@ let dom = {
             cont:    document.querySelector('#watch'),
         },
         workoutName: document.querySelector('#workout-name'),
-        darkMode:    document.querySelector('#dark-mode'),
-        theme:       document.querySelector('#theme'),
         targetPower: document.querySelector('#target-power-value'),
         workPower:   document.querySelector('#work-power-value'),
         restPower:   document.querySelector('#rest-power-value'),
@@ -43,6 +41,12 @@ let dom = {
         startRestInterval: document.querySelector('#start-rest-interval'),
         laps: document.querySelector('#laps'),
         startWorkout: document.querySelector('#start-workout'),
+    },
+    settings: {
+        ftp:      document.querySelector('#ftp-value'),
+        ftpBtn:   document.querySelector('#ftp-btn'),
+        darkMode: document.querySelector('#dark-mode'),
+        theme:    document.querySelector('#theme'),
     },
     navigation: {
         menu:         document.querySelector('.menu-cont'),
@@ -82,7 +86,8 @@ let dom = {
     },
     graphPower: {
         cont:  document.querySelector('#graph-power'),
-        graph: document.querySelector('#graph-power .graph')
+        graph: document.querySelector('#graph-power .graph'),
+        ftp:   document.querySelector('#ftp-line-value')
     }
 };
 

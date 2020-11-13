@@ -28,7 +28,8 @@ import { ControllableConnectionView,
          LoadWorkoutView,
          WorkoutsView,
          ActivityView,
-         NavigationWidget
+         NavigationWidget,
+         SettingsView
        } from './views.js';
 import { DeviceController,
          FileController,
@@ -166,6 +167,7 @@ function start() {
     WorkoutsView({dom: dom.workouts, workouts: workouts});
     ActivityView({dom: dom.activity});
     NavigationWidget({dom: dom.navigation});
+    SettingsView({dom: dom.settings});
 
     DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
