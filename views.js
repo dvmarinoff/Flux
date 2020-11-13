@@ -160,7 +160,7 @@ function GraphWorkout(args) {
     });
 
     xf.reg('screen:change', e => {
-        setProgress(index);
+        setProgress(interval);
     });
 }
 
@@ -170,17 +170,15 @@ function NavigationWidget(args) {
 
     xf.sub('pointerup', e => {
         i = dom.homeBtn.getAttribute('date-index');
-        dom.settingsPage.style.display = 'none';
-        dom.workoutsPage.style.display = 'none';
-        dom.homePage.style.display = 'block';
+        // dom.homePage.style.display     = 'block';
+        // dom.settingsPage.style.display = 'none';
+        // dom.workoutsPage.style.display = 'none';
 
-        // dom.settingsPage.style.left = 1000;
-        // dom.workoutsPage.style.left = 1000;
-        // dom.homePage.style.left     = 0;
+        dom.settingsPage.style.left    = '-100vw';
+        dom.workoutsPage.style.left    = '100vw';
+        dom.homePage.style.left        = '0px';
+        dom.controls.style.display   = 'block';
 
-        // dom.settingsPage.style.zIndex = '0';
-        // dom.workoutsPage.style.zIndex = '0';
-        // dom.homePage.style.zIndex     = '1';
 
         dom.settingsBtn.classList.remove('active');
         dom.homeBtn.classList.add('active');
@@ -193,17 +191,15 @@ function NavigationWidget(args) {
 
     xf.sub('pointerup', e => {
         i = dom.settingsBtn.getAttribute('date-index');
-        dom.homePage.style.display = 'none';
-        dom.workoutsPage.style.display = 'none';
-        dom.settingsPage.style.display = 'block';
+        // dom.settingsPage.style.display = 'block';
+        // dom.homePage.style.display     = 'none';
+        // dom.workoutsPage.style.display = 'none';
 
-        // dom.settingsPage.style.left = 0;
-        // dom.workoutsPage.style.left = 1000;
-        // dom.homePage.style.left     = 1000;
+        dom.workoutsPage.style.left    = '100vw';
+        dom.homePage.style.left        = '100vw';
+        dom.settingsPage.style.left    = '0px';
+        dom.controls.style.display   = 'none';
 
-        // dom.workoutsPage.style.zIndex = '0';
-        // dom.homePage.style.zIndex     = '0';
-        // dom.settingsPage.style.zIndex = '1';
 
         dom.settingsBtn.classList.add('active');
         dom.homeBtn.classList.remove('active');
@@ -216,15 +212,20 @@ function NavigationWidget(args) {
 
     xf.sub('pointerup', e => {
         i = dom.workoutsBtn.getAttribute('date-index');
-        dom.homePage.style.display = 'none';
-        dom.settingsPage.style.display = 'none';
-        dom.workoutsPage.style.display = 'block';
+        // dom.workoutsPage.style.display = 'block';
+        // dom.homePage.style.display     = 'none';
+        // dom.settingsPage.style.display = 'none';
+
+        dom.settingsPage.style.left    = '-100vw';
+        dom.homePage.style.left        = '-100vw';
+        dom.workoutsPage.style.left    = '0px';
+        dom.controls.style.display     = 'block';
 
         dom.settingsBtn.classList.remove('active');
         dom.homeBtn.classList.remove('active');
         dom.workoutsBtn.classList.add('active');
 
-        dom.menu.classList.add('active');
+        // dom.menu.classList.add('active');
 
         xf.dispatch('ui:tab', i);
     }, dom.workoutsBtn);

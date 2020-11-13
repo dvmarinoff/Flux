@@ -30,6 +30,7 @@ let dom = {
             stop:    document.querySelector('#watch-stop'),
             save:    document.querySelector('#activity-save'),
             workout: document.querySelector('#start-workout'),
+            cont:    document.querySelector('#watch'),
         },
         workoutName: document.querySelector('#workout-name'),
         darkMode:    document.querySelector('#dark-mode'),
@@ -53,6 +54,7 @@ let dom = {
         homePage:     document.querySelector('#home-page'),
         settingsPage: document.querySelector('#settings-page'),
         workoutsPage: document.querySelector('#workouts-page'),
+        controls:     document.querySelector('.control-screen'),
     },
     file: {
         fileBtn: document.querySelector('#workout-file'),
