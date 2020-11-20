@@ -55,10 +55,6 @@ function DataScreen(args) {
         let vspd = e.detail.data.vspd;
         dom.speed.textContent = `${vspd.toFixed(1)}`;
     });
-    // xf.sub('db:vdis', e => {
-    //     let vdis = e.detail.data.vdis;
-    //     dom.distance.textContent = `${metersToDistance(vdis)}`;
-    // });
     xf.sub('db:spd', e => {
         let spd = e.detail.data.spd;
         dom.speed.textContent = `${spd.toFixed(1)}`;
@@ -83,6 +79,19 @@ function DataScreen(args) {
     });
     xf.sub('db:targetPwr', e => {
         dom.targetPwr.textContent = e.detail.data.targetPwr;
+    });
+}
+
+function ControllableSettingsView(args) {
+    let dom = args.dom;
+}
+
+function HrbSettingsView(args) {
+    let dom = args.dom;
+
+    xf.sub('db:hr', e => {
+        let hr = e.detail.data.hr;
+        dom.value.textContent = `${hr}`;
     });
 }
 
@@ -223,17 +232,6 @@ function SettingsView(args) {
     let dom = args.dom;
     let ftp = 256;
 
-    // xf.sub('db:darkMode', e => {
-    //     let mode = e.detail.data.darkMode;
-    //     if(mode) {
-    //         dom.theme.classList.remove('light');
-    //         dom.theme.classList.add('dark');
-    //     } else {
-    //         dom.theme.classList.remove('dark');
-    //         dom.theme.classList.add('light');
-    //     }
-    // });
-
     xf.sub('change', e => { ftp = parseInt(e.target.value); }, dom.ftp);
 
     xf.sub('pointerup', e => {
@@ -338,15 +336,15 @@ function WorkoutsView(args) {
         let item = `
             <div class='workout list-item cf' id="li${w.id}">
                 <div class="first-row">
-                    <div class="name t4">${w.name}</div>
-                    <div class="type t4">${w.type}</div>
-                    <div class="time t4">${w.duration} min</div>
+                    <div class="name t6">${w.name}</div>
+                    <div class="type t6">${w.type}</div>
+                    <div class="time t6">${w.duration} min</div>
                     <div class="select" id="btn${w.id}">${w.id === 0 ? on : off}</div>
                 </div>
                 <div class="second-row">
                     <div class="desc">
                         <div class="workout-graph">${w.graph}</div>
-                        <div class="content t4">${w.description}</div>
+                        <div class="content t5">${w.description}</div>
                     </div>
                 </div>
             </div>`;
@@ -398,6 +396,8 @@ function ActivityView(args) {
 export {
     ControllableConnectionView,
     HrbConnectionView,
+    ControllableSettingsView,
+    HrbSettingsView,
     DataScreen,
     GraphHr,
     GraphPower,

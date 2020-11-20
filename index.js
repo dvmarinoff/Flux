@@ -20,6 +20,8 @@ import { avgOfArray,
          timeDiff } from './functions.js';
 import { ControllableConnectionView,
          HrbConnectionView,
+         ControllableSettingsView,
+         HrbSettingsView,
          DataScreen,
          GraphHr,
          GraphPower,
@@ -140,8 +142,8 @@ xf.reg('watch:nextWorkoutStep', e => {
 });
 xf.sub('ui:activity:save', e => {
     let activity   = Encode({data: db.records, laps: db.laps});
-    let fileHndler = new FileHandler();
-    fileHndler.downloadActivity(activity);
+    let fileHandler = new FileHandler();
+    fileHandler.downloadActivity(activity);
 });
 xf.sub('ui:tab', e => {
     let i = e.detail.data;
@@ -157,6 +159,12 @@ function start() {
 
     ControllableConnectionView({dom: dom.controllableConnectionScreen});
     HrbConnectionView({dom: dom.hrbConnectionScreen});
+
+    ControllableConnectionView({dom: dom.controllableSettings});
+    HrbConnectionView({dom: dom.hrbSettings});
+
+    ControllableSettingsView({dom: dom.controllableSettings});
+    HrbSettingsView({dom: dom.hrbSettings});
 
     DataScreen({dom: dom.datascreen});
     GraphPower({dom: dom.graphPower});
