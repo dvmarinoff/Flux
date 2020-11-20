@@ -10,27 +10,17 @@
         <link href="css/flux.css" rel="stylesheet"/>
         <link rel="manifest" href="./manifest.webmanifest">
     </head>
-    <body id="theme" class="dark">
-        <div class="wrapper">
+    <body id="theme" class="dark-bg white">
+        <div class="wrapper" onselectstart="return false;">
             <div class="page" id="home-page">
-                <header class="">
-                    <div class="devices page-header cf">
-                        <div id="flux-connection-screen" class="connection-screen">
-                            <button type="button" class="switch">
-                                <div class="indicator off"></div>
-                                <div class="text t2">Controllable</div>
-                            </button>
-                            <!-- <button type="button" class="start-notifications btn">Start</button>
-                                <button type="button" class="stop-notifications btn">Stop</button> -->
-                        </div>
-                        <div id="hrb-connection-screen" class="connection-screen">
-                            <button type="button" class="switch">
-                                <div class="indicator off"></div>
-                                <div class="text t2">HRM</div>
-                            </button>
-                            <!-- <button type="button" class="start-notifications btn">Start</button>
-                                <button type="button" class="stop-notifications btn">Stop</button> -->
-                        </div>
+                <header class="devices page-header chrome-bg cf">
+                    <div id="controllable-connection-btn" class="switch">
+                        <div class="indicator off"></div>
+                        <div class="text t2">Controllable</div>
+                    </div>
+                    <div id="hrb-connection-btn" class="switch">
+                        <div class="indicator off"></div>
+                        <div class="text t2">HRM</div>
                     </div>
                 </header>
                 <div class="data-screen cf">
@@ -89,7 +79,7 @@
                 <div class="graphs">
                     <div class="graph-screen" id="graph-power">
                         <h4 class="graph-heading h4">Power</h4>
-                        <div class="ftp-line"><div id="ftp-line-value" class="ftp t5">FTP</div></div>
+                        <div class="ftp-line"><div id="ftp-line-value" class="ftp h4">FTP</div></div>
                         <div class="graph cf">
                         </div>
                     </div>
@@ -153,8 +143,8 @@
                     <div class="workout-load-file">
                         <h2 class="h2">Load workout:</h2>
                         <div class="file-btn">
-                            <label for="workout-file" class="label-btn btn">Select</label>
-                            <input id="workout-file" class="native-btn" name="workout-file" type="file" value=""/>
+                            <label for="workout-file" class="file-btn-label btn">Select</label>
+                            <input id="workout-file" class="file-btn-native" name="workout-file" type="file" value=""/>
                         </div>
                     </div>
                     <br/><br/><br/>
@@ -164,23 +154,42 @@
                 <header class="page-header">
                     <h2 class="t2">Settings</h2>
                 </header>
-                <div class="card controllable">
-                    <h2 class="h2">Controllable</h2>
-                </div>
-                <div class="card hr">
-                    <h2 class="h2">HRM</h2>
-                </div>
-                <!-- <button type="button" id="dark-mode" class="btn">Light Mode</button> -->
-                <div id="ftp-settings" class="settings-row">
-                    <label for="" class="h2">FTP</label>
-                    <div class="row">
-                        <input id="ftp-value" class="input" name="ftp-value" type="text" value=" 256"/>
-                        <button type="button" id="ftp-btn" class="btn">Set FTP</button>
+                <div class="settings-tiles">
+                    <div id="ftp-settings" class="settings-tile">
+                        <label for="ftp-value" class="settings-tile-label">FTP</label>
+                        <input id="ftp-value" class="settings-tile-input" name="ftp-value" type="text" value="256"/>
+                        <div id="ftp-btn" class="settings-tile-btn">Set</div>
                     </div>
+                    <div id="weight-settings" class="settings-tile">
+                        <label for="weight-value" class="settings-tile-label">kg</label>
+                        <input id="weight-value" class="settings-tile-input" name="weight-value" type="text" value="75"/>
+                        <div id="weight-btn" class="settings-tile-btn">Set</div>
+                    </div>
+                    <!-- <div id="max-hr-settings" class="settings-tile">
+                         <label for="max-hr-value" class="settings-tile-label">Max HR</label>
+                         <input id="max-hr-value" class="settings-tile-input" name="max-hr-value" type="text" value="198"/>
+                         <div id="ftp-btn" class="settings-tile-btn">Set</div>
+                         </div> -->
+                </div>
+
+                <div class="settings-card controllable">
+                    <div id="controllable-settings-btn" class="switch">
+                        <div class="indicator off"></div>
+                        <div class="text t2">Controllable</div>
+                    </div>
+
+                    <div class="value"></div>
+                </div>
+                <div class="settings-card hr">
+                    <div id="hrb-settings-btn" class="switch">
+                        <div class="indicator off"></div>
+                        <div class="text t2">HRM</div>
+                    </div>
+                    <div id="hrb-settings-value">---</div>
                 </div>
             </div> <!-- page -->
 
-            <div class="control-screen">
+            <div class="control-screen dark-bg">
                 <div id="watch" class="watch cf">
                     <div id="workout-name">Free ride</div>
                     <div id="start-workout" class="control-btn">
@@ -239,7 +248,7 @@
             </div>
 
             <div id="menu" class="menu">
-                <div class="menu-cont">
+                <div class="menu-cont dark-bg">
                     <div id="settings-tab-btn" class="settings tab-btn icon-btn" data-index="2">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                             <path d="M0 0h24v24H0V0z" fill="none"/>
@@ -253,21 +262,21 @@
                                          2.88 1.15 2.43-4.2s-.14-.12-.33-.26l-2.11-1.66zM12 15.5c-1.93
                                          0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
                         </svg>
-                        <div class="text">Settings</div>
+                        <div class="text t4">Settings</div>
                     </div>
                     <div id="home-tab-btn" class="home tab-btn active icon-btn" data-index="0">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path class="icon-fill" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z" />
                         </svg>
-                        <div class="text">Home</div>
+                        <div class="text t4">Home</div>
                     </div>
                     <div id="workouts-tab-btn" class="workouts tab-btn icon-btn" data-index="1">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                             <path d="M0 0h24v24H0V0z" fill="none"/>
                             <path class="icon-fill" fill="#aaa" d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/>
                         </svg>
-                        <div class="text">Workouts</div>
+                        <div class="text t4">Workouts</div>
                     </div>
                 </div>
             </div> <!-- menu -->

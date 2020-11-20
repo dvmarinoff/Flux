@@ -1,15 +1,20 @@
 let dom = {
     hrbConnectionScreen: {
-        switchBtn:     document.querySelector('#hrb-connection-screen .switch'),
-        indicator:     document.querySelector('#hrb-connection-screen .indicator'),
-        startBtn:      document.querySelector('#hrb-connection-screen .start-notifications'),
-        stopBtn:       document.querySelector('#hrb-connection-screen .stop-notifications'),
+        switchBtn: document.querySelector('#hrb-connection-btn'),
+        indicator: document.querySelector('#hrb-connection-btn .indicator'),
     },
     controllableConnectionScreen: {
-        switchBtn:     document.querySelector('#flux-connection-screen .switch'),
-        indicator:     document.querySelector('#flux-connection-screen .indicator'),
-        startBtn:      document.querySelector('#flux-connection-screen .start-notifications'),
-        stopBtn:       document.querySelector('#flux-connection-screen .stop-notifications'),
+        switchBtn: document.querySelector('#controllable-connection-btn'),
+        indicator: document.querySelector('#controllable-connection-btn .indicator'),
+    },
+    hrbSettings: {
+        switchBtn: document.querySelector('#hrb-settings-btn'),
+        indicator: document.querySelector('#hrb-settings-btn .indicator'),
+        value:      document.querySelector('#hrb-settings-value'),
+    },
+    controllableSettings: {
+        switchBtn:     document.querySelector('#controllable-settings-btn'),
+        indicator:     document.querySelector('#controllable-settings-btn .indicator'),
     },
     datascreen: {
         time:      document.querySelector('#time'),

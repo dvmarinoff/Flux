@@ -1,18 +1,28 @@
 import { xf } from '../xf.js';
 
-var services =
-	  {fitnessMachine:
-     {uuid: 0x1826,
-      indoorBikeData: {uuid: 0x2AD2},
-      fitnessMachineControlPoint: {uuid: 0x2AD9}
-     },
-     cyclingPower:
-     {uuid: 0x1818},
-     heartRate: {
-         uuid: 0x180D,
-         heartRateMeasurement: {uuid: 0x2A37}
-     }
-	  };
+var services = {
+    fitnessMachine: {
+        uuid: 0x1826,
+        indoorBikeData: {uuid: 0x2AD2},
+        fitnessMachineControlPoint: {uuid: 0x2AD9}
+    },
+    cyclingPower: {
+        uuid: 0x1818
+    },
+    heartRate: {
+        uuid: 0x180D,
+        heartRateMeasurement: {uuid: 0x2A37}
+    },
+    batteryService: {
+        uuid: 0x180F,
+        batteryLevel: {uuid: 0x2A19}
+    },
+    deviceInformation: {
+        uuid: 0x180A,
+        manufecturerNameString: {uuid: 0x2A9},
+        modelNumberString: {uuid: 0x2A24}
+    }
+};
 
 let hr             = dataview => dataview.getUint8(1, true);
 let flags          = dataview => dataview.getUint8(0, true);
@@ -137,6 +147,8 @@ class Hrb {
         self.device.connectAndNotify(services.heartRate.uuid,
                                      services.heartRate.heartRateMeasurement.uuid,
                                      self.onHeartRateMeasurement);
+        self.device.getService('battery_service');
+        console.log(self.device);
     }
     async disconnect() {
         this.device.disconnect();
