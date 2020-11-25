@@ -136,6 +136,9 @@ function parseZwo(zwo) {
     let doc = parser.parseFromString(zwo, 'text/xml');
 
     let workoutEl = doc.querySelector('workout');
+    let nameEl    = doc.querySelector('name');
+    let descEl    = doc.querySelector('description');
+
     let elements = Array.from(workoutEl.children);
 
     let steps = elements.reduce((acc, el) => {
@@ -143,9 +146,12 @@ function parseZwo(zwo) {
         return acc;
     }, []);
 
-    let intervals = steps.flatMap(step => stepToInterval(step));
+    let intervals   = steps.flatMap(step => stepToInterval(step));
+    let duration    = Math.round(intervals.reduce( (acc, x) => acc + (x.duration / 60), 0));
+    let name        = nameEl.textContent;
+    let description = descEl.textContent;
 
-    return intervals;
+    return {intervals: intervals, duration: duration, name: name, description: description};
 }
 
 function intervalsToGraph(intervals, ftp) {

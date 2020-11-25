@@ -103,6 +103,39 @@ function metersToDistance(meters) {
     return s;
 }
 
+function hexToString(str) {
+    var j;
+    var hexes = str.match(/.{1,4}/g) || [];
+    var back = "";
+    for(j = 0; j<hexes.length; j++) {
+        back += String.fromCharCode(parseInt(hexes[j], 16));
+    }
+    return back;
+}
+
+function stringToHex(str) {
+    var hex, i;
+    var result = "";
+    for (i=0; i<str.length; i++) {
+        hex = str.charCodeAt(i).toString(16);
+        result += ("000"+hex).slice(-4);
+    }
+    return result;
+}
+
+function hex (n) {
+    return '0x' + parseInt(n).toString(16).toUpperCase();
+}
+
+function dataViewToString (dataview) {
+    let len = dataview.byteLength;
+    let str = '';
+    for(let i = 0; i < len; i++) {
+        str += hexToString(hex(dataview.getUint8(i, true)));
+    }
+    return str;
+}
+
 export {
     sin,
     cos,
@@ -121,6 +154,10 @@ export {
     round,
     floor,
     ceil,
+    hexToString,
+    stringToHex,
+    hex,
+    dataViewToString,
     powerToColor,
     hrToColor,
     valueToHeight,

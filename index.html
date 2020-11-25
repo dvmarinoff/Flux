@@ -157,12 +157,12 @@
                 <div class="settings-tiles">
                     <div id="ftp-settings" class="settings-tile">
                         <label for="ftp-value" class="settings-tile-label">FTP</label>
-                        <input id="ftp-value" class="settings-tile-input" name="ftp-value" type="text" value="256"/>
+                        <input id="ftp-value" class="settings-tile-input" name="ftp-value" type="text" value="---"/>
                         <div id="ftp-btn" class="settings-tile-btn">Set</div>
                     </div>
                     <div id="weight-settings" class="settings-tile">
                         <label for="weight-value" class="settings-tile-label">kg</label>
-                        <input id="weight-value" class="settings-tile-input" name="weight-value" type="text" value="75"/>
+                        <input id="weight-value" class="settings-tile-input" name="weight-value" type="text" value="--"/>
                         <div id="weight-btn" class="settings-tile-btn">Set</div>
                     </div>
                     <!-- <div id="max-hr-settings" class="settings-tile">
@@ -172,20 +172,61 @@
                          </div> -->
                 </div>
 
-                <div class="settings-card controllable">
-                    <div id="controllable-settings-btn" class="switch">
-                        <div class="indicator off"></div>
-                        <div class="text t2">Controllable</div>
+                <div class="settings-card  controllable">
+                    <div class="device-controls">
+                        <div id="controllable-settings-btn" class="switch">
+                            <div class="indicator off"></div>
+                            <div id="controllable-settings-name" class="text t2">Controllable</div>
+                        </div>
                     </div>
-
-                    <div class="value"></div>
+                    <div class="device-info">
+                        <div class="info-cell">
+                            <h3 class="">Model</h3>
+                            <div class="value">
+                                <span id="controllable-settings-manufacturer">---</span>
+                                <span id="controllable-settings-model"></span>
+                                <span id="controllable-settings-software-version"></span>
+                            </div>
+                        </div>
+                        <div class="info-cell">
+                            <h3 class="">Power</h3>
+                            <div class="value" id="controllable-settings-power">-- W</div>
+                        </div>
+                        <div class="info-cell">
+                            <h3 class="">Cadence</h3>
+                            <div class="value" id="controllable-settings-cadence">-- rpm</div>
+                        </div>
+                        <div class="info-cell">
+                            <h3 class="">Speed</h3>
+                            <div class="value" id="controllable-settings-speed">-- km/h</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="settings-card hr">
-                    <div id="hrb-settings-btn" class="switch">
-                        <div class="indicator off"></div>
-                        <div class="text t2">HRM</div>
+                    <div class="device-controls">
+                        <div id="hrb-settings-btn" class="switch">
+                            <div class="indicator off"></div>
+                            <div id="hrb-settings-name" class="text t2">HRM</div>
+                        </div>
                     </div>
-                    <div id="hrb-settings-value">---</div>
+                    <div class="device-info">
+                        <div class="info-cell">
+                            <h3 class="">Model</h3>
+                            <div class="value">
+                                <span id="hrb-settings-manufacturer">---</span>
+                                <span id="hrb-settings-model"></span>
+                                <span id="hrb-settings-software-version"></span>
+                            </div>
+                        </div>
+                        <div class="info-cell">
+                            <h3 class="">Heart Rate</h3>
+                            <div class="value" id="hrb-settings-value">-- bpm</div>
+                        </div>
+                        <div class="info-cell">
+                            <h3 class="">Battery</h3>
+                            <div class="value" id="hrb-settings-battery">--- %</div>
+                        </div>
+                    </div>
                 </div>
             </div> <!-- page -->
 

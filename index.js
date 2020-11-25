@@ -9,6 +9,7 @@ import { StopWatch } from './workout.js';
 import { WakeLock } from './lock.js';
 import { speedFromPower } from './speed.js';
 import { workouts } from './workouts/workouts.js';
+import { Storage } from './storage.js';
 import { avgOfArray,
          maxOfArray,
          sum,
@@ -60,7 +61,8 @@ let db = DB({
     elapsed: 0,
     lapTime: 0,
     targetPwr: 100,
-    ftp: 256,
+    ftp: 0,
+    weight: 0,
     timestamp: Date.now(),
     workout:  [],
     workoutFile: '',
@@ -96,6 +98,9 @@ xf.reg('watch:lapTime',  e => db.lapTime = e.detail.data);
 xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
 xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
 xf.reg('ui:ftp',         e => db.ftp = e.detail.data);
+xf.reg('storage:ftp',    e => db.ftp = e.detail.data);
+xf.reg('ui:weight',      e => db.weight = e.detail.data);
+xf.reg('storage:weight', e => db.weight = e.detail.data);
 xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
 xf.reg('ui:workout:set', e => db.workout = db.workouts[e.detail.data]);
 xf.reg('workout:add',    e => db.workouts.push(e.detail.data));
@@ -150,12 +155,11 @@ xf.sub('ui:tab', e => {
     db.tab = i;
 });
 
-
 function start() {
-    let hrb   = new Hrb({name: 'hrb'});
-    let flux  = new Controllable({name: 'controllable'});
-    let watch = new StopWatch();
-    let lock  = new WakeLock();
+    let hrb     = new Hrb({name: 'hrb'});
+    let flux    = new Controllable({name: 'controllable'});
+    let watch   = new StopWatch();
+    let lock    = new WakeLock();
 
     ControllableConnectionView({dom: dom.controllableConnectionScreen});
     HrbConnectionView({dom: dom.hrbConnectionScreen});
@@ -163,8 +167,8 @@ function start() {
     ControllableConnectionView({dom: dom.controllableSettings});
     HrbConnectionView({dom: dom.hrbSettings});
 
-    ControllableSettingsView({dom: dom.controllableSettings});
-    HrbSettingsView({dom: dom.hrbSettings});
+    ControllableSettingsView({dom: dom.controllableSettings, name: 'controllable'});
+    HrbSettingsView({dom: dom.hrbSettings, name: 'hrb'});
 
     DataScreen({dom: dom.datascreen});
     GraphPower({dom: dom.graphPower});
@@ -182,8 +186,10 @@ function start() {
     WorkoutController();
 
     Screen();
-    // Vibrate({vibrate: true, long: false});
 
+    let storage = new Storage();
+
+    // Vibrate({vibrate: true, long: false});
     // DataMock({hr: true, pwr: true});
 };
 

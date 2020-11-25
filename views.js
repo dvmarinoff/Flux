@@ -83,15 +83,44 @@ function DataScreen(args) {
 }
 
 function ControllableSettingsView(args) {
-    let dom = args.dom;
+    let dom  = args.dom;
+    let name = args.name || 'controllable';
+
+    xf.sub('db:pwr', e => {
+        let power = e.detail.data.pwr;
+        dom.power.textContent = `${power}`;
+    });
+    xf.sub('db:cad', e => {
+        let cadence = e.detail.data.cad;
+        dom.cadence.textContent = `${cadence}`;
+    });
+    xf.sub('db:spd', e => {
+        let speed = e.detail.data.spd;
+        dom.speed.textContent = `${speed}`;
+    });
+
+    xf.sub(`${name}:info`, e => {
+        console.log(e.detail.data);
+        dom.name.textContent         = `${e.detail.data.name}`;
+        dom.model.textContent        = `${e.detail.data.modelNumberString}`;
+        dom.manufacturer.textContent = `${e.detail.data.manufacturerNameString}`;
+    });
 }
 
 function HrbSettingsView(args) {
-    let dom = args.dom;
+    let dom  = args.dom;
+    let name = args.name || 'hrb';
 
     xf.sub('db:hr', e => {
         let hr = e.detail.data.hr;
-        dom.value.textContent = `${hr}`;
+        dom.value.textContent = `${hr} bpm`;
+    });
+
+    xf.sub(`${name}:info`, e => {
+        console.log(e.detail.data);
+        dom.name.textContent         = `${e.detail.data.name}`;
+        dom.model.textContent        = `${e.detail.data.modelNumberString}`;
+        dom.manufacturer.textContent = `${e.detail.data.manufacturerNameString}`;
     });
 }
 
@@ -230,13 +259,28 @@ function NavigationWidget(args) {
 
 function SettingsView(args) {
     let dom = args.dom;
-    let ftp = 256;
+    let ftp = 100;
+    let weight = 75;
 
-    xf.sub('change', e => { ftp = parseInt(e.target.value); }, dom.ftp);
+    xf.sub('db:ftp', e => {
+        ftp = e.detail.data.ftp;
+        dom.ftp.value = ftp;
+    });
+    xf.sub('db:weight', e => {
+        weight = e.detail.data.weight;
+        dom.weight.value = weight;
+    });
+
+    xf.sub('change', e => { ftp    = parseInt(e.target.value); }, dom.ftp);
+    xf.sub('change', e => { weight = parseInt(e.target.value); }, dom.weight);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:ftp', ftp);
     }, dom.ftpBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:weight', weight);
+    }, dom.weightBtn);
 }
 
 function ControlView(args) {
