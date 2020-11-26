@@ -1,6 +1,7 @@
 import { powerToColor,
          hrToColor,
-         valueToHeight } from './functions.js';
+         valueToHeight,
+         secondsToHms } from './functions.js';
 
 function readWarmup(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
@@ -164,7 +165,12 @@ function intervalsToGraph(intervals, ftp) {
             let width = 100 / len;
             let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
             return a +
-                `<div class="graph-bar ${(powerToColor(step.power, ftp)).name}-zone" style="height: ${height}%; width: ${width}%"><div class="graph-info t5">${step.power}</div></div>`;
+                `<div class="graph-bar ${(powerToColor(step.power, ftp)).name}-zone" style="height: ${height}%; width: ${width}%">
+                     <div class="graph-info t5">
+                         <div class="power">${step.power}<span>W</span></div>
+                         <div class="time">${secondsToHms(step.duration, true)}<span></span></div>
+                     </div>
+                </div>`;
         }, `<div class="graph-interval" style="width: ${width}px">`) + `</div>`;
 
     }, ``);

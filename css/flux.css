@@ -636,6 +636,11 @@ body {
     border-radius: 2px;
     z-index: 1;
 }
+.graph-info .power {}
+.graph-info .power span {}
+.graph-info .time {
+    color: var(--gray);
+}
 
 .graph-bar:hover .graph-info {
     display: block;

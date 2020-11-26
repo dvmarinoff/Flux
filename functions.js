@@ -91,10 +91,21 @@ function secondsToHms(elapsed, compact = false) {
     let hour = Math.floor(elapsed / 3600);
     let min  = Math.floor(elapsed % 3600 / 60);
     let sec  = elapsed % 60;
-    let sD = (sec < 10)  ? `0${sec}`  : `${sec}`;
-    let mD = (min < 10)  ? `0${min}`  : `${min}`;
-    let hD = (hour < 10) ? `0${hour}` : `${hour}`;
-    return compact ? `${mD}:${sD}` : `${hD}:${mD}:${sD}`;
+    let sD   = (sec < 10)  ? `0${sec}`  : `${sec}`;
+    let mD   = (min < 10)  ? `0${min}`  : `${min}`;
+    let hD   = (hour < 10) ? `0${hour}` : `${hour}`;
+    let hDs  = (hour < 10) ? `${hour}`  : `${hour}`;
+    let res  = ``;
+    if(compact) {
+        if(elapsed < 3600) {
+            res = `${mD}:${sD}`;
+        } else {
+            res = `${hDs}:${mD}:${sD}`;
+        }
+    } else {
+        res = `${hD}:${mD}:${sD}`;
+    }
+    return res ;
 }
 
 function metersToDistance(meters) {
