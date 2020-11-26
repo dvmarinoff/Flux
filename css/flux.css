@@ -82,35 +82,49 @@ body {
     --yellow:      #F8C73A;
     --dark:        #28272D;
     --chrome:      #35363a;
-    --zone-gray:   #636468;
-    --zone-blue:   #328AFF;
-    --zone-green:  #57C057;
-    --zone-yellow: #F8C73A;
-    --zone-orange: #FF663A;
+
     --zone-red:    #FE340B;
+    --zone-orange: #FF663A;
+    --zone-yellow: #F8C73A;
+    --zone-green:  #57C057;
+    --zone-blue:   #328AFF;
+    --zone-gray:   #636468;
+
+    /* --zone-purple: #BDACEF; */
+    /* --zone-red:    #D32020; */
+    /* --zone-orange: #F98925; */
+    /* --zone-yellow: #FACA48; */
+    /* --zone-green:  #82C91E; */
+    /* --zone-blue:   #3B97F3; */
+    /* --zone-gray:   #C3C3C3; */
+
     --black-opacity-01:  rgba(0,0,0, 0.1);
     --white-opacity-01:  rgba(255,255,255, 0.1);
 }
 
 /* Color */
-.gray-zone {
+.zone-one {
     background-color: var(--zone-gray);
 }
-.blue-zone {
+.zone-two {
     background-color: var(--zone-blue);
 }
-.green-zone {
+.zone-three {
+    background-color: var(--zone-gray);
+}
+.zone-four {
     background-color: var(--zone-green);
 }
-.yellow-zone {
+.zone-five {
     background-color: var(--zone-yellow);
 }
-.orange-zone {
+.zone-six {
     background-color: var(--zone-orange);
 }
-.red-zone {
+.zone-seven {
     background-color: var(--zone-red);
 }
+
 
 .black {
     color: var(--black);

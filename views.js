@@ -1,6 +1,5 @@
 import { xf } from './xf.js';
 import { avgOfArray,
-         powerToColor,
          hrToColor,
          valueToHeight,
          secondsToHms,

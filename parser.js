@@ -1,4 +1,4 @@
-import { powerToColor,
+import { powerToZone,
          hrToColor,
          valueToHeight,
          secondsToHms } from './functions.js';
@@ -165,7 +165,7 @@ function intervalsToGraph(intervals, ftp) {
             let width = 100 / len;
             let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
             return a +
-                `<div class="graph-bar ${(powerToColor(step.power, ftp)).name}-zone" style="height: ${height}%; width: ${width}%">
+                `<div class="graph-bar zone-${(powerToZone(step.power, ftp)).name}" style="height: ${height}%; width: ${width}%">
                      <div class="graph-info t5">
                          <div class="power">${step.power}<span>W</span></div>
                          <div class="time">${secondsToHms(step.duration, true)}<span></span></div>

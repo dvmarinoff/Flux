@@ -39,25 +39,25 @@ function sum(xs, prop = false) {
 };
 
 
-function powerToColor(value, ftp = 256) {
-    let color = 'gray';
+function powerToZone(value, ftp = 256) {
+    let name = 'one';
     let hex   = '#636468';
     if(value < (ftp * 0.55)) {
-        color = 'gray'; hex = '#636468';
+        name = 'one';
     } else if(value < (ftp * 0.76)) {
-        color = 'blue'; hex = '#328AFF';
+        name = 'two';
     } else if(value < (ftp * 0.88)) {
-        color = 'green'; hex = '#57C057';
+        name = 'three';
     } else if(value < (ftp * 0.95)) {
-        color = 'yellow'; hex = '#F8C73A';
+        name = 'four';
     } else if(value < (ftp * 1.06)) {
-        color = 'yellow'; hex = '#F8C73A';
+        name = 'five';
     } else if (value < (ftp * 1.20)) {
-        color = 'orange'; hex = '#FF663A';
+        name = 'six';
     } else {
-        color = 'red'; hex = '#FE340B';
+        name = 'seven';
     }
-    return {name: color, hex: hex};
+    return {name: name};
 }
 
 function valueToHeight(max, value) {
@@ -100,7 +100,7 @@ function secondsToHms(elapsed, compact = false) {
         if(elapsed < 3600) {
             res = `${mD}:${sD}`;
         } else {
-            res = `${hDs}:${mD}:${sD}`;
+            res = `${hD}:${mD}:${sD}`;
         }
     } else {
         res = `${hD}:${mD}:${sD}`;
@@ -169,7 +169,7 @@ export {
     stringToHex,
     hex,
     dataViewToString,
-    powerToColor,
+    powerToZone,
     hrToColor,
     valueToHeight,
     timeDiff,
