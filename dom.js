@@ -8,13 +8,25 @@ let dom = {
         indicator: document.querySelector('#controllable-connection-btn .indicator'),
     },
     hrbSettings: {
-        switchBtn: document.querySelector('#hrb-settings-btn'),
-        indicator: document.querySelector('#hrb-settings-btn .indicator'),
-        value:      document.querySelector('#hrb-settings-value'),
+        switchBtn:    document.querySelector('#hrb-settings-btn'),
+        indicator:    document.querySelector('#hrb-settings-btn .indicator'),
+        name:         document.querySelector('#hrb-settings-name'),
+        manufacturer: document.querySelector('#hrb-settings-manufacturer'),
+        model:        document.querySelector('#hrb-settings-model'),
+        firmware:     document.querySelector('#hrb-settings-firmware'),
+        value:        document.querySelector('#hrb-settings-value'),
+        battery:      document.querySelector('#hrb-settings-battery'),
     },
     controllableSettings: {
         switchBtn:     document.querySelector('#controllable-settings-btn'),
         indicator:     document.querySelector('#controllable-settings-btn .indicator'),
+        name:          document.querySelector('#controllable-settings-name'),
+        manufacturer:  document.querySelector('#controllable-settings-manufacturer'),
+        model:         document.querySelector('#controllable-settings-model'),
+        firmware:      document.querySelector('#controllable-settings-firmware'),
+        power:         document.querySelector('#controllable-settings-power'),
+        cadence:       document.querySelector('#controllable-settings-cadence'),
+        speed:         document.querySelector('#controllable-settings-speed'),
     },
     datascreen: {
         time:      document.querySelector('#time'),
@@ -26,32 +38,47 @@ let dom = {
         distance:  document.querySelector('#distance'),
         heartRate: document.querySelector('#heart-rate')
     },
-    controlscreen: {
-        watch: {
-            start:   document.querySelector('#watch-start'),
-            pause:   document.querySelector('#watch-pause'),
-            resume:  document.querySelector('#watch-resume'),
-            lap:     document.querySelector('#watch-lap'),
-            stop:    document.querySelector('#watch-stop'),
-            save:    document.querySelector('#activity-save'),
-            workout: document.querySelector('#start-workout'),
-            cont:    document.querySelector('#watch'),
-        },
-        workoutName: document.querySelector('#workout-name'),
-        targetPower: document.querySelector('#target-power-value'),
-        workPower:   document.querySelector('#work-power-value'),
-        restPower:   document.querySelector('#rest-power-value'),
+    watch: {
+        start:   document.querySelector('#watch-start'),
+        pause:   document.querySelector('#watch-pause'),
+        resume:  document.querySelector('#watch-resume'),
+        lap:     document.querySelector('#watch-lap'),
+        stop:    document.querySelector('#watch-stop'),
+        save:    document.querySelector('#activity-save'),
+        workout: document.querySelector('#start-workout'),
+        cont:    document.querySelector('#watch'),
+        name:    document.querySelector('#workout-name'),
+    },
+    controls: {
+        resistanceMode:   document.querySelector('#resistance-mode-btn'),
+        slopeMode:        document.querySelector('#slope-mode-btn'),
+        ergMode:          document.querySelector('#erg-mode-btn'),
+        freeMode:         document.querySelector('#free-mode-btn'),
+
+        resistanceControls: document.querySelector('#resistance-mode-controls'),
+        slopeControls:      document.querySelector('#slope-mode-controls'),
+        ergControls:        document.querySelector('#erg-mode-controls'),
+
+        resistance:        document.querySelector('#resistance-value'),
+        resistanceBtn:     document.querySelector('#resistance-control-btn'),
+        resistanceSetBtn:  document.querySelector('#resistance-set-btn'),
+        slope:             document.querySelector('#slope-value'),
+        slopeBtn:          document.querySelector('#slope-control-btn'),
+        slopeSetBtn:       document.querySelector('#slope-set-btn'),
+
+
+        targetPower:       document.querySelector('#target-power-value'),
+        workPower:         document.querySelector('#work-power-value'),
+        restPower:         document.querySelector('#rest-power-value'),
         setTargetPower:    document.querySelector('#set-target-power'),
         startWorkInterval: document.querySelector('#start-work-interval'),
         startRestInterval: document.querySelector('#start-rest-interval'),
-        laps: document.querySelector('#laps'),
-        startWorkout: document.querySelector('#start-workout'),
     },
     settings: {
-        ftp:      document.querySelector('#ftp-value'),
-        ftpBtn:   document.querySelector('#ftp-btn'),
-        darkMode: document.querySelector('#dark-mode'),
-        theme:    document.querySelector('#theme'),
+        ftp:        document.querySelector('#ftp-value'),
+        ftpBtn:     document.querySelector('#ftp-btn'),
+        weight:     document.querySelector('#weight-value'),
+        weightBtn:  document.querySelector('#weight-btn'),
     },
     navigation: {
         menu:         document.querySelector('.menu-cont'),
@@ -93,6 +120,11 @@ let dom = {
         cont:  document.querySelector('#graph-power'),
         graph: document.querySelector('#graph-power .graph'),
         ftp:   document.querySelector('#ftp-line-value')
+    },
+    recon: {
+        section: document.querySelector('#recon-cont'),
+        cont:    document.querySelector('#recon-graph'),
+        graph:   document.querySelector('#recon-graph .graph'),
     }
 };
 

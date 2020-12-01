@@ -1,6 +1,7 @@
-import { powerToColor,
+import { powerToZone,
          hrToColor,
-         valueToHeight } from './functions.js';
+         valueToHeight,
+         secondsToHms } from './functions.js';
 
 function readWarmup(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
@@ -136,6 +137,9 @@ function parseZwo(zwo) {
     let doc = parser.parseFromString(zwo, 'text/xml');
 
     let workoutEl = doc.querySelector('workout');
+    let nameEl    = doc.querySelector('name');
+    let descEl    = doc.querySelector('description');
+
     let elements = Array.from(workoutEl.children);
 
     let steps = elements.reduce((acc, el) => {
@@ -143,9 +147,12 @@ function parseZwo(zwo) {
         return acc;
     }, []);
 
-    let intervals = steps.flatMap(step => stepToInterval(step));
+    let intervals   = steps.flatMap(step => stepToInterval(step));
+    let duration    = Math.round(intervals.reduce( (acc, x) => acc + (x.duration / 60), 0));
+    let name        = nameEl.textContent;
+    let description = descEl.textContent;
 
-    return intervals;
+    return {intervals: intervals, duration: duration, name: name, description: description};
 }
 
 function intervalsToGraph(intervals, ftp) {
@@ -158,7 +165,12 @@ function intervalsToGraph(intervals, ftp) {
             let width = 100 / len;
             let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
             return a +
-                `<div class="graph-bar ${(powerToColor(step.power, ftp)).name}-zone" style="height: ${height}%; width: ${width}%"><div class="graph-info t5">${step.power}</div></div>`;
+                `<div class="graph-bar zone-${(powerToZone(step.power, ftp)).name}" style="height: ${height}%; width: ${width}%">
+                     <div class="graph-info t5">
+                         <div class="power">${step.power}<span>W</span></div>
+                         <div class="time">${secondsToHms(step.duration, true)}<span></span></div>
+                     </div>
+                </div>`;
         }, `<div class="graph-interval" style="width: ${width}px">`) + `</div>`;
 
     }, ``);

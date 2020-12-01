@@ -82,35 +82,49 @@ body {
     --yellow:      #F8C73A;
     --dark:        #28272D;
     --chrome:      #35363a;
-    --zone-gray:   #636468;
-    --zone-blue:   #328AFF;
-    --zone-green:  #57C057;
-    --zone-yellow: #F8C73A;
-    --zone-orange: #FF663A;
+
     --zone-red:    #FE340B;
+    --zone-orange: #FF663A;
+    --zone-yellow: #F8C73A;
+    --zone-green:  #57C057;
+    --zone-blue:   #328AFF;
+    --zone-gray:   #636468;
+
+    /* --zone-purple: #BDACEF; */
+    /* --zone-red:    #D32020; */
+    /* --zone-orange: #F98925; */
+    /* --zone-yellow: #FACA48; */
+    /* --zone-green:  #82C91E; */
+    /* --zone-blue:   #3B97F3; */
+    /* --zone-gray:   #C3C3C3; */
+
     --black-opacity-01:  rgba(0,0,0, 0.1);
     --white-opacity-01:  rgba(255,255,255, 0.1);
 }
 
 /* Color */
-.gray-zone {
+.zone-one {
     background-color: var(--zone-gray);
 }
-.blue-zone {
+.zone-two {
     background-color: var(--zone-blue);
 }
-.green-zone {
+.zone-three {
+    background-color: var(--zone-gray);
+}
+.zone-four {
     background-color: var(--zone-green);
 }
-.yellow-zone {
+.zone-five {
     background-color: var(--zone-yellow);
 }
-.orange-zone {
+.zone-six {
     background-color: var(--zone-orange);
 }
-.red-zone {
+.zone-seven {
     background-color: var(--zone-red);
 }
+
 
 .black {
     color: var(--black);
@@ -308,11 +322,11 @@ body {
     line-height: 22px;
 }
 .t4 { /* tab text, workout list, */
-    font-size: 9px;
-    /* font-size: 10px; */
+    font-size: 10px;
+    /* font-size: 9px; */
     line-height: 14px;
     letter-spacing: 1px;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
 }
 .t5 { /* workout desc, */
     font-size: 14px;
@@ -409,13 +423,34 @@ body {
 }
 
 
+/* Controls */
+#controls {
+    text-align: center;
+}
+.number-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.number-btn .inc.btn {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+.number-btn .value {
+    border: 1px solid var(--white-opacity-01);
+}
+.number-btn .dec.btn {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+.number-btn .dev {}
 
 /* Control Screen */
 .control-screen {
     position: fixed;
     bottom: 40px;
     left: 0;
-    height: 30px;
+    height: 40px;
     width: 100%;
     text-align: center;
     border-top: 1px solid var(--white-opacity-01);
@@ -473,6 +508,26 @@ body {
     color: #fff;
     /* border-bottom: 1px solid rgba(255,255,255, 0.9); */
 }
+.resistance-mode {
+    margin-bottom: 20px;
+}
+.slope-mode {
+    margin-bottom: 20px;
+}
+.erg-mode {
+    margin-bottom: 20px;
+}
+.mode-controls {
+    margin-bottom: 20px;
+}
+.mode-controls header {
+    margin: 0px auto 5px;
+}
+
+
+
+
+
 .watch .btn {
     margin: 0px 2px;
 }
@@ -481,7 +536,6 @@ body {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin-top: 80px;
 }
 .control-point .tile {
 }
@@ -636,6 +690,11 @@ body {
     border-radius: 2px;
     z-index: 1;
 }
+.graph-info .power {}
+.graph-info .power span {}
+.graph-info .time {
+    color: var(--gray);
+}
 
 .graph-bar:hover .graph-info {
     display: block;
@@ -677,6 +736,35 @@ body {
     background-color: rgba(255,255,255, .3);
     z-index: 1;
 }
+
+
+
+#recon-graph {
+    position: relative;
+    width: 100%;
+}
+#recon-graph .graph {
+    display: flex;
+    width: 100%;
+    height: 110px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0;
+}
+.elevation-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex-wrap: nowrap;
+    height: 100px;
+    width: 1px;
+    padding: 0;
+    background-color: var(--zone-blue);
+}
+
 
 .workouts-list .h2 {
     margin: 10px auto;
@@ -759,6 +847,8 @@ body {
 /* Settings Page */
 .settings-tiles {
     display: flex;
+    max-width: 480px;
+    margin: 0px auto;
 }
 .settings-tile {
     width: 120px;
@@ -811,21 +901,47 @@ body {
     -webkit-transition: all 0.2s ease-in-out 0s;
     transition: all 0.2s ease-in-out 0s;
 }
+.settings-tile-btn {
+    cursor: pointer;
+}
 
 .settings-card {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    height: 120px;
     padding: 5px 5px;
-    margin: 10px 10px;
+    max-width: 480px;
+    margin: 10px auto;
+    /* margin: 10px 10px; */
     text-align: center;
     border: 1px solid var(--white-opacity-01);
 }
 .settings-card .switch {
-    align-self: center;
+    /* padding-left: 0; */
 }
+.device-controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 5px;
+}
+.device-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    text-align: left;
+}
+.info-cell {}
+.info-cell h3 {
+    font-size: 10px;
+    line-height: 12px;
+    /* text-transform: uppercase; */
+}
+.info-cell .value{
+    font-size: 12px;
+    font-weight: bold;
+}
+
 @media all and (min-width: 1800px) {
 }
 @media all and (min-width: 1600px) {
@@ -837,6 +953,10 @@ body {
 @media all and (max-width: 768px) {
 }
 @media all and (max-width: 600px) {
+    .settings-card {
+        margin: 10px 10px;
+        max-width: 600px;
+    }
 }
 @media all and (max-width: 414px) {
     /* IPHONE X */

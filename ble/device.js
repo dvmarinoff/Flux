@@ -1,4 +1,5 @@
 import { xf } from '../xf.js';
+import { stringToHex, hexToString, hex, dataViewToString } from '../functions.js';
 
 var services = {
     fitnessMachine: {
@@ -19,8 +20,9 @@ var services = {
     },
     deviceInformation: {
         uuid: 0x180A,
-        manufecturerNameString: {uuid: 0x2A9},
-        modelNumberString: {uuid: 0x2A24}
+        manufacturerNameString: {uuid: 0x2A29},
+        modelNumberString: {uuid: 0x2A24},
+        firmwareRevisionString: {uuid: 0x2A26}
     }
 };
 
@@ -31,7 +33,6 @@ let instCadence    = dataview => (dataview.getUint16(4, true) / 2);
 let instPower      = dataview => dataview.getUint16(6, true);
 let requestControl = _        => new Uint8Array([0x00]);
 let setTargetPower = value    => new Uint8Array([0x05,0xe6]);
-let hex            = n        => '0x' + parseInt(n).toString(16).toUpperCase();
 
 function indoorBikeDataFlags(dataview) {
     let f = dataview.getUint16(0, true);
@@ -62,15 +63,39 @@ class Device {
         this.control = false;
         this.connected = false;
         this.filter = args.filter; // service uuid -> services.fitnessMachine.uuid
+        this.optionalServices = args.optionalServices || [];
+    }
+    async isBleAvailable() {
+        let self = this;
+        return await navigator.bluetooth.getAvailability();
+    }
+    async query() {
+        let self = this;
+        let deviceId = window.sessionStorage.getItem(self.name);
+        let devices  = await navigator.bluetooth.getDevices();
+        let device   = devices.filter( device => device.id === deviceId)[0];
+        return device;
+    }
+    async request() {
+        let self = this;
+        return await navigator.bluetooth.requestDevice({filters: [{services: [self.filter]}],
+                                                        optionalServices: self.optionalServices});
     }
     async connect() {
         let self = this;
-        self.device = await navigator.bluetooth.requestDevice({ filters: [{ services: [self.filter] }] });
-        self.server = await self.device.gatt.connect();
-        self.connected = true;
-        xf.dispatch(`${self.name}:connected`);
-        console.log(`Connected ${self.device.name} ${self.name}.`);
-        self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
+        if(self.isBleAvailable()) {
+
+            self.device = await self.request();
+            window.sessionStorage.setItem(self.name, self.device.id);
+            self.server = await self.device.gatt.connect();
+
+            self.connected = true;
+            xf.dispatch(`${self.name}:connected`);
+            console.log(`Connected ${self.device.name} ${self.name}.`);
+            self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
+        } else {
+            console.warn('BLE is not available! You need to turn it on.');
+        }
     }
     async disconnect() {
         let self = this;
@@ -94,7 +119,7 @@ class Device {
         self.characteristics[characteristic] =
             await self.services[service].getCharacteristic(characteristic);
     }
-    async getDescriptor(characteristic, descriptor) {
+    async getDescriptor(service, characteristic, descriptor) {
         let self = this;
         self.descriptors[descriptor] =
             await self.services[service].getCharacteristic(characteristic);
@@ -136,19 +161,82 @@ class Device {
         }
         return res;
     }
+    async readCharacteristic(characteristic) {
+        let self = this;
+        let res  = new DataView(new Uint8Array([0]).buffer);
+        try{
+            res = await self.characteristics[characteristic].readValue();
+        } catch(e) {
+            console.log(`ERROR: device.readCharacteristic: ${e}`);
+        }
+        return res;
+    }
+    async deviceInformation() {
+        let self = this;
+        await self.getService(services.deviceInformation.uuid);
+        await self.getCharacteristic(services.deviceInformation.uuid,
+                                            services.deviceInformation.manufacturerNameString.uuid);
+        await self.getCharacteristic(services.deviceInformation.uuid,
+                                            services.deviceInformation.modelNumberString.uuid);
+        await self.getCharacteristic(services.deviceInformation.uuid,
+                                     services.deviceInformation.firmwareRevisionString.uuid);
+
+        let manufacturerNameString =
+            await self.readCharacteristic(services.deviceInformation.manufacturerNameString.uuid);
+
+        let modelNumberString =
+            await self.readCharacteristic(services.deviceInformation.modelNumberString.uuid);
+
+        console.log(services.deviceInformation.firmwareRevisionString.uuid);
+        let firmwareRevisionString =
+            await self.readCharacteristic(services.deviceInformation.firmwareRevisionString.uuid);
+
+        manufacturerNameString = dataViewToString(manufacturerNameString) || 'Unknown';
+        modelNumberString      = dataViewToString(modelNumberString)      || '';
+        firmwareRevisionString = dataViewToString(firmwareRevisionString) || '';
+
+        self.info = {manufacturerNameString: manufacturerNameString,
+                     modelNumberString:      modelNumberString,
+                     firmwareRevisionString: firmwareRevisionString,
+                     name:                   self.device.name};
+
+        xf.dispatch(`${self.name}:info`, self.info);
+        return self.info;
+    }
+    async batteryService() {
+        let self = this;
+
+        await self.getService(services.batteryService.uuid);
+        await self.getCharacteristic(services.batteryService.uuid,
+                                            services.batteryService.batteryLevel.uuid);
+        let batteryLevel =
+            await self.readCharacteristic(services.batteryService.batteryLevel.uuid);
+
+        batteryLevel = batteryLevel.getUint8(0, true);
+        self.battery = batteryLevel;
+
+        console.log(batteryLevel);
+
+        xf.dispatch(`${self.name}:battery`, self.battery);
+        return self.battery;
+    }
 };
 
 class Hrb {
     constructor(args) {
-        this.device = new Device({filter: services.heartRate.uuid, name: args.name});
+        this.device = new Device({filter: services.heartRate.uuid,
+                                  optionalServices: [services.deviceInformation.uuid,
+                                                     services.batteryService.uuid],
+                                  name: args.name});
+        this.name = args.name;
     }
     async connect() {
         let self = this;
-        self.device.connectAndNotify(services.heartRate.uuid,
+        await self.device.connectAndNotify(services.heartRate.uuid,
                                      services.heartRate.heartRateMeasurement.uuid,
                                      self.onHeartRateMeasurement);
-        self.device.getService('battery_service');
-        console.log(self.device);
+        await self.device.deviceInformation();
+        await self.device.batteryService();
     }
     async disconnect() {
         this.device.disconnect();
@@ -174,7 +262,10 @@ class Hrb {
 
 class Controllable {
     constructor(args) {
-        this.device = new Device({filter: services.fitnessMachine.uuid, name: args.name});
+        this.device = new Device({filter: services.fitnessMachine.uuid,
+                                  optionalServices: [services.deviceInformation.uuid,
+                                                     services.batteryService.uuid],
+                                  name: args.name});
     }
     async connect() {
         let self = this;
@@ -185,6 +276,7 @@ class Controllable {
                                  services.fitnessMachine.fitnessMachineControlPoint.uuid,
                                  self.onControlPoint);
         await self.requestControl();
+        await self.device.deviceInformation();
     }
     async disconnect() {
         this.device.disconnect();
@@ -205,14 +297,30 @@ class Controllable {
         let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, opCode.buffer);
         return res;
     }
+    async setTargetResistanceLevel(value) {
+        let self  = this;
+        let OpCode = 0x04;
+        let resistance = value || 0; // unitless - 0.1
+
+        let buffer = new ArrayBuffer(3);
+        let view   = new DataView(buffer);
+        view.setUint8(0, 0x04, true);
+        // view.setUint8(1, parseInt(resistance), true); // by Spec
+        view.setInt16(1, resistance, true); // works with Tacx
+        console.log(`set target resistance: ${resistance}`);
+        console.log(buffer);
+        let res =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+
+    }
     async setTargetPower(value) {
         let self   = this;
         let OpCode = 0x05;
+        let power  = value; // Watt - 1
         let buffer = new ArrayBuffer(3);
         let view   = new DataView(buffer);
         view.setUint8(0, 0x05, true);
-        view.setInt16(1, hex(value), true);
-        // view.setUint8(3, 0x00, true);
+        view.setInt16(1, value, true);
         console.log(`set target power: ${value} ${hex(value)}`);
         let res =
             await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
@@ -221,17 +329,18 @@ class Controllable {
     async setSimulationParameters(args) {
         let self  = this;
         let OpCode = 0x11;
-        let wind  = args.wind  || 0; // mps  - 0.001
-        let grade = args.grade || 0; // %    - 0.01
-        let crr   = args.crr   || 0; // null - 0.001
-        let drag  = args.drag  || 0; // kg/m - 0.01
+        let wind  = args.wind  || 0; // mps      - 0.001
+        let grade = args.grade || 0; // %        - 0.01
+        let crr   = args.crr   || 0; // unitless - 0.0001
+        let drag  = args.drag  || 0; // kg/m     - 0.01
 
-        let buffer = new ArrayBuffer(6);
+        let buffer = new ArrayBuffer(7);
         let view   = new DataView(buffer);
-        view.setInt16(0, hex(wind),  true);
-        view.setInt16(2, hex(grade), true);
-        view.setUint8(4, hex(crr),   true);
-        view.setUint8(5, hex(drag),  true);
+        view.setUint8(0, 0x11, true);
+        view.setInt16(1, hex(wind),  true);
+        view.setInt16(3, hex(grade), true);
+        view.setUint8(5, hex(crr),   true);
+        view.setUint8(6, hex(drag),  true);
         console.log(`set simulation: ${wind} ${grade} ${crr} ${drag}`);
         console.log(buffer);
         let res =
@@ -262,10 +371,11 @@ class Controllable {
         // 01 - success
         // 02 - not supported
         // 03 - invalid parameter
-        // 04 - operationa fail
+        // 04 - operation fail
         // 05 - control not permitted
         // 06 - reserved for future use
 
+        // ?? - operation code - status code
         // 128-0-1
         // 128-5-3
         // 128-5-1

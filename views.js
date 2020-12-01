@@ -1,7 +1,7 @@
 import { xf } from './xf.js';
 import { avgOfArray,
-         powerToColor,
          hrToColor,
+         powerToZone,
          valueToHeight,
          secondsToHms,
          metersToDistance } from './functions.js';
@@ -83,15 +83,46 @@ function DataScreen(args) {
 }
 
 function ControllableSettingsView(args) {
-    let dom = args.dom;
+    let dom  = args.dom;
+    let name = args.name || 'controllable';
+
+    xf.sub('db:pwr', e => {
+        let power = e.detail.data.pwr;
+        dom.power.textContent = `${power}`;
+    });
+    xf.sub('db:cad', e => {
+        let cadence = e.detail.data.cad;
+        dom.cadence.textContent = `${cadence}`;
+    });
+    xf.sub('db:spd', e => {
+        let speed = e.detail.data.spd;
+        dom.speed.textContent = `${speed}`;
+    });
+
+    xf.sub(`${name}:info`, e => {
+        console.log(e.detail.data);
+        dom.name.textContent         = `${e.detail.data.name}`;
+        dom.model.textContent        = `${e.detail.data.modelNumberString}`;
+        dom.manufacturer.textContent = `${e.detail.data.manufacturerNameString}`;
+        dom.firmware.textContent     = `${e.detail.data.firmwareRevisionString}`;
+    });
 }
 
 function HrbSettingsView(args) {
-    let dom = args.dom;
+    let dom  = args.dom;
+    let name = args.name || 'hrb';
 
     xf.sub('db:hr', e => {
         let hr = e.detail.data.hr;
-        dom.value.textContent = `${hr}`;
+        dom.value.textContent = `${hr} bpm`;
+    });
+
+    xf.sub(`${name}:info`, e => {
+        console.log(e.detail.data);
+        dom.name.textContent         = `${e.detail.data.name}`;
+        dom.model.textContent        = `${e.detail.data.modelNumberString}`;
+        dom.manufacturer.textContent = `${e.detail.data.manufacturerNameString}`;
+        dom.firmware.textContent     = `${e.detail.data.firmwareRevisionString}`;
     });
 }
 
@@ -113,7 +144,7 @@ function GraphPower(args) {
         if(count >= size) {
             dom.graph.removeChild(dom.graph.childNodes[0]);
         }
-        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${(powerToColor(pwr, ftp)).name}-zone" style="height: ${h}%"></div>`);
+        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp))}" style="height: ${h}%"></div>`);
     });
 }
 
@@ -221,7 +252,7 @@ function NavigationWidget(args) {
         dom.homeBtn.classList.remove('active');
         dom.workoutsBtn.classList.add('active');
 
-        // dom.menu.classList.add('active');
+        dom.menu.classList.remove('active');
 
         xf.dispatch('ui:tab', i);
     }, dom.workoutsBtn);
@@ -230,26 +261,85 @@ function NavigationWidget(args) {
 
 function SettingsView(args) {
     let dom = args.dom;
-    let ftp = 256;
+    let ftp = 100;
+    let weight = 75;
 
-    xf.sub('change', e => { ftp = parseInt(e.target.value); }, dom.ftp);
+    xf.sub('db:ftp', e => {
+        ftp = e.detail.data.ftp;
+        dom.ftp.value = ftp;
+    });
+    xf.sub('db:weight', e => {
+        weight = e.detail.data.weight;
+        dom.weight.value = weight;
+    });
+
+    xf.sub('change', e => { ftp    = parseInt(e.target.value); }, dom.ftp);
+    xf.sub('change', e => { weight = parseInt(e.target.value); }, dom.weight);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:ftp', ftp);
     }, dom.ftpBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:weight', weight);
+    }, dom.weightBtn);
 }
 
 function ControlView(args) {
-    let dom       = args.dom;
+    let dom = args.dom;
+
+    // Resistance mode
+    let resistance             = 0;
+    let maxResistanceSupported = 100;
+
+    xf.sub('change', e => {
+        console.log(e.target.value);
+        let value = parseInt(e.target.value || 0);
+        if(value >= 0 && value < maxResistanceSupported) {
+            resistance = value;
+        }
+        if(value >= maxResistanceSupported) {
+            resistance = maxResistanceSupported;
+        }
+    }, dom.resistance);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:resistance-target', resistance);
+    }, dom.resistanceSetBtn);
+
+    // Slope mode
+    let slope             = 0;
+    let minSlopeSupported = -10.0;
+    let maxSlopeSupported = 10.0;
+
+    xf.sub('change', e => {
+        let value = parseFloat(e.target.value || 0);
+        if(value > minSlopeSupported && value < maxSlopeSupported) {
+            slope = value;
+        }
+        if(value >= maxSlopeSupported) {
+            slope = maxSlopeSupported - 0.01;
+        }
+        if(value <= minSlopeSupported) {
+            slope = minSlopeSupported + 0.01;
+        }
+    }, dom.slope);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:slope-target', slope);
+    }, dom.slopeSetBtn);
+
+    // ERG mode
     let targetPwr = 100;
     let workPwr   = 235;
     let restPwr   = 100;
-
     xf.sub('change', e => { targetPwr = parseInt(e.target.value); }, dom.targetPower);
     xf.sub('change', e => { workPwr   = parseInt(e.target.value); }, dom.workPower);
     xf.sub('change', e => { restPwr   = parseInt(e.target.value); }, dom.restPower);
 
-    xf.sub('pointerup', e => { xf.dispatch('ui:target-pwr', targetPwr); }, dom.setTargetPower);
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:target-pwr', targetPwr);
+    }, dom.setTargetPower);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:target-pwr', workPwr);
@@ -261,49 +351,53 @@ function ControlView(args) {
         xf.dispatch('ui:watchLap');
     }, dom.startRestInterval);
 
-    xf.sub('pointerup', e => xf.dispatch('ui:darkMode'),     dom.darkMode);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),   dom.watch.start);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),   dom.watch.pause);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),     dom.watch.lap);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.watch.stop);
-    xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.startWorkout);
+}
+
+function WatchView(args) {
+    let dom = args.dom;
+
+    xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),   dom.start);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),   dom.pause);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),     dom.lap);
+    xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.stop);
+    xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.workout);
 
     xf.reg('db:workout', e => {
         let workout = e.detail.data.workout;
-        dom.workoutName.textContent = workout.name;
+        dom.name.textContent = workout.name;
     });
 
-    dom.watch.pause.style.display = 'none';
-    dom.watch.stop.style.display = 'none';
-    dom.watch.save.style.display = 'none';
-    dom.watch.lap.style.display = 'none';
+    dom.pause.style.display = 'none';
+    dom.stop.style.display  = 'none';
+    dom.save.style.display  = 'none';
+    dom.lap.style.display   = 'none';
 
     xf.sub('watch:started', e => {
-        // dom.watch.start.textContent = 'Pause';
-        dom.watch.start.style.display = 'none';
-        dom.watch.save.style.display  = 'none';
-        dom.watch.pause.style.display = 'inline-block';
-        dom.watch.lap.style.display   = 'inline-block';
-        // dom.watch.stop.style.display  = 'none';
-        dom.watch.stop.style.display  = 'inline-block';
+        // dom.start.textContent = 'Pause';
+        dom.start.style.display = 'none';
+        dom.save.style.display  = 'none';
+        dom.pause.style.display = 'inline-block';
+        dom.lap.style.display   = 'inline-block';
+        // dom.stop.style.display  = 'none';
+        dom.stop.style.display  = 'inline-block';
     });
     xf.sub('watch:paused', e => {
-        // dom.watch.start.textContent = 'Resume';
-        dom.watch.pause.style.display = 'none';
-        dom.watch.start.style.display = 'inline-block';
-        // dom.watch.stop.style.display  = 'inline-block';
+        // dom.start.textContent = 'Resume';
+        dom.pause.style.display = 'none';
+        dom.start.style.display = 'inline-block';
+        // dom.stop.style.display  = 'inline-block';
     });
     xf.sub('watch:stopped', e => {
-        // dom.watch.start.textContent = 'Start';
-        dom.watch.pause.style.display   = 'none';
-        dom.watch.lap.style.display     = 'none';
-        dom.watch.stop.style.display    = 'none';
-        dom.watch.save.style.display    = 'inline-block';
-        dom.watch.workout.style.display = 'inline-block';
-        dom.watch.start.style.display    = 'inline-block';
+        // dom.start.textContent = 'Start';
+        dom.pause.style.display   = 'none';
+        dom.lap.style.display     = 'none';
+        dom.stop.style.display    = 'none';
+        dom.save.style.display    = 'inline-block';
+        dom.workout.style.display = 'inline-block';
+        dom.start.style.display    = 'inline-block';
     });
     xf.sub('watch:workoutStarted', e => {
-        dom.watch.workout.style.display = 'none';
+        dom.workout.style.display = 'none';
     });
 }
 
@@ -383,7 +477,7 @@ function LoadWorkoutView(args) {
         let file = e.target.files[0];
         console.log(file);
         xf.dispatch('ui:workoutFile', file);
-    }, dom.loadBtn);
+    }, dom.fileBtn);
 }
 
 function ActivityView(args) {
@@ -391,6 +485,38 @@ function ActivityView(args) {
     xf.sub('pointerup', e => {
         xf.dispatch('ui:activity:save');
     }, dom.saveBtn);
+}
+
+
+function RampTest() {
+    let startFTP = 0;
+    let progressFTP = 0;
+
+    xf.sub('db:ftp', e => {
+        startFTP = e.detail.data.ftp;
+    });
+
+    xf.sub('ftptest:progress', e => {
+    });
+}
+
+function ReconView(args) {
+    let dom = args.dom;
+    let points = [];
+
+    xf.sub('db:points', e => {
+        points = e.detail.data.points;
+
+        console.log(points);
+
+        // dom.graph.innerHTML = ``;
+
+        // points.forEach((point, i) => {
+        //     let elevation = point.elevation;
+        //     dom.graph.insertAdjacentHTML('beforeend',
+        //                                  `<div class="elevation-bar" style="height: ${elevation/10}px; background-color: var(--zone-blue);"></div>`);
+        // });
+    });
 }
 
 export {
@@ -403,10 +529,12 @@ export {
     GraphPower,
     GraphWorkout,
     ControlView,
+    WatchView,
     LoadWorkoutView,
     WorkoutsView,
     ActivityView,
     NavigationWidget,
-    SettingsView
+    SettingsView,
+    ReconView,
 };
 

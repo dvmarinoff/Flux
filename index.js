@@ -1,5 +1,6 @@
 import { dom } from './dom.js';
 import { Device, Hrb, Controllable } from './ble/device.js';
+// import { Recon } from './recon.js';
 import { parseZwo, intervalsToGraph } from './parser.js';
 import { Encode } from './fit.js';
 import { FileHandler } from './file.js';
@@ -7,6 +8,7 @@ import { StopWatch } from './workout.js';
 import { WakeLock } from './lock.js';
 import { speedFromPower } from './speed.js';
 import { workouts } from './workouts/workouts.js';
+import { Storage } from './storage.js';
 import { avgOfArray,
          maxOfArray,
          sum,
@@ -25,11 +27,13 @@ import { ControllableConnectionView,
          GraphPower,
          GraphWorkout,
          ControlView,
+         WatchView,
          LoadWorkoutView,
          WorkoutsView,
          ActivityView,
          NavigationWidget,
-         SettingsView
+         SettingsView,
+         ReconView,
        } from './views.js';
 import { DeviceController,
          FileController,
@@ -58,12 +62,16 @@ let db = DB({
     elapsed: 0,
     lapTime: 0,
     targetPwr: 100,
-    ftp: 256,
+    resistanceTarget: 0,
+    slopeTarget: 0,
+    ftp: 0,
+    weight: 0,
     timestamp: Date.now(),
     workout:  [],
     workoutFile: '',
     workouts: [],
     darkMode: true,
+    points: [],
     vspd: 0,
     vdis: 0,
     env: {
@@ -92,8 +100,10 @@ xf.reg('watch:started',  e => db.lapStartTime = Date.now());
 xf.reg('watch:elapsed',  e => db.elapsed = e.detail.data);
 xf.reg('watch:lapTime',  e => db.lapTime = e.detail.data);
 xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
-xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
 xf.reg('ui:ftp',         e => db.ftp = e.detail.data);
+xf.reg('storage:ftp',    e => db.ftp = e.detail.data);
+xf.reg('ui:weight',      e => db.weight = e.detail.data);
+xf.reg('storage:weight', e => db.weight = e.detail.data);
 xf.reg('ui:workoutFile', e => db.workoutFile = e.detail.data);
 xf.reg('ui:workout:set', e => db.workout = db.workouts[e.detail.data]);
 xf.reg('workout:add',    e => db.workouts.push(e.detail.data));
@@ -143,17 +153,21 @@ xf.sub('ui:activity:save', e => {
     let fileHandler = new FileHandler();
     fileHandler.downloadActivity(activity);
 });
+xf.reg('ui:resistance-target', e => db.resistanceTarget = e.detail.data);
+xf.reg('ui:slope-target',      e => db.slopeTarget = e.detail.data);
 xf.sub('ui:tab', e => {
     let i = e.detail.data;
     db.tab = i;
 });
-
+xf.reg('recon:points', e => {
+    db.points = e.detail.data;
+});
 
 function start() {
-    let hrb   = new Hrb({name: 'hrb'});
-    let flux  = new Controllable({name: 'controllable'});
-    let watch = new StopWatch();
-    let lock  = new WakeLock();
+    let hrb     = new Hrb({name: 'hrb'});
+    let flux    = new Controllable({name: 'controllable'});
+    let watch   = new StopWatch();
+    let lock    = new WakeLock();
 
     ControllableConnectionView({dom: dom.controllableConnectionScreen});
     HrbConnectionView({dom: dom.hrbConnectionScreen});
@@ -161,14 +175,15 @@ function start() {
     ControllableConnectionView({dom: dom.controllableSettings});
     HrbConnectionView({dom: dom.hrbSettings});
 
-    ControllableSettingsView({dom: dom.controllableSettings});
-    HrbSettingsView({dom: dom.hrbSettings});
+    ControllableSettingsView({dom: dom.controllableSettings, name: 'controllable'});
+    HrbSettingsView({dom: dom.hrbSettings, name: 'hrb'});
 
     DataScreen({dom: dom.datascreen});
     GraphPower({dom: dom.graphPower});
     GraphWorkout({dom: dom.graphWorkout});
 
-    ControlView({dom: dom.controlscreen});
+    WatchView({dom: dom.watch});
+    ControlView({dom: dom.controls});
     LoadWorkoutView({dom: dom.file});
     WorkoutsView({dom: dom.workouts, workouts: workouts});
     ActivityView({dom: dom.activity});
@@ -180,8 +195,13 @@ function start() {
     WorkoutController();
 
     Screen();
-    // Vibrate({vibrate: true, long: false});
 
+    let storage = new Storage();
+
+    // ReconView({dom: dom.recon});
+    // Recon();
+
+    // Vibrate({vibrate: true, long: false});
     // DataMock({hr: true, pwr: true});
 };
 
