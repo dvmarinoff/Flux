@@ -2,6 +2,7 @@ import 'regenerator-runtime/runtime';
 
 import { dom } from './dom.js';
 import { Device, Hrb, Controllable } from './ble/device.js';
+// import { Recon } from './recon.js';
 import { parseZwo, intervalsToGraph } from './parser.js';
 import { Encode } from './fit.js';
 import { FileHandler } from './file.js';
@@ -28,11 +29,13 @@ import { ControllableConnectionView,
          GraphPower,
          GraphWorkout,
          ControlView,
+         WatchView,
          LoadWorkoutView,
          WorkoutsView,
          ActivityView,
          NavigationWidget,
-         SettingsView
+         SettingsView,
+         ReconView,
        } from './views.js';
 import { DeviceController,
          FileController,
@@ -61,6 +64,8 @@ let db = DB({
     elapsed: 0,
     lapTime: 0,
     targetPwr: 100,
+    resistanceTarget: 0,
+    slopeTarget: 0,
     ftp: 0,
     weight: 0,
     timestamp: Date.now(),
@@ -68,6 +73,7 @@ let db = DB({
     workoutFile: '',
     workouts: [],
     darkMode: true,
+    points: [],
     vspd: 0,
     vdis: 0,
     env: {
@@ -96,7 +102,6 @@ xf.reg('watch:started',  e => db.lapStartTime = Date.now());
 xf.reg('watch:elapsed',  e => db.elapsed = e.detail.data);
 xf.reg('watch:lapTime',  e => db.lapTime = e.detail.data);
 xf.reg('ui:target-pwr',  e => db.targetPwr = e.detail.data);
-xf.reg('ui:darkMode',    e => db.darkMode ? db.darkMode = false : db.darkMode = true);
 xf.reg('ui:ftp',         e => db.ftp = e.detail.data);
 xf.reg('storage:ftp',    e => db.ftp = e.detail.data);
 xf.reg('ui:weight',      e => db.weight = e.detail.data);
@@ -150,9 +155,14 @@ xf.sub('ui:activity:save', e => {
     let fileHandler = new FileHandler();
     fileHandler.downloadActivity(activity);
 });
+xf.reg('ui:resistance-target', e => db.resistanceTarget = e.detail.data);
+xf.reg('ui:slope-target',      e => db.slopeTarget = e.detail.data);
 xf.sub('ui:tab', e => {
     let i = e.detail.data;
     db.tab = i;
+});
+xf.reg('recon:points', e => {
+    db.points = e.detail.data;
 });
 
 function start() {
@@ -174,7 +184,8 @@ function start() {
     GraphPower({dom: dom.graphPower});
     GraphWorkout({dom: dom.graphWorkout});
 
-    ControlView({dom: dom.controlscreen});
+    WatchView({dom: dom.watch});
+    ControlView({dom: dom.controls});
     LoadWorkoutView({dom: dom.file});
     WorkoutsView({dom: dom.workouts, workouts: workouts});
     ActivityView({dom: dom.activity});
@@ -188,6 +199,9 @@ function start() {
     Screen();
 
     let storage = new Storage();
+
+    // ReconView({dom: dom.recon});
+    // Recon();
 
     // Vibrate({vibrate: true, long: false});
     // DataMock({hr: true, pwr: true});

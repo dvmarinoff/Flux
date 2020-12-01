@@ -98,37 +98,67 @@
 
                 <div class="line"></div>
 
-                <div id="mode-selector" class="mode-selector">
-                    <div id="mode-erg-btn" class="mode active">ERG</div>
-                    <div id="mode-resistance-btn" class="mode">Resistance</div>
-                    <div id="mode-slope-btn" class="mode">Slope</div>
-                    <div id="mode-free-btn" class="mode">Free</div>
-                </div>
+                <div id="controls">
+                    <div id="mode-selector" class="mode-selector">
+                        <div id="erg-mode-btn" class="mode active">ERG</div>
+                        <div id="resistance-mode-btn" class="mode">Resistance</div>
+                        <div id="slope-mode-btn" class="mode">Slope</div>
+                        <div id="free-mode-btn" class="mode">Free</div>
+                    </div>
 
-                <!-- <div class="slope-mode">
-                     <div class="h2">Slope</div>
-                     <div class="number-btn">
-                     <div class="inc">-</div>
-                     <input id="slope-value"" class="value" name="slope-value" type="text" value="0"/>
-                     <div class="dec">+</div>
+                    <div id="resistance-mode-controls" class="resistance-mode mode-controls">
+                        <header>
+                            <div class="h3">Resistance</div>
+                            <div class="t4">1 to 100</div>
+                        </header>
+                        <div id="resistance-control-btn" class="number-btn">
+                            <div class="dec btn">-</div>
+                            <input id="resistance-value"" class="value input" name="resistance-value" type="text" value="0"/>
+                            <div class="inc btn">+</div>
+                            <div id="resistance-set-btn" class="btn">Set</div>
+                        </div>
+                    </div>
+
+                    <div id="slope-mode-controls" class="slope-mode mode-controls">
+                        <header>
+                            <div class="h3">Slope</div>
+                            <div class="t4">1 to 10 %</div>
+                        </header>
+                        <div id="slope-control-btn" class="number-btn">
+                            <div class="dec btn">-</div>
+                            <input id="slope-value"" class="value input" name="slope-value" type="text" value="0"/>
+                            <div class="inc btn">+</div>
+                            <div id="slope-set-btn" class="btn">Set</div>
+                        </div>
+                    </div>
+
+                    <div id="erg-mode-controls" class="erg-mode mode-controlse">
+                        <header>
+                            <div class="h3">Power</div>
+                            <div class="t4">1 to 1500 W</div>
+                        </header>
+                        <div class="control-point">
+                            <div class="tile cf">
+                                <input id="target-power-value" class="input" name="target" type="text" value="100"/>
+                                <button type="button" id="set-target-power" class="btn">Target</button>
+                            </div>
+                            <div class="tile cf">
+                                <input id="work-power-value"" class="input" name="work" type="text" value="235"/>
+                                <button type="button" id="start-work-interval" class="btn">Work Interval</button>
+                            </div>
+                            <div class="tile cf">
+                                <input id="rest-power-value"" class="input" name="rest" type="text" value="100"/>
+                                <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- controls -->
+                <!-- <div id="recon-cont">
+                     <h2 class="h3">Race Recon</h2>
+                     <div id="recon-graph" class="recon-graph-cont">
+                     <div class="graph"></div>
                      </div>
                      </div> -->
-
-                <div class="control-point cf">
-                    <div class="tile cf">
-                        <input id="target-power-value" class="input" name="target" type="text" value="100"/>
-                        <button type="button" id="set-target-power" class="btn">Target</button>
-                    </div>
-                    <div class="tile cf">
-                        <input id="work-power-value"" class="input" name="work" type="text" value="235"/>
-                        <button type="button" id="start-work-interval" class="btn">Work Interval</button>
-                    </div>
-                    <div class="tile cf">
-                        <input id="rest-power-value"" class="input" name="rest" type="text" value="100"/>
-                        <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
-                    </div>
-                </div>
-
             </div> <!-- page -->
             <div class="page" id="workouts-page">
                 <div class="workouts-list" id="workouts">
@@ -185,7 +215,7 @@
                             <div class="value">
                                 <span id="controllable-settings-manufacturer">---</span>
                                 <span id="controllable-settings-model"></span>
-                                <span id="controllable-settings-software-version"></span>
+                                <span id="controllable-settings-firmware"></span>
                             </div>
                         </div>
                         <div class="info-cell">
@@ -215,7 +245,7 @@
                             <div class="value">
                                 <span id="hrb-settings-manufacturer">---</span>
                                 <span id="hrb-settings-model"></span>
-                                <span id="hrb-settings-software-version"></span>
+                                <span id="hrb-settings-firmware"></span>
                             </div>
                         </div>
                         <div class="info-cell">

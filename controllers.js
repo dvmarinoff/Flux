@@ -13,6 +13,18 @@ function DeviceController(args) {
         let targetPwr = e.detail.data.targetPwr;
         controllable.setTargetPower(targetPwr);
     });
+    xf.sub('db:resistanceTarget', e => {
+        let resistance = e.detail.data.resistanceTarget;
+        resistance *= 10;
+        resistance = parseInt(resistance);
+        controllable.setTargetResistanceLevel(resistance);
+    });
+    xf.sub('db:slopeTarget', e => {
+        let slope = e.detail.data.slopeTarget;
+        slope *= 100;
+        slope = parseInt(slope);
+        controllable.setSimulationParameters({grade: slope});
+    });
     xf.sub('ui:watchStart',  e => { watch.start();  });
     xf.sub('ui:watchPause',  e => { watch.pause();  });
     xf.sub('ui:watchResume', e => { watch.resume(); });

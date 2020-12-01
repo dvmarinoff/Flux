@@ -2,6 +2,7 @@ let sin    = x => Math.sin(x);
 let cos    = x => Math.cos(x);
 let arctan = x => Math.atan(x);
 let abs    = x => Math.abs(x);
+let sqrt   = x => Math.sqrt(x);
 let round  = x => Math.round(x);
 let floor  = x => Math.floor(x);
 let ceil   = x => Math.ceil(x);
@@ -10,9 +11,11 @@ let sqr    = x => x * x;
 let avg    = (x, y) => (x + y) / 2;
 let last   = xs => xs[xs.length - 1];
 let first  = xs => xs[0];
+let second = xs => xs[1];
 let format = (x, precision = 1000) => round(x * precision) / precision;
 let mps    = kph => format(kph / 3.6);
 let kph    = mps => 3.6 * mps;
+let nextToLast = xs => xs[xs.length - 2];
 
 function avgOfArray(xs, prop = false) {
     if(prop !== false) {
@@ -142,7 +145,12 @@ function dataViewToString (dataview) {
     let len = dataview.byteLength;
     let str = '';
     for(let i = 0; i < len; i++) {
-        str += hexToString(hex(dataview.getUint8(i, true)));
+        let value = dataview.getUint8(i, true);
+        if(value === 0) {
+            str += '';
+        } else {
+            str += hexToString(hex(value));
+        }
     }
     return str;
 }
@@ -154,6 +162,7 @@ export {
     abs,
     sqr,
     exp,
+    sqrt,
     mps,
     kph,
     avg,
@@ -161,7 +170,9 @@ export {
     maxOfArray,
     sum,
     first,
+    second,
     last,
+    nextToLast,
     round,
     floor,
     ceil,

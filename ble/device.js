@@ -21,7 +21,8 @@ var services = {
     deviceInformation: {
         uuid: 0x180A,
         manufacturerNameString: {uuid: 0x2A29},
-        modelNumberString: {uuid: 0x2A24}
+        modelNumberString: {uuid: 0x2A24},
+        firmwareRevisionString: {uuid: 0x2A26}
     }
 };
 
@@ -162,7 +163,7 @@ class Device {
     }
     async readCharacteristic(characteristic) {
         let self = this;
-        let res = undefined;
+        let res  = new DataView(new Uint8Array([0]).buffer);
         try{
             res = await self.characteristics[characteristic].readValue();
         } catch(e) {
@@ -177,6 +178,8 @@ class Device {
                                             services.deviceInformation.manufacturerNameString.uuid);
         await self.getCharacteristic(services.deviceInformation.uuid,
                                             services.deviceInformation.modelNumberString.uuid);
+        await self.getCharacteristic(services.deviceInformation.uuid,
+                                     services.deviceInformation.firmwareRevisionString.uuid);
 
         let manufacturerNameString =
             await self.readCharacteristic(services.deviceInformation.manufacturerNameString.uuid);
@@ -184,11 +187,17 @@ class Device {
         let modelNumberString =
             await self.readCharacteristic(services.deviceInformation.modelNumberString.uuid);
 
+        console.log(services.deviceInformation.firmwareRevisionString.uuid);
+        let firmwareRevisionString =
+            await self.readCharacteristic(services.deviceInformation.firmwareRevisionString.uuid);
+
         manufacturerNameString = dataViewToString(manufacturerNameString) || 'Unknown';
-        modelNumberString      = dataViewToString(modelNumberString)      || 'Unknown';
+        modelNumberString      = dataViewToString(modelNumberString)      || '';
+        firmwareRevisionString = dataViewToString(firmwareRevisionString) || '';
 
         self.info = {manufacturerNameString: manufacturerNameString,
                      modelNumberString:      modelNumberString,
+                     firmwareRevisionString: firmwareRevisionString,
                      name:                   self.device.name};
 
         xf.dispatch(`${self.name}:info`, self.info);
@@ -253,7 +262,10 @@ class Hrb {
 
 class Controllable {
     constructor(args) {
-        this.device = new Device({filter: services.fitnessMachine.uuid, name: args.name});
+        this.device = new Device({filter: services.fitnessMachine.uuid,
+                                  optionalServices: [services.deviceInformation.uuid,
+                                                     services.batteryService.uuid],
+                                  name: args.name});
     }
     async connect() {
         let self = this;
@@ -264,6 +276,7 @@ class Controllable {
                                  services.fitnessMachine.fitnessMachineControlPoint.uuid,
                                  self.onControlPoint);
         await self.requestControl();
+        await self.device.deviceInformation();
     }
     async disconnect() {
         this.device.disconnect();
@@ -284,14 +297,30 @@ class Controllable {
         let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, opCode.buffer);
         return res;
     }
+    async setTargetResistanceLevel(value) {
+        let self  = this;
+        let OpCode = 0x04;
+        let resistance = value || 0; // unitless - 0.1
+
+        let buffer = new ArrayBuffer(3);
+        let view   = new DataView(buffer);
+        view.setUint8(0, 0x04, true);
+        // view.setUint8(1, parseInt(resistance), true); // by Spec
+        view.setInt16(1, resistance, true); // works with Tacx
+        console.log(`set target resistance: ${resistance}`);
+        console.log(buffer);
+        let res =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+
+    }
     async setTargetPower(value) {
         let self   = this;
         let OpCode = 0x05;
+        let power  = value; // Watt - 1
         let buffer = new ArrayBuffer(3);
         let view   = new DataView(buffer);
         view.setUint8(0, 0x05, true);
-        view.setInt16(1, hex(value), true);
-        // view.setUint8(3, 0x00, true);
+        view.setInt16(1, value, true);
         console.log(`set target power: ${value} ${hex(value)}`);
         let res =
             await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
@@ -300,17 +329,18 @@ class Controllable {
     async setSimulationParameters(args) {
         let self  = this;
         let OpCode = 0x11;
-        let wind  = args.wind  || 0; // mps  - 0.001
-        let grade = args.grade || 0; // %    - 0.01
-        let crr   = args.crr   || 0; // null - 0.001
-        let drag  = args.drag  || 0; // kg/m - 0.01
+        let wind  = args.wind  || 0; // mps      - 0.001
+        let grade = args.grade || 0; // %        - 0.01
+        let crr   = args.crr   || 0; // unitless - 0.0001
+        let drag  = args.drag  || 0; // kg/m     - 0.01
 
-        let buffer = new ArrayBuffer(6);
+        let buffer = new ArrayBuffer(7);
         let view   = new DataView(buffer);
-        view.setInt16(0, hex(wind),  true);
-        view.setInt16(2, hex(grade), true);
-        view.setUint8(4, hex(crr),   true);
-        view.setUint8(5, hex(drag),  true);
+        view.setUint8(0, 0x11, true);
+        view.setInt16(1, hex(wind),  true);
+        view.setInt16(3, hex(grade), true);
+        view.setUint8(5, hex(crr),   true);
+        view.setUint8(6, hex(drag),  true);
         console.log(`set simulation: ${wind} ${grade} ${crr} ${drag}`);
         console.log(buffer);
         let res =
@@ -341,10 +371,11 @@ class Controllable {
         // 01 - success
         // 02 - not supported
         // 03 - invalid parameter
-        // 04 - operationa fail
+        // 04 - operation fail
         // 05 - control not permitted
         // 06 - reserved for future use
 
+        // ?? - operation code - status code
         // 128-0-1
         // 128-5-3
         // 128-5-1

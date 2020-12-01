@@ -423,6 +423,27 @@ body {
 }
 
 
+/* Controls */
+#controls {
+    text-align: center;
+}
+.number-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.number-btn .inc.btn {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+.number-btn .value {
+    border: 1px solid var(--white-opacity-01);
+}
+.number-btn .dec.btn {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+.number-btn .dev {}
 
 /* Control Screen */
 .control-screen {
@@ -487,6 +508,26 @@ body {
     color: #fff;
     /* border-bottom: 1px solid rgba(255,255,255, 0.9); */
 }
+.resistance-mode {
+    margin-bottom: 20px;
+}
+.slope-mode {
+    margin-bottom: 20px;
+}
+.erg-mode {
+    margin-bottom: 20px;
+}
+.mode-controls {
+    margin-bottom: 20px;
+}
+.mode-controls header {
+    margin: 0px auto 5px;
+}
+
+
+
+
+
 .watch .btn {
     margin: 0px 2px;
 }
@@ -495,7 +536,6 @@ body {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin-top: 80px;
 }
 .control-point .tile {
 }
@@ -697,6 +737,35 @@ body {
     z-index: 1;
 }
 
+
+
+#recon-graph {
+    position: relative;
+    width: 100%;
+}
+#recon-graph .graph {
+    display: flex;
+    width: 100%;
+    height: 110px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0;
+}
+.elevation-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex-wrap: nowrap;
+    height: 100px;
+    width: 1px;
+    padding: 0;
+    background-color: var(--zone-blue);
+}
+
+
 .workouts-list .h2 {
     margin: 10px auto;
 }
@@ -778,6 +847,8 @@ body {
 /* Settings Page */
 .settings-tiles {
     display: flex;
+    max-width: 480px;
+    margin: 0px auto;
 }
 .settings-tile {
     width: 120px;
@@ -835,9 +906,10 @@ body {
 }
 
 .settings-card {
-    /* height: 120px; */
     padding: 5px 5px;
-    margin: 10px 10px;
+    max-width: 480px;
+    margin: 10px auto;
+    /* margin: 10px 10px; */
     text-align: center;
     border: 1px solid var(--white-opacity-01);
 }
@@ -881,6 +953,10 @@ body {
 @media all and (max-width: 768px) {
 }
 @media all and (max-width: 600px) {
+    .settings-card {
+        margin: 10px 10px;
+        max-width: 600px;
+    }
 }
 @media all and (max-width: 414px) {
     /* IPHONE X */
