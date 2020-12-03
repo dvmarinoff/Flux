@@ -155,6 +155,14 @@ function dataViewToString (dataview) {
     return str;
 }
 
+const getBitField = (field, bit) => (field >> bit) & 1;
+
+function toBool (n) {
+    let x = parseInt(n);
+    if(!(x === 0 || x === 1)) throw new Error(`Wrong argument for toBool: ${n}`);
+    return !!(x);
+}
+
 export {
     sin,
     cos,
@@ -180,6 +188,8 @@ export {
     stringToHex,
     hex,
     dataViewToString,
+    getBitField,
+    toBool,
     powerToZone,
     hrToColor,
     valueToHeight,
