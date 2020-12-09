@@ -144,7 +144,7 @@ function GraphPower(args) {
         if(count >= size) {
             dom.graph.removeChild(dom.graph.childNodes[0]);
         }
-        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp))}" style="height: ${h}%"></div>`);
+        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%"></div>`);
     });
 }
 
@@ -161,7 +161,7 @@ function GraphHr(args) {
             // dom.graph.style.left = `-${count}px`; // shift and keep
             dom.graph.removeChild(dom.graph.childNodes[0]); // shift and replace
         }
-        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${hrToColor(hr)}-zone" style="height: ${h}%"></div>`);
+        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${hrToColor(hr).name}-zone" style="height: ${h}%"></div>`);
     });
 }
 
@@ -210,6 +210,10 @@ function NavigationWidget(args) {
     let i   = 1;
 
     xf.sub('pointerup', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
         i = dom.homeBtn.getAttribute('date-index');
         dom.homePage.style.display     = 'block';
         dom.settingsPage.style.display = 'none';
@@ -226,6 +230,10 @@ function NavigationWidget(args) {
     }, dom.homeBtn);
 
     xf.sub('pointerup', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
         i = dom.settingsBtn.getAttribute('date-index');
         dom.settingsPage.style.display = 'block';
         dom.homePage.style.display     = 'none';
@@ -242,6 +250,10 @@ function NavigationWidget(args) {
     }, dom.settingsBtn);
 
     xf.sub('pointerup', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
         i = dom.workoutsBtn.getAttribute('date-index');
         dom.workoutsPage.style.display = 'block';
         dom.homePage.style.display     = 'none';
@@ -290,27 +302,61 @@ function ControlView(args) {
 
     // Resistance mode
     let resistance             = 0;
-    let maxResistanceSupported = 100;
+    let minResistanceSupported = 0;
+    let maxResistanceSupported = 1000;
+    let resistanceInc          = 100;
 
     xf.sub('change', e => {
-        console.log(e.target.value);
         let value = parseInt(e.target.value || 0);
-        if(value >= 0 && value < maxResistanceSupported) {
-            resistance = value;
+        if(value <= minResistanceSupported) {
+            resistance = minResistanceSupported;
+            dom.resistanceValue.value = resistance;
         }
         if(value >= maxResistanceSupported) {
             resistance = maxResistanceSupported;
+            dom.resistanceValue.value = resistance;
         }
-    }, dom.resistance);
+        if(value >= minResistanceSupported && value < maxResistanceSupported) {
+            resistance = value;
+        }
+        xf.dispatch('ui:resistance-target', resistance);
+    }, dom.resistanceValue);
 
     xf.sub('pointerup', e => {
+        let target = resistance + resistanceInc;
+        if(target >= maxResistanceSupported) {
+            resistance = maxResistanceSupported;
+        } else if(target < minResistanceSupported) {
+            resistance = minResistanceSupported;
+        } else {
+            resistance = target;
+        }
+        dom.resistanceValue.value = resistance;
         xf.dispatch('ui:resistance-target', resistance);
-    }, dom.resistanceSetBtn);
+    }, dom.resistanceInc);
+
+    xf.sub('pointerup', e => {
+        let target = resistance - resistanceInc;
+        if(target >= maxResistanceSupported) {
+            resistance = maxResistanceSupported;
+        } else if(target < 0) {
+            resistance = minResistanceSupported;
+        } else {
+            resistance = target;
+        }
+        dom.resistanceValue.value = resistance;
+        xf.dispatch('ui:resistance-target', resistance);
+    }, dom.resistanceDec);
+
+    // xf.sub('pointerup', e => {
+    //     xf.dispatch('ui:resistance-target', resistance);
+    // }, dom.resistanceSet);
 
     // Slope mode
     let slope             = 0;
     let minSlopeSupported = -10.0;
     let maxSlopeSupported = 10.0;
+    let slopeInc          = 0.5;
 
     xf.sub('change', e => {
         let value = parseFloat(e.target.value || 0);
@@ -318,16 +364,45 @@ function ControlView(args) {
             slope = value;
         }
         if(value >= maxSlopeSupported) {
-            slope = maxSlopeSupported - 0.01;
+            slope = maxSlopeSupported - 0;
+            dom.slopeValue.value = slope;
         }
         if(value <= minSlopeSupported) {
-            slope = minSlopeSupported + 0.01;
+            slope = minSlopeSupported + 0;
+            dom.slopeValue.value = slope;
         }
-    }, dom.slope);
+        xf.dispatch('ui:slope-target', slope);
+    }, dom.slopeValue);
 
     xf.sub('pointerup', e => {
+        let target = slope + slopeInc;
+        if(target >= maxSlopeSupported) {
+            slope = maxSlopeSupported;
+        } else if(target < minSlopeSupported) {
+            slope = minSlopeSupported;
+        } else {
+            slope = target;
+        }
+        dom.slopeValue.value = slope;
         xf.dispatch('ui:slope-target', slope);
-    }, dom.slopeSetBtn);
+    }, dom.slopeInc);
+
+    xf.sub('pointerup', e => {
+        let target = slope - slopeInc;
+        if(target >= maxSlopeSupported) {
+            slope = maxSlopeSupported;
+        } else if(target < 0) {
+            slope = 0;
+        } else {
+            slope = target;
+        }
+        dom.slopeValue.value = slope;
+        xf.dispatch('ui:slope-target', slope);
+    }, dom.slopeDec);
+
+    // xf.sub('pointerup', e => {
+    //     xf.dispatch('ui:slope-target', slope);
+    // }, dom.slopeSet);
 
     // ERG mode
     let targetPwr = 100;

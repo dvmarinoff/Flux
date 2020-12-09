@@ -61,9 +61,10 @@ let db = DB({
     laps:    [],
     lapStartTime: Date.now(),
     workoutIntervalIndex: 0,
+    inProgress: false,
     elapsed: 0,
     lapTime: 0,
-    targetPwr: 100,
+    targetPwr: 0,
     resistanceTarget: 0,
     slopeTarget: 0,
     ftp: 0,
@@ -165,6 +166,8 @@ xf.reg('recon:points', e => {
     db.points = e.detail.data;
 });
 
+
+
 function start() {
     let hrb     = new Hrb({name: 'hrb'});
     let flux    = new Controllable({name: 'controllable'});
@@ -197,9 +200,10 @@ function start() {
     WorkoutController();
 
     Screen();
+    // Session();
 
     let storage = new Storage();
-
+    xf.dispatch('app:start');
     // ReconView({dom: dom.recon});
     // Recon();
 

@@ -59,12 +59,14 @@ let dom = {
         slopeControls:      document.querySelector('#slope-mode-controls'),
         ergControls:        document.querySelector('#erg-mode-controls'),
 
-        resistance:        document.querySelector('#resistance-value'),
-        resistanceBtn:     document.querySelector('#resistance-control-btn'),
-        resistanceSetBtn:  document.querySelector('#resistance-set-btn'),
-        slope:             document.querySelector('#slope-value'),
-        slopeBtn:          document.querySelector('#slope-control-btn'),
-        slopeSetBtn:       document.querySelector('#slope-set-btn'),
+        resistanceValue:   document.querySelector('#resistance-value'),
+        resistanceInc:     document.querySelector('#resistance-inc'),
+        resistanceDec:     document.querySelector('#resistance-dec'),
+        // resistanceSet:     document.querySelector('#resistance-set'),
+        slopeValue:        document.querySelector('#slope-value'),
+        slopeInc:          document.querySelector('#slope-inc'),
+        slopeDec:          document.querySelector('#slope-dec'),
+        // slopeSet:          document.querySelector('#slope-set'),
 
 
         targetPower:       document.querySelector('#target-power-value'),
