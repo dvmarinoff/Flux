@@ -1,5 +1,3 @@
-import 'regenerator-runtime/runtime';
-
 import { dom } from './dom.js';
 import { Device, Hrb, Controllable } from './ble/device.js';
 // import { Recon } from './recon.js';
