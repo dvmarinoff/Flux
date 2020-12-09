@@ -1,11 +1,20 @@
 import { xf } from '../xf.js';
-import { stringToHex, hexToString, hex, dataViewToString } from '../functions.js';
+import { stringToHex,
+         hexToString,
+         hex,
+         dataViewToString,
+         getBitField,
+         toBool, } from '../functions.js';
 
-var services = {
+const services = {
     fitnessMachine: {
         uuid: 0x1826,
         indoorBikeData: {uuid: 0x2AD2},
-        fitnessMachineControlPoint: {uuid: 0x2AD9}
+        fitnessMachineControlPoint: {uuid: 0x2AD9},
+        fitnessMachineFeature: {uuid: 0x2ACC},
+        supportedResistanceLevelRange: {uuid: 0x2AD6},
+        supportedPowerRange: {uuid: 0x2AD8},
+        fitnessMachineStatus: {uuid: 0x2AD9}
     },
     cyclingPower: {
         uuid: 0x1818
@@ -25,6 +34,152 @@ var services = {
         firmwareRevisionString: {uuid: 0x2A26}
     }
 };
+
+const controlPointResults = {
+    '0x01': {definition: 'success',          msg: 'success'},
+    '0x02': {definition: 'notSupported',     msg: 'not supported'},
+    '0x03': {definition: 'invalidParameter', msg: 'invalid parameter'},
+    '0x04': {definition: 'operationFail',    msg: 'operation fail'},
+    '0x05': {definition: 'notPermitted',     msg: 'not permitted'},
+};
+
+const controlPointOperations = {
+    '0x00': {param: false,
+             definition: 'requestControl',
+             msg: 'request control'},
+    '0x01': {param: false,
+             definition: 'reset',
+             msg: 'reset'},
+    '0x04': {param: {resistance: 'Uint8'},
+             definition: 'setTargetResistanceLevel',
+             msg: 'set target resistance'},
+    '0x05': {param: {power: 'Int16'},
+             definition: 'setTargetPower',
+             msg: 'set target power'},
+    '0x11': {param: {wind: 'Int16', grade: 'Int16', crr: 'Uint8', cw: 'Uint8'},
+             definition: 'setIndoorBikeSimulationParameters',
+             msg: 'set indoor bike simulation'},
+    '0x13': {param: {speedLow: 'Uint16', speedHigh: 'Uint16'},
+             definition: 'spinDownControl',
+             msg: 'Spin Down Control'},
+};
+
+const fitnessMachineStatusCodes = {
+    '0x00': {param: false, msg: 'Reserved for Future Use'},
+    '0x01': {param: false, msg: 'Reset'},
+    '0x02': {param: false, msg: 'Fitness Machine Stopped or Paused by the User'},
+    '0x07': {param: {resistance: 'Uint8'},
+             msg: 'Target Resistance Level Changed'},
+    '0x08': {param: {power: 'Int16'},
+             msg: 'Target Power Changed'},
+    '0x12': {param: {wind: 'Int16', grade: 'Int16', crr: 'Uint8', cw: 'Uint8'},
+             msg: 'Indoor Bike Simulation Parameters Changed'},
+    '0x14': {param: '', msg: 'Spin Down Status'},
+    '0xFF': {param: '', msg: 'Control Permission Lost'},
+};
+
+let targetSettingFeatures =
+[
+    {key: 'Speed',                          flagBit:  0, supported: false, msg: 'Speed'},
+    {key: 'Inclination',                    flagBit:  1, supported: false, msg: 'Inclination'},
+    {key: 'Resistance',                     flagBit:  2, supported: false, msg: 'Resistance'},
+    {key: 'Power',                          flagBit:  3, supported: false, msg: 'Power'},
+    {key: 'HeartRate',                      flagBit:  4, supported: false, msg: 'Heart Rate'},
+    {key: 'ExpendedEnergy',                 flagBit:  5, supported: false, msg: 'Expended Energy'},
+    {key: 'StepNumber',                     flagBit:  6, supported: false, msg: 'Step Number'},
+    {key: 'StrideNumber',                   flagBit:  7, supported: false, msg: 'Stride Number'},
+    {key: 'Distance',                       flagBit:  8, supported: false, msg: 'Distance'},
+    {key: 'TrainingTime',                   flagBit:  9, supported: false, msg: 'Training Time'},
+    {key: 'TimeInTwoHeartRateZones',        flagBit: 10, supported: false, msg: 'Time In Two Heart Rate Zones'},
+    {key: 'TimeInThreeHeartRateZones',      flagBit: 11, supported: false, msg: 'Time In Three Heart Rate Zones'},
+    {key: 'TimeInFiveHeartRateZones',       flagBit: 12, supported: false, msg: 'Time In Five Heart Rate Zones'},
+    {key: 'IndoorBikeSimulationParameters', flagBit: 13, supported: false, msg: 'Indoor Bike Simulation Parameters'},
+    {key: 'WheelCircumference',             flagBit: 14, supported: false, msg: 'Wheel Circumference'},
+    {key: 'SpinDownControl',                flagBit: 15, supported: false, msg: 'Spin Down Control'},
+    {key: 'Cadence',                        flagBit: 16, supported: false, msg: 'Cadence'},
+    // bit 17-31 reserved for future use
+];
+
+let fitnessMachineFeatures =
+[
+    {key: 'AverageSpeed',              flagBit:  0, supported: false, msg: 'Average Speed'},
+    {key: 'Cadence',                   flagBit:  1, supported: false, msg: 'Cadence'},
+    {key: 'TotalDistance',             flagBit:  2, supported: false, msg: 'Total Distance'},
+    {key: 'Inclination',               flagBit:  3, supported: false, msg: 'Inclination'},
+    {key: 'ElevationGain',             flagBit:  4, supported: false, msg: 'Elevation Gain'},
+    {key: 'Pace',                      flagBit:  5, supported: false, msg: 'Pace'},
+    {key: 'StepCount',                 flagBit:  6, supported: false, msg: 'Step Count'},
+    {key: 'ResistanceLevel',           flagBit:  7, supported: false, msg: 'Resistance Level'},
+    {key: 'StrideCount',               flagBit:  8, supported: false, msg: 'Stride Count'},
+    {key: 'ExpendedEnergy',            flagBit:  9, supported: false, msg: 'Expended Energy'},
+    {key: 'HeartRateMeasurement',      flagBit: 10, supported: false, msg: 'Heart Rate Measurement'},
+    {key: 'MetabolicEquivalent',       flagBit: 11, supported: false, msg: 'Metabolic Equivalent'},
+    {key: 'ElapsedTime',               flagBit: 12, supported: false, msg: 'Elapsed Time'},
+    {key: 'RemainingTime',             flagBit: 13, supported: false, msg: 'Remaining Time'},
+    {key: 'PowerMeasurement',          flagBit: 14, supported: false, msg: 'Power Measurement'},
+    {key: 'ForceOnBeltAndPowerOutput', flagBit: 15, supported: false, msg: 'Force On Belt And Power Output'},
+    {key: 'UserDataRetention',         flagBit: 16, supported: false, msg: 'User DataRetention'},
+    // bit 17-31 reserved for future use
+];
+
+function setSupportFeatures(dataview) {
+    let featureFlags       = dataview.getUint32(0, true); // 0-31 flags
+    let targetSettingFlags = dataview.getUint32(4, true); // 0-31 flags
+    let read = (xs, i) => toBool(getBitField(xs, i));
+
+    fitnessMachineFeatures.forEach(feature => {
+        feature.supported = read(featureFlags, feature.flagBit);
+    });
+
+    targetSettingFeatures.forEach(feature => {
+        feature.supported = read(targetSettingFlags, feature.flagBit);
+    });
+
+    return {fitnessMachineFeatures: fitnessMachineFeatures,
+            targetSettingFeatures:  targetSettingFeatures};
+}
+
+function getSupportedFeatures(dataview) {
+    let featureFlags       = dataview.getUint32(0, true); // 0-31 flags
+    let targetSettingFlags = dataview.getUint32(4, true); // 0-31 flags
+    let read = (xs, i) => toBool(getBitField(xs, i));
+
+    fitnessMachineFeatures.forEach(feature => {
+        feature.supported = read(featureFlags, feature.flagBit);
+    });
+
+    targetSettingFeatures.forEach(feature => {
+        feature.supported = read(targetSettingFlags, feature.flagBit);
+    });
+
+    let readings  = features.fitnessMachineFeatures;
+    let targets   = features.targetSettingFeatures;
+    let supported = {readings: [], targets: []};
+
+    supported.readings = readings.filter(feature => feature.supported);
+    supported.targets  = targets.filter(feature => feature.supported);
+
+    console.log(supported);
+    return supported;
+}
+
+function getSupportedResistanceLevel(dataview) {
+    let min = dataview.getUint16(0, dataview, true);
+    let max = dataview.getUint16(2, dataview, true);
+    let inc = dataview.getUint16(4, dataview, true);
+
+    return {min: min, max: max, increment: inc};
+}
+
+function getSupportedPowerRange(dataview) {
+    let min = dataview.getUint16(0, dataview, true);
+    let max = dataview.getUint16(2, dataview, true);
+    let inc = dataview.getUint16(4, dataview, true);
+
+    return {min: min, max: max, increment: inc};
+}
+
+function getFitnessMachineStatus() {}
 
 let hr             = dataview => dataview.getUint8(1, true);
 let flags          = dataview => dataview.getUint8(0, true);
@@ -187,7 +342,6 @@ class Device {
         let modelNumberString =
             await self.readCharacteristic(services.deviceInformation.modelNumberString.uuid);
 
-        console.log(services.deviceInformation.firmwareRevisionString.uuid);
         let firmwareRevisionString =
             await self.readCharacteristic(services.deviceInformation.firmwareRevisionString.uuid);
 
@@ -277,6 +431,21 @@ class Controllable {
                                  self.onControlPoint);
         await self.requestControl();
         await self.device.deviceInformation();
+
+
+        await self.device.getCharacteristic(services.fitnessMachine.uuid,
+                                            services.fitnessMachine.fitnessMachineFeature.uuid);
+
+        let fitnessMachineFeature =
+            await self.device.readCharacteristic(services.fitnessMachine.fitnessMachineFeature.uuid);
+
+        console.log(fitnessMachineFeature);
+        // self.device.getCharacteristic(services.fitnessMachine.uuid,
+        //                               services.fitnessMachine.supportedResistanceLevelRange.uuid);
+        // self.device.getCharacteristic(services.fitnessMachine.uuid,
+        //                               services.fitnessMachine.supportedPowerRange.uuid);
+        // self.device.getCharacteristic(services.fitnessMachine.uuid,
+        //                               services.fitnessMachine.fitnessMachineStatus.uuid);
     }
     async disconnect() {
         this.device.disconnect();
@@ -297,6 +466,18 @@ class Controllable {
         let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, opCode.buffer);
         return res;
     }
+    async reset() {
+        let self  = this;
+        let OpCode = 0x01;
+
+        let buffer = new ArrayBuffer(1);
+        let view   = new DataView(buffer);
+        view.setUint8(0, OpCode, true);
+        console.log(`reset`);
+        let res =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+
+    }
     async setTargetResistanceLevel(value) {
         let self  = this;
         let OpCode = 0x04;
@@ -304,7 +485,7 @@ class Controllable {
 
         let buffer = new ArrayBuffer(3);
         let view   = new DataView(buffer);
-        view.setUint8(0, 0x04, true);
+        view.setUint8(0, OpCode, true);
         // view.setUint8(1, parseInt(resistance), true); // by Spec
         view.setInt16(1, resistance, true); // works with Tacx
         console.log(`set target resistance: ${resistance}`);
@@ -347,6 +528,18 @@ class Controllable {
             await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
 
     }
+    async spinDownControl() {
+        let self   = this;
+        let OpCode = 0x01;
+
+        let buffer = new ArrayBuffer(1);
+        let view   = new DataView(buffer);
+        view.setUint8(0, OpCode, true);
+        console.log(`reset`);
+        let res =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+
+    }
     onIndoorBikeData (e) {
         let dataview = e.target.value;
         let data = {
@@ -375,12 +568,19 @@ class Controllable {
         // 05 - control not permitted
         // 06 - reserved for future use
 
-        // ?? - operation code - status code
+        // 0xFF on fitness machine status - control permission lost
+        // 128 - 0b10000000, 8 bit is 1
+
+        // 0x80 - operation code - status code
         // 128-0-1
         // 128-5-3
         // 128-5-1
+        let response  = hex(res.responseCode);
+        let operation = controlPointOperations[hex(res.requestCode)].msg;
+        let result    = controlPointResults[hex(res.resultCode)].msg;
 
         console.log(`on control point: ${res.responseCode} ${res.requestCode} ${res.resultCode}`);
+        console.log(`on procedure complete: ${response} ${operation} ${result}`);
     }
 }
 

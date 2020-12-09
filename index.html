@@ -109,13 +109,14 @@
                     <div id="resistance-mode-controls" class="resistance-mode mode-controls">
                         <header>
                             <div class="h3">Resistance</div>
-                            <div class="t4">1 to 100</div>
+                            <div class="t4">1 to 1000</div>
                         </header>
                         <div id="resistance-control-btn" class="number-btn">
-                            <div class="dec btn">-</div>
-                            <input id="resistance-value"" class="value input" name="resistance-value" type="text" value="0"/>
-                            <div class="inc btn">+</div>
-                            <div id="resistance-set-btn" class="btn">Set</div>
+                            <button id="resistance-dec" class="dec btn">-</button>
+                            <input  id="resistance-value" class="value input" name=""
+                                    type="number" value="0" autocomplete="no"/>
+                            <button id="resistance-inc" class="inc btn">+</button>
+                            <!-- <button id="resistance-set" class="btn">Set</button> -->
                         </div>
                     </div>
 
@@ -125,10 +126,11 @@
                             <div class="t4">1 to 10 %</div>
                         </header>
                         <div id="slope-control-btn" class="number-btn">
-                            <div class="dec btn">-</div>
-                            <input id="slope-value"" class="value input" name="slope-value" type="text" value="0"/>
-                            <div class="inc btn">+</div>
-                            <div id="slope-set-btn" class="btn">Set</div>
+                            <button id="slope-dec" class="dec btn">-</button>
+                            <input  id="slope-value" class="value input" name=""
+                                    type="number" value="0" autocomplete="no"/>
+                            <button id="slope-inc" class="inc btn">+</button>
+                            <!-- <button id="slope-set" class="btn">Set</button> -->
                         </div>
                     </div>
 
@@ -139,15 +141,15 @@
                         </header>
                         <div class="control-point">
                             <div class="tile cf">
-                                <input id="target-power-value" class="input" name="target" type="text" value="100"/>
+                                <input id="target-power-value" class="input" name="target" type="number" value="100"/>
                                 <button type="button" id="set-target-power" class="btn">Target</button>
                             </div>
                             <div class="tile cf">
-                                <input id="work-power-value"" class="input" name="work" type="text" value="235"/>
+                                <input id="work-power-value"" class="input" name="work" type="number" value="235"/>
                                 <button type="button" id="start-work-interval" class="btn">Work Interval</button>
                             </div>
                             <div class="tile cf">
-                                <input id="rest-power-value"" class="input" name="rest" type="text" value="100"/>
+                                <input id="rest-power-value"" class="input" name="rest" type="number" value="100"/>
                                 <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
                             </div>
                         </div>
@@ -202,59 +204,63 @@
                          </div> -->
                 </div>
 
-                <div class="settings-card  controllable">
-                    <div class="device-controls">
-                        <div id="controllable-settings-btn" class="switch">
-                            <div class="indicator off"></div>
-                            <div id="controllable-settings-name" class="text t2">Controllable</div>
-                        </div>
-                    </div>
-                    <div class="device-info">
-                        <div class="info-cell">
-                            <h3 class="">Model</h3>
-                            <div class="value">
-                                <span id="controllable-settings-manufacturer">---</span>
-                                <span id="controllable-settings-model"></span>
-                                <span id="controllable-settings-firmware"></span>
+                <div class="row border">
+                    <div class="settings-card  controllable">
+                        <div class="device-controls">
+                            <div id="controllable-settings-btn" class="switch">
+                                <div class="indicator off"></div>
+                                <div id="controllable-settings-name" class="text t2">Controllable</div>
                             </div>
                         </div>
-                        <div class="info-cell">
-                            <h3 class="">Power</h3>
-                            <div class="value" id="controllable-settings-power">-- W</div>
-                        </div>
-                        <div class="info-cell">
-                            <h3 class="">Cadence</h3>
-                            <div class="value" id="controllable-settings-cadence">-- rpm</div>
-                        </div>
-                        <div class="info-cell">
-                            <h3 class="">Speed</h3>
-                            <div class="value" id="controllable-settings-speed">-- km/h</div>
+                        <div class="device-info">
+                            <div class="info-cell">
+                                <h3 class="">Model</h3>
+                                <div class="value">
+                                    <span id="controllable-settings-manufacturer">---</span>
+                                    <span id="controllable-settings-model"></span>
+                                    <span id="controllable-settings-firmware"></span>
+                                </div>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Power</h3>
+                                <div class="value" id="controllable-settings-power">-- W</div>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Cadence</h3>
+                                <div class="value" id="controllable-settings-cadence">-- rpm</div>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Speed</h3>
+                                <div class="value" id="controllable-settings-speed">-- km/h</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="settings-card hr">
-                    <div class="device-controls">
-                        <div id="hrb-settings-btn" class="switch">
-                            <div class="indicator off"></div>
-                            <div id="hrb-settings-name" class="text t2">HRM</div>
-                        </div>
-                    </div>
-                    <div class="device-info">
-                        <div class="info-cell">
-                            <h3 class="">Model</h3>
-                            <div class="value">
-                                <span id="hrb-settings-manufacturer">---</span>
-                                <span id="hrb-settings-model"></span>
-                                <span id="hrb-settings-firmware"></span>
+                <div class="row border">
+                    <div class="settings-card hr">
+                        <div class="device-controls">
+                            <div id="hrb-settings-btn" class="switch">
+                                <div class="indicator off"></div>
+                                <div id="hrb-settings-name" class="text t2">HRM</div>
                             </div>
                         </div>
-                        <div class="info-cell">
-                            <h3 class="">Heart Rate</h3>
-                            <div class="value" id="hrb-settings-value">-- bpm</div>
-                        </div>
-                        <div class="info-cell">
-                            <h3 class="">Battery</h3>
-                            <div class="value" id="hrb-settings-battery">--- %</div>
+                        <div class="device-info">
+                            <div class="info-cell">
+                                <h3 class="">Model</h3>
+                                <div class="value">
+                                    <span id="hrb-settings-manufacturer">---</span>
+                                    <span id="hrb-settings-model"></span>
+                                    <span id="hrb-settings-firmware"></span>
+                                </div>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Heart Rate</h3>
+                                <div class="value" id="hrb-settings-value">-- bpm</div>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Battery</h3>
+                                <div class="value" id="hrb-settings-battery">--- %</div>
+                            </div>
                         </div>
                     </div>
                 </div>
