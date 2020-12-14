@@ -177,7 +177,7 @@ function GraphWorkout(args) {
     };
 
     xf.reg('db:workout', e => {
-        let workout = e.detail.data.workout;
+        let workout = e.workout;
         // dom.name.textContent = workout.name;
 
         dom.graph.innerHTML = ``;
@@ -193,11 +193,11 @@ function GraphWorkout(args) {
     });
 
     xf.reg('watch:nextWorkoutInterval', e => {
-        interval = e.detail.data;
+        interval = e;
         setProgress(interval);
     });
     xf.reg('watch:nextWorkoutStep', e => {
-        step = e.detail.data;
+        step = e;
     });
 
     xf.reg('screen:change', e => {
@@ -298,134 +298,156 @@ function SettingsView(args) {
 }
 
 function ControlView(args) {
-    let dom = args.dom;
+    let dom      = args.dom;
 
-    // Resistance mode
-    let resistance             = 0;
-    let minResistanceSupported = 0;
-    let maxResistanceSupported = 1000;
-    let resistanceInc          = 100;
+    xf.sub('db:controllableFeatures', e => {
+        let features = e.detail.data.controllableFeatures;
+        Resistance(features);
+        Slope(features);
+        ERG(features);
+    });
 
-    xf.sub('change', e => {
-        let value = parseInt(e.target.value || 0);
-        if(value <= minResistanceSupported) {
-            resistance = minResistanceSupported;
+    function Resistance(features) {
+        // Resistance mode
+        let resistance             = 0;
+        let minResistanceSupported = features.resistance.params.min;
+        let maxResistanceSupported = features.resistance.params.max;
+        let resistanceInc          = features.resistance.params.inc * 100;
+
+        dom.resistanceParams.textContent = `${minResistanceSupported} to ${maxResistanceSupported}`;
+
+        xf.sub('change', e => {
+            let value = parseInt(e.target.value || 0);
+            if(value <= minResistanceSupported) {
+                resistance = minResistanceSupported;
+                dom.resistanceValue.value = resistance;
+            }
+            if(value >= maxResistanceSupported) {
+                resistance = maxResistanceSupported;
+                dom.resistanceValue.value = resistance;
+            }
+            if(value >= minResistanceSupported && value < maxResistanceSupported) {
+                resistance = value;
+            }
+            xf.dispatch('ui:resistance-target', resistance);
+        }, dom.resistanceValue);
+
+        xf.sub('pointerup', e => {
+            let target = resistance + resistanceInc;
+            if(target >= maxResistanceSupported) {
+                resistance = maxResistanceSupported;
+            } else if(target < minResistanceSupported) {
+                resistance = minResistanceSupported;
+            } else {
+                resistance = target;
+            }
             dom.resistanceValue.value = resistance;
-        }
-        if(value >= maxResistanceSupported) {
-            resistance = maxResistanceSupported;
+            xf.dispatch('ui:resistance-target', resistance);
+        }, dom.resistanceInc);
+
+        xf.sub('pointerup', e => {
+            let target = resistance - resistanceInc;
+            if(target >= maxResistanceSupported) {
+                resistance = maxResistanceSupported;
+            } else if(target < 0) {
+                resistance = minResistanceSupported;
+            } else {
+                resistance = target;
+            }
             dom.resistanceValue.value = resistance;
-        }
-        if(value >= minResistanceSupported && value < maxResistanceSupported) {
-            resistance = value;
-        }
-        xf.dispatch('ui:resistance-target', resistance);
-    }, dom.resistanceValue);
+            xf.dispatch('ui:resistance-target', resistance);
+        }, dom.resistanceDec);
+    }
 
-    xf.sub('pointerup', e => {
-        let target = resistance + resistanceInc;
-        if(target >= maxResistanceSupported) {
-            resistance = maxResistanceSupported;
-        } else if(target < minResistanceSupported) {
-            resistance = minResistanceSupported;
-        } else {
-            resistance = target;
-        }
-        dom.resistanceValue.value = resistance;
-        xf.dispatch('ui:resistance-target', resistance);
-    }, dom.resistanceInc);
 
-    xf.sub('pointerup', e => {
-        let target = resistance - resistanceInc;
-        if(target >= maxResistanceSupported) {
-            resistance = maxResistanceSupported;
-        } else if(target < 0) {
-            resistance = minResistanceSupported;
-        } else {
-            resistance = target;
-        }
-        dom.resistanceValue.value = resistance;
-        xf.dispatch('ui:resistance-target', resistance);
-    }, dom.resistanceDec);
+    function Slope(features) {
+        // Slope mode
+        // Waiting on:
+        // https://stackoverflow.com/questions/65257156/what-is-the-supported-range-of-indoor-bike-simulation-parameters-in-the-ftms-spe
+        let slope             = 0;
+        let minSlopeSupported = 0; //-10;
+        let maxSlopeSupported = 14.0; // change it
+        let slopeInc          = 0.5;
 
-    // xf.sub('pointerup', e => {
-    //     xf.dispatch('ui:resistance-target', resistance);
-    // }, dom.resistanceSet);
+        dom.slopeParams.textContent = `${minSlopeSupported} to ${maxSlopeSupported}`;
 
-    // Slope mode
-    let slope             = 0;
-    let minSlopeSupported = -10.0;
-    let maxSlopeSupported = 10.0;
-    let slopeInc          = 0.5;
+        xf.sub('change', e => {
+            let value = parseFloat(e.target.value || 0);
+            if(value > minSlopeSupported && value < maxSlopeSupported) {
+                slope = value;
+            }
+            if(value >= maxSlopeSupported) {
+                slope = maxSlopeSupported - 0;
+                dom.slopeValue.value = slope;
+            }
+            if(value <= minSlopeSupported) {
+                slope = minSlopeSupported + 0;
+                dom.slopeValue.value = slope;
+            }
+            xf.dispatch('ui:slope-target', slope);
+        }, dom.slopeValue);
 
-    xf.sub('change', e => {
-        let value = parseFloat(e.target.value || 0);
-        if(value > minSlopeSupported && value < maxSlopeSupported) {
-            slope = value;
-        }
-        if(value >= maxSlopeSupported) {
-            slope = maxSlopeSupported - 0;
+        xf.sub('pointerup', e => {
+            let target = slope + slopeInc;
+            if(target >= maxSlopeSupported) {
+                slope = maxSlopeSupported;
+            } else if(target < minSlopeSupported) {
+                slope = minSlopeSupported;
+            } else {
+                slope = target;
+            }
             dom.slopeValue.value = slope;
-        }
-        if(value <= minSlopeSupported) {
-            slope = minSlopeSupported + 0;
+            xf.dispatch('ui:slope-target', slope);
+        }, dom.slopeInc);
+
+        xf.sub('pointerup', e => {
+            let target = slope - slopeInc;
+            if(target >= maxSlopeSupported) {
+                slope = maxSlopeSupported;
+            } else if(target < 0) {
+                slope = 0;
+            } else {
+                slope = target;
+            }
             dom.slopeValue.value = slope;
-        }
-        xf.dispatch('ui:slope-target', slope);
-    }, dom.slopeValue);
+            xf.dispatch('ui:slope-target', slope);
+        }, dom.slopeDec);
 
-    xf.sub('pointerup', e => {
-        let target = slope + slopeInc;
-        if(target >= maxSlopeSupported) {
-            slope = maxSlopeSupported;
-        } else if(target < minSlopeSupported) {
-            slope = minSlopeSupported;
-        } else {
-            slope = target;
-        }
-        dom.slopeValue.value = slope;
-        xf.dispatch('ui:slope-target', slope);
-    }, dom.slopeInc);
-
-    xf.sub('pointerup', e => {
-        let target = slope - slopeInc;
-        if(target >= maxSlopeSupported) {
-            slope = maxSlopeSupported;
-        } else if(target < 0) {
-            slope = 0;
-        } else {
-            slope = target;
-        }
-        dom.slopeValue.value = slope;
-        xf.dispatch('ui:slope-target', slope);
-    }, dom.slopeDec);
-
-    // xf.sub('pointerup', e => {
-    //     xf.dispatch('ui:slope-target', slope);
-    // }, dom.slopeSet);
+        // xf.sub('pointerup', e => {
+        //     xf.dispatch('ui:slope-target', slope);
+        // }, dom.slopeSet);
+    }
 
     // ERG mode
-    let targetPwr = 100;
-    let workPwr   = 235;
-    let restPwr   = 100;
-    xf.sub('change', e => { targetPwr = parseInt(e.target.value); }, dom.targetPower);
-    xf.sub('change', e => { workPwr   = parseInt(e.target.value); }, dom.workPower);
-    xf.sub('change', e => { restPwr   = parseInt(e.target.value); }, dom.restPower);
+    function ERG(features) {
+        let targetPwr = 100;
+        let workPwr   = 235;
+        let restPwr   = 100;
 
-    xf.sub('pointerup', e => {
-        xf.dispatch('ui:target-pwr', targetPwr);
-    }, dom.setTargetPower);
+        let minPowerSupported = features.power.params.min || 0;
+        let maxPowerSupported = features.power.params.max || 0;
+        let powerInc          = features.power.params.inc || 0;
 
-    xf.sub('pointerup', e => {
-        xf.dispatch('ui:target-pwr', workPwr);
-        xf.dispatch('ui:watchLap');
-    }, dom.startWorkInterval);
+        dom.ergParams.textContent = `${minPowerSupported} to ${maxPowerSupported}`;
 
-    xf.sub('pointerup', e => {
-        xf.dispatch('ui:target-pwr', restPwr);
-        xf.dispatch('ui:watchLap');
-    }, dom.startRestInterval);
+        xf.sub('change', e => { targetPwr = parseInt(e.target.value); }, dom.targetPower);
+        xf.sub('change', e => { workPwr   = parseInt(e.target.value); }, dom.workPower);
+        xf.sub('change', e => { restPwr   = parseInt(e.target.value); }, dom.restPower);
 
+        xf.sub('pointerup', e => {
+            xf.dispatch('ui:target-pwr', targetPwr);
+        }, dom.setTargetPower);
+
+        xf.sub('pointerup', e => {
+            xf.dispatch('ui:target-pwr', workPwr);
+            xf.dispatch('ui:watchLap');
+        }, dom.startWorkInterval);
+
+        xf.sub('pointerup', e => {
+            xf.dispatch('ui:target-pwr', restPwr);
+            xf.dispatch('ui:watchLap');
+        }, dom.startRestInterval);
+    }
 }
 
 function WatchView(args) {
@@ -437,9 +459,8 @@ function WatchView(args) {
     xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.stop);
     xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.workout);
 
-    xf.reg('db:workout', e => {
-        let workout = e.detail.data.workout;
-        dom.name.textContent = workout.name;
+    xf.reg('db:workout', db => {
+        dom.name.textContent = db.workout.name;
     });
 
     dom.pause.style.display = 'none';
@@ -484,23 +505,23 @@ function WorkoutsView(args) {
     let off = `
         <svg class="radio radio-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
             <path d="M0 0h24v24H0V0z" fill="none"/>
-            <path fill="#fff" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12
+            <path class="path" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12
                     2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
         </svg>`;
 
     let on = `
         <svg class="radio radio-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
             <path d="M0 0h24v24H0V0z" fill="none"/>
-            <path fill="#fff" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0
+            <path class="path" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0
                     18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-            <circle fill="#fff" cx="12" cy="12" r="5"/>
+            <circle class="circle" cx="12" cy="12" r="5"/>
         </svg>`;
     xf.reg('workouts:init', e => {
         dom.list.innerHTML = '';
     });
 
     xf.reg('workout:add', e => {
-        let w = e.detail.data;
+        let w = e;
 
         let item = `
             <div class='workout list-item cf' id="li${w.id}">

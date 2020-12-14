@@ -95,6 +95,9 @@ body {
     --zone-blue:   #328AFF;
     --zone-gray:   #636468;
 
+    --orange-logo: #FC4C02;
+    --white-gray: #F7F7FA;
+    --red-logo: #E50914;
     /* --zone-purple: #BDACEF; */
     /* --zone-red:    #D32020; */
     /* --zone-orange: #F98925; */
@@ -104,7 +107,9 @@ body {
     /* --zone-gray:   #C3C3C3; */
 
     --black-opacity-01:  rgba(0,0,0, 0.1);
+    --black-opacity-02:  rgba(0,0,0, 0.2);
     --white-opacity-01:  rgba(255,255,255, 0.1);
+    --white-opacity-03:  rgba(255,255,255, 0.3);
 }
 
 /* Color */
@@ -197,7 +202,108 @@ body {
 }
 
 
+
 /* Theme */
+/* White Theme */
+body.white-theme {
+    color: #444;
+    background-color: var(--white-gray);
+}
+.white-theme .devices {
+    background-color: var(--white);
+    box-shadow: 0px 1px 1px 0px var(--black-opacity-01);
+}
+.white-theme .menu-cont {
+    background-color: var(--white);
+}
+.white-theme .control-screen {
+    background-color: var(--white);
+}
+.white-theme .icon-btn .icon {
+    fill: var(--gray);
+}
+.white-theme .icon-btn .text {
+    color: var(--gray);
+}
+.white-theme .tab-btn.active .text {
+    color: var(--black);
+}
+.white-theme .tab-btn.active .icon-fill {
+    fill: var(--black);
+}
+.white-theme .control-icon {
+    fill: var(--black);
+}
+.white-theme .btn {
+    background-color: var(--black);
+}
+.white-theme .btn:hover {
+    background-color: var(--gray);
+}
+.white-theme .radio {
+    fill: var(--black);
+}
+.white-theme .settings-tile-btn {
+    color: var(--black);
+}
+.white-theme .settings-tile-input {
+    color: var(--black);
+    background-color: var(--white-gray);
+}
+.white-theme .settings-tile {
+    /* width: 120px; */
+    border: 2px solid var(--black-opacity-01);
+}
+.white-theme .line {
+    border: 1px solid var(--black-opacity-01);
+}
+.white-theme #progress-active {
+    background-color: var(--black-opacity-02);
+}
+
+/* Dark Theme */
+body.dark-theme {
+    color: var(--white);
+    background-color: var(--dark);
+}
+.dark-theme .devices {
+    background-color: var(--chrome);
+    /* border-bottom: 1px solid var(--white-opacity-01); */
+}
+
+.dark-theme .control-screen {
+    background-color: var(--dark);
+}
+.dark-theme .menu-cont {
+    background-color: var(--dark);
+}
+.dark-theme #progress-active {
+    background-color: var(--white-opacity-03);
+}
+.dark-theme .radio {
+    fill: var(--white);
+}
+.dark-theme .workout {
+    border-bottom: 1px solid var(--white-opacity-01);
+}
+
+.icon-btn .icon {
+    fill: var(--gray);
+}
+.icon-btn .text {
+    color: var(--gray);
+}
+.tab-btn.active .text {
+    color: var(--white);
+}
+.tab-btn.active .icon-fill {
+    fill: var(--white);
+}
+.control-icon {
+    fill: #fff;
+}
+
+
 
 
 /* Page */
@@ -270,12 +376,16 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 .icon-btn .icon {
     display: block;
     width: 16px;
     height: 16px;
     fill: var(--gray);
+}
+.control-icon {
+    cursor: pointer;
 }
 .icon-btn .text {
     color: var(--gray);
@@ -366,8 +476,6 @@ body {
     justify-content: space-between;
     align-items: center;
     align-content: center;
-    box-shadow: 0px 1px 1px 0px var(--black-opacity-01);
-    border-bottom: 1px solid var(--white-opacity-01);
 }
 .switch {
     display: flex;
@@ -463,7 +571,7 @@ body {
     width: 100%;
     text-align: center;
     border-top: 1px solid var(--white-opacity-01);
-    z-index: 2;
+    z-index: 1;
 }
 .watch {
     padding: 5px 0 5px;
@@ -557,6 +665,28 @@ body {
     margin: 3px auto;
     width: 105px;
 }
+
+#workout-start-btn-cont {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    height: 110px;
+    background-color: rgba(0,0,0, 0.1);
+}
+#start-workout-graph {
+    width: 24px;
+    height: 24px;
+    background-color: #ddd;
+    border-radius: 50%;
+    z-index: 10;
+}
+/* #start-workout svg #path { */
+/*     fill: #fff; */
+/* } */
+
 #dark-mode {
     display: inline-block;
     margin: 20px auto 20px;
@@ -675,7 +805,6 @@ body {
 .graph-bar {
     position: relative;
     display: flex;
-    flex-direction: col;
     justify-content: center;
     align-items: flex-start;
 
@@ -733,7 +862,6 @@ body {
     width: 0px;
     /* height: 122px; */
     height: 102px;
-    background-color: rgba(0,0,0, .3);
 }
 #progress-active {
     display: flex;
@@ -744,7 +872,6 @@ body {
     left: 0;
     width: 0px;
     height: 102px;
-    background-color: rgba(255,255,255, .3);
     z-index: 1;
 }
 
@@ -814,7 +941,6 @@ body {
 .workout {
     padding: 0 5px 5px 5px;
     margin-bottom: 5px;
-    border-bottom: 1px solid var(--white-opacity-01);
 }
 .workout .first-row {
     cursor: pointer;

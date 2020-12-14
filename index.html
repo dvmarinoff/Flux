@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8"/>
@@ -6,14 +5,15 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="theme-color" content="#35363a" />
+        <!-- <meta name="theme-color" content="#fff" /> -->
         <title>Flux</title>
         <link href="css/flux.css" rel="stylesheet"/>
         <link rel="manifest" href="./manifest.webmanifest">
     </head>
-    <body id="theme" class="dark-bg white">
+    <body id="theme" class="dark-theme">
         <div class="wrapper" onselectstart="return false;">
             <div class="page" id="home-page">
-                <header class="devices page-header chrome-bg cf">
+                <header class="devices page-header cf">
                     <div id="controllable-connection-btn" class="switch">
                         <div class="indicator off"></div>
                         <div class="text t2">Controllable</div>
@@ -92,7 +92,16 @@
 
                 <div class="workout-graph-cont">
                     <h4 id="current-workout-name" class="graph-heading h4"></h4>
-                    <!-- <div id="progress" class="progress"></div> -->
+                    <!-- <div id="workout-start-btn-cont">
+                         <div id="start-workout-graph" class="">
+                         <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
+                         height="34" viewBox="0 0 24 24" width="34">
+                         <path  id="path" d="M0 0h24v24H0V0z" fill="none"/>
+                         <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
+                         10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                         </svg>
+                         </div>
+                         </div> -->
                     <div id="current-workout-graph" class="workout-graph"></div>
                 </div>
 
@@ -109,7 +118,7 @@
                     <div id="resistance-mode-controls" class="resistance-mode mode-controls">
                         <header>
                             <div class="h3">Resistance</div>
-                            <div class="t4">1 to 1000</div>
+                            <div id="resistance-mode-params" class="t4">0 to 0</div>
                         </header>
                         <div id="resistance-control-btn" class="number-btn">
                             <button id="resistance-dec" class="dec btn">-</button>
@@ -123,7 +132,7 @@
                     <div id="slope-mode-controls" class="slope-mode mode-controls">
                         <header>
                             <div class="h3">Slope</div>
-                            <div class="t4">1 to 10 %</div>
+                            <div id="slope-mode-params" class="t4">0 to 0 %</div>
                         </header>
                         <div id="slope-control-btn" class="number-btn">
                             <button id="slope-dec" class="dec btn">-</button>
@@ -137,7 +146,7 @@
                     <div id="erg-mode-controls" class="erg-mode mode-controlse">
                         <header>
                             <div class="h3">Power</div>
-                            <div class="t4">1 to 1500 W</div>
+                            <div id="erg-mode-params" class="t4">0 to 0 W</div>
                         </header>
                         <div class="control-point">
                             <div class="tile cf">
@@ -266,18 +275,17 @@
                 </div>
             </div> <!-- page -->
 
-            <div class="control-screen dark-bg">
+            <div class="control-screen">
                 <div id="watch" class="watch cf">
                     <div id="workout-name">Free ride</div>
                     <div id="start-workout" class="control-btn">
                         <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
-                                height="24" viewBox="0 0 24 24" width="24">
+                             height="24" viewBox="0 0 24 24" width="24">
                             <path d="M0 0h24v24H0V0z" fill="none"/>
                             <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
-                                        10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                                     10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
                         </svg>
                     </div>
-
                     <div id="watch-start" class="control-btn">
                         <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
                                 height="24" viewBox="0 0 24 24" width="24">
@@ -325,7 +333,7 @@
             </div>
 
             <div id="menu" class="menu">
-                <div class="menu-cont dark-bg">
+                <div class="menu-cont">
                     <div id="settings-tab-btn" class="settings tab-btn icon-btn" data-index="2">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                             <path d="M0 0h24v24H0V0z" fill="none"/>

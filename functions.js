@@ -138,7 +138,11 @@ function stringToHex(str) {
 }
 
 function hex (n) {
-    return '0x' + parseInt(n).toString(16).toUpperCase();
+    let h = parseInt(n).toString(16).toUpperCase();
+    if(h.length === 1) {
+        h = '0'+ h;
+    }
+     return '0x' + h;
 }
 
 function dataViewToString (dataview) {
@@ -195,4 +199,5 @@ export {
     valueToHeight,
     timeDiff,
     secondsToHms,
-    metersToDistance };
+    metersToDistance
+};

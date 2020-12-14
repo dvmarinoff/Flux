@@ -15,7 +15,7 @@ function DeviceController(args) {
     });
     xf.sub('db:resistanceTarget', e => {
         let resistance = e.detail.data.resistanceTarget;
-        resistance *= 10;
+        // resistance *= 10;
         resistance = parseInt(resistance);
         controllable.setTargetResistanceLevel(resistance);
     });
@@ -57,7 +57,7 @@ function Vibrate(args) {
     let long = args.long;
 
     xf.reg('db:lapTime', e => {
-        lapTime = e.detail.data.lapTime;
+        lapTime = e.lapTime;
 
         if(vibrate) {
             if(lapTime === 3 && long) {
@@ -94,7 +94,7 @@ function WorkoutController() {
     let workout = {};
 
     xf.reg('db:ftp', e => {
-        ftp = e.detail.data.ftp;
+        ftp = e.ftp;
         xf.dispatch('workouts:init', workouts);
         xf.dispatch('ui:workout:set', 0);
     });
@@ -127,7 +127,7 @@ function WorkoutController() {
     });
 
     xf.reg('workouts:init', e => {
-        let workoutFiles = e.detail.data;
+        let workoutFiles = e;
         workoutFiles.forEach( w => {
             let workout = parseZwo(w.xml);
             workout.intervals.forEach( interval => {

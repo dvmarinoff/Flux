@@ -4,7 +4,7 @@ function dispatch (name, value) {
     document.dispatchEvent(evt(name)(value));
 };
 function reg (name, handler) {
-    document.addEventListener(name, e => handler(e));
+    document.addEventListener(name, e => handler(e.detail.data));
 };
 function sub(name, handler, el = false) {
     if(el) {
