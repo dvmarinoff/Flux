@@ -94,23 +94,6 @@ let fitnessMachineFeatures =
     // bit 17-31 reserved for future use
 ];
 
-let indoorBikeDataFlags =
-[
-    {key: 'MoreData',             flagBit:  0, present: false}, // 0 present,
-    {key: 'AverageSpeed',         flagBit:  1, present: false}, // 1 present,
-    {key: 'InstantaneousCadence', flagBit:  2, present: false}, // 0 present,
-    {key: 'AverageCandence',      flagBit:  3, present: false}, // 1 present,
-    {key: 'TotalDistance',        flagBit:  4, present: false}, // 1 present,
-    {key: 'ResistanceLevel',      flagBit:  5, present: false}, // 1 present,
-    {key: 'InstantaneousPower',   flagBit:  6, present: false}, // 1 present,
-    {key: 'AveragePower',         flagBit:  7, present: false}, // 1 present,
-    {key: 'ExpendedEnergy',       flagBit:  8, present: false}, // 1 present,
-    {key: 'HeartRate',            flagBit:  9, present: false}, // 1 present,
-    {key: 'MetabolicEquivalent',  flagBit: 10, present: false}, // 1 present,
-    {key: 'ElapsedTime',          flagBit: 11, present: false}, // 1 present,
-    {key: 'RemainingTime',        flagBit: 12, present: false}  // 1 present,
-];
-
 function setSupportFeatures(dataview) {
     let featureFlags       = dataview.getUint32(0, true); // 0-31 flags
     let targetSettingFlags = dataview.getUint32(4, true); // 0-31 flags
@@ -177,23 +160,60 @@ function dataviewToFitnessMachineStatus(dataview) {
     return {status, msg};
 }
 
-let hr             = dataview => dataview.getUint8(1, true);
-let requestControl = _        => new Uint8Array([0x00]);
-let setTargetPower = value    => new Uint8Array([0x05,0xe6]);
+let indoorBikeDataFlags =
+[
+    // {key: 'InstantaneousSpeed',    flagBit:  0, present: false}, // 0 present
+    {key: 'MoreData',              flagBit:  0, present: false}, // 0 present,
+    {key: 'InstantaneousCandence', flagBit:  1, present: false}, // 0 present, 2
+    {key: 'AverageSpeed',          flagBit:  2, present: false}, // 1 present, 1
+    {key: 'AverageCandence',       flagBit:  3, present: false}, // 1 present, 3
+    {key: 'TotalDistance',         flagBit:  4, present: false}, // 1 present, 4
+    {key: 'ResistanceLevel',       flagBit:  5, present: false}, // 1 present, 5
+    {key: 'InstantaneousPower',    flagBit:  6, present: false}, // 1 present, 6
+    {key: 'AveragePower',          flagBit:  7, present: false}, // 1 present, 7
+    {key: 'ExpendedEnergy',        flagBit:  8, present: false}, // 1 present, 8
+    {key: 'HeartRate',             flagBit:  9, present: false}, // 1 present, 9
+    {key: 'MetabolicEquivalent',   flagBit: 10, present: false}, // 1 present, 10
+    {key: 'ElapsedTime',           flagBit: 11, present: false}, // 1 present, 11
+    {key: 'RemainingTime',         flagBit: 12, present: false}, // 1 present, 12
+    // {key: 'Reserved',              flagBit: 13, present: false}  // 1 present, 13
+];
+
+let indoorBikeData =
+[
+    {key: 'InstantaneousSpeed',   type: 'Uint16', present: false, unit: 'm',    resolution: 1}, // Uint16
+    {key: 'AverageSpeed',         type: 'Uint16', present: false, unit: 'm',    resolution: 1}, // Uint16
+    {key: 'AverageCandence',      type: 'Uint16', present: false, unit: 'rpm',  resolution: 0.5}, // Uint16
+    {key: 'TotalDistance',        type: 'Uint24', present: false, unit: 'm',    resolution: 1}, // Uint24
+    {key: 'ResistanceLevel',      type: 'Int16',  present: false, unit: '',     resolution: 1}, // Sint16
+    {key: 'InstantaneousPower',   type: 'Int16',  present: false, unit: 'W',    resolution: 1}, // Sint16
+    {key: 'AveragePower',         type: 'Int16',  present: false, unit: 'W',    resolution: 1}, // Sint16
+    {key: 'ExpendedEnergy',       type: '',       present: false, unit: 'kCal', resolution: 1}, //
+    {key: 'HeartRate',            type: 'Uint8',  present: false, unit: 'bpm',  resolution: 1},   // Uint8
+    {key: 'MetabolicEquivalent',  type: 'Uint8',  present: false, unit: '',     resolution: 0.1}, // Uint8
+    {key: 'ElapsedTime',          type: 'Uint16', present: false, unit: 'sec',  resolution: 1},   // Uint16
+    {key: 'RemainingTime',        type: 'Uint16', present: false, unit: 'sec',  resolution: 1}    // Uint16
+];
 
 function dataviewToIndoorBikeData(dataview) {
+ //    value: (0x) 44-00-18-01-14-00-06-00
+ //           (10) 68-00-24-01-20-00-06-00
+ //
+ //    "Instantanious Speed: 2.8 km/h
+ //     Instantanious Cadence: 10.0 per min
+ //     Instantanious Power: 6 W" received
+
     const speedDiv    = 100;
     const cadenceDiv  = 2;
-    const flags       = dataview =>  dataview.getUint16(0, true);
-    const instSpeed   = dataview => (dataview.getUint16(2, true) / speedDiv);
-    const instCadence = dataview => (dataview.getUint16(4, true) / cadenceDiv);
-    const instPower   = dataview =>  dataview.getUint16(6, true);
+
+    let flags = dataview.getUint16(0, true);
+
 
     let data = {
-        flags: flags(dataview),
-        pwr:   instPower(dataview),
-        spd:   instSpeed(dataview),
-        cad:   instCadence(dataview),
+        flags:  dataview.getUint16(0, true),
+        spd:   (dataview.getUint16(2, true) / speedDiv),
+        cad:   (dataview.getUint16(4, true) / cadenceDiv),
+        pwr:    dataview.getInt16( 6, true),
     };
 
     return data;

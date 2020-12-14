@@ -8,6 +8,7 @@ import { stringToHex,
 import { xf }       from '../xf.js';
 import { Device }   from './device.js';
 import { services } from './services.js';
+import { hrs }      from './hrs.js';
 
 class Hrb {
     constructor(args) {
@@ -40,9 +41,7 @@ class Hrb {
     }
     onHeartRateMeasurement (e) {
         let dataview = e.target.value;
-        let data = {
-            flags: dataview.getUint8(0, true),
-            hr:    dataview.getUint8(1, true)};
+        let data     = hrs.dataviewToHeartRateMeasurement(dataview);
         xf.dispatch('device:hr', data.hr);
     }
 }

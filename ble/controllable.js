@@ -33,17 +33,14 @@ class Controllable {
         await self.device.deviceInformation();
 
         let fitnessMachineFeature = await self.getFitnessMachineFeature();
-        let features              = await self.setFeatures(fitnessMachineFeature.targets);
+        let features              = await self.setFeatures(fitnessMachineFeature);
 
-        await self.getFitnessMachineStatus();
-        let status = await self.readFitnessMachineStatus();
+        await self.notifyFitnessMachineStatus();
 
         self.fitnessMachineFeature = fitnessMachineFeature;
         self.features = features;
-        self.status   = status;
 
         console.log(features);
-        console.log(status);
     }
     async disconnect() {
         this.device.disconnect();
@@ -58,8 +55,13 @@ class Controllable {
         let self = this;
         self.device.stopNotifications(services.fitnessMachine.indoorBikeData.uuid);
     }
-    async setFeatures(targets) {
-        let self = this;
+    async setFeatures(fitnessMachineFeature) {
+        let self     = this;
+        let targets  = fitnessMachineFeature.targets;
+        let readings = fitnessMachineFeature.readings;
+
+        console.log(`setFeatures: `);
+        console.log(fitnessMachineFeature);
 
         let includes = (xs, key) => xs.filter(x => x.key === key).length > 0;
 
@@ -117,15 +119,18 @@ class Controllable {
 
         return supportedResistanceLevelRange;
     }
-    async getFitnessMachineStatus() {
+    async notifyFitnessMachineStatus() {
         let self = this;
-        await self.device.getCharacteristic(services.fitnessMachine.uuid,
-                                            services.fitnessMachine.fitnessMachineStatus.uuid);
+        await self.device.notify(services.fitnessMachine.uuid,
+                                 services.fitnessMachine.fitnessMachineStatus.uuid,
+                                 self.onFitnessMachineStatus);
     }
-    async readFitnessMachineStatus() {
+    async onFitnessMachineStatus(dataview) {
         let self = this;
-        let dataview = await self.device.readCharacteristic(services.fitnessMachine.fitnessMachineStatus.uuid);
         let fitnessMachineStatus = ftms.dataviewToFitnessMachineStatus(dataview);
+
+        console.log(fitnessMachineStatus);
+
         return fitnessMachineStatus;
     }
     async requestControl() {
@@ -209,7 +214,9 @@ class Controllable {
     }
     onIndoorBikeData (e) {
         let dataview = e.target.value;
-        let data     = ftms.dataviewToIndoorBikeDatai();
+        let data     = ftms.dataviewToIndoorBikeData(dataview);
+        console.log(`onIndoorBikeData: `);
+        console.log(data);
         xf.dispatch('device:pwr', data.pwr);
         xf.dispatch('device:spd', data.spd);
         xf.dispatch('device:cad', data.cad);

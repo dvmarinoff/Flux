@@ -5,6 +5,7 @@ import { stringToHex,
          dataViewToString,
          getBitField,
          toBool, } from '../functions.js';
+import { services } from './services.js';
 
 class Device {
     constructor(args) {
@@ -72,10 +73,10 @@ class Device {
         self.characteristics[characteristic] =
             await self.services[service].getCharacteristic(characteristic);
     }
-    async getDescriptor(service, characteristic, descriptor) {
+    async getDescriptors(characteristic) {
         let self = this;
-        self.descriptors[descriptor] =
-            await self.services[service].getCharacteristic(characteristic);
+        let descriptors = await self.characteristics[characteristic].getDescriptors(characteristic);
+        return descriptors;
     }
     async startNotifications(characteristic, handler) {
         let self = this;
@@ -174,4 +175,4 @@ class Device {
     }
 };
 
-export { Device, Hrb, Controllable };
+export { Device };

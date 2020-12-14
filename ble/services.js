@@ -6,7 +6,7 @@ const services = {
         fitnessMachineFeature: {uuid: 0x2ACC},
         supportedResistanceLevelRange: {uuid: 0x2AD6},
         supportedPowerRange: {uuid: 0x2AD8},
-        fitnessMachineStatus: {uuid: 0x2AD9}
+        fitnessMachineStatus: {uuid: 0x2ADA}
     },
     cyclingPower: {
         uuid: 0x1818
