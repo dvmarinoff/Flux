@@ -1,4 +1,5 @@
 import { xf } from './xf.js';
+import { q } from './q.js';
 import { avgOfArray,
          hrToColor,
          powerToZone,
@@ -8,7 +9,11 @@ import { avgOfArray,
 import { parseZwo, intervalsToGraph } from './parser.js';
 
 function ControllableConnectionView(args) {
-    let dom = args.dom;
+    let dom = {
+        switchBtn: q.get('#controllable-connection-btn'),
+        indicator: q.get('#controllable-connection-btn .indicator'),
+    };
+
     xf.sub('pointerup', e => xf.dispatch('ui:controllableSwitch'), dom.switchBtn);
 
     xf.sub('controllable:connected', e => {
@@ -23,7 +28,11 @@ function ControllableConnectionView(args) {
 }
 
 function HrbConnectionView(args) {
-    let dom = args.dom;
+    let dom = {
+        switchBtn: q.get('#hrb-connection-btn'),
+        indicator: q.get('#hrb-connection-btn .indicator'),
+    };
+
     xf.sub('pointerup', e => xf.dispatch('ui:hrbSwitch'), dom.switchBtn);
 
     xf.sub('hrb:connected', e => {
@@ -38,37 +47,39 @@ function HrbConnectionView(args) {
 }
 
 function DataScreen(args) {
-    let dom = args.dom;
-    xf.sub('db:hr', e => {
-        let hr = e.detail.data.hr;
+    let dom = {
+        time:      q.get('#time'),
+        interval:  q.get('#interval-time'),
+        targetPwr: q.get('#target-power'),
+        power:     q.get('#power'),
+        cadence:   q.get('#cadence'),
+        speed:     q.get('#speed'),
+        distance:  q.get('#distance'),
+        heartRate: q.get('#heart-rate')
+    };
+
+    xf.sub('db:hr', hr => {
         dom.heartRate.textContent = `${hr}`;
     });
-    xf.sub('db:pwr', e => {
-        let pwr = e.detail.data.pwr;
+    xf.sub('db:pwr', pwr => {
         dom.power.textContent = `${pwr}`;
     });
-    xf.sub('db:distance', e => {
-        let dis = e.detail.data.distance;
-        dom.distance.textContent = `${metersToDistance(dis)}`;
+    xf.sub('db:distance', distance => {
+        dom.distance.textContent = `${metersToDistance(distance)}`;
     });
-    xf.sub('db:vspd', e => {
-        let vspd = e.detail.data.vspd;
+    xf.sub('db:vspd', vspd => {
         dom.speed.textContent = `${vspd.toFixed(1)}`;
     });
-    xf.sub('db:spd', e => {
-        let spd = e.detail.data.spd;
+    xf.sub('db:spd', spd => {
         dom.speed.textContent = `${spd.toFixed(1)}`;
     });
-    xf.sub('db:cad', e => {
-        let cad = e.detail.data.cad;
+    xf.sub('db:cad', cad => {
         dom.cadence.textContent = `${cad}`;
     });
-    xf.sub('db:elapsed', e => {
-        let elapsed = e.detail.data.elapsed;
+    xf.sub('db:elapsed', elapsed => {
         dom.time.textContent = secondsToHms(elapsed);
     });
-    xf.sub('db:lapTime', e => {
-        let lapTime = e.detail.data.lapTime;
+    xf.sub('db:lapTime', lapTime => {
         if(!Number.isInteger(lapTime)) {
             lapTime = 0;
         }
@@ -77,74 +88,165 @@ function DataScreen(args) {
         }
         dom.interval.textContent = secondsToHms(lapTime, true);
     });
-    xf.sub('db:targetPwr', e => {
-        dom.targetPwr.textContent = e.detail.data.targetPwr;
+    xf.sub('db:targetPwr', targetPwr => {
+        dom.targetPwr.textContent = targetPwr;
+    });
+}
+
+function DataBar(args) {
+    let dom = {
+        time:      q.get('#data-bar-time'),
+        interval:  q.get('#data-bar-interval-time'),
+        targetPwr: q.get('#data-bar-target-power'),
+        power:     q.get('#data-bar-power'),
+        cadence:   q.get('#data-bar-cadence'),
+        heartRate: q.get('#data-bar-heart-rate'),
+        progress:  q.get('#data-bar-progress-cont'),
+    };
+    let ftp = 250;
+
+    xf.sub('db:hr', hr => {
+        // let hr = e.detail.data.hr;
+        dom.heartRate.textContent = `${hr}`;
+    });
+    xf.sub('db:pwr', pwr => {
+        // let pwr = e.detail.data.pwr;
+        dom.power.textContent = `${pwr}`;
+        dom.progress.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${100}%"></div>`);
+    });
+    xf.sub('db:vspd', vspd => {
+        // let vspd = e.detail.data.vspd;
+        dom.speed.textContent = `${vspd.toFixed(1)}`;
+    });
+    xf.sub('db:cad', cad => {
+        // let cad = e.detail.data.cad;
+        dom.cadence.textContent = `${cad}`;
+    });
+    xf.sub('db:elapsed', elapsed => {
+        // let elapsed = e.detail.data.elapsed;
+        dom.time.textContent = secondsToHms(elapsed);
+    });
+    xf.sub('db:lapTime', lapTime => {
+        // let lapTime = e.detail.data.lapTime;
+        if(!Number.isInteger(lapTime)) {
+            lapTime = 0;
+        }
+        if(lapTime < 0) {
+            lapTime = 0;
+        }
+        dom.interval.textContent = secondsToHms(lapTime, true);
+    });
+    xf.sub('db:targetPwr', targetPwr => {
+        // dom.targetPwr.textContent = e.detail.data.targetPwr;
+        dom.targetPwr.textContent = targetPwr;
     });
 }
 
 function ControllableSettingsView(args) {
-    let dom  = args.dom;
     let name = args.name || 'controllable';
+    let dom  = {
+        switchBtn:     q.get('#controllable-settings-btn'),
+        indicator:     q.get('#controllable-settings-btn .indicator'),
+        name:          q.get('#controllable-settings-name'),
+        manufacturer:  q.get('#controllable-settings-manufacturer'),
+        model:         q.get('#controllable-settings-model'),
+        firmware:      q.get('#controllable-settings-firmware'),
+        power:         q.get('#controllable-settings-power'),
+        cadence:       q.get('#controllable-settings-cadence'),
+        speed:         q.get('#controllable-settings-speed'),
+    };
 
-    xf.sub('db:pwr', e => {
-        let power = e.detail.data.pwr;
-        dom.power.textContent = `${power}`;
+    xf.sub('db:pwr', pwr => {
+        // let power = e.detail.data.pwr;
+        dom.power.textContent = `${pwr}`;
     });
-    xf.sub('db:cad', e => {
-        let cadence = e.detail.data.cad;
-        dom.cadence.textContent = `${cadence}`;
+    xf.sub('db:cad', cad => {
+        // let cadence = e.detail.data.cad;
+        dom.cadence.textContent = `${cad}`;
     });
-    xf.sub('db:spd', e => {
-        let speed = e.detail.data.spd;
-        dom.speed.textContent = `${speed}`;
+    xf.sub('db:spd', spd => {
+        // let speed = e.detail.data.spd;
+        dom.speed.textContent = `${spd}`;
     });
 
-    xf.sub(`${name}:info`, e => {
-        console.log(e.detail.data);
-        dom.name.textContent         = `${e.detail.data.name}`;
-        dom.model.textContent        = `${e.detail.data.modelNumberString}`;
-        dom.manufacturer.textContent = `${e.detail.data.manufacturerNameString}`;
-        dom.firmware.textContent     = `${e.detail.data.firmwareRevisionString}`;
+    xf.sub(`${name}:info`, data => {
+        console.log(data);
+        dom.name.textContent         = `${data.name}`;
+        dom.model.textContent        = `${data.modelNumberString}`;
+        dom.manufacturer.textContent = `${data.manufacturerNameString}`;
+        dom.firmware.textContent     = `${data.firmwareRevisionString}`;
     });
 }
 
 function HrbSettingsView(args) {
-    let dom  = args.dom;
     let name = args.name || 'hrb';
+    let dom  = {
+        switchBtn:    q.get('#hrb-settings-btn'),
+        indicator:    q.get('#hrb-settings-btn .indicator'),
+        name:         q.get('#hrb-settings-name'),
+        manufacturer: q.get('#hrb-settings-manufacturer'),
+        model:        q.get('#hrb-settings-model'),
+        firmware:     q.get('#hrb-settings-firmware'),
+        value:        q.get('#hrb-settings-value'),
+        battery:      q.get('#hrb-settings-battery'),
+    };
 
-    xf.sub('db:hr', e => {
-        let hr = e.detail.data.hr;
+    xf.sub('db:hr', hr => {
+        // let hr = e.detail.data.hr;
         dom.value.textContent = `${hr} bpm`;
     });
 
-    xf.sub(`${name}:info`, e => {
-        console.log(e.detail.data);
-        dom.name.textContent         = `${e.detail.data.name}`;
-        dom.model.textContent        = `${e.detail.data.modelNumberString}`;
-        dom.manufacturer.textContent = `${e.detail.data.manufacturerNameString}`;
-        dom.firmware.textContent     = `${e.detail.data.firmwareRevisionString}`;
+    xf.sub(`${name}:info`, data => {
+        console.log(data);
+        dom.name.textContent         = `${data.name}`;
+        dom.model.textContent        = `${data.modelNumberString}`;
+        dom.manufacturer.textContent = `${data.manufacturerNameString}`;
+        dom.firmware.textContent     = `${data.firmwareRevisionString}`;
     });
 }
 
 function GraphPower(args) {
-    let dom = args.dom;
+    let dom = {
+        cont:  q.get('#graph-power'),
+        graph: q.get('#graph-power .graph'),
+        // ftp:   q.get('#ftp-line-value')
+    };
     let ftp = 100;
     let size = dom.cont.getBoundingClientRect().width;
     let count = 0;
     let scale = 400;
+    let workout = {};
+    let intervalIndex = 0;
+    let width = 1;
 
-    xf.sub('db:ftp', e => {
-        ftp = e.detail.data.ftp;
-        dom.ftp.textContent = `FTP ${ftp}`;
+    xf.sub('db:ftp', x => {
+        // dom.ftp.textContent = `FTP ${x}`;
+        ftp = x;
     });
-    xf.sub('db:pwr', e => {
-        let pwr = e.detail.data.pwr;
+
+    xf.reg('db:elapsed', db => {
+        let pwr = db.pwr;
         let h = valueToHeight(scale, pwr);
-        count += 1;
-        if(count >= size) {
-            dom.graph.removeChild(dom.graph.childNodes[0]);
-        }
-        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%"></div>`);
+        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width}px;"></div>`);
+    });
+
+    // xf.sub('db:pwr', pwr => {
+    //     let h = valueToHeight(scale, pwr);
+    //     count += 1;
+    //     if(count >= size) {
+    //         dom.graph.removeChild(dom.graph.childNodes[0]);
+    //     }
+    //     dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width};"></div>`);
+    // });
+
+    xf.sub('watch:nextWorkoutInterval', index => {
+        dom.graph.innerHTML = '';
+        intervalIndex = index;
+        width = size / workout.intervals[intervalIndex].duration;
+    });
+
+    xf.sub('db:workout', x => {
+        workout = x;
     });
 }
 
@@ -153,8 +255,8 @@ function GraphHr(args) {
     let count = 0;
     let scale = 200;
     let size = dom.cont.getBoundingClientRect().width;
-    xf.sub('db:hr', e => {
-        let hr = e.detail.data.hr;
+    xf.sub('db:hr', hr => {
+        // let hr = e.detail.data.hr;
         let h = valueToHeight(scale, hr);
         count += 1;
         if(count >= size) {
@@ -214,7 +316,7 @@ function NavigationWidget(args) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        i = dom.homeBtn.getAttribute('date-index');
+        i = dom.homeBtn.getAttribute('data-index');
         dom.homePage.style.display     = 'block';
         dom.settingsPage.style.display = 'none';
         dom.workoutsPage.style.display = 'none';
@@ -234,7 +336,7 @@ function NavigationWidget(args) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        i = dom.settingsBtn.getAttribute('date-index');
+        i = dom.settingsBtn.getAttribute('data-index');
         dom.settingsPage.style.display = 'block';
         dom.homePage.style.display     = 'none';
         dom.workoutsPage.style.display = 'none';
@@ -254,7 +356,7 @@ function NavigationWidget(args) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        i = dom.workoutsBtn.getAttribute('date-index');
+        i = dom.workoutsBtn.getAttribute('data-index');
         dom.workoutsPage.style.display = 'block';
         dom.homePage.style.display     = 'none';
         dom.settingsPage.style.display = 'none';
@@ -276,12 +378,12 @@ function SettingsView(args) {
     let ftp = 100;
     let weight = 75;
 
-    xf.sub('db:ftp', e => {
-        ftp = e.detail.data.ftp;
+    xf.sub('db:ftp', ftp => {
+        // ftp = e.detail.data.ftp;
         dom.ftp.value = ftp;
     });
-    xf.sub('db:weight', e => {
-        weight = e.detail.data.weight;
+    xf.sub('db:weight', weight => {
+        // weight = e.detail.data.weight;
         dom.weight.value = weight;
     });
 
@@ -297,14 +399,136 @@ function SettingsView(args) {
     }, dom.weightBtn);
 }
 
-function ControlView(args) {
-    let dom      = args.dom;
+function NumberInput(args) {
+    let dom               = args.dom;
+    let name              = args.name || `number-input`;
+    let value             = args.init || 0;
+    let type              = args.type || 'Int';
+    let minValueSupported = args.min  || 0;
+    let maxValueSupported = args.max  || 0;
+    let incStep           = args.inc  || 1;
+    let set               = args.set  || function(x) { return x; };
 
-    xf.sub('db:controllableFeatures', e => {
-        let features = e.detail.data.controllableFeatures;
-        Resistance(features);
-        Slope(features);
-        ERG(features);
+    const inRange = (target, minValueSupported, maxValueSupported, init = 0) => {
+        let value = init;
+        if(target >= maxValueSupported) {
+            value = maxValueSupported;
+        } else if(target < minValueSupported) {
+            value = minValueSupported;
+        } else {
+            value = target;
+        }
+        return value;
+    };
+
+    xf.sub('change', e => {
+        let x = 0;
+        if(type === 'Int') {
+            x = parseInt(e.target.value || 0);
+        } else {
+            x = parseFloat(e.target.value || 0);
+        }
+        if(x > minValueSupported && x < maxValueSupported) {
+            value = x;
+        }
+        if(x >= maxValueSupported) {
+            value = maxValueSupported;
+        }
+        if(x <= minValueSupported) {
+            value = minValueSupported;
+        }
+        dom.input.value = value;
+        set(value);
+        xf.dispatch(`ui:${name}-target`, value);
+    }, dom.input);
+
+    xf.sub('pointerup', e => {
+        let target = value + incStep;
+        value = inRange(target, minValueSupported, maxValueSupported, value);
+        dom.input.value = value;
+        set(value);
+        xf.dispatch(`ui:${name}-target`, value);
+    }, dom.incBtn);
+
+    xf.sub('pointerup', e => {
+        let target = value - incStep;
+        value = inRange(target, minValueSupported, maxValueSupported, value);
+        dom.input.value = value;
+        set(value);
+        xf.dispatch(`ui:${name}-target`, value);
+    }, dom.decBtn);
+}
+
+function ControlView(args) {
+    let dom = {
+        resistanceModeBtn:  q.get('#resistance-mode-btn'),
+        slopeModeBtn:       q.get('#slope-mode-btn'),
+        ergModeBtn:         q.get('#erg-mode-btn'),
+
+        resistanceControls: q.get('#resistance-mode-controls'),
+        slopeControls:      q.get('#slope-mode-controls'),
+        ergControls:        q.get('#erg-mode-controls'),
+
+        resistanceParams:   q.get('#resistance-mode-params'),
+        slopeParams:        q.get('#slope-mode-params'),
+        ergParams:          q.get('#erg-mode-params'),
+
+        resistanceValue:    q.get('#resistance-value'),
+        resistanceInc:      q.get('#resistance-inc'),
+        resistanceDec:      q.get('#resistance-dec'),
+
+        slopeValue:         q.get('#slope-value'),
+        slopeInc:           q.get('#slope-inc'),
+        slopeDec:           q.get('#slope-dec'),
+
+        targetPower:        q.get('#target-power-value'),
+        workPower:          q.get('#work-power-value'),
+        restPower:          q.get('#rest-power-value'),
+        setTargetPower:     q.get('#set-target-power'),
+        startWorkInterval:  q.get('#start-work-interval'),
+        startRestInterval:  q.get('#start-rest-interval'),
+    };
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:erg-mode');
+        dom.ergModeBtn.classList.add('active');
+        dom.resistanceModeBtn.classList.remove('active');
+        dom.slopeModeBtn.classList.remove('active');
+        dom.ergControls.style.display        = 'block';
+        dom.resistanceControls.style.display = 'none';
+        dom.slopeControls.style.display      = 'none';
+    }, dom.ergModeBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:resistance-mode');
+        dom.ergModeBtn.classList.remove('active');
+        dom.resistanceModeBtn.classList.add('active');
+        dom.slopeModeBtn.classList.remove('active');
+        dom.ergControls.style.display        = 'none';
+        dom.resistanceControls.style.display = 'block';
+        dom.slopeControls.style.display      = 'none';
+    }, dom.resistanceModeBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:slope-mode');
+        dom.ergModeBtn.classList.remove('active');
+        dom.resistanceModeBtn.classList.remove('active');
+        dom.slopeModeBtn.classList.add('active');
+        dom.ergControls.style.display        = 'none';
+        dom.resistanceControls.style.display = 'none';
+        dom.slopeControls.style.display      = 'block';
+    }, dom.slopeModeBtn);
+
+
+    // ERG({power: {params: {min: 0, max: 800, inc: 1}}});
+    // Slope({slope: {params: {min: 0, max: 30, inc: 0.5}}});
+    // Resistance({resistance: {params: {min: 0, max: 100, inc: 1}}});
+
+    xf.sub('db:controllableFeatures', controllableFeatures => {
+        let features = controllableFeatures;
+        Resistance(features); // will overflow max value
+        Slope(features);      // speed based, will ignore max value
+        ERG(features);        // will ignore max value (most likely)
     });
 
     function Resistance(features) {
@@ -316,113 +540,48 @@ function ControlView(args) {
 
         dom.resistanceParams.textContent = `${minResistanceSupported} to ${maxResistanceSupported}`;
 
-        xf.sub('change', e => {
-            let value = parseInt(e.target.value || 0);
-            if(value <= minResistanceSupported) {
-                resistance = minResistanceSupported;
-                dom.resistanceValue.value = resistance;
-            }
-            if(value >= maxResistanceSupported) {
-                resistance = maxResistanceSupported;
-                dom.resistanceValue.value = resistance;
-            }
-            if(value >= minResistanceSupported && value < maxResistanceSupported) {
-                resistance = value;
-            }
-            xf.dispatch('ui:resistance-target', resistance);
-        }, dom.resistanceValue);
-
-        xf.sub('pointerup', e => {
-            let target = resistance + resistanceInc;
-            if(target >= maxResistanceSupported) {
-                resistance = maxResistanceSupported;
-            } else if(target < minResistanceSupported) {
-                resistance = minResistanceSupported;
-            } else {
-                resistance = target;
-            }
-            dom.resistanceValue.value = resistance;
-            xf.dispatch('ui:resistance-target', resistance);
-        }, dom.resistanceInc);
-
-        xf.sub('pointerup', e => {
-            let target = resistance - resistanceInc;
-            if(target >= maxResistanceSupported) {
-                resistance = maxResistanceSupported;
-            } else if(target < 0) {
-                resistance = minResistanceSupported;
-            } else {
-                resistance = target;
-            }
-            dom.resistanceValue.value = resistance;
-            xf.dispatch('ui:resistance-target', resistance);
-        }, dom.resistanceDec);
+        NumberInput({dom: {input: dom.resistanceValue,
+                           incBtn: dom.resistanceInc,
+                           decBtn: dom.resistanceDec},
+                     name: 'resistance',
+                     init: resistance,
+                     type: 'Int',
+                     min: minResistanceSupported,
+                     max: maxResistanceSupported,
+                     inc: resistanceInc});
     }
 
 
     function Slope(features) {
         // Slope mode
-        // Waiting on:
-        // https://stackoverflow.com/questions/65257156/what-is-the-supported-range-of-indoor-bike-simulation-parameters-in-the-ftms-spe
         let slope             = 0;
-        let minSlopeSupported = 0; //-10;
-        let maxSlopeSupported = 14.0; // change it
+        let minSlopeSupported = 0;
+        let maxSlopeSupported = 30.0; // maybe ... it is speed dependant
         let slopeInc          = 0.5;
 
         dom.slopeParams.textContent = `${minSlopeSupported} to ${maxSlopeSupported}`;
 
-        xf.sub('change', e => {
-            let value = parseFloat(e.target.value || 0);
-            if(value > minSlopeSupported && value < maxSlopeSupported) {
-                slope = value;
-            }
-            if(value >= maxSlopeSupported) {
-                slope = maxSlopeSupported - 0;
-                dom.slopeValue.value = slope;
-            }
-            if(value <= minSlopeSupported) {
-                slope = minSlopeSupported + 0;
-                dom.slopeValue.value = slope;
-            }
+        xf.sub('ui:slope-mode', e => {
             xf.dispatch('ui:slope-target', slope);
-        }, dom.slopeValue);
+        });
 
-        xf.sub('pointerup', e => {
-            let target = slope + slopeInc;
-            if(target >= maxSlopeSupported) {
-                slope = maxSlopeSupported;
-            } else if(target < minSlopeSupported) {
-                slope = minSlopeSupported;
-            } else {
-                slope = target;
-            }
-            dom.slopeValue.value = slope;
-            xf.dispatch('ui:slope-target', slope);
-        }, dom.slopeInc);
-
-        xf.sub('pointerup', e => {
-            let target = slope - slopeInc;
-            if(target >= maxSlopeSupported) {
-                slope = maxSlopeSupported;
-            } else if(target < 0) {
-                slope = 0;
-            } else {
-                slope = target;
-            }
-            dom.slopeValue.value = slope;
-            xf.dispatch('ui:slope-target', slope);
-        }, dom.slopeDec);
-
-        // xf.sub('pointerup', e => {
-        //     xf.dispatch('ui:slope-target', slope);
-        // }, dom.slopeSet);
+        NumberInput({dom: {input:  dom.slopeValue,
+                           incBtn: dom.slopeInc,
+                           decBtn: dom.slopeDec},
+                     name: 'slope',
+                     init: slope,
+                     type: 'Float',
+                     min: minSlopeSupported,
+                     max: maxSlopeSupported,
+                     inc: slopeInc,
+                     set: value => slope = value});
     }
 
     // ERG mode
     function ERG(features) {
-        let targetPwr = 100;
-        let workPwr   = 235;
-        let restPwr   = 100;
+        let targetPwr = dom.targetPower.value || 100;
+        let workPwr   = dom.workPower.value || 235;
+        let restPwr   = dom.restPower || 100;
 
         let minPowerSupported = features.power.params.min || 0;
         let maxPowerSupported = features.power.params.max || 0;
@@ -430,7 +589,9 @@ function ControlView(args) {
 
         dom.ergParams.textContent = `${minPowerSupported} to ${maxPowerSupported}`;
 
-        xf.sub('change', e => { targetPwr = parseInt(e.target.value); }, dom.targetPower);
+        xf.sub('change', e => {
+            alert(`change targetPwr`);
+            targetPwr = parseInt(e.target.value); }, dom.targetPower);
         xf.sub('change', e => { workPwr   = parseInt(e.target.value); }, dom.workPower);
         xf.sub('change', e => { restPwr   = parseInt(e.target.value); }, dom.restPower);
 
@@ -451,7 +612,16 @@ function ControlView(args) {
 }
 
 function WatchView(args) {
-    let dom = args.dom;
+    let dom =  {
+        start:   q.get('#watch-start'),
+        pause:   q.get('#watch-pause'),
+        lap:     q.get('#watch-lap'),
+        stop:    q.get('#watch-stop'),
+        save:    q.get('#activity-save'),
+        workout: q.get('#start-workout'),
+        cont:    q.get('#watch'),
+        name:    q.get('#workout-name'),
+    };
 
     xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),   dom.start);
     xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),   dom.pause);
@@ -621,6 +791,7 @@ export {
     ControllableSettingsView,
     HrbSettingsView,
     DataScreen,
+    DataBar,
     GraphHr,
     GraphPower,
     GraphWorkout,

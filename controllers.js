@@ -9,18 +9,17 @@ function DeviceController(args) {
     let hrb          = args.hrb;
     let watch        = args.watch;
 
-    xf.sub('db:targetPwr', e => {
-        let targetPwr = e.detail.data.targetPwr;
+    xf.sub('db:targetPwr', targetPwr => {
+        // let targetPwr = e.detail.data.targetPwr;
         controllable.setTargetPower(targetPwr);
     });
-    xf.sub('db:resistanceTarget', e => {
-        let resistance = e.detail.data.resistanceTarget;
-        // resistance *= 10;
+    xf.sub('db:resistanceTarget', resistanceTarget => {
+        let resistance = resistanceTarget;
         resistance = parseInt(resistance);
         controllable.setTargetResistanceLevel(resistance);
     });
-    xf.sub('db:slopeTarget', e => {
-        let slope = e.detail.data.slopeTarget;
+    xf.sub('db:slopeTarget', slopeTarget => {
+        let slope = slopeTarget;
         slope *= 100;
         slope = parseInt(slope);
         controllable.setSimulationParameters({grade: slope});
@@ -29,7 +28,28 @@ function DeviceController(args) {
     xf.sub('ui:watchPause',  e => { watch.pause();  });
     xf.sub('ui:watchResume', e => { watch.resume(); });
     xf.sub('ui:watchLap',    e => { watch.lap();    });
-    xf.sub('ui:watchStop',   e => { watch.stop();   });
+    xf.sub('ui:watchStop',   e => {
+        const stop = confirm('Confirm Stop?');
+        if(stop) {
+            watch.stop();
+        }
+    });
+
+
+    xf.sub(`session:watchRestore`, session => {
+        watch.elapsed = session.elapsed;
+        watch.lapTime = session.lapTime;
+        watch.stepTime = session.stepTime;
+
+        if(session.watchState === 'started') {
+            watch.workoutStarted = true;
+            xf.dispatch('ui:watchStart');
+        }
+        if(session.watchState === 'paused') {
+            watch.workoutStarted = true;
+        }
+
+    });
 
     xf.sub('ui:controllableSwitch', e => {
         if(controllable.device.connected) {
@@ -81,8 +101,8 @@ function Screen() {
 
 function FileController() {
 
-    xf.sub('db:workoutFile', e => {
-        let workoutFile = e.detail.data.workoutFile;
+    xf.sub('db:workoutFile', workoutFile => {
+        // let workoutFile = e.detail.data.workoutFile;
         let fileHandler = new FileHandler();
         fileHandler.readFile(workoutFile);
     });

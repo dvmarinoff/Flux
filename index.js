@@ -9,12 +9,12 @@ import { FileHandler } from './file.js';
 import { StopWatch } from './workout.js';
 import { WakeLock } from './lock.js';
 import { workouts } from './workouts/workouts.js';
-import { Storage } from './storage.js';
 import { ControllableConnectionView,
          HrbConnectionView,
          ControllableSettingsView,
          HrbSettingsView,
          DataScreen,
+         DataBar,
          GraphHr,
          GraphPower,
          GraphWorkout,
@@ -31,31 +31,33 @@ import { DeviceController,
          WorkoutController,
          Screen,
          Vibrate } from './controllers.js';
+import { IDB, Storage } from './storage.js';
 import { DataMock } from './test/mock.js';
-
 
 'use strict';
 
-function start() {
+
+async function start() {
     let hrb   = new Hrb({name: 'hrb'});
     let flux  = new Controllable({name: 'controllable'});
     let watch = new StopWatch();
     let lock  = new WakeLock();
 
-    ControllableConnectionView({dom: dom.controllableConnectionScreen});
-    HrbConnectionView({dom: dom.hrbConnectionScreen});
+    ControllableConnectionView();
+    HrbConnectionView();
 
-    ControllableConnectionView({dom: dom.controllableSettings});
-    HrbConnectionView({dom: dom.hrbSettings});
+    ControllableConnectionView();
+    HrbConnectionView();
 
-    ControllableSettingsView({dom: dom.controllableSettings, name: 'controllable'});
-    HrbSettingsView({dom: dom.hrbSettings, name: 'hrb'});
+    ControllableSettingsView({name: 'controllable'});
+    HrbSettingsView({name: 'hrb'});
 
-    DataScreen({dom: dom.datascreen});
-    GraphPower({dom: dom.graphPower});
+    DataScreen();
+    // DataBar();
+    GraphPower();
     GraphWorkout({dom: dom.graphWorkout});
 
-    WatchView({dom: dom.watch});
+    WatchView();
     ControlView({dom: dom.controls});
     LoadWorkoutView({dom: dom.file});
     WorkoutsView({dom: dom.workouts, workouts: workouts});
@@ -68,7 +70,7 @@ function start() {
     WorkoutController();
 
     Screen();
-    // Session();
+
     let storage = new Storage();
 
     xf.dispatch('app:start');

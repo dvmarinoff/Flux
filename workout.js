@@ -66,8 +66,9 @@ class StopWatch {
     }
     init() {
         let self = this;
-        xf.sub('db:workout', e => {
-            self.workout = e.detail.data.workout.intervals;
+        xf.sub('db:workout', workout => {
+            // self.workout = e.detail.data.workout.intervals;
+            self.workout = workout.intervals;
         });
     }
     start() {
@@ -143,7 +144,6 @@ class StopWatch {
         self.stepTime = stepDuration;
         self.workoutCurrentStepDuration = stepDuration;
 
-
         xf.dispatch('watch:nextWorkoutStep', s);
         xf.dispatch('watch:stepTime', stepDuration);
         xf.dispatch('watch:step');
@@ -189,6 +189,11 @@ class StopWatch {
             self.interval = setInterval(self.onTick.bind(self), 1000);
             self.started  = true;
         }
+    }
+    restore(args) {
+        let self = this;
+        self.elapsed = args.elapsed;
+        self.resume();
     }
     stop () {
         let self = this;

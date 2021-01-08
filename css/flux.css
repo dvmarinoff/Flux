@@ -211,7 +211,11 @@ body.white-theme {
 }
 .white-theme .devices {
     background-color: var(--white);
-    box-shadow: 0px 1px 1px 0px var(--black-opacity-01);
+
+    /* color: var(--white); */
+    /* background-color: var(--chrome); */
+
+    /* box-shadow: 0px 1px 1px 0px var(--black-opacity-01); */
 }
 .white-theme .menu-cont {
     background-color: var(--white);
@@ -260,6 +264,12 @@ body.white-theme {
 .white-theme #progress-active {
     background-color: var(--black-opacity-02);
 }
+.white-theme .a {
+    color: var(--gray);
+}
+.white-theme .mode.active {
+    color: var(--dark);
+}
 
 /* Dark Theme */
 body.dark-theme {
@@ -285,6 +295,9 @@ body.dark-theme {
 }
 .dark-theme .workout {
     border-bottom: 1px solid var(--white-opacity-01);
+}
+.dark-theme .mode.active {
+    color: #fff;
 }
 
 .icon-btn .icon {
@@ -361,6 +374,7 @@ body.dark-theme {
     justify-content: center;
     align-items: center;
     align-content: stretch;
+    wrap: wrap;
     z-index: 2;
 }
 .menu-cont.active {
@@ -453,8 +467,7 @@ body.dark-theme {
 }
 
 .a {
-    color: #121212;
-    text-decoration: none;
+    color: #bbb;
     text-transform: uppercase;
     cursor: pointer;
 }
@@ -515,16 +528,27 @@ body.dark-theme {
 .connection-screen {
 }
 
+/* Zoom Level */
+.zoom-level-one {
+    /* display: none; */
+}
 
-/* Data Screen */
-.data-screen {
+.zoom-level-two {
+    display: none;
+}
+
+/* Data Tiles */
+.data-tiles {
     width: 100%;
 }
 .data-tile {
     float: left;
     width: 33.3333%;
+    min-width: 30px;
     padding: 10px;
     text-align: center;
+}
+.tile-heading {
 }
 .tile-value {
     display: flex;
@@ -538,6 +562,106 @@ body.dark-theme {
     padding: 10px;
     text-align: center;
 }
+
+/* Data Bar */
+.data-bar {
+    display: flex;
+    /* display: none; */
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 10px 0px;
+    height: 150px;
+    color: var(--white);
+    /* background-color: #aaa; */
+    background-color: var(--dark);
+    /* background-color: var(--chrome); */
+    z-index: 0;
+}
+.data-bar-progress-cont {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-end;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    padding: 0;
+    /* background-color: var(--zone-gray); */
+    /* background-color: var(--zone-blue); */
+    /* background-color: var(--zone-green); */
+    /* background-color: var(--zone-yellow); */
+    /* background-color: var(--zone-orange); */
+    /* background-color: var(--zone-red); */
+    z-index: 1;
+}
+
+.data-bar-left {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    padding: 0px 0px 0px 0px;
+    z-index: 2;
+}
+.data-bar-right {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    padding: 0px 0px 0px 0px;
+    z-index: 2;
+}
+.data-bar-power {
+    /* width: 80px; */
+    /* text-align: right; */
+    text-align: center;
+    /* margin-bottom: 35px; */
+}
+.data-bar-cadence {
+    /* width: 60px; */
+    /* text-align: right; */
+    text-align: center;
+    /* margin-bottom: 35px; */
+}
+.data-bar-heading {
+    /* text-align: right; */
+    width: 100%;
+    margin: 0 0 15px 0;
+    /* font-size: 18px; */
+    font-size: 12px;
+    /* font-weight: bold; */
+    text-transform: uppercase;
+}
+.data-bar-value {
+    /* width: 80px; */
+    width: 100%;
+    text-align: right;
+    font-size: 48px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.data-bar-target-heading {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+}
+.data-bar-target-value {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
 
 
 /* Controls */
@@ -618,24 +742,25 @@ body.dark-theme {
 }
 .mode {
     padding: 0px 20px;
-    /* border: 1px solid rgba(255,255,255, 0.1); */
-    color: #aaa;
+    color: var(--gray);
+    cursor: pointer;
 }
 .mode.active {
-    color: #fff;
-    /* border-bottom: 1px solid rgba(255,255,255, 0.9); */
+    font-weight: bold;
 }
 .resistance-mode {
+    display: none;
     margin-bottom: 20px;
 }
 .slope-mode {
-    margin-bottom: 20px;
+    display: none;
+    margin-bottom: 50px;
 }
 .erg-mode {
-    margin-bottom: 20px;
+    margin-bottom: 50px;
 }
 .mode-controls {
-    margin-bottom: 20px;
+    margin-bottom: 50px;
 }
 .mode-controls header {
     margin: 0px auto 5px;
@@ -759,6 +884,7 @@ body.dark-theme {
 
 
 /* Graph */
+.graphs {}
 .graph-screen {
     position: relative;
     height: 120px;
@@ -1082,13 +1208,53 @@ body.dark-theme {
     font-weight: bold;
 }
 
+.connections {
+    margin: 30px auto;
+}
+.connections h2 {
+    text-align: center;
+}
+.connection {
+    display: flex;
+    max-width: 480px;
+    margin: 0 auto;
+    align-items: center;
+    /* justify-content: center; */
+    padding: 10px 10px;
+}
+.connection h3 {}
+.connection-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+.connection-content {}
+
 @media all and (min-width: 1800px) {
 }
 @media all and (min-width: 1600px) {
 }
 @media all and (max-width: 1250px) {
 }
-@media all and (max-width: 980px) {
+@media all and (max-width: 1024px) {
+    .control-screen {
+        height: 50px;
+        bottom: 49px;
+    }
+    .watch {
+        /* padding: 5px 0 5px; */
+        padding: 10px 5px;
+    }
+    .control-btn {
+        margin: 0 14px;
+    }
+    .menu {
+        height: 50px;
+        /* border-top: 1px solid rgba(0,0,0,.4); */
+    }
+    .tab-btn {
+        height: 50px;
+    }
 }
 @media all and (max-width: 768px) {
 }
@@ -1119,12 +1285,12 @@ body.dark-theme {
         font-size: 10px;
     }
 
-    .control-screen {
-        height: 40px;
-    }
+    /* .control-screen { */
+    /*     height: 40px; */
+    /* } */
     .watch {
         /* margin: 10px 0 14px; */
-        padding: 9px 5px;
+        /* padding: 9px 5px; */
     }
     .devices {
         padding: 10px 10px 10px 10px;

@@ -4,6 +4,7 @@ import { avgOfArray,
          sum,
          mps,
          kph,
+         rand,
          first,
          last,
          round,
@@ -12,11 +13,17 @@ import { avgOfArray,
 function DataMock(args) {
     let count = 0;
     let interval = null;
+    let power = 0;
+
+    xf.sub('db:targetPwr', pwr => {
+        power = pwr;
+    });
 
     xf.sub('watch:started', e => {
 
         interval = setInterval(function() {
-            let power    = (count % 60) < 30 ?  100 : 300;
+            // let power    = (count % 60) < 30 ?  100 : 300;
+
             let hr       = (count % 60) < 30 ?  120 : 160;
             let cadence  = (count % 60) < 30 ?   75 : 90;
             let speed    = (count % 60) < 30 ? 27.0 : 39.0;
@@ -26,13 +33,14 @@ function DataMock(args) {
                 xf.dispatch('device:hr', hr);
             }
             if(args.pwr) {
-                xf.dispatch('device:pwr',  power);
+                xf.dispatch('device:pwr',  power + rand(-10, 10));
                 xf.dispatch('device:cad',  cadence);
                 xf.dispatch('device:spd',  speed);
                 // xf.dispatch('device:dist', distance);
             }
+            console.log(`mock ${power}`);
             count += 1;
-        }, 1000);
+        }, 700);
     });
 
     xf.sub('watch:stopped', e => {

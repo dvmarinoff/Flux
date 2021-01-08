@@ -11,7 +11,7 @@
         <link rel="manifest" href="./manifest.webmanifest">
     </head>
     <body id="theme" class="dark-theme">
-        <div class="wrapper" onselectstart="return false;">
+        <div class="wrapper">
             <div class="page" id="home-page">
                 <header class="devices page-header cf">
                     <div id="controllable-connection-btn" class="switch">
@@ -23,71 +23,129 @@
                         <div class="text t2">HRM</div>
                     </div>
                 </header>
-                <div class="data-screen cf">
-                    <div class="data-tile">
-                        <h2 class="tile-heading h2">Power</h2>
-                        <div class="tile-value">
-                            <div id="power" class="data-screen-value t1">--</div>
+
+                <!-- Zoom Level 1 -->
+                <div class="zoom-level-one">
+                    <div class="data-tiles cf">
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Power</h2>
+                            <div class="tile-value">
+                                <div id="power" class="data-screen-value t1">--</div>
+                            </div>
+                        </div>
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Interval Time</h2>
+                            <div class="tile-value">
+                                <div id="interval-time" class="data-screen-value t1">--:--</div>
+                            </div>
+                        </div>
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Heart Rate</h2>
+                            <div class="tile-value">
+                                <div id="heart-rate" class="data-screen-value t1">--</div>
+                            </div>
+                        </div>
+
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Target</h2>
+                            <div class="tile-value">
+                                <div id="target-power" class="data-screen-value t1">--</div>
+                            </div>
+                        </div>
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Elapsed Time</h2>
+                            <div class="tile-value">
+                                <div id="time" class="data-screen-value t1">--:--:--</div>
+                            </div>
+                        </div>
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Cadence</h2>
+                            <div class="tile-value">
+                                <div id="cadence" class="data-screen-value t1">--</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="data-tile">
-                        <h2 class="tile-heading h2">Interval Time</h2>
-                        <div class="tile-value">
-                            <div id="interval-time" class="data-screen-value t1">--:--</div>
+                    <div class="data-tiles cf">
+                        <div class="data-tile-small">
+                            <h2 class="tile-heading h3">Speed</h2>
+                            <div class="tile-value">
+                                <div id="speed" class="data-screen-value-small t3">--</div>
+                            </div>
+                        </div>
+                        <div class="data-tile-small">
+                            <h2 class="tile-heading h3">Distance</h2>
+                            <div class="tile-value">
+                                <div id="distance" class="data-screen-value-small t3">--</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="data-tile">
-                        <h2 class="tile-heading h2">Heart Rate</h2>
-                        <div class="tile-value">
-                            <div id="heart-rate" class="data-screen-value t1">--</div>
+
+                    <div class="line"></div>
+
+                    <div class="graphs">
+                        <div class="graph-screen" id="graph-power">
+                            <h4 class="graph-heading h4">Power</h4>
+                            <!-- <div class="ftp-line"><div id="ftp-line-value" class="ftp h4">FTP</div></div> -->
+                            <div class="graph cf">
+                            </div>
                         </div>
                     </div>
-                    <div class="data-tile">
-                        <h2 class="tile-heading h2">Target</h2>
-                        <div class="tile-value">
-                            <div id="target-power" class="data-screen-value t1">--</div>
+
+                </div>
+                <!-- end Zoom Level 1 -->
+
+                <!-- Zoom Level 2 -->
+                <div class="zoom-level-two">
+                    <div id="data-bar" class="data-bar">
+                        <div id="data-bar-progress-cont" class="data-bar-progress-cont"></div>
+                        <div class="data-bar-left">
+                            <div class="data-bar-power">
+                                <h2 class="data-bar-heading">Watt</h2>
+                                <div id="data-bar-power" class="data-bar-value">--</div>
+                            </div>
+                        </div>
+                        <div class="data-bar-right">
+                            <div class="data-bar-cadence">
+                                <h2 class="data-bar-heading">RPM</h2>
+                                <div id="data-bar-cadence" class="data-bar-value">--</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="data-tile">
-                        <h2 class="tile-heading h2">Elapsed Time</h2>
-                        <div class="tile-value">
-                            <div id="time" class="data-screen-value t1">--:--:--</div>
+                    <div class="data-tiles cf">
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Target</h2>
+                            <div class="tile-value">
+                                <div id="data-bar-target-power" class="data-screen-value t1">--</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="data-tile">
-                        <h2 class="tile-heading h2">Cadence</h2>
-                        <div class="tile-value">
-                            <div id="cadence" class="data-screen-value t1">--</div>
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Interval Time</h2>
+                            <div class="tile-value">
+                                <div id="data-bar-interval-time" class="data-screen-value t1">--:--</div>
+                            </div>
                         </div>
+
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Heart Rate</h2>
+                            <div class="tile-value">
+                                <div id="data-bar-heart-rate" class="data-screen-value t1">--</div>
+                            </div>
+                        </div>
+
+                        <div class="data-tile"></div>
+
+                        <div class="data-tile">
+                            <h2 class="tile-heading h2">Elapsed Time</h2>
+                            <div class="tile-value">
+                                <div id="data-bar-time" class="data-screen-value t1">--:--:--</div>
+                            </div>
+                        </div>
+
+                        <div class="data-tile"></div>
                     </div>
                 </div>
-                <div class="data-screen cf">
-                    <div class="data-tile-small">
-                        <h2 class="tile-heading h3">Speed</h2>
-                        <div class="tile-value">
-                            <div id="speed" class="data-screen-value-small t3">--</div>
-                        </div>
-                    </div>
-                    <div class="data-tile-small">
-                        <h2 class="tile-heading h3">Distance</h2>
-                        <div class="tile-value">
-                            <div id="distance" class="data-screen-value-small t3">--</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="line"></div>
-                <div class="graphs">
-                    <div class="graph-screen" id="graph-power">
-                        <h4 class="graph-heading h4">Power</h4>
-                        <div class="ftp-line"><div id="ftp-line-value" class="ftp h4">FTP</div></div>
-                        <div class="graph cf">
-                        </div>
-                    </div>
-                    <!-- <div class="graph-screen" id="graph-hr">
-                        <h4 class="graph-heading h4">Hr</h4>
-                        <div class="graph cf"></div>
-                        </div> -->
-                </div>
+                <!-- end Zoom Level 2 -->
+
                 <div class="line"></div>
 
                 <div class="workout-graph-cont">
@@ -112,7 +170,6 @@
                         <div id="erg-mode-btn" class="mode active">ERG</div>
                         <div id="resistance-mode-btn" class="mode">Resistance</div>
                         <div id="slope-mode-btn" class="mode">Slope</div>
-                        <div id="free-mode-btn" class="mode">Free</div>
                     </div>
 
                     <div id="resistance-mode-controls" class="resistance-mode mode-controls">
@@ -123,7 +180,7 @@
                         <div id="resistance-control-btn" class="number-btn">
                             <button id="resistance-dec" class="dec btn">-</button>
                             <input  id="resistance-value" class="value input" name=""
-                                    type="number" value="0" autocomplete="no"/>
+                                    type="number" value="0" autocomplete="off" tabindex="-1"/>
                             <button id="resistance-inc" class="inc btn">+</button>
                             <!-- <button id="resistance-set" class="btn">Set</button> -->
                         </div>
@@ -137,7 +194,7 @@
                         <div id="slope-control-btn" class="number-btn">
                             <button id="slope-dec" class="dec btn">-</button>
                             <input  id="slope-value" class="value input" name=""
-                                    type="number" value="0" autocomplete="no"/>
+                                    type="number" value="0" autocomplete="off" tabindex="-1"/>
                             <button id="slope-inc" class="inc btn">+</button>
                             <!-- <button id="slope-set" class="btn">Set</button> -->
                         </div>
@@ -150,15 +207,15 @@
                         </header>
                         <div class="control-point">
                             <div class="tile cf">
-                                <input id="target-power-value" class="input" name="target" type="number" value="100"/>
+                                <input id="target-power-value" class="input" name="target" type="number" value="100" autocomplete="off" tabindex="-1"/>
                                 <button type="button" id="set-target-power" class="btn">Target</button>
                             </div>
                             <div class="tile cf">
-                                <input id="work-power-value"" class="input" name="work" type="number" value="235"/>
+                                <input id="work-power-value"" class="input" name="work" type="number" value="235" autocomplete="off" tabindex="-1"/>
                                 <button type="button" id="start-work-interval" class="btn">Work Interval</button>
                             </div>
                             <div class="tile cf">
-                                <input id="rest-power-value"" class="input" name="rest" type="number" value="100"/>
+                                <input id="rest-power-value"" class="input" name="rest" type="number" value="100" autocomplete="off" tabindex="-1"/>
                                 <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
                             </div>
                         </div>
@@ -273,9 +330,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="connections">
+                    <h2 class="h2">Connections</h2>
+                    <div class="connection">
+                        <img class="connection-icon" alt="GC" src="images/connections/garmin-connect.jpg"/>
+                        <div class="connection-content">
+                            <h3 class="h3">Garmin</h3>
+                            <a class="a t2" href="https://connect.garmin.com/modern/import-data" target="_blank">Garmin Connect Import Page</a>
+                        </div>
+                    </div>
+                </div>
             </div> <!-- page -->
 
             <div class="control-screen">
+
                 <div id="watch" class="watch cf">
                     <div id="workout-name">Free ride</div>
                     <div id="start-workout" class="control-btn">

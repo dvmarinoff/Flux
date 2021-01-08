@@ -2,13 +2,13 @@ let workouts =
 [
 { name: 'Dijon',
   type: 'VO2 Max',
-  description: '60/60s or 60 sec ON at 131% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.',
+  description: '60/60s or 60 sec ON at 121% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.',
   duration: 57,
   xml:
 `<workout_file>
     <author>Marinov</author>
     <name>Dijon</name>
-    <description>60/60s or 60 sec ON at 131% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.</description>
+    <description>60/60s or 60 sec ON at 121% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.</description>
     <sportType>bike</sportType>
     <tags>
     </tags>
@@ -20,10 +20,10 @@ let workouts =
         <SteadyState Duration="60" Power="0.63"/>
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
         <SteadyState Duration="120" Power="0.5"/>
-        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.31" OffPower="0.3"/>
-        <SteadyState Duration="300" Power="0.39"/>
-        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.31" OffPower="0.3"/>
-        <SteadyState Duration="300" Power="0.39"/>
+        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44"/>
+        <SteadyState Duration="300" Power="0.40"/>
+        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44"/>
+        <SteadyState Duration="300" Power="0.40"/>
         <Cooldown Duration="300" PowerLow="0.25" PowerHigh="0.39"/>
     </workout>
 </workout_file>
@@ -49,10 +49,10 @@ let workouts =
         <SteadyState Duration="60" Power="0.63"/>
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
         <SteadyState Duration="120" Power="0.5"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.3"/>
-        <SteadyState Duration="300" Power="0.39"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.3"/>
-        <SteadyState Duration="300" Power="0.39"/>
+        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44"/>
+        <SteadyState Duration="300" Power="0.40"/>
+        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44"/>
+        <SteadyState Duration="300" Power="0.40"/>
         <Cooldown Duration="300" PowerLow="0.25" PowerHigh="0.39"/>
     </workout>
 </workout_file>
@@ -104,13 +104,13 @@ let workouts =
         <SteadyState Duration="60" Power="0.47"/>
         <SteadyState Duration="60" Power="0.55"/>
         <SteadyState Duration="60" Power="0.63"/>
-        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
+        <IntervalsT  Repeat="2" OnDuration="30" OffDuration="30" OnPower="1.06" OffPower="0.63"/>
         <SteadyState Duration="120" Power="0.5"/>
         <SteadyState Duration="1200" Power="0.98"/>
-        <SteadyState Duration="600" Power="0.39"/>
+        <SteadyState Duration="600" Power="0.44"/>
         <SteadyState Duration="1200" Power="0.98"/>
-        <SteadyState Duration="300" Power="0.39"/>
-        <Cooldown Duration="300" PowerLow="0.25" PowerHigh="0.39"/>
+        <SteadyState Duration="300" Power="0.44"/>
+        <Cooldown Duration="300" PowerLow="0.25" PowerHigh="0.44"/>
     </workout>
 </workout_file>`
 },
@@ -130,38 +130,36 @@ let workouts =
     </tags>
     <workout>
         <Warmup Duration="300" PowerLow="0.25" PowerHigh="0.75"/>
-        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.92" OffPower="0.39"/>
-        <SteadyState Duration="180" Power="0.39"/>
-        <IntervalsT Repeat="4" OnDuration="600" OffDuration="300" OnPower="0.92" OffPower="0.39"/>
-        <Cooldown Duration="600" PowerLow="0.25" PowerHigh="0.47"/>
+        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="1.08" OffPower="0.44"/>
+        <SteadyState Duration="180" Power="0.44"/>
+        <IntervalsT Repeat="4" OnDuration="600" OffDuration="300" OnPower="0.92" OffPower="0.44"/>
+        <Cooldown Duration="600" PowerLow="0.25" PowerHigh="0.44"/>
     </workout>
 </workout_file>`
 },
-{ name: 'Maple (flat)',
+{ name: 'Honey',
   type: 'Sweet Spot',
   description: '4 times 10 min Sweet Spot intervals with 5 min recovery in between.',
   duration: 80,
   xml:
 `<workout_file>
     <author>Marinov</author>
-    <name>Maple</name>
+    <name>Honey</name>
     <description>4 times 10 min Sweet Spot intervals with 5 min recovery in between.</description>
     <sportType>bike</sportType>
     <workout>
-        <SteadyState Duration="60" Power="0.30"/>
-        <SteadyState Duration="60" Power="0.35"/>
-        <SteadyState Duration="180" Power="0.39"/>
-        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.92" OffPower="0.39"/>
-        <SteadyState Duration="180" Power="0.39"/>
-        <IntervalsT Repeat="4" OnDuration="600" OffDuration="300" OnPower="0.92" OffPower="0.39"/>
-        <SteadyState Duration="600" Power="0.39"/>
+        <Warmup Duration="300" PowerLow="0.25" PowerHigh="0.75"/>
+        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="1.08" OffPower="0.44"/>
+        <SteadyState Duration="180" Power="0.44"/>
+        <IntervalsT Repeat="3" OnDuration="900" OffDuration="300" OnPower="0.90" OffPower="0.44"/>
+        <Cooldown Duration="600" PowerLow="0.25" PowerHigh="0.44"/>
     </workout>
 </workout_file>`
 },
 { name: 'Baguette',
   type: 'Base',
   description: 'The bread and butter of Endurance training with efforts in Zone 1 and 2.',
-  duration: 120,
+  duration: 90,
   xml:
 `<workout_file>
     <author>Marinov</author>
@@ -171,21 +169,17 @@ let workouts =
     <tags>
     </tags>
     <workout>
-        <FreeRide Duration="600" FlatRoad="1"/>
-        <SteadyState Duration="600" Power="0.55"/>
-        <SteadyState Duration="300" Power="0.51"/>
-        <SteadyState Duration="600" Power="0.59"/>
-        <SteadyState Duration="300" Power="0.51"/>
+        <Warmup Duration="600" PowerLow="0.25" PowerHigh="0.63"/>
         <SteadyState Duration="600" Power="0.63"/>
-        <SteadyState Duration="300" Power="0.51"/>
-        <SteadyState Duration="600" Power="0.66"/>
-        <SteadyState Duration="300" Power="0.51"/>
+        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="600" Power="0.71"/>
+        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="600" Power="0.71"/>
+        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="600" Power="0.71"/>
+        <SteadyState Duration="300" Power="0.55"/>
         <SteadyState Duration="600" Power="0.63"/>
-        <SteadyState Duration="300" Power="0.51"/>
-        <SteadyState Duration="600" Power="0.59"/>
-        <SteadyState Duration="300" Power="0.51"/>
-        <SteadyState Duration="600" Power="0.55"/>
-        <FreeRide Duration="600" FlatRoad="1"/>
+        <Cooldown Duration="600" PowerLow="0.25" PowerHigh="0.63"/>
     </workout>
 </workout_file>`
 },
@@ -202,7 +196,7 @@ let workouts =
     <tags>
     </tags>
     <workout>
-        <FreeRide Duration="600" FlatRoad="1"/>
+        <Warmup Duration="600" PowerLow="0.25" PowerHigh="0.63"/>
         <SteadyState Duration="600" Power="0.63"/>
         <SteadyState Duration="300" Power="0.55"/>
         <SteadyState Duration="600" Power="0.67"/>
@@ -216,7 +210,7 @@ let workouts =
         <SteadyState Duration="600" Power="0.67"/>
         <SteadyState Duration="300" Power="0.55"/>
         <SteadyState Duration="600" Power="0.63"/>
-        <FreeRide Duration="600" FlatRoad="1"/>
+        <Cooldown Duration="600" PowerLow="0.25" PowerHigh="0.63"/>
     </workout>
 </workout_file>`
 },
