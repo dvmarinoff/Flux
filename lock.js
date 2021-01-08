@@ -1,3 +1,5 @@
+import { xf } from './xf.js';
+
 class WakeLock {
     constructor(args) {
         this.lock = undefined;
@@ -14,6 +16,10 @@ class WakeLock {
         self.lockScreen();
 
         document.addEventListener('visibilitychange', self.onVisibilityChange.bind(self));
+
+        window.addEventListener('beforeunload', e => {
+            xf.dispatch('lock:beforeunload');
+        });
     }
     checkVisibility() {
         let isVisible = false;
@@ -43,6 +49,7 @@ class WakeLock {
 
             lock.addEventListener('release', e => {
                 self.isLocked = false;
+                xf.dispatch('lock:release');
                 console.log(`Wake lock released.`);
             });
         }

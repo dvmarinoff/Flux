@@ -12,10 +12,13 @@ let avg    = (x, y) => (x + y) / 2;
 let last   = xs => xs[xs.length - 1];
 let first  = xs => xs[0];
 let second = xs => xs[1];
+let third  = xs => xs[2];
 let format = (x, precision = 1000) => round(x * precision) / precision;
 let mps    = kph => format(kph / 3.6);
 let kph    = mps => 3.6 * mps;
 let nextToLast = xs => xs[xs.length - 2];
+
+const rand = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1) + min);
 
 function avgOfArray(xs, prop = false) {
     if(prop !== false) {
@@ -138,7 +141,11 @@ function stringToHex(str) {
 }
 
 function hex (n) {
-    return '0x' + parseInt(n).toString(16).toUpperCase();
+    let h = parseInt(n).toString(16).toUpperCase();
+    if(h.length === 1) {
+        h = '0'+ h;
+    }
+     return '0x' + h;
 }
 
 function dataViewToString (dataview) {
@@ -174,11 +181,13 @@ export {
     mps,
     kph,
     avg,
+    rand,
     avgOfArray,
     maxOfArray,
     sum,
     first,
     second,
+    third,
     last,
     nextToLast,
     round,
@@ -195,4 +204,5 @@ export {
     valueToHeight,
     timeDiff,
     secondsToHms,
-    metersToDistance };
+    metersToDistance
+};
