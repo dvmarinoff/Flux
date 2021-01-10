@@ -1,0 +1,16 @@
+let simulationParams = {
+    riderWeight: 73,
+    bikeWeight: 7.7,
+    totalWeight: 80.7,
+    cda: 0.3451,
+    loss: 0,
+    crr: 0.005,
+    wind: 0,
+    grade: 0,
+    g: 9.8067,
+    rho: 1.2251781195947158,
+    temperature: 20,
+    elevation: 100,
+    airPressure: 1018,
+    dewPoint: 7.5,
+};

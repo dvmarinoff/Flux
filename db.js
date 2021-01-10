@@ -16,6 +16,15 @@ let db = DB({
     elapsed: 0,
     lapTime: 0,
 
+    lapIndex: 0,
+    stepIndex: 0,
+    lapDuration: 0,
+    stepDuration: 0,
+    lapIndex: 0,
+    stepIndex: 0,
+    watchState: 'stopped',
+    workoutState: 'stopped',
+
     targetPwr: 0,
     resistanceTarget: 0,
     slopeTarget: 0,
@@ -24,9 +33,7 @@ let db = DB({
     lap:     [],
     laps:    [],
     lapStartTime: Date.now(),
-    workoutIntervalIndex: 0,
     timestamp: Date.now(),
-    watchState: 'stopped',
     inProgress: false,
 
     ftp: 0,
@@ -39,31 +46,46 @@ let db = DB({
     points: [],
 
     controllableFeatures: {},
-    garminImportUrl: 'https://connect.garmin.com/modern/import-data',
 });
+
 xf.reg('device:hr',      x => db.hr  = x);
 xf.reg('device:pwr',     x => db.pwr = x);
 xf.reg('device:spd',     x => db.spd = x);
 xf.reg('device:cad',     x => db.cad = x);
 xf.reg('device:dist',    x => db.distance = x);
-xf.reg('watch:started',  x => {
-    db.lapStartTime = Date.now();
-    db.watchState = 'started';
-});
-xf.reg('watch:paused',   x => db.watchState = 'paused');
-xf.reg('watch:stopped',  x => db.watchState = 'stopped');
-xf.reg('watch:elapsed',  x => db.elapsed = x);
-xf.reg('watch:lapTime',  x => db.lapTime = x);
-xf.reg('watch:stepTime', x => db.stepTime = x);
-xf.reg('ui:target-pwr',  x => db.targetPwr = x);
+
 xf.reg('ui:ftp',         x => db.ftp = x);
-xf.reg('storage:ftp',    x => db.ftp = x);
 xf.reg('ui:weight',      x => db.weight = x);
 xf.reg('storage:weight', x => db.weight = x);
+xf.reg('storage:ftp',    x => db.ftp = x);
+
 xf.reg('ui:workoutFile', x => db.workoutFile = x);
 xf.reg('ui:workout:set', x => db.workout = db.workouts[x]);
 xf.reg('workout:add',    x => db.workouts.push(x));
+
+xf.reg('ui:target-pwr',        x => db.targetPwr = x);
+xf.reg('ui:resistance-target', x => db.resistanceTarget = x);
+xf.reg('ui:slope-target',      x => db.slopeTarget = x);
+
+
+xf.reg('workout:lapDuration',  time => db.lapDuration  = time);
+xf.reg('workout:stepDuration', time => db.stepDuration = time);
+xf.reg('workout:lapIndex',    index => db.lapIndex     = index);
+xf.reg('watch:lapTime',        time => db.lapTime      = time);
+xf.reg('watch:stepTime',       time => db.stepTime     = time);
+xf.reg('workout:stepIndex',   index => db.stepIndex    = index);
+xf.reg('workout:started', x =>  db.workoutState = 'started');
+xf.reg('workout:stopped', x =>  db.workoutState = 'stopped');
+xf.reg('workout:done',    x =>  db.workoutState = 'done');
+xf.reg('watch:started',   x => {
+    db.watchState = 'started';
+    db.lapStartTime = Date.now(); // ??
+});
+xf.reg('watch:paused',   x => db.watchState = 'paused');
+xf.reg('watch:stopped',  x => db.watchState = 'stopped');
 xf.reg('watch:elapsed',  x => {
+    console.log(`db watch:elapsed ${x}`);
+    db.elapsed = x;
     db.distance  += 1 * mps(db.spd);
     let record = { timestamp: Date.now(),
                    power:     db.pwr,
@@ -90,18 +112,17 @@ xf.reg('watch:lap', x => {
     db.lap = [];
     db.lapStartTime = timeEnd + 0;
 });
-xf.reg('watch:nextWorkoutInterval', index => {
-    db.workoutIntervalIndex = index;
-});
-xf.reg('watch:nextWorkoutStep', step => {
-    let interval  = db.workoutIntervalIndex;
-    let targetPwr = db.workout.intervals[interval].steps[step].power;
-    db.workoutStepIndex = step;
-    db.targetPwr  = targetPwr;
-});
-xf.reg('ui:resistance-target', x => db.resistanceTarget = x);
-xf.reg('ui:slope-target',      x => db.slopeTarget = x);
-xf.reg('ui:tab', i => db.tab = i );
+// xf.reg('watch:nextWorkoutInterval', index => {
+//     db.workoutIntervalIndex = index;
+// });
+// xf.reg('watch:nextWorkoutStep', step => {
+//     let interval  = db.workoutIntervalIndex;
+//     let targetPwr = db.workout.intervals[interval].steps[step].power;
+//     db.workoutStepIndex = step;
+//     db.targetPwr  = targetPwr;
+// });
+
+
 xf.reg('device:features', x => {
     console.log('controllable:features');
     db.controllableFeatures = x;
@@ -111,6 +132,7 @@ xf.sub('ui:activity:save', x => {
     let fileHandler = new FileHandler();
     fileHandler.downloadActivity(activity);
 });
+xf.reg('ui:tab', i => db.tab = i );
 
 
 // let storage = new Storage();
@@ -132,11 +154,14 @@ xf.reg('lock:release', e => {
 });
 xf.reg(`session:restore`, session => {
 
+    // Restore DB state
     for(let prop in session) {
         if (session.hasOwnProperty(prop)) {
             db[prop] = session[prop];
         }
     }
+
+    // Restore BLE Devices
     // db.controllable = session.controllable;
     // db.hrm          = session.hrm;
     console.log(session);
