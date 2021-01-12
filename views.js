@@ -106,28 +106,23 @@ function DataBar(args) {
     let ftp = 250;
 
     xf.sub('db:hr', hr => {
-        // let hr = e.detail.data.hr;
         dom.heartRate.textContent = `${hr}`;
     });
     xf.sub('db:pwr', pwr => {
-        // let pwr = e.detail.data.pwr;
         dom.power.textContent = `${pwr}`;
-        dom.progress.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${100}%"></div>`);
+        dom.progress.insertAdjacentHTML('beforeend',
+        `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${100}%"></div>`);
     });
     xf.sub('db:vspd', vspd => {
-        // let vspd = e.detail.data.vspd;
         dom.speed.textContent = `${vspd.toFixed(1)}`;
     });
     xf.sub('db:cad', cad => {
-        // let cad = e.detail.data.cad;
         dom.cadence.textContent = `${cad}`;
     });
     xf.sub('db:elapsed', elapsed => {
-        // let elapsed = e.detail.data.elapsed;
         dom.time.textContent = secondsToHms(elapsed);
     });
     xf.sub('db:lapTime', lapTime => {
-        // let lapTime = e.detail.data.lapTime;
         if(!Number.isInteger(lapTime)) {
             lapTime = 0;
         }
@@ -137,7 +132,6 @@ function DataBar(args) {
         dom.interval.textContent = secondsToHms(lapTime, true);
     });
     xf.sub('db:targetPwr', targetPwr => {
-        // dom.targetPwr.textContent = e.detail.data.targetPwr;
         dom.targetPwr.textContent = targetPwr;
     });
 }
@@ -157,15 +151,12 @@ function ControllableSettingsView(args) {
     };
 
     xf.sub('db:pwr', pwr => {
-        // let power = e.detail.data.pwr;
         dom.power.textContent = `${pwr}`;
     });
     xf.sub('db:cad', cad => {
-        // let cadence = e.detail.data.cad;
         dom.cadence.textContent = `${cad}`;
     });
     xf.sub('db:spd', spd => {
-        // let speed = e.detail.data.spd;
         dom.speed.textContent = `${spd}`;
     });
 
@@ -192,7 +183,6 @@ function HrbSettingsView(args) {
     };
 
     xf.sub('db:hr', hr => {
-        // let hr = e.detail.data.hr;
         dom.value.textContent = `${hr} bpm`;
     });
 
@@ -219,27 +209,35 @@ function GraphPower(args) {
     let intervalIndex = 0;
     let width = 1;
 
+    function matchInterval() {
+        xf.reg('db:elapsed', db => {
+            let pwr = db.pwr;
+            let h = valueToHeight(scale, pwr);
+            dom.graph.insertAdjacentHTML('beforeend',
+        `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width}px;"></div>`);
+        });
+    }
+
+    function freeRide() {
+        xf.sub('db:pwr', pwr => {
+            let h = valueToHeight(scale, pwr);
+            count += 1;
+            if(count >= size) {
+                dom.graph.removeChild(dom.graph.childNodes[0]);
+            }
+            dom.graph.insertAdjacentHTML('beforeend',
+        `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width};"></div>`);
+        });
+    }
+
+    matchInterval();
+
     xf.sub('db:ftp', x => {
         // dom.ftp.textContent = `FTP ${x}`;
         ftp = x;
     });
 
-    xf.reg('db:elapsed', db => {
-        let pwr = db.pwr;
-        let h = valueToHeight(scale, pwr);
-        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width}px;"></div>`);
-    });
-
-    // xf.sub('db:pwr', pwr => {
-    //     let h = valueToHeight(scale, pwr);
-    //     count += 1;
-    //     if(count >= size) {
-    //         dom.graph.removeChild(dom.graph.childNodes[0]);
-    //     }
-    //     dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width};"></div>`);
-    // });
-
-    xf.sub('watch:nextWorkoutInterval', index => {
+    xf.sub('db:intervalIndex', index => {
         dom.graph.innerHTML = '';
         intervalIndex = index;
         width = size / workout.intervals[intervalIndex].duration;
@@ -294,12 +292,12 @@ function GraphWorkout(args) {
         dom.steps     = document.querySelectorAll('#current-workout-graph .graph-bar');
     });
 
-    xf.reg('watch:nextWorkoutInterval', e => {
-        interval = e;
+    xf.sub('db:intervalIndex', i => {
+        interval = i;
         setProgress(interval);
     });
-    xf.reg('watch:nextWorkoutStep', e => {
-        step = e;
+    xf.sub('db:stepIndex', i => {
+        step = i;
     });
 
     xf.reg('screen:change', e => {
@@ -633,37 +631,49 @@ function WatchView(args) {
         dom.name.textContent = db.workout.name;
     });
 
-    dom.pause.style.display = 'none';
-    dom.stop.style.display  = 'none';
-    dom.save.style.display  = 'none';
-    dom.lap.style.display   = 'none';
-
-    xf.sub('watch:started', e => {
-        // dom.start.textContent = 'Pause';
+    const init = _ => {
+        dom.pause.style.display = 'none';
+        dom.stop.style.display  = 'none';
+        dom.save.style.display  = 'none';
+        dom.lap.style.display   = 'none';
+    };
+    const started = _ => {
         dom.start.style.display = 'none';
         dom.save.style.display  = 'none';
         dom.pause.style.display = 'inline-block';
         dom.lap.style.display   = 'inline-block';
-        // dom.stop.style.display  = 'none';
-        dom.stop.style.display  = 'inline-block';
-    });
-    xf.sub('watch:paused', e => {
-        // dom.start.textContent = 'Resume';
+        dom.stop.style.display  = 'none';
+        // dom.stop.style.display  = 'inline-block';
+    };
+    const paused = _ => {
         dom.pause.style.display = 'none';
         dom.start.style.display = 'inline-block';
-        // dom.stop.style.display  = 'inline-block';
-    });
-    xf.sub('watch:stopped', e => {
-        // dom.start.textContent = 'Start';
+        dom.stop.style.display  = 'inline-block';
+    };
+    const stopped = _ => {
         dom.pause.style.display   = 'none';
         dom.lap.style.display     = 'none';
         dom.stop.style.display    = 'none';
         dom.save.style.display    = 'inline-block';
         dom.workout.style.display = 'inline-block';
-        dom.start.style.display    = 'inline-block';
-    });
-    xf.sub('watch:workoutStarted', e => {
+        dom.start.style.display   = 'inline-block';
+    };
+    const workoutStarted = _ => {
         dom.workout.style.display = 'none';
+    };
+
+    init();
+
+    xf.sub('db:watchState', state => {
+        if(state === 'started') { started(); }
+        if(state === 'paused')  { paused();  }
+        if(state === 'stopped') { stopped(); }
+    });
+    xf.sub('db:workoutState', state => {
+        if(state === 'started') { workoutStarted(); }
+        if(state === 'done') {
+            console.log(`Workout done!`);
+        }
     });
 }
 
@@ -772,16 +782,7 @@ function ReconView(args) {
 
     xf.sub('db:points', e => {
         points = e.detail.data.points;
-
         console.log(points);
-
-        // dom.graph.innerHTML = ``;
-
-        // points.forEach((point, i) => {
-        //     let elevation = point.elevation;
-        //     dom.graph.insertAdjacentHTML('beforeend',
-        //                                  `<div class="elevation-bar" style="height: ${elevation/10}px; background-color: var(--zone-blue);"></div>`);
-        // });
     });
 }
 

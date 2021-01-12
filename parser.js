@@ -71,6 +71,10 @@ function warmupToInterval(step) {
     let powerDiff  = Math.round((step.powerHigh * 100) - (step.powerLow * 100));
     let powerDx    = 0.01;
     let steps      = powerDiff;
+    if(steps >= step.duration) {
+        steps = step.duration;
+        powerDx = (step.powerHigh-step.powerLow) / steps;
+    }
     let remainder  = (step.duration % steps);
     let durationDx = remainder > 0 ? remainder : step.duration / steps;
     let power      = step.powerLow;
@@ -97,9 +101,13 @@ function cooldownToInterval(step) {
     let interval  = {duration: step.duration, steps: []};
     let powerDx    = 0.01;
     let steps      = Math.round((step.powerHigh-step.powerLow) / powerDx);
+    if(steps > step.duration) {
+        steps = step.duration;
+        powerDx = (step.powerHigh-step.powerLow) / steps;
+    }
     let durationDx = Math.round(step.duration/steps);
     let power      = step.powerHigh;
-    let stepsLen   = steps + 1;
+    let stepsLen   = steps;
     for(let i = 0; i < stepsLen; i++) {
         interval.steps.push({duration: durationDx, power: power});
         power = toDecimalPoint(power - powerDx);

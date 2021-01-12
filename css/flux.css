@@ -92,12 +92,13 @@ body {
     --zone-orange: #FF663A;
     --zone-yellow: #F8C73A;
     --zone-green:  #57C057;
+    --zone-teal:   #bffff9;
     --zone-blue:   #328AFF;
     --zone-gray:   #636468;
 
     --orange-logo: #FC4C02;
-    --white-gray: #F7F7FA;
-    --red-logo: #E50914;
+    --white-gray:  #F7F7FA;
+    --red-logo:    #E50914;
     /* --zone-purple: #BDACEF; */
     /* --zone-red:    #D32020; */
     /* --zone-orange: #F98925; */
@@ -121,6 +122,7 @@ body {
 }
 .zone-three {
     background-color: var(--zone-gray);
+    /* background-color: var(--zone-teal); */
 }
 .zone-four {
     background-color: var(--zone-green);
@@ -191,6 +193,9 @@ body {
     background-color: var(--zone-orange);
 }
 .red-zone {
+    background-color: var(--zone-red);
+}
+.purple-zone {
     background-color: var(--zone-red);
 }
 

@@ -10,7 +10,6 @@ function DeviceController(args) {
     let watch        = args.watch;
 
     xf.sub('db:targetPwr', targetPwr => {
-        // let targetPwr = e.detail.data.targetPwr;
         controllable.setTargetPower(targetPwr);
     });
     xf.sub('db:resistanceTarget', resistanceTarget => {
@@ -24,31 +23,17 @@ function DeviceController(args) {
         slope = parseInt(slope);
         controllable.setSimulationParameters({grade: slope});
     });
-    xf.sub('ui:watchStart',  e => { watch.start();  });
-    xf.sub('ui:watchPause',  e => { watch.pause();  });
-    xf.sub('ui:watchResume', e => { watch.resume(); });
-    xf.sub('ui:watchLap',    e => { watch.lap();    });
-    xf.sub('ui:watchStop',   e => {
+    xf.sub('ui:workoutStart', e => { watch.startWorkout();   });
+    xf.sub('ui:watchStart',   e => { watch.start();          });
+    xf.sub('workout:restore', e => { watch.restoreWorkout(); });
+    xf.sub('ui:watchPause',   e => { watch.pause();          });
+    xf.sub('ui:watchResume',  e => { watch.resume();         });
+    xf.sub('ui:watchLap',     e => { watch.lap();            });
+    xf.sub('ui:watchStop',    e => {
         const stop = confirm('Confirm Stop?');
         if(stop) {
             watch.stop();
         }
-    });
-
-
-    xf.sub(`session:watchRestore`, session => {
-        watch.elapsed = session.elapsed;
-        watch.lapTime = session.lapTime;
-        watch.stepTime = session.stepTime;
-
-        if(session.watchState === 'started') {
-            watch.workoutStarted = true;
-            xf.dispatch('ui:watchStart');
-        }
-        if(session.watchState === 'paused') {
-            watch.workoutStarted = true;
-        }
-
     });
 
     xf.sub('ui:controllableSwitch', e => {
@@ -66,9 +51,6 @@ function DeviceController(args) {
             hrb.connect();
         }
     });
-
-    xf.sub('ui:workoutStart',  e => { watch.startWorkout();  });
-
 }
 
 function Vibrate(args) {
@@ -76,8 +58,8 @@ function Vibrate(args) {
     let vibrate = args.vibrate;
     let long = args.long;
 
-    xf.reg('db:lapTime', e => {
-        lapTime = e.lapTime;
+    xf.reg('db:lapTime', time => {
+        lapTime = time;
 
         if(vibrate) {
             if(lapTime === 3 && long) {
@@ -102,7 +84,6 @@ function Screen() {
 function FileController() {
 
     xf.sub('db:workoutFile', workoutFile => {
-        // let workoutFile = e.detail.data.workoutFile;
         let fileHandler = new FileHandler();
         fileHandler.readFile(workoutFile);
     });
@@ -115,8 +96,8 @@ function WorkoutController() {
 
     xf.reg('db:ftp', e => {
         ftp = e.ftp;
-        xf.dispatch('workouts:init', workouts);
-        xf.dispatch('ui:workout:set', 0);
+        xf.dispatch('workouts:init', workouts); // ??
+        xf.dispatch('ui:workout:set', 0);       // ??
     });
 
     xf.reg('file:upload:workout', e => {
@@ -163,9 +144,6 @@ function WorkoutController() {
             index += 1;
         });
     });
-
-    //Set defaults and init the build in collection:
-    // xf.dispatch('ui:ftp', 256);
 }
 
 export { DeviceController, FileController, WorkoutController, Screen, Vibrate };

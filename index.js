@@ -4,7 +4,7 @@ import { xf, DB } from './xf.js';
 import { Hrb } from './ble/hrb.js';
 import { Controllable } from './ble/controllable.js';
 import { FileHandler } from './file.js';
-import { StopWatch } from './workout.js';
+import { Watch } from './watch.js';
 import { WakeLock } from './lock.js';
 import { workouts } from './workouts/workouts.js';
 import { ControllableConnectionView,
@@ -38,7 +38,8 @@ import { DataMock } from './test/mock.js';
 async function start() {
     let hrb   = new Hrb({name: 'hrb'});
     let flux  = new Controllable({name: 'controllable'});
-    let watch = new StopWatch();
+    // let watch = new StopWatch();
+    let watch = new Watch();
     let lock  = new WakeLock();
 
     ControllableConnectionView();
