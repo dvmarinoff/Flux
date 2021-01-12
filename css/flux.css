@@ -121,8 +121,8 @@ body {
     background-color: var(--zone-blue);
 }
 .zone-three {
-    /* background-color: var(--zone-gray); */
-    background-color: var(--zone-teal);
+    background-color: var(--zone-gray);
+    /* background-color: var(--zone-teal); */
 }
 .zone-four {
     background-color: var(--zone-green);

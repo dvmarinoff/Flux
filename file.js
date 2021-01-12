@@ -52,7 +52,7 @@ class FileHandler {
         let blob = new Blob([activity], {type: 'application/octet-stream'});
         let date = new Date();
         let fileDate =
-            `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}-${date.getHours()}${date.getMinutes()}`;
+            `workout-${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}-${date.getHours()}-${date.getMinutes()}`;
 
         self.saveFile()(blob,`ex${fileDate}.fit`);
     }
