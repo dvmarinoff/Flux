@@ -1,36 +1,17 @@
 import 'regenerator-runtime/runtime';
 
 import { db } from './db.js';
-import { dom } from './dom.js';
 import { xf, DB } from './xf.js';
-import { Hrb } from './ble/hrb.js';
 import { Controllable } from './ble/controllable.js';
-import { FileHandler } from './file.js';
+import { Hrb } from './ble/hrb.js';
 import { Watch } from './watch.js';
 import { WakeLock } from './lock.js';
-import { workouts } from './workouts/workouts.js';
-import { ControllableConnectionView,
-         HrbConnectionView,
-         ControllableSettingsView,
-         HrbSettingsView,
-         DataScreen,
-         DataBar,
-         GraphHr,
-         GraphPower,
-         GraphWorkout,
-         ControlView,
-         WatchView,
-         LoadWorkoutView,
-         WorkoutsView,
-         ActivityView,
-         NavigationWidget,
-         SettingsView,
-       } from './views.js';
+import { Views } from './views.js';
 import { DeviceController,
          FileController,
          WorkoutController,
-         Screen,
          Vibrate } from './controllers.js';
+import { FileHandler } from './file.js';
 import { IDB, Storage } from './storage.js';
 import { DataMock } from './test/mock.js';
 
@@ -40,37 +21,14 @@ import { DataMock } from './test/mock.js';
 async function start() {
     let hrb   = new Hrb({name: 'hrb'});
     let flux  = new Controllable({name: 'controllable'});
-    // let watch = new StopWatch();
     let watch = new Watch();
     let lock  = new WakeLock();
 
-    ControllableConnectionView();
-    HrbConnectionView();
+    Views();
 
-    ControllableConnectionView();
-    HrbConnectionView();
-
-    ControllableSettingsView({name: 'controllable'});
-    HrbSettingsView({name: 'hrb'});
-
-    DataScreen();
-    // DataBar();
-    GraphPower();
-    GraphWorkout({dom: dom.graphWorkout});
-
-    WatchView();
-    ControlView({dom: dom.controls});
-    LoadWorkoutView({dom: dom.file});
-    WorkoutsView({dom: dom.workouts, workouts: workouts});
-    ActivityView({dom: dom.activity});
-    NavigationWidget({dom: dom.navigation});
-    SettingsView({dom: dom.settings});
-
-    DeviceController({controllable: flux, watch: watch, hrb: hrb});
     FileController();
     WorkoutController();
-
-    Screen();
+    DeviceController({controllable: flux, watch: watch, hrb: hrb});
 
     let storage = new Storage();
 

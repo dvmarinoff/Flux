@@ -49,7 +49,7 @@
                         <div class="data-tile">
                             <h2 class="tile-heading h2">Target</h2>
                             <div class="tile-value">
-                                <div id="target-power" class="data-screen-value t1">--</div>
+                                <div id="power-target" class="data-screen-value t1">--</div>
                             </div>
                         </div>
                         <div class="data-tile">
@@ -115,7 +115,7 @@
                         <div class="data-tile">
                             <h2 class="tile-heading h2">Target</h2>
                             <div class="tile-value">
-                                <div id="data-bar-target-power" class="data-screen-value t1">--</div>
+                                <div id="data-bar-power-target" class="data-screen-value t1">--</div>
                             </div>
                         </div>
                         <div class="data-tile">
@@ -150,16 +150,6 @@
 
                 <div class="workout-graph-cont">
                     <h4 id="current-workout-name" class="graph-heading h4"></h4>
-                    <!-- <div id="workout-start-btn-cont">
-                         <div id="start-workout-graph" class="">
-                         <svg class="control-icon" xmlns="http://www.w3.org/2000/svg"
-                         height="34" viewBox="0 0 24 24" width="34">
-                         <path  id="path" d="M0 0h24v24H0V0z" fill="none"/>
-                         <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
-                         10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                         </svg>
-                         </div>
-                         </div> -->
                     <div id="current-workout-graph" class="workout-graph"></div>
                 </div>
 
@@ -182,7 +172,6 @@
                             <input  id="resistance-value" class="value input" name=""
                                     type="number" value="0" autocomplete="off" tabindex="-1"/>
                             <button id="resistance-inc" class="inc btn">+</button>
-                            <!-- <button id="resistance-set" class="btn">Set</button> -->
                         </div>
                     </div>
 
@@ -196,37 +185,22 @@
                             <input  id="slope-value" class="value input" name=""
                                     type="number" value="0" autocomplete="off" tabindex="-1"/>
                             <button id="slope-inc" class="inc btn">+</button>
-                            <!-- <button id="slope-set" class="btn">Set</button> -->
                         </div>
                     </div>
 
-                    <div id="erg-mode-controls" class="erg-mode mode-controlse">
+                    <div id="erg-mode-controls" class="erg-mode mode-controls">
                         <header>
                             <div class="h3">Power</div>
                             <div id="erg-mode-params" class="t4">0 to 0 W</div>
                         </header>
-                        <div class="control-point">
-                            <div class="tile cf">
-                                <input id="target-power-value" class="input" name="target" type="number" value="100" autocomplete="off" tabindex="-1"/>
-                                <button type="button" id="set-target-power" class="btn">Target</button>
-                            </div>
-                            <div class="tile cf">
-                                <input id="work-power-value"" class="input" name="work" type="number" value="235" autocomplete="off" tabindex="-1"/>
-                                <button type="button" id="start-work-interval" class="btn">Work Interval</button>
-                            </div>
-                            <div class="tile cf">
-                                <input id="rest-power-value"" class="input" name="rest" type="number" value="100" autocomplete="off" tabindex="-1"/>
-                                <button type="button" id="start-rest-interval" class="btn">Rest Interval</button>
-                            </div>
+                        <div id="power-control-btn" class="number-btn">
+                            <button id="power-dec" class="dec btn">-</button>
+                            <input  id="power-target-value" class="value input" name=""
+                                    type="number" value="0" autocomplete="off" tabindex="-1"/>
+                            <button id="power-inc" class="inc btn">+</button>
                         </div>
                     </div>
                 </div> <!-- controls -->
-                <!-- <div id="recon-cont">
-                     <h2 class="h3">Race Recon</h2>
-                     <div id="recon-graph" class="recon-graph-cont">
-                     <div class="graph"></div>
-                     </div>
-                     </div> -->
             </div> <!-- page -->
             <div class="page" id="workouts-page">
                 <div class="workouts-list" id="workouts">
@@ -263,11 +237,6 @@
                         <input id="weight-value" class="settings-tile-input" name="weight-value" type="text" value="--"/>
                         <div id="weight-btn" class="settings-tile-btn">Set</div>
                     </div>
-                    <!-- <div id="max-hr-settings" class="settings-tile">
-                         <label for="max-hr-value" class="settings-tile-label">Max HR</label>
-                         <input id="max-hr-value" class="settings-tile-input" name="max-hr-value" type="text" value="198"/>
-                         <div id="ftp-btn" class="settings-tile-btn">Set</div>
-                         </div> -->
                 </div>
 
                 <div class="row border">

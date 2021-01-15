@@ -19,17 +19,15 @@ class Watch {
     }
     init() {
         let self = this;
-        xf.sub('db:workout',    workout => {
-            console.log(workout.intervals);
-            self.intervals = workout.intervals; });
-        xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed; });
-        xf.sub('db:lapTime',          time => { self.lapTime       = time;    });
-        xf.sub('db:stepTime',         time => { self.stepTime      = time;    });
-        xf.sub('db:intervalDuration', time => { self.lapDuration   = time;    });
-        xf.sub('db:stepDuration',     time => { self.stepDuration  = time;    });
-        xf.sub('db:intervalIndex',   index => { self.intervalIndex = index;   });
-        xf.sub('db:stepIndex',       index => { self.stepIndex     = index;   });
-        xf.sub('db:watchState',      state => { self.state         = state;   });
+        xf.sub('db:workout',       workout => { self.intervals     = workout.intervals; });
+        xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed;           });
+        xf.sub('db:lapTime',          time => { self.lapTime       = time;              });
+        xf.sub('db:stepTime',         time => { self.stepTime      = time;              });
+        xf.sub('db:intervalDuration', time => { self.lapDuration   = time;              });
+        xf.sub('db:stepDuration',     time => { self.stepDuration  = time;              });
+        xf.sub('db:intervalIndex',   index => { self.intervalIndex = index;             });
+        xf.sub('db:stepIndex',       index => { self.stepIndex     = index;             });
+        xf.sub('db:watchState',      state => { self.state         = state;             });
         xf.sub('db:workoutState',    state => {
             self.stateWorkout = state;
 
@@ -46,7 +44,7 @@ class Watch {
     isWorkoutDone()    { return this.stateWorkout === 'done';    };
     start() {
         let self = this;
-        if(self.isStarted()) {
+        if(self.isStarted() && !self.isWorkoutStarted()) {
             self.pause();
         } else {
             self.timer = setInterval(self.onTick.bind(self), 1000);
@@ -74,8 +72,13 @@ class Watch {
     }
     restoreWorkout() {
         let self = this;
-        xf.dispatch('workout:started');
-        self.start();
+
+        if(self.isWorkoutStarted()) {
+            xf.dispatch('workout:started');
+        }
+        if(self.isStarted()) {
+            self.start();
+        }
     }
     resume() {
         let self = this;

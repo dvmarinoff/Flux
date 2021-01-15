@@ -18,7 +18,8 @@ let mps    = kph => format(kph / 3.6);
 let kph    = mps => 3.6 * mps;
 let nextToLast = xs => xs[xs.length - 2];
 
-const rand = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1) + min);
+const digits  = n => Math.log(n) * Math.LOG10E + 1 | 0;
+const rand    = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1) + min);
 
 function avgOfArray(xs, prop = false) {
     if(prop !== false) {
@@ -44,6 +45,25 @@ function sum(xs, prop = false) {
     }
 };
 
+function parseNumber(n, type = 'Int') {
+    let value = 0;
+    if(type === 'Int') {
+        value = parseInt(n || 0);
+    } else {
+        value = parseFloat(n || 0);
+    }
+    return value;
+};
+
+function fixInRange(target, min, max) {
+    if(target >= max) {
+        return max;
+    } else if(target < min) {
+        return min;
+    } else {
+        return target;
+    }
+};
 
 function powerToZone(value, ftp = 256) {
     let name = 'one';
@@ -86,6 +106,15 @@ function hrToColor(value) {
         color = 'red';
     }
     return color;
+}
+
+function dateToDashString(date) {
+    const day    = (date.getDate()).toString().padStart(2, '0');
+    const month  = (date.getMonth()+1).toString().padStart(2, '0');
+    const year   = date.getFullYear().toString();
+    const hour   = (date.getHours()).toString().padStart(2, '0');
+    const minute = (date.getMinutes()).toString().padStart(2, '0');
+    return `${day}-${month}-${year}-at-${hour}-${minute}h`;
 }
 
 function timeDiff(timestamp1, timestamp2) {
@@ -162,6 +191,7 @@ function dataViewToString (dataview) {
     return str;
 }
 
+
 const getBitField = (field, bit) => (field >> bit) & 1;
 
 function toBool (n) {
@@ -182,9 +212,12 @@ export {
     kph,
     avg,
     rand,
+    digits,
     avgOfArray,
     maxOfArray,
     sum,
+    parseNumber,
+    fixInRange,
     first,
     second,
     third,
@@ -202,6 +235,7 @@ export {
     powerToZone,
     hrToColor,
     valueToHeight,
+    dateToDashString,
     timeDiff,
     secondsToHms,
     metersToDistance

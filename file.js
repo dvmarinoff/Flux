@@ -1,3 +1,4 @@
+import { dateToDashString } from './functions.js';
 import { xf } from './xf.js';
 
 class FileHandler {
@@ -21,7 +22,7 @@ class FileHandler {
         self.unsupportedFormat();
     }
     unsupporedFormat() {
-        console.warn(`.fit files and other binary formats are not yet supported!`);
+        console.warn(`.fit workout files and other binary formats are not yet supported!`);
     }
     readFile(file) {
         let self = this;
@@ -47,15 +48,20 @@ class FileHandler {
             window.URL.revokeObjectURL(url);
         };
     };
+
     downloadActivity(activity) {
         let self = this;
         let blob = new Blob([activity], {type: 'application/octet-stream'});
-        let date = new Date();
-        let fileDate =
-            `workout-${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}-${date.getHours()}-${date.getMinutes()}`;
 
-        self.saveFile()(blob,`ex${fileDate}.fit`);
+        self.saveFile()(blob, WorkoutFileName());
+        xf.dispatch('file:download:activity');
     }
 }
 
-export { FileHandler };
+function WorkoutFileName () {
+    let now  = new Date();
+    return `workout-${dateToDashString(now)}.fit`;
+}
+
+
+export { FileHandler, WorkoutFileName };

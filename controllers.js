@@ -9,8 +9,8 @@ function DeviceController(args) {
     let hrb          = args.hrb;
     let watch        = args.watch;
 
-    xf.sub('db:targetPwr', targetPwr => {
-        controllable.setTargetPower(targetPwr);
+    xf.sub('db:powerTarget', power => {
+        controllable.setTargetPower(power);
     });
     xf.sub('db:resistanceTarget', resistanceTarget => {
         let resistance = resistanceTarget;
@@ -58,7 +58,7 @@ function Vibrate(args) {
     let vibrate = args.vibrate;
     let long = args.long;
 
-    xf.reg('db:lapTime', time => {
+    xf.sub('db:lapTime', time => {
         lapTime = time;
 
         if(vibrate) {
@@ -69,15 +69,6 @@ function Vibrate(args) {
                 window.navigator.vibrate([250]);
             }
         }
-    });
-}
-
-function Screen() {
-    window.addEventListener('orientationchange', e => {
-        xf.dispatch('screen:change', e.target);
-    });
-    window.addEventListener('resize', e => {
-        xf.dispatch('screen:change', e.target);
     });
 }
 
@@ -146,4 +137,4 @@ function WorkoutController() {
     });
 }
 
-export { DeviceController, FileController, WorkoutController, Screen, Vibrate };
+export { DeviceController, FileController, WorkoutController, Vibrate };

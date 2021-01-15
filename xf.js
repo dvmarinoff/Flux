@@ -11,11 +11,12 @@ function reg (name, handler) {
 };
 function sub(name, handler, el = false) {
     if(el) {
-        el.addEventListener(name, e => handler(e));
+        el.addEventListener(name, e => {
+            handler(e);
+        });
     } else {
         document.addEventListener(name, e => {
             dbSource(name) ? handler(e.detail.data[evtProp(name)]) : handler(e.detail.data) ;
-            // handler(e);
         });
     }
 };

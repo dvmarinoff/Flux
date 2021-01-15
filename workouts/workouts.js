@@ -1,25 +1,25 @@
 let workouts =
 [
-// { name: 'Software Test',
-//   type: 'Debug',
-//   description: 'Software Test',
-//   duration: 60,
-//   xml:
-//       `<workout_file>
-//     <author>Marinov</author>
-//     <name>Software Test</name>
-//     <description>Software Test</description>
-//     <sporttype>bike</sporttype>
-//     <tags></tags>
-//     <workout>
-//         <Warmup Duration="30" PowerLow="0.30" PowerHigh="0.6"/>
-//         <SteadyState Duration="10" Power="0.88"/>
-//         <SteadyState Duration="10" Power="1.20"/>
-//         <IntervalsT Repeat="2" OnDuration="10" OffDuration="10" OnPower="0.95" OffPower="0.6"/>
-//         <Cooldown Duration="20" PowerLow="0.30" PowerHigh="0.60"/>
-//     </workout>
-// </workout_file>`
-// },
+{ name: 'Software Test',
+  type: 'Debug',
+  description: 'Software Test',
+  duration: 60,
+  xml:
+      `<workout_file>
+    <author>Marinov</author>
+    <name>Software Test</name>
+    <description>Software Test</description>
+    <sporttype>bike</sporttype>
+    <tags></tags>
+    <workout>
+        <Warmup Duration="30" PowerLow="0.30" PowerHigh="0.6"/>
+        <SteadyState Duration="10" Power="0.88"/>
+        <SteadyState Duration="10" Power="1.20"/>
+        <IntervalsT Repeat="2" OnDuration="10" OffDuration="10" OnPower="0.95" OffPower="0.6"/>
+        <Cooldown Duration="20" PowerLow="0.30" PowerHigh="0.60"/>
+    </workout>
+</workout_file>`
+},
 { name: 'Dijon',
   type: 'VO2 Max',
   description: '60/60s or 60 sec ON at 121% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.',

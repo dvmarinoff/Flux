@@ -23,8 +23,8 @@ class Session {
               self.clear(self.idb);
           }
         }
-        console.log(`sessions`);
-        console.log(sessions);
+        console.log(`session restore: `);
+        console.log(session);
     }
     async backup(idb, session) {
         let self = this;
