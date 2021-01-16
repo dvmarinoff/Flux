@@ -82,7 +82,7 @@ xf.reg('workout:add',    (x, db) => db.workouts.push(x));
 // >> watch.js
 // watch end
 
-xf.sub('ui:activity:save', (x, db) => {
+xf.reg('ui:activity:save', (x, db) => {
     let activity   = Encode({data: db.records, laps: db.laps});
     let fileHandler = new FileHandler();
     fileHandler.downloadActivity(activity);
