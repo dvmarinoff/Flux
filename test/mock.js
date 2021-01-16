@@ -1,4 +1,4 @@
-import { xf, DB } from '../xf.js';
+import { xf } from '../xf.js';
 import { avgOfArray,
          maxOfArray,
          sum,
