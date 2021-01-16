@@ -5,15 +5,12 @@ import { avgOfArray,
          powerToZone,
          valueToHeight,
          secondsToHms,
-         metersToDistance } from './functions.js';
+         metersToDistance,
+         parseNumber,
+         fixInRange } from './functions.js';
 import { parseZwo, intervalsToGraph } from './parser.js';
 
-function ControllableConnectionView(args) {
-    let dom = {
-        switchBtn: q.get('#controllable-connection-btn'),
-        indicator: q.get('#controllable-connection-btn .indicator'),
-    };
-
+function ControllableConnectionView(dom) {
     xf.sub('pointerup', e => xf.dispatch('ui:controllableSwitch'), dom.switchBtn);
 
     xf.sub('controllable:connected', e => {
@@ -27,12 +24,7 @@ function ControllableConnectionView(args) {
     });
 }
 
-function HrbConnectionView(args) {
-    let dom = {
-        switchBtn: q.get('#hrb-connection-btn'),
-        indicator: q.get('#hrb-connection-btn .indicator'),
-    };
-
+function HrbConnectionView(dom) {
     xf.sub('pointerup', e => xf.dispatch('ui:hrbSwitch'), dom.switchBtn);
 
     xf.sub('hrb:connected', e => {
@@ -46,94 +38,31 @@ function HrbConnectionView(args) {
     });
 }
 
-function DataScreen(args) {
+function ConnectionControlsView() {
     let dom = {
-        time:      q.get('#time'),
-        interval:  q.get('#interval-time'),
-        targetPwr: q.get('#target-power'),
-        power:     q.get('#power'),
-        cadence:   q.get('#cadence'),
-        speed:     q.get('#speed'),
-        distance:  q.get('#distance'),
-        heartRate: q.get('#heart-rate')
+        controllableHome: {
+            switchBtn: q.get('#controllable-connection-btn'),
+            indicator: q.get('#controllable-connection-btn .indicator'),
+        },
+        hrbHome: {
+            switchBtn: q.get('#hrb-connection-btn'),
+            indicator: q.get('#hrb-connection-btn .indicator'),
+        },
+        controllableSettings: {
+            switchBtn: q.get('#controllable-settings-btn'),
+            indicator: q.get('#controllable-settings-btn .indicator'),
+        },
+        hrbSettings: {
+            switchBtn: q.get('#hrb-settings-btn'),
+            indicator: q.get('#hrb-settings-btn .indicator'),
+        }
     };
 
-    xf.sub('db:hr', hr => {
-        dom.heartRate.textContent = `${hr}`;
-    });
-    xf.sub('db:pwr', pwr => {
-        dom.power.textContent = `${pwr}`;
-    });
-    xf.sub('db:distance', distance => {
-        dom.distance.textContent = `${metersToDistance(distance)}`;
-    });
-    xf.sub('db:vspd', vspd => {
-        dom.speed.textContent = `${vspd.toFixed(1)}`;
-    });
-    xf.sub('db:spd', spd => {
-        dom.speed.textContent = `${spd.toFixed(1)}`;
-    });
-    xf.sub('db:cad', cad => {
-        dom.cadence.textContent = `${cad}`;
-    });
-    xf.sub('db:elapsed', elapsed => {
-        dom.time.textContent = secondsToHms(elapsed);
-    });
-    xf.sub('db:lapTime', lapTime => {
-        if(!Number.isInteger(lapTime)) {
-            lapTime = 0;
-        }
-        if(lapTime < 0) {
-            lapTime = 0;
-        }
-        dom.interval.textContent = secondsToHms(lapTime, true);
-    });
-    xf.sub('db:targetPwr', targetPwr => {
-        dom.targetPwr.textContent = targetPwr;
-    });
-}
+    ControllableConnectionView(dom.controllableHome);
+    HrbConnectionView(dom.hrbHome);
 
-function DataBar(args) {
-    let dom = {
-        time:      q.get('#data-bar-time'),
-        interval:  q.get('#data-bar-interval-time'),
-        targetPwr: q.get('#data-bar-target-power'),
-        power:     q.get('#data-bar-power'),
-        cadence:   q.get('#data-bar-cadence'),
-        heartRate: q.get('#data-bar-heart-rate'),
-        progress:  q.get('#data-bar-progress-cont'),
-    };
-    let ftp = 250;
-
-    xf.sub('db:hr', hr => {
-        dom.heartRate.textContent = `${hr}`;
-    });
-    xf.sub('db:pwr', pwr => {
-        dom.power.textContent = `${pwr}`;
-        dom.progress.insertAdjacentHTML('beforeend',
-        `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${100}%"></div>`);
-    });
-    xf.sub('db:vspd', vspd => {
-        dom.speed.textContent = `${vspd.toFixed(1)}`;
-    });
-    xf.sub('db:cad', cad => {
-        dom.cadence.textContent = `${cad}`;
-    });
-    xf.sub('db:elapsed', elapsed => {
-        dom.time.textContent = secondsToHms(elapsed);
-    });
-    xf.sub('db:lapTime', lapTime => {
-        if(!Number.isInteger(lapTime)) {
-            lapTime = 0;
-        }
-        if(lapTime < 0) {
-            lapTime = 0;
-        }
-        dom.interval.textContent = secondsToHms(lapTime, true);
-    });
-    xf.sub('db:targetPwr', targetPwr => {
-        dom.targetPwr.textContent = targetPwr;
-    });
+    ControllableConnectionView(dom.controllableSettings);
+    HrbConnectionView(dom.hrbSettings);
 }
 
 function ControllableSettingsView(args) {
@@ -195,6 +124,53 @@ function HrbSettingsView(args) {
     });
 }
 
+function DataScreen(args) {
+    let dom = {
+        time:        q.get('#time'),
+        interval:    q.get('#interval-time'),
+        powerTarget: q.get('#power-target'),
+        power:       q.get('#power'),
+        cadence:     q.get('#cadence'),
+        speed:       q.get('#speed'),
+        distance:    q.get('#distance'),
+        heartRate:   q.get('#heart-rate')
+    };
+
+    xf.sub('db:hr', hr => {
+        dom.heartRate.textContent = `${hr}`;
+    });
+    xf.sub('db:pwr', pwr => {
+        dom.power.textContent = `${pwr}`;
+    });
+    xf.sub('db:distance', distance => {
+        dom.distance.textContent = `${metersToDistance(distance)}`;
+    });
+    xf.sub('db:vspd', vspd => {
+        dom.speed.textContent = `${vspd.toFixed(1)}`;
+    });
+    xf.sub('db:spd', spd => {
+        dom.speed.textContent = `${spd.toFixed(1)}`;
+    });
+    xf.sub('db:cad', cad => {
+        dom.cadence.textContent = `${cad}`;
+    });
+    xf.sub('db:elapsed', elapsed => {
+        dom.time.textContent = secondsToHms(elapsed);
+    });
+    xf.sub('db:lapTime', lapTime => {
+        if(!Number.isInteger(lapTime)) {
+            lapTime = 0;
+        }
+        if(lapTime < 0) {
+            lapTime = 0;
+        }
+        dom.interval.textContent = secondsToHms(lapTime, true);
+    });
+    xf.sub('db:powerTarget', power => {
+        dom.powerTarget.textContent = power;
+    });
+}
+
 function GraphPower(args) {
     let dom = {
         cont:  q.get('#graph-power'),
@@ -248,25 +224,14 @@ function GraphPower(args) {
     });
 }
 
-function GraphHr(args) {
-    let dom = args.dom;
-    let count = 0;
-    let scale = 200;
-    let size = dom.cont.getBoundingClientRect().width;
-    xf.sub('db:hr', hr => {
-        // let hr = e.detail.data.hr;
-        let h = valueToHeight(scale, hr);
-        count += 1;
-        if(count >= size) {
-            // dom.graph.style.left = `-${count}px`; // shift and keep
-            dom.graph.removeChild(dom.graph.childNodes[0]); // shift and replace
-        }
-        dom.graph.insertAdjacentHTML('beforeend', `<div class="graph-bar ${hrToColor(hr).name}-zone" style="height: ${h}%"></div>`);
-    });
-}
+function GraphWorkout() {
+    let dom = {
+        name:      q.get('#current-workout-name'),
+        graph:     q.get('#current-workout-graph'),
+        intervals: [],
+        steps:     [],
+    };
 
-function GraphWorkout(args) {
-    let dom      = args.dom;
     let interval = 0;
     let step     = 0;
     let index    = 0;
@@ -278,7 +243,6 @@ function GraphWorkout(args) {
 
     xf.reg('db:workout', e => {
         let workout = e.workout;
-        // dom.name.textContent = workout.name;
 
         dom.graph.innerHTML = ``;
         dom.graph.insertAdjacentHTML('beforeend',
@@ -290,6 +254,8 @@ function GraphWorkout(args) {
         dom.active    = document.querySelector('#progress-active');
         dom.intervals = document.querySelectorAll('#current-workout-graph .graph-interval');
         dom.steps     = document.querySelectorAll('#current-workout-graph .graph-bar');
+
+        setProgress(interval);
     });
 
     xf.sub('db:intervalIndex', i => {
@@ -299,42 +265,26 @@ function GraphWorkout(args) {
     xf.sub('db:stepIndex', i => {
         step = i;
     });
-
     xf.reg('screen:change', e => {
         setProgress(interval);
     });
 }
 
-function NavigationWidget(args) {
-    let dom = args.dom;
-    let i   = 1;
+function NavigationWidget() {
+    let dom = {
+        menu:         q.get('.menu-cont'),
+        tabBtns:      q.getAll('.menu .tab-btn'),
+        pages:        q.getAll('.page'),
+        homeBtn:      q.get('#home-tab-btn'),
+        settingsBtn:  q.get('#settings-tab-btn'),
+        workoutsBtn:  q.get('#workouts-tab-btn'),
+        homePage:     q.get('#home-page'),
+        settingsPage: q.get('#settings-page'),
+        workoutsPage: q.get('#workouts-page'),
+        controls:     q.get('.control-screen'),
+    };
 
-    xf.sub('pointerup', e => {
-        e.stopPropagation();
-        e.preventDefault();
-        e.stopImmediatePropagation();
-
-        i = dom.homeBtn.getAttribute('data-index');
-        dom.homePage.style.display     = 'block';
-        dom.settingsPage.style.display = 'none';
-        dom.workoutsPage.style.display = 'none';
-        dom.controls.style.display     = 'block';
-
-        dom.settingsBtn.classList.remove('active');
-        dom.homeBtn.classList.add('active');
-        dom.workoutsBtn.classList.remove('active');
-
-        dom.menu.classList.remove('active');
-
-        xf.dispatch('ui:tab', i);
-    }, dom.homeBtn);
-
-    xf.sub('pointerup', e => {
-        e.stopPropagation();
-        e.preventDefault();
-        e.stopImmediatePropagation();
-
-        i = dom.settingsBtn.getAttribute('data-index');
+    function uiSettingsPage(dom) {
         dom.settingsPage.style.display = 'block';
         dom.homePage.style.display     = 'none';
         dom.workoutsPage.style.display = 'none';
@@ -345,16 +295,20 @@ function NavigationWidget(args) {
         dom.workoutsBtn.classList.remove('active');
 
         dom.menu.classList.add('active');
+    }
+    function uiHomePage(dom) {
+        dom.homePage.style.display     = 'block';
+        dom.settingsPage.style.display = 'none';
+        dom.workoutsPage.style.display = 'none';
+        dom.controls.style.display     = 'block';
 
-        xf.dispatch('ui:tab', i);
-    }, dom.settingsBtn);
+        dom.settingsBtn.classList.remove('active');
+        dom.homeBtn.classList.add('active');
+        dom.workoutsBtn.classList.remove('active');
 
-    xf.sub('pointerup', e => {
-        e.stopPropagation();
-        e.preventDefault();
-        e.stopImmediatePropagation();
-
-        i = dom.workoutsBtn.getAttribute('data-index');
+        dom.menu.classList.remove('active');
+    }
+    function uiWorkoutsPage(dom) {
         dom.workoutsPage.style.display = 'block';
         dom.homePage.style.display     = 'none';
         dom.settingsPage.style.display = 'none';
@@ -365,28 +319,54 @@ function NavigationWidget(args) {
         dom.workoutsBtn.classList.add('active');
 
         dom.menu.classList.remove('active');
+    }
 
-        xf.dispatch('ui:tab', i);
+    xf.sub('pointerup', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        uiHomePage(dom);
+    }, dom.homeBtn);
+
+    xf.sub('pointerup', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        uiSettingsPage(dom);
+    }, dom.settingsBtn);
+
+    xf.sub('pointerup', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        uiWorkoutsPage(dom);
     }, dom.workoutsBtn);
 
 }
 
 function SettingsView(args) {
-    let dom = args.dom;
+    let dom = {
+        ftp:       q.get('#ftp-value'),
+        ftpBtn:    q.get('#ftp-btn'),
+        weight:    q.get('#weight-value'),
+        weightBtn: q.get('#weight-btn'),
+    };
+
     let ftp = 100;
     let weight = 75;
 
     xf.sub('db:ftp', ftp => {
-        // ftp = e.detail.data.ftp;
         dom.ftp.value = ftp;
     });
+
     xf.sub('db:weight', weight => {
-        // weight = e.detail.data.weight;
         dom.weight.value = weight;
     });
 
-    xf.sub('change', e => { ftp    = parseInt(e.target.value); }, dom.ftp);
-    xf.sub('change', e => { weight = parseInt(e.target.value); }, dom.weight);
+    xf.sub('change', e => {
+        ftp = parseInt(e.target.value);
+    }, dom.ftp);
+
+    xf.sub('change', e => {
+        weight = parseInt(e.target.value);
+    }, dom.weight);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:ftp', ftp);
@@ -397,216 +377,213 @@ function SettingsView(args) {
     }, dom.weightBtn);
 }
 
-function NumberInput(args) {
-    let dom               = args.dom;
-    let name              = args.name || `number-input`;
-    let value             = args.init || 0;
-    let type              = args.type || 'Int';
-    let minValueSupported = args.min  || 0;
-    let maxValueSupported = args.max  || 0;
-    let incStep           = args.inc  || 1;
-    let set               = args.set  || function(x) { return x; };
 
-    const inRange = (target, minValueSupported, maxValueSupported, init = 0) => {
-        let value = init;
-        if(target >= maxValueSupported) {
-            value = maxValueSupported;
-        } else if(target < minValueSupported) {
-            value = minValueSupported;
-        } else {
-            value = target;
-        }
-        return value;
-    };
+
+function NumberInput(args) {
+    let dom   = args.dom;
+    let evt   = args.evt  || 'number-input';
+    let type  = args.type || 'Int';
+    let prop  = args.prop || 'numberInput';
+    let value = 0;
+
+    xf.sub(`db:${prop}`, x => {
+        value = x;
+        dom.input.value = x;
+    });
 
     xf.sub('change', e => {
-        let x = 0;
-        if(type === 'Int') {
-            x = parseInt(e.target.value || 0);
-        } else {
-            x = parseFloat(e.target.value || 0);
-        }
-        if(x > minValueSupported && x < maxValueSupported) {
-            value = x;
-        }
-        if(x >= maxValueSupported) {
-            value = maxValueSupported;
-        }
-        if(x <= minValueSupported) {
-            value = minValueSupported;
-        }
-        dom.input.value = value;
-        set(value);
-        xf.dispatch(`ui:${name}-target`, value);
+        let target = parseNumber(e.target.value, type);
+        xf.dispatch(`ui:${evt}-set`, target);
     }, dom.input);
 
     xf.sub('pointerup', e => {
-        let target = value + incStep;
-        value = inRange(target, minValueSupported, maxValueSupported, value);
-        dom.input.value = value;
-        set(value);
-        xf.dispatch(`ui:${name}-target`, value);
+        xf.dispatch(`ui:${evt}-inc`);
     }, dom.incBtn);
 
     xf.sub('pointerup', e => {
-        let target = value - incStep;
-        value = inRange(target, minValueSupported, maxValueSupported, value);
-        dom.input.value = value;
-        set(value);
-        xf.dispatch(`ui:${name}-target`, value);
+        xf.dispatch(`ui:${evt}-dec`);
     }, dom.decBtn);
+}
+
+function ERG() {
+    let dom = {
+        powerValue: q.get('#power-target-value'),
+        powerInc:   q.get('#power-inc'),
+        powerDec:   q.get('#power-dec'),
+        ergParams:  q.get('#erg-mode-params'),
+    };
+
+    // will ignore max value (most likely)
+    let powerTarget = 0;
+    let powerMin    = 0;
+    let powerMax    = 400;
+    let powerInc    = 10;
+
+    const updateParams = () => {
+        dom.ergParams.textContent = `${powerMin} to ${powerMax}`;
+    };
+
+    xf.sub('db:powerMin', min => { powerMin = min; updateParams(); });
+    xf.sub('db:powerMax', max => { powerMax = max; updateParams(); });
+    xf.sub('db:powerInx', inc => { powerInc = inc; });
+
+    NumberInput({dom: {input:  dom.powerValue,
+                       incBtn: dom.powerInc,
+                       decBtn: dom.powerDec},
+                 evt:  'power-target-manual',
+                 prop: 'powerTargetManual',
+                 type: 'Int'});
+}
+
+function Resistance() {
+    let dom = {
+        resistanceValue:  q.get('#resistance-value'),
+        resistanceInc:    q.get('#resistance-inc'),
+        resistanceDec:    q.get('#resistance-dec'),
+        resistanceParams: q.get('#resistance-mode-params'),
+    };
+
+    // will overflow max value
+    let resistanceMin = 0;
+    let resistanceMax = 100;
+    let resistanceInc = 10;
+
+    const updateParams = () => {
+        dom.resistanceParams.textContent = `${resistanceMin} to ${resistanceMax}`;
+    };
+
+    xf.sub('db:resistanceMin', min => { resistanceMin = min; updateParams(); });
+    xf.sub('db:resistanceMax', max => { resistanceMax = max; updateParams(); });
+    xf.sub('db:resistanceInx', inc => { resistanceInc = inc; });
+
+    NumberInput({dom: {input:  dom.resistanceValue,
+                       incBtn: dom.resistanceInc,
+                       decBtn: dom.resistanceDec},
+                 evt:  'resistance-target',
+                 prop: 'resistanceTarget',
+                 type: 'Int'});
+}
+
+function Slope() {
+    let dom = {
+        slopeValue:  q.get('#slope-value'),
+        slopeInc:    q.get('#slope-inc'),
+        slopeDec:    q.get('#slope-dec'),
+        slopeParams: q.get('#slope-mode-params'),
+    };
+
+    // speed based, will ignore max value
+    let slopeMin = 0;
+    let slopeMax = 30.0; // maybe ... it is speed dependant
+
+    const updateParams = () => {
+        dom.slopeParams.textContent = `${slopeMin} to ${slopeMax}`;
+    };
+
+    xf.sub('db:slopeMin', min => { slopeMin = min; updateParams(); });
+    xf.sub('db:slopeMax', max => { slopeMax = max; updateParams(); });
+
+    NumberInput({dom: {input:  dom.slopeValue,
+                       incBtn: dom.slopeInc,
+                       decBtn: dom.slopeDec},
+                 evt:  'slope-target',
+                 prop: 'slopeTarget',
+                 type: 'Float'});
 }
 
 function ControlView(args) {
     let dom = {
+        ergModeBtn:         q.get('#erg-mode-btn'),
         resistanceModeBtn:  q.get('#resistance-mode-btn'),
         slopeModeBtn:       q.get('#slope-mode-btn'),
-        ergModeBtn:         q.get('#erg-mode-btn'),
-
+        ergControls:        q.get('#erg-mode-controls'),
         resistanceControls: q.get('#resistance-mode-controls'),
         slopeControls:      q.get('#slope-mode-controls'),
-        ergControls:        q.get('#erg-mode-controls'),
-
-        resistanceParams:   q.get('#resistance-mode-params'),
-        slopeParams:        q.get('#slope-mode-params'),
-        ergParams:          q.get('#erg-mode-params'),
-
-        resistanceValue:    q.get('#resistance-value'),
-        resistanceInc:      q.get('#resistance-inc'),
-        resistanceDec:      q.get('#resistance-dec'),
-
-        slopeValue:         q.get('#slope-value'),
-        slopeInc:           q.get('#slope-inc'),
-        slopeDec:           q.get('#slope-dec'),
-
-        targetPower:        q.get('#target-power-value'),
-        workPower:          q.get('#work-power-value'),
-        restPower:          q.get('#rest-power-value'),
-        setTargetPower:     q.get('#set-target-power'),
-        startWorkInterval:  q.get('#start-work-interval'),
-        startRestInterval:  q.get('#start-rest-interval'),
     };
 
-    xf.sub('pointerup', e => {
-        xf.dispatch('ui:erg-mode');
+    let mode = 'erg';
+
+    xf.sub('db:mode', m => {
+        mode = m;
+        if(m === 'erg')        uiErgMode(dom);
+        if(m === 'resistance') uiResistanceMode(dom);
+        if(m === 'slope')      uiSlopeMode(dom);
+    });
+
+    function uiErgMode(dom) {
         dom.ergModeBtn.classList.add('active');
         dom.resistanceModeBtn.classList.remove('active');
         dom.slopeModeBtn.classList.remove('active');
         dom.ergControls.style.display        = 'block';
         dom.resistanceControls.style.display = 'none';
         dom.slopeControls.style.display      = 'none';
-    }, dom.ergModeBtn);
-
-    xf.sub('pointerup', e => {
-        xf.dispatch('ui:resistance-mode');
+    }
+    function uiResistanceMode(dom) {
         dom.ergModeBtn.classList.remove('active');
         dom.resistanceModeBtn.classList.add('active');
         dom.slopeModeBtn.classList.remove('active');
         dom.ergControls.style.display        = 'none';
         dom.resistanceControls.style.display = 'block';
         dom.slopeControls.style.display      = 'none';
-    }, dom.resistanceModeBtn);
-
-    xf.sub('pointerup', e => {
-        xf.dispatch('ui:slope-mode');
+    }
+    function uiSlopeMode(dom) {
         dom.ergModeBtn.classList.remove('active');
         dom.resistanceModeBtn.classList.remove('active');
         dom.slopeModeBtn.classList.add('active');
         dom.ergControls.style.display        = 'none';
         dom.resistanceControls.style.display = 'none';
         dom.slopeControls.style.display      = 'block';
-    }, dom.slopeModeBtn);
+    }
 
-
-    // ERG({power: {params: {min: 0, max: 800, inc: 1}}});
-    // Slope({slope: {params: {min: 0, max: 30, inc: 0.5}}});
-    // Resistance({resistance: {params: {min: 0, max: 100, inc: 1}}});
-
-    xf.sub('db:controllableFeatures', controllableFeatures => {
-        let features = controllableFeatures;
-        Resistance(features); // will overflow max value
-        Slope(features);      // speed based, will ignore max value
-        ERG(features);        // will ignore max value (most likely)
+    xf.sub('key:up', e => {
+        if(mode === 'erg') {
+            xf.dispatch('ui:power-target-manual-inc');
+        }
+        if(mode === 'resistance') {
+            xf.dispatch('ui:resistance-target-manual-inc');
+        }
+        if(mode === 'slope') {
+            xf.dispatch('ui:slope-target-manual-inc');
+        }
     });
 
-    function Resistance(features) {
-        // Resistance mode
-        let resistance             = 0;
-        let minResistanceSupported = features.resistance.params.min;
-        let maxResistanceSupported = features.resistance.params.max;
-        let resistanceInc          = features.resistance.params.inc * 100;
+    xf.sub('key:down', e => {
+        if(mode === 'erg') {
+            xf.dispatch('ui:power-target-dec');
+        }
+        if(mode === 'resistance') {
+            xf.dispatch('ui:resistance-target-dec');
+        }
+        if(mode === 'slope') {
+            xf.dispatch('ui:slope-target-dec');
+        }
+    });
 
-        dom.resistanceParams.textContent = `${minResistanceSupported} to ${maxResistanceSupported}`;
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:erg-mode');
+    }, dom.ergModeBtn);
 
-        NumberInput({dom: {input: dom.resistanceValue,
-                           incBtn: dom.resistanceInc,
-                           decBtn: dom.resistanceDec},
-                     name: 'resistance',
-                     init: resistance,
-                     type: 'Int',
-                     min: minResistanceSupported,
-                     max: maxResistanceSupported,
-                     inc: resistanceInc});
-    }
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:resistance-mode');
+    }, dom.resistanceModeBtn);
 
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:slope-mode');
+    }, dom.slopeModeBtn);
 
-    function Slope(features) {
-        // Slope mode
-        let slope             = 0;
-        let minSlopeSupported = 0;
-        let maxSlopeSupported = 30.0; // maybe ... it is speed dependant
-        let slopeInc          = 0.5;
+    xf.sub('key:e', e => {
+        xf.dispatch('ui:erg-mode');
+    });
+    xf.sub('key:r', e => {
+        xf.dispatch('ui:resistance-mode');
+    });
+    xf.sub('key:s', e => {
+        xf.dispatch('ui:slope-mode');
+    });
 
-        dom.slopeParams.textContent = `${minSlopeSupported} to ${maxSlopeSupported}`;
-
-        xf.sub('ui:slope-mode', e => {
-            xf.dispatch('ui:slope-target', slope);
-        });
-
-        NumberInput({dom: {input:  dom.slopeValue,
-                           incBtn: dom.slopeInc,
-                           decBtn: dom.slopeDec},
-                     name: 'slope',
-                     init: slope,
-                     type: 'Float',
-                     min: minSlopeSupported,
-                     max: maxSlopeSupported,
-                     inc: slopeInc,
-                     set: value => slope = value});
-    }
-
-    // ERG mode
-    function ERG(features) {
-        let targetPwr = dom.targetPower.value || 100;
-        let workPwr   = dom.workPower.value || 235;
-        let restPwr   = dom.restPower || 100;
-
-        let minPowerSupported = features.power.params.min || 0;
-        let maxPowerSupported = features.power.params.max || 0;
-        let powerInc          = features.power.params.inc || 0;
-
-        dom.ergParams.textContent = `${minPowerSupported} to ${maxPowerSupported}`;
-
-        xf.sub('change', e => {
-            alert(`change targetPwr`);
-            targetPwr = parseInt(e.target.value); }, dom.targetPower);
-        xf.sub('change', e => { workPwr   = parseInt(e.target.value); }, dom.workPower);
-        xf.sub('change', e => { restPwr   = parseInt(e.target.value); }, dom.restPower);
-
-        xf.sub('pointerup', e => {
-            xf.dispatch('ui:target-pwr', targetPwr);
-        }, dom.setTargetPower);
-
-        xf.sub('pointerup', e => {
-            xf.dispatch('ui:target-pwr', workPwr);
-            xf.dispatch('ui:watchLap');
-        }, dom.startWorkInterval);
-
-        xf.sub('pointerup', e => {
-            xf.dispatch('ui:target-pwr', restPwr);
-            xf.dispatch('ui:watchLap');
-        }, dom.startRestInterval);
-    }
+    Resistance();
+    Slope();
+    ERG();
 }
 
 function WatchView(args) {
@@ -620,24 +597,38 @@ function WatchView(args) {
         cont:    q.get('#watch'),
         name:    q.get('#workout-name'),
     };
+    let watchState = 'stopped';
+
+    xf.reg('db:workout', db => {
+        dom.name.textContent = db.workout.name;
+    });
+
+    xf.reg('db:watchState', db => {
+        console.log(`db.watchState: ${db.watchState}`);
+        watchState = db.watchState;
+    });
 
     xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),   dom.start);
     xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),   dom.pause);
     xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),     dom.lap);
     xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.stop);
     xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.workout);
-
-    xf.reg('db:workout', db => {
-        dom.name.textContent = db.workout.name;
+    xf.sub('key:space', e => {
+        console.log(watchState);
+        if(watchState === 'paused' || watchState === 'stopped') {
+            xf.dispatch('ui:watchStart');
+        } else {
+            xf.dispatch('ui:watchPause');
+        }
     });
 
-    const init = _ => {
+    const init = dom => {
         dom.pause.style.display = 'none';
         dom.stop.style.display  = 'none';
         dom.save.style.display  = 'none';
         dom.lap.style.display   = 'none';
     };
-    const started = _ => {
+    const started = dom => {
         dom.start.style.display = 'none';
         dom.save.style.display  = 'none';
         dom.pause.style.display = 'inline-block';
@@ -645,12 +636,12 @@ function WatchView(args) {
         dom.stop.style.display  = 'none';
         // dom.stop.style.display  = 'inline-block';
     };
-    const paused = _ => {
+    const paused = dom => {
         dom.pause.style.display = 'none';
         dom.start.style.display = 'inline-block';
         dom.stop.style.display  = 'inline-block';
     };
-    const stopped = _ => {
+    const stopped = dom => {
         dom.pause.style.display   = 'none';
         dom.lap.style.display     = 'none';
         dom.stop.style.display    = 'none';
@@ -658,19 +649,19 @@ function WatchView(args) {
         dom.workout.style.display = 'inline-block';
         dom.start.style.display   = 'inline-block';
     };
-    const workoutStarted = _ => {
+    const workoutStarted = dom => {
         dom.workout.style.display = 'none';
     };
 
-    init();
+    init(dom);
 
     xf.sub('db:watchState', state => {
-        if(state === 'started') { started(); }
-        if(state === 'paused')  { paused();  }
-        if(state === 'stopped') { stopped(); }
+        if(state === 'started') { started(dom); }
+        if(state === 'paused')  { paused(dom);  }
+        if(state === 'stopped') { stopped(dom); }
     });
     xf.sub('db:workoutState', state => {
-        if(state === 'started') { workoutStarted(); }
+        if(state === 'started') { workoutStarted(dom); }
         if(state === 'done') {
             console.log(`Workout done!`);
         }
@@ -678,8 +669,14 @@ function WatchView(args) {
 }
 
 
-function WorkoutsView(args) {
-    let dom = args.dom;
+function WorkoutsView() {
+    let dom = {
+        workouts:     q.get('#workouts'),
+        list:         q.get('#workouts .list'),
+        items:        [],
+        select:       [],
+        descriptions: [],
+    };
     let id  = 0;
 
     let off = `
@@ -747,8 +744,11 @@ function WorkoutsView(args) {
     });
 }
 
-function LoadWorkoutView(args) {
-    let dom = args.dom;
+function UploadWorkoutView(args) {
+    let dom = {
+        fileBtn: q.get('#workout-file'),
+    };
+
     xf.sub('change', e => {
         let file = e.target.files[0];
         console.log(file);
@@ -757,52 +757,88 @@ function LoadWorkoutView(args) {
 }
 
 function ActivityView(args) {
-    let dom = args.dom;
+    let dom = {
+        saveBtn: q.get('#activity-save'),
+    };
+
     xf.sub('pointerup', e => {
         xf.dispatch('ui:activity:save');
     }, dom.saveBtn);
 }
 
+function Keyboard() {
+    xf.sub('keydown', e => {
+        let keyCode = e.keyCode;
+        let code = e.code;
 
-function RampTest() {
-    let startFTP = 0;
-    let progressFTP = 0;
+        if (e.isComposing || keyCode === 229 || e.ctrlKey || e.shiftKey || e.altKey) {
+            return;
+        }
 
-    xf.sub('db:ftp', e => {
-        startFTP = e.detail.data.ftp;
+        const isKeyUp    = (code) => code === 'ArrowUp';
+        const isKeyDown  = (code) => code === 'ArrowDown';
+        const isKeyE     = (code) => code === 'KeyE';
+        const isKeyR     = (code) => code === 'KeyR';
+        const isKeyS     = (code) => code === 'KeyS';
+        const isKeySpace = (code) => code === 'Space';
+
+        if(isKeyUp(code)) {
+            e.preventDefault();
+            xf.dispatch('key:up');
+        }
+        if(isKeyDown(code)) {
+            e.preventDefault();
+            xf.dispatch('key:down');
+        }
+        if(isKeyS(code)) {
+            xf.dispatch('key:s');
+        }
+        if(isKeyR(code)) {
+            xf.dispatch('key:r');
+        }
+        if(isKeyE(code)) {
+            xf.dispatch('key:e');
+        }
+        if(isKeySpace(code)) {
+            e.preventDefault();
+            xf.dispatch('key:space');
+        }
+    }, window);
+}
+
+function ScreenChange() {
+    window.addEventListener('orientationchange', e => {
+        xf.dispatch('screen:change', e.target);
     });
-
-    xf.sub('ftptest:progress', e => {
+    window.addEventListener('resize', e => {
+        xf.dispatch('screen:change', e.target);
     });
 }
 
-function ReconView(args) {
-    let dom = args.dom;
-    let points = [];
+function Views() {
+    ScreenChange();
+    Keyboard();
 
-    xf.sub('db:points', e => {
-        points = e.detail.data.points;
-        console.log(points);
-    });
+    ConnectionControlsView();
+    ControllableSettingsView({name: 'controllable'});
+    HrbSettingsView({name: 'hrb'});
+
+    DataScreen();
+    GraphPower();
+    GraphWorkout();
+
+    ControlView();
+    WatchView();
+
+    NavigationWidget();
+    ActivityView();
+    SettingsView();
+    WorkoutsView();
+
+    UploadWorkoutView();
 }
 
 export {
-    ControllableConnectionView,
-    HrbConnectionView,
-    ControllableSettingsView,
-    HrbSettingsView,
-    DataScreen,
-    DataBar,
-    GraphHr,
-    GraphPower,
-    GraphWorkout,
-    ControlView,
-    WatchView,
-    LoadWorkoutView,
-    WorkoutsView,
-    ActivityView,
-    NavigationWidget,
-    SettingsView,
-    ReconView,
+    Views,
 };
 

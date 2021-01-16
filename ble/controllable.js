@@ -162,7 +162,7 @@ class Controllable {
         // view.setUint8(1, parseInt(resistance), true); // by Spec
         view.setInt16(1, resistance, true); // works with Tacx
         console.log(`set target resistance: ${resistance}`);
-        console.log(buffer);
+        // console.log(buffer);
         let res =
             await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
 
@@ -196,7 +196,6 @@ class Controllable {
         view.setUint8(5, hex(crr),   true);
         view.setUint8(6, hex(drag),  true);
         console.log(`set simulation: ${wind} ${grade} ${crr} ${drag}`);
-        console.log(buffer);
         let res =
             await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
 

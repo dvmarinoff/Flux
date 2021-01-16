@@ -8,17 +8,22 @@ function DeviceController(args) {
     let controllable = args.controllable;
     let hrb          = args.hrb;
     let watch        = args.watch;
+    let mode         = 'erg';
 
-    xf.sub('db:targetPwr', targetPwr => {
-        controllable.setTargetPower(targetPwr);
+    xf.sub('db:mode', m => { mode = m; });
+
+    xf.sub('db:powerTarget', power => {
+        if(mode === 'erg') {
+            controllable.setTargetPower(power);
+        }
     });
-    xf.sub('db:resistanceTarget', resistanceTarget => {
-        let resistance = resistanceTarget;
+    xf.sub('db:resistanceTarget', target => {
+        let resistance = target;
         resistance = parseInt(resistance);
         controllable.setTargetResistanceLevel(resistance);
     });
-    xf.sub('db:slopeTarget', slopeTarget => {
-        let slope = slopeTarget;
+    xf.sub('db:slopeTarget', target => {
+        let slope = target;
         slope *= 100;
         slope = parseInt(slope);
         controllable.setSimulationParameters({grade: slope});
@@ -58,7 +63,7 @@ function Vibrate(args) {
     let vibrate = args.vibrate;
     let long = args.long;
 
-    xf.reg('db:lapTime', time => {
+    xf.sub('db:lapTime', time => {
         lapTime = time;
 
         if(vibrate) {
@@ -69,15 +74,6 @@ function Vibrate(args) {
                 window.navigator.vibrate([250]);
             }
         }
-    });
-}
-
-function Screen() {
-    window.addEventListener('orientationchange', e => {
-        xf.dispatch('screen:change', e.target);
-    });
-    window.addEventListener('resize', e => {
-        xf.dispatch('screen:change', e.target);
     });
 }
 
@@ -146,4 +142,4 @@ function WorkoutController() {
     });
 }
 
-export { DeviceController, FileController, WorkoutController, Screen, Vibrate };
+export { DeviceController, FileController, WorkoutController, Vibrate };
