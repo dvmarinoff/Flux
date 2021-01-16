@@ -8,17 +8,22 @@ function DeviceController(args) {
     let controllable = args.controllable;
     let hrb          = args.hrb;
     let watch        = args.watch;
+    let mode         = 'erg';
+
+    xf.sub('db:mode', m => { mode = m; });
 
     xf.sub('db:powerTarget', power => {
-        controllable.setTargetPower(power);
+        if(mode === 'erg') {
+            controllable.setTargetPower(power);
+        }
     });
-    xf.sub('db:resistanceTarget', resistanceTarget => {
-        let resistance = resistanceTarget;
+    xf.sub('db:resistanceTarget', target => {
+        let resistance = target;
         resistance = parseInt(resistance);
         controllable.setTargetResistanceLevel(resistance);
     });
-    xf.sub('db:slopeTarget', slopeTarget => {
-        let slope = slopeTarget;
+    xf.sub('db:slopeTarget', target => {
+        let slope = target;
         slope *= 100;
         slope = parseInt(slope);
         controllable.setSimulationParameters({grade: slope});

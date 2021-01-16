@@ -1,6 +1,8 @@
 import { powerToZone,
          hrToColor,
          valueToHeight,
+         toDecimalPoint,
+         divisors,
          secondsToHms } from './functions.js';
 
 function readWarmup(el) {
@@ -62,25 +64,66 @@ function readZwoElement(el) {
     }
 }
 
-function toDecimalPoint (x, point = 2) {
-    return Number((x).toFixed(point));
+function timeUnit(duration) {
+    let candidates = divisors(duration);
+    if(duration < 12 || candidates.length === 1) {
+        return 1;
+    };
+    if(duration < 121) {
+        if(candidates.includes(4)) return 4;
+        if(candidates.includes(3)) return 3;
+        if(candidates.includes(2)) return 2;
+        if(candidates.includes(5)) return 5;
+        if(candidates.includes(6)) return 6;
+        if(candidates.includes(7)) return 7;
+    }
+    if(duration < 301) {
+        if(candidates.includes(7))  return 7;
+        if(candidates.includes(6))  return 6;
+        if(candidates.includes(5))  return 5;
+        if(candidates.includes(11)) return 11;
+        if(candidates.includes(13)) return 13;
+        if(candidates.includes(13)) return 17;
+        if(candidates.includes(4))  return 4;
+        if(candidates.includes(3))  return 3;
+        if(candidates.includes(2))  return 2;
+    };
+    if(duration > 300) {
+        if(candidates.includes(9))  return 9;
+        if(candidates.includes(10)) return 10;
+        if(candidates.includes(7))  return 7;
+        if(candidates.includes(11)) return 11;
+        if(candidates.includes(13)) return 13;
+        if(candidates.includes(6))  return 6;
+        if(candidates.includes(5))  return 5;
+        if(candidates.includes(17)) return 17;
+        if(candidates.includes(19)) return 19;
+        if(candidates.includes(23)) return 23;
+        if(candidates.includes(4))  return 4;
+        if(candidates.includes(3))  return 3;
+        if(candidates.includes(2))  return 2;
+    }
+    return candidates[candidates.length - 1];
 }
 
 function warmupToInterval(step) {
     let interval   = {duration: step.duration, steps: []};
-    let powerDiff  = Math.round((step.powerHigh * 100) - (step.powerLow * 100));
-    let powerDx    = 0.01;
-    let steps      = powerDiff;
-    if(steps >= step.duration) {
-        steps = step.duration;
-        powerDx = (step.powerHigh-step.powerLow) / steps;
-    }
-    let remainder  = (step.duration % steps);
-    let durationDx = remainder > 0 ? remainder : step.duration / steps;
+    let timeDx     = timeUnit(step.duration);
+    let timeSteps  = (step.duration / timeDx);
+    let powerDiff  = (parseInt(step.powerHigh * 100) - parseInt(step.powerLow * 100));
+    let powerDx    = (powerDiff / timeSteps) / 100;
     let power      = step.powerLow;
-    for(let i = 0; i < steps; i++) {
-        interval.steps.push({duration: i === 0 ? durationDx + remainder : durationDx, power: power});
-        power = toDecimalPoint(power + powerDx);
+
+    const nextToLastStep = (i) => i === (timeSteps - 2);
+
+    for(let i = 0; i < timeSteps; i++) {
+        interval.steps.push({duration: timeDx, power: toDecimalPoint(power)});
+
+        if(nextToLastStep(i)) {
+            power = step.powerHigh;
+        } else {
+            power = (power + powerDx);
+        }
     };
     return [interval];
 }
@@ -98,19 +141,23 @@ function steadyStateToInterval(step) {
                      power:    step.power}]};
 }
 function cooldownToInterval(step) {
-    let interval  = {duration: step.duration, steps: []};
-    let powerDx    = 0.01;
-    let steps      = Math.round((step.powerHigh-step.powerLow) / powerDx);
-    if(steps > step.duration) {
-        steps = step.duration;
-        powerDx = (step.powerHigh-step.powerLow) / steps;
-    }
-    let durationDx = Math.round(step.duration/steps);
+    let interval   = {duration: step.duration, steps: []};
+    let timeDx     = timeUnit(step.duration);
+    let timeSteps  = (step.duration / timeDx);
+    let powerDiff  = (parseInt(step.powerHigh * 100) - parseInt(step.powerLow * 100));
+    let powerDx    = (powerDiff / timeSteps) / 100;
     let power      = step.powerHigh;
-    let stepsLen   = steps;
-    for(let i = 0; i < stepsLen; i++) {
-        interval.steps.push({duration: durationDx, power: power});
-        power = toDecimalPoint(power - powerDx);
+
+    const nextToLastStep = (i) => i === (timeSteps - 2);
+
+    for(let i = 0; i < timeSteps; i++) {
+        interval.steps.push({duration: timeDx, power: toDecimalPoint(power)});
+
+        if(nextToLastStep(i)) {
+            power = step.powerLow;
+        } else {
+            power = (power - powerDx);
+        }
     };
     return [interval];
 }

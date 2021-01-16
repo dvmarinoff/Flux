@@ -149,6 +149,18 @@ function metersToDistance(meters) {
     return s;
 }
 
+function toDecimalPoint (x, point = 2) {
+    return Number((x).toFixed(point));
+}
+
+function divisors(number) {
+    let divisors = [1];
+    for(let i=2; i < number/2; i++) {
+        if(number % i === 0) { divisors.push(i); }
+    }
+    return divisors;
+}
+
 function hexToString(str) {
     var j;
     var hexes = str.match(/.{1,4}/g) || [];
@@ -217,6 +229,8 @@ export {
     maxOfArray,
     sum,
     parseNumber,
+    toDecimalPoint,
+    divisors,
     fixInRange,
     first,
     second,

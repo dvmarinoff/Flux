@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime';
 
+import { xf } from './xf.js';
 import { db } from './db.js';
-import { xf, DB } from './xf.js';
 import { Controllable } from './ble/controllable.js';
 import { Hrb } from './ble/hrb.js';
 import { Watch } from './watch.js';

@@ -1,5 +1,9 @@
 import { xf } from './xf.js';
 
+import { avgOfArray, maxOfArray, sum,
+         first, last, round, mps, kph,
+         timeDiff, fixInRange } from './functions.js';
+
 class Watch {
     constructor(args) {
         this.elapsed          = 0;
@@ -19,7 +23,10 @@ class Watch {
     }
     init() {
         let self = this;
-        xf.sub('db:workout',       workout => { self.intervals     = workout.intervals; });
+        xf.sub('db:workout',       workout => {
+            self.intervals     = workout.intervals;
+            console.log(self.intervals);
+        });
         xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed;           });
         xf.sub('db:lapTime',          time => { self.lapTime       = time;              });
         xf.sub('db:stepTime',         time => { self.stepTime      = time;              });
@@ -214,5 +221,54 @@ class Watch {
         xf.dispatch('watch:step');
     }
 }
+
+// Register DB Events
+xf.reg('watch:lapDuration',    (time, db) => db.intervalDuration = time);
+xf.reg('watch:stepDuration',   (time, db) => db.stepDuration     = time);
+xf.reg('watch:lapTime',        (time, db) => db.lapTime          = time);
+xf.reg('watch:stepTime',       (time, db) => db.stepTime         = time);
+xf.reg('watch:intervalIndex', (index, db) => db.intervalIndex    = index);
+xf.reg('watch:stepIndex',     (index, db) => {
+    db.stepIndex      = index;
+    let intervalIndex = db.intervalIndex;
+    let target        = db.workout.intervals[intervalIndex].steps[index].power;
+    xf.dispatch('ui:power-target-set', target);
+});
+xf.reg('workout:started', (x, db) => db.workoutState = 'started');
+xf.reg('workout:stopped', (x, db) => db.workoutState = 'stopped');
+xf.reg('workout:done',    (x, db) => db.workoutState = 'done');
+xf.reg('watch:started',   (x, db) => {
+    db.watchState = 'started';
+    db.lapStartTime = Date.now(); // ??
+});
+xf.reg('watch:paused',  (x, db) => db.watchState = 'paused');
+xf.reg('watch:stopped', (x, db) => db.watchState = 'stopped');
+xf.reg('watch:elapsed', (x, db) => {
+    db.elapsed = x;
+    db.distance  += 1 * mps(db.spd);
+    let record = {timestamp: Date.now(),
+                  power:     db.pwr,
+                  cadence:   db.cad,
+                  speed:     db.spd,
+                  hr:        db.hr,
+                  distance:  db.distance};
+    db.records.push(record);
+    db.lap.push(record);
+});
+xf.reg('watch:lap', (x, db) => {
+    let timeEnd   = Date.now();
+    let timeStart = db.lapStartTime;
+    let elapsed   = timeDiff(timeStart, timeEnd);
+
+    if(elapsed > 0) {
+        db.laps.push({timestamp:        timeEnd,
+                      startTime:        timeStart,
+                      totalElapsedTime: elapsed,
+                      avgPower:         round(avgOfArray(db.lap, 'power')),
+                      maxPower:         maxOfArray(db.lap, 'power')});
+    }
+    db.lap = [];
+    db.lapStartTime = timeEnd + 0;
+});
 
 export { Watch };

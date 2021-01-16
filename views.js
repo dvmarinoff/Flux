@@ -379,51 +379,29 @@ function SettingsView(args) {
 
 
 
-
 function NumberInput(args) {
-    let dom     = args.dom;
-    let evt     = args.evt  || 'number-input';
-    let prop    = args.prop || 'numberInput';
-    let minProp = args.minProp;
-    let maxProp = args.maxProp;
-    let incProp = args.incProp;
-    let type    = args.type || 'Int';
-    let value   = 0;
-    let min     = args.min || 0;
-    let max     = args.max || 0;
-    let inc     = args.inc || 1;
+    let dom   = args.dom;
+    let evt   = args.evt  || 'number-input';
+    let type  = args.type || 'Int';
+    let prop  = args.prop || 'numberInput';
+    let value = 0;
 
     xf.sub(`db:${prop}`, x => {
-        console.log(`UPDATE: ${evt}, ${x}`);
         value = x;
-        dom.input.value = value;
+        dom.input.value = x;
     });
 
-    xf.sub(minProp, x => { min = x; });
-    xf.sub(maxProp, x => { max = x; });
-    xf.sub(incProp, x => { inc = x; });
-
-    const validate = (input, min, max) => {
-        return fixInRange(parseNumber(input, type), min, max);
-    };
-
     xf.sub('change', e => {
-        let target = validate(e.target.value, min, max);
-        xf.dispatch(`ui:${evt}`, target);
+        let target = parseNumber(e.target.value, type);
+        xf.dispatch(`ui:${evt}-set`, target);
     }, dom.input);
 
     xf.sub('pointerup', e => {
-        let target = value + inc;
-        target = validate(target, min, max);
-        xf.dispatch(`ui:${evt}`, target);
-        console.log(`ui:${evt}, value: ${target}, min: ${min}, max: ${max}, inc: ${inc}, ${prop}`);
+        xf.dispatch(`ui:${evt}-inc`);
     }, dom.incBtn);
 
     xf.sub('pointerup', e => {
-        let target = value - inc;
-        target = validate(target, min, max, value);
-        xf.dispatch(`ui:${evt}`, target);
-        console.log(`ui:${evt}, value: ${target}, min: ${min}, max: ${max}, inc: ${inc}, ${prop}`);
+        xf.dispatch(`ui:${evt}-dec`);
     }, dom.decBtn);
 }
 
@@ -441,20 +419,20 @@ function ERG() {
     let powerMax    = 400;
     let powerInc    = 10;
 
-    dom.ergParams.textContent = `${powerMin} to ${powerMax}`;
+    const updateParams = () => {
+        dom.ergParams.textContent = `${powerMin} to ${powerMax}`;
+    };
+
+    xf.sub('db:powerMin', min => { powerMin = min; updateParams(); });
+    xf.sub('db:powerMax', max => { powerMax = max; updateParams(); });
+    xf.sub('db:powerInx', inc => { powerInc = inc; });
 
     NumberInput({dom: {input:  dom.powerValue,
                        incBtn: dom.powerInc,
                        decBtn: dom.powerDec},
-                 evt:     'power-target',
-                 prop:    'powerTarget',
-                 type:    'Int',
-                 min:      powerMin,
-                 max:      powerMax,
-                 inc:      powerInc,
-                 minProp: 'powerMin',
-                 maxProp: 'powerMax',
-                 incProp: 'powerInc'});
+                 evt:  'power-target-manual',
+                 prop: 'powerTargetManual',
+                 type: 'Int'});
 }
 
 function Resistance() {
@@ -470,24 +448,20 @@ function Resistance() {
     let resistanceMax = 100;
     let resistanceInc = 10;
 
-    xf.sub('db:resistanceMin', min => resistanceMin = min);
-    xf.sub('db:resistanceMax', max => resistanceMax = max);
-    xf.sub('db:resistanceInx', inc => resistanceInc = inc);
+    const updateParams = () => {
+        dom.resistanceParams.textContent = `${resistanceMin} to ${resistanceMax}`;
+    };
 
-    dom.resistanceParams.textContent = `${resistanceMin} to ${resistanceMax}`;
+    xf.sub('db:resistanceMin', min => { resistanceMin = min; updateParams(); });
+    xf.sub('db:resistanceMax', max => { resistanceMax = max; updateParams(); });
+    xf.sub('db:resistanceInx', inc => { resistanceInc = inc; });
 
     NumberInput({dom: {input:  dom.resistanceValue,
-                        incBtn: dom.resistanceInc,
-                        decBtn: dom.resistanceDec},
-                  evt:     'resistance-target',
-                  type:    'Int',
-                  min:      resistanceMin,
-                  max:      resistanceMax,
-                  inc:      resistanceInc,
-                  prop:    'resistanceTarget',
-                  minProp: 'resistanceMin',
-                  maxProp: 'resistanceMax',
-                  incProp: 'resistanceInc'});
+                       incBtn: dom.resistanceInc,
+                       decBtn: dom.resistanceDec},
+                 evt:  'resistance-target',
+                 prop: 'resistanceTarget',
+                 type: 'Int'});
 }
 
 function Slope() {
@@ -502,23 +476,19 @@ function Slope() {
     let slopeMin = 0;
     let slopeMax = 30.0; // maybe ... it is speed dependant
 
-    xf.sub('db:slopeMin', min => slopeMin = min);
-    xf.sub('db:slopeMax', max => slopeMax = max);
+    const updateParams = () => {
+        dom.slopeParams.textContent = `${slopeMin} to ${slopeMax}`;
+    };
 
-    dom.slopeParams.textContent = `${slopeMin} to ${slopeMax}`;
+    xf.sub('db:slopeMin', min => { slopeMin = min; updateParams(); });
+    xf.sub('db:slopeMax', max => { slopeMax = max; updateParams(); });
 
     NumberInput({dom: {input:  dom.slopeValue,
                        incBtn: dom.slopeInc,
                        decBtn: dom.slopeDec},
-                  evt:     'slope-target',
-                  prop:    'slopeTarget',
-                  type:    'Float',
-                  min:      slopeMin,
-                  max:      slopeMax,
-                  inc:      0.5,
-                  minProp: 'slopeMin',
-                  maxProp: 'slopeMax',
-                  incProp: 'slopeInc'});
+                 evt:  'slope-target',
+                 prop: 'slopeTarget',
+                 type: 'Float'});
 }
 
 function ControlView(args) {
@@ -532,6 +502,7 @@ function ControlView(args) {
     };
 
     let mode = 'erg';
+
     xf.sub('db:mode', m => {
         mode = m;
         if(m === 'erg')        uiErgMode(dom);
@@ -563,6 +534,30 @@ function ControlView(args) {
         dom.resistanceControls.style.display = 'none';
         dom.slopeControls.style.display      = 'block';
     }
+
+    xf.sub('key:up', e => {
+        if(mode === 'erg') {
+            xf.dispatch('ui:power-target-manual-inc');
+        }
+        if(mode === 'resistance') {
+            xf.dispatch('ui:resistance-target-manual-inc');
+        }
+        if(mode === 'slope') {
+            xf.dispatch('ui:slope-target-manual-inc');
+        }
+    });
+
+    xf.sub('key:down', e => {
+        if(mode === 'erg') {
+            xf.dispatch('ui:power-target-dec');
+        }
+        if(mode === 'resistance') {
+            xf.dispatch('ui:resistance-target-dec');
+        }
+        if(mode === 'slope') {
+            xf.dispatch('ui:slope-target-dec');
+        }
+    });
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:erg-mode');
@@ -771,6 +766,46 @@ function ActivityView(args) {
     }, dom.saveBtn);
 }
 
+function Keyboard() {
+    xf.sub('keydown', e => {
+        let keyCode = e.keyCode;
+        let code = e.code;
+
+        if (e.isComposing || keyCode === 229 || e.ctrlKey || e.shiftKey || e.altKey) {
+            return;
+        }
+
+        const isKeyUp    = (code) => code === 'ArrowUp';
+        const isKeyDown  = (code) => code === 'ArrowDown';
+        const isKeyE     = (code) => code === 'KeyE';
+        const isKeyR     = (code) => code === 'KeyR';
+        const isKeyS     = (code) => code === 'KeyS';
+        const isKeySpace = (code) => code === 'Space';
+
+        if(isKeyUp(code)) {
+            e.preventDefault();
+            xf.dispatch('key:up');
+        }
+        if(isKeyDown(code)) {
+            e.preventDefault();
+            xf.dispatch('key:down');
+        }
+        if(isKeyS(code)) {
+            xf.dispatch('key:s');
+        }
+        if(isKeyR(code)) {
+            xf.dispatch('key:r');
+        }
+        if(isKeyE(code)) {
+            xf.dispatch('key:e');
+        }
+        if(isKeySpace(code)) {
+            e.preventDefault();
+            xf.dispatch('key:space');
+        }
+    }, window);
+}
+
 function ScreenChange() {
     window.addEventListener('orientationchange', e => {
         xf.dispatch('screen:change', e.target);
@@ -782,6 +817,7 @@ function ScreenChange() {
 
 function Views() {
     ScreenChange();
+    Keyboard();
 
     ConnectionControlsView();
     ControllableSettingsView({name: 'controllable'});
