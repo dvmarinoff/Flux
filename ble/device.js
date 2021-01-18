@@ -7,6 +7,8 @@ import { stringToHex,
          toBool, } from '../functions.js';
 import { services } from './services.js';
 
+
+
 class Device {
     constructor(args) {
         this.device = {};
@@ -18,6 +20,7 @@ class Device {
         this.connected = false;
         this.filter = args.filter; // service uuid -> services.fitnessMachine.uuid
         this.optionalServices = args.optionalServices || [];
+        this.retry = 0;
     }
     async isBleAvailable() {
         let self = this;
@@ -38,16 +41,30 @@ class Device {
     async connect() {
         let self = this;
         if(self.isBleAvailable()) {
+            xf.dispatch(`${self.name}:connecting`);
+            try {
 
-            self.device = await self.request();
-            window.sessionStorage.setItem(self.name, self.device.id);
-            self.server = await self.device.gatt.connect();
+                self.device = await self.request();
+                self.server = await self.device.gatt.connect();
+                window.sessionStorage.setItem(self.name, self.device.id);
 
-            self.connected = true;
-            xf.dispatch(`${self.name}:connected`);
-            console.log(`Connected ${self.device.name} ${self.name}.`);
-            self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
+            } catch(error) {
+                console.error(error);
+                xf.dispatch(`${self.name}:disconnected`);
+            } finally {
+
+                if('connected' in self.server) {
+                    if(self.server.connected) {
+                        self.connected = true;
+                        self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
+
+                        xf.dispatch(`${self.name}:connected`, self.device);
+                        console.log(`Connected ${self.device.name} ${self.name}.`);
+                    }
+                }
+            }
         } else {
+            xf.dispatch(`device:ble:unavalilable`);
             console.warn('BLE is not available! You need to turn it on.');
         }
     }
@@ -94,16 +111,23 @@ class Device {
     }
     async notify(service, characteristic, handler) {
         let self = this;
-        await self.getService(service);
-        await self.getCharacteristic(service, characteristic);
-        await self.startNotifications(characteristic, handler);
+
+        if(self.connected) {
+            await self.getService(service);
+            await self.getCharacteristic(service, characteristic);
+            await self.startNotifications(characteristic, handler);
+        }
     }
     async connectAndNotify(service, characteristic, handler) {
         let self = this;
+
         await self.connect();
-        await self.getService(service);
-        await self.getCharacteristic(service, characteristic);
-        await self.startNotifications(characteristic, handler);
+
+        if(self.connected) {
+            await self.getService(service);
+            await self.getCharacteristic(service, characteristic);
+            await self.startNotifications(characteristic, handler);
+        }
     }
     async writeCharacteristic(characteristic, value, response = false) {
         let self = this;

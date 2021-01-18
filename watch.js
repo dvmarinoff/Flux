@@ -25,7 +25,6 @@ class Watch {
         let self = this;
         xf.sub('db:workout',       workout => {
             self.intervals     = workout.intervals;
-            console.log(self.intervals);
         });
         xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed;           });
         xf.sub('db:lapTime',          time => { self.lapTime       = time;              });

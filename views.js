@@ -13,28 +13,45 @@ import { parseZwo, intervalsToGraph } from './parser.js';
 function ControllableConnectionView(dom) {
     xf.sub('pointerup', e => xf.dispatch('ui:controllableSwitch'), dom.switchBtn);
 
-    xf.sub('controllable:connected', e => {
-        dom.indicator.classList.remove('off');
-        dom.indicator.classList.add('on');
-    });
-
     xf.sub('controllable:disconnected', e => {
+        dom.indicator.classList.remove('loading');
         dom.indicator.classList.remove('on');
         dom.indicator.classList.add('off');
+    });
+
+    xf.sub('controllable:connecting', e => {
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.remove('on');
+        dom.indicator.classList.add('loading');
+    });
+
+    xf.sub('controllable:connected', e => {
+        dom.indicator.classList.remove('loading');
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.add('on');
     });
 }
 
 function HrbConnectionView(dom) {
     xf.sub('pointerup', e => xf.dispatch('ui:hrbSwitch'), dom.switchBtn);
 
-    xf.sub('hrb:connected', e => {
-        dom.indicator.classList.remove('off');
-        dom.indicator.classList.add('on');
-    });
-
     xf.sub('hrb:disconnected', e => {
+        dom.indicator.classList.remove('loading');
         dom.indicator.classList.remove('on');
         dom.indicator.classList.add('off');
+
+    });
+
+    xf.sub('hrb:connecting', e => {
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.remove('on');
+        dom.indicator.classList.add('loading');
+    });
+
+    xf.sub('hrb:connected', e => {
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.remove('loading');
+        dom.indicator.classList.add('on');
     });
 }
 
@@ -77,6 +94,7 @@ function ControllableSettingsView(args) {
         power:         q.get('#controllable-settings-power'),
         cadence:       q.get('#controllable-settings-cadence'),
         speed:         q.get('#controllable-settings-speed'),
+        distance:      q.get('#controllable-settings-distance'),
     };
 
     xf.sub('db:pwr', pwr => {
@@ -87,6 +105,9 @@ function ControllableSettingsView(args) {
     });
     xf.sub('db:spd', spd => {
         dom.speed.textContent = `${spd}`;
+    });
+    xf.sub('db:distance', distance => {
+        dom.distance.textContent = `${distance}`;
     });
 
     xf.sub(`${name}:info`, data => {
