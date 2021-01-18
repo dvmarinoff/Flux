@@ -122,7 +122,6 @@ body {
 }
 .zone-three {
     background-color: var(--zone-gray);
-    /* background-color: var(--zone-teal); */
 }
 .zone-four {
     background-color: var(--zone-green);
@@ -219,8 +218,6 @@ body.white-theme {
 
     /* color: var(--white); */
     /* background-color: var(--chrome); */
-
-    /* box-shadow: 0px 1px 1px 0px var(--black-opacity-01); */
 }
 .white-theme .menu-cont {
     background-color: var(--white);
@@ -1253,6 +1250,12 @@ body.dark-theme {
     margin-right: 10px;
 }
 .connection-content {}
+
+#version {
+    text-align: center;
+    margin: 10px 0 0 0;
+    padding: 10px 10px;
+}
 
 @media all and (min-width: 1800px) {
 }

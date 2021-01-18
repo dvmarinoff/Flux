@@ -15,7 +15,7 @@ function DataMock(args) {
     let interval = null;
     let power = 0;
 
-    xf.sub('db:targetPwr', pwr => {
+    xf.sub('db:powerTarget', pwr => {
         power = pwr;
     });
 
