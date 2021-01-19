@@ -8,7 +8,7 @@ import { stringToHex,
 import { xf }       from '../xf.js';
 import { Device }   from './device.js';
 import { services } from './services.js';
-import { ftms } from './ftms.js';
+import { ftms }     from './ftms.js';
 
 
 class Controllable {
@@ -214,8 +214,8 @@ class Controllable {
     onIndoorBikeData (e) {
         let dataview = e.target.value;
         let data     = ftms.dataviewToIndoorBikeData(dataview);
-        console.log(`onIndoorBikeData: `);
-        console.log(data);
+        // console.log(`onIndoorBikeData: `);
+        // console.log(data);
         xf.dispatch('device:pwr', data.pwr);
         xf.dispatch('device:spd', data.spd);
         xf.dispatch('device:cad', data.cad);

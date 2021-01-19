@@ -13,28 +13,45 @@ import { parseZwo, intervalsToGraph } from './parser.js';
 function ControllableConnectionView(dom) {
     xf.sub('pointerup', e => xf.dispatch('ui:controllableSwitch'), dom.switchBtn);
 
-    xf.sub('controllable:connected', e => {
-        dom.indicator.classList.remove('off');
-        dom.indicator.classList.add('on');
-    });
-
     xf.sub('controllable:disconnected', e => {
+        dom.indicator.classList.remove('loading');
         dom.indicator.classList.remove('on');
         dom.indicator.classList.add('off');
+    });
+
+    xf.sub('controllable:connecting', e => {
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.remove('on');
+        dom.indicator.classList.add('loading');
+    });
+
+    xf.sub('controllable:connected', e => {
+        dom.indicator.classList.remove('loading');
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.add('on');
     });
 }
 
 function HrbConnectionView(dom) {
     xf.sub('pointerup', e => xf.dispatch('ui:hrbSwitch'), dom.switchBtn);
 
-    xf.sub('hrb:connected', e => {
-        dom.indicator.classList.remove('off');
-        dom.indicator.classList.add('on');
-    });
-
     xf.sub('hrb:disconnected', e => {
+        dom.indicator.classList.remove('loading');
         dom.indicator.classList.remove('on');
         dom.indicator.classList.add('off');
+
+    });
+
+    xf.sub('hrb:connecting', e => {
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.remove('on');
+        dom.indicator.classList.add('loading');
+    });
+
+    xf.sub('hrb:connected', e => {
+        dom.indicator.classList.remove('off');
+        dom.indicator.classList.remove('loading');
+        dom.indicator.classList.add('on');
     });
 }
 
@@ -77,6 +94,7 @@ function ControllableSettingsView(args) {
         power:         q.get('#controllable-settings-power'),
         cadence:       q.get('#controllable-settings-cadence'),
         speed:         q.get('#controllable-settings-speed'),
+        distance:      q.get('#controllable-settings-distance'),
     };
 
     xf.sub('db:pwr', pwr => {
@@ -87,6 +105,9 @@ function ControllableSettingsView(args) {
     });
     xf.sub('db:spd', spd => {
         dom.speed.textContent = `${spd}`;
+    });
+    xf.sub('db:distance', distance => {
+        dom.distance.textContent = `${distance}`;
     });
 
     xf.sub(`${name}:info`, data => {
@@ -202,11 +223,12 @@ function GraphPower(args) {
                 dom.graph.removeChild(dom.graph.childNodes[0]);
             }
             dom.graph.insertAdjacentHTML('beforeend',
-        `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width};"></div>`);
+        `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width}px;"></div>`);
         });
     }
 
-    matchInterval();
+    // matchInterval();
+    freeRide();
 
     xf.sub('db:ftp', x => {
         // dom.ftp.textContent = `FTP ${x}`;
@@ -214,9 +236,9 @@ function GraphPower(args) {
     });
 
     xf.sub('db:intervalIndex', index => {
-        dom.graph.innerHTML = '';
+        // dom.graph.innerHTML = '';
         intervalIndex = index;
-        width = size / workout.intervals[intervalIndex].duration;
+        // width = size / workout.intervals[intervalIndex].duration;
     });
 
     xf.sub('db:workout', x => {
@@ -385,10 +407,18 @@ function NumberInput(args) {
     let type  = args.type || 'Int';
     let prop  = args.prop || 'numberInput';
     let value = 0;
+    let vibrate = true;
+    let btn = 10;
 
     xf.sub(`db:${prop}`, x => {
         value = x;
         dom.input.value = x;
+    });
+    xf.sub(`db:vibrate`, x => {
+        vibrate = x;
+    });
+    xf.sub(`db:vibrateBtn`, x => {
+        btn = x;
     });
 
     xf.sub('change', e => {
@@ -398,10 +428,12 @@ function NumberInput(args) {
 
     xf.sub('pointerup', e => {
         xf.dispatch(`ui:${evt}-inc`);
+        if(vibrate) navigator.vibrate([btn]);
     }, dom.incBtn);
 
     xf.sub('pointerup', e => {
         xf.dispatch(`ui:${evt}-dec`);
+        if(vibrate) navigator.vibrate([btn]);
     }, dom.decBtn);
 }
 
@@ -502,6 +534,8 @@ function ControlView(args) {
     };
 
     let mode = 'erg';
+    let vibrate = true;
+    let btn = 10;
 
     xf.sub('db:mode', m => {
         mode = m;
@@ -509,6 +543,9 @@ function ControlView(args) {
         if(m === 'resistance') uiResistanceMode(dom);
         if(m === 'slope')      uiSlopeMode(dom);
     });
+
+    xf.sub(`db:vibrate`, x => {vibrate = x;});
+    xf.sub(`db:vibrateBtn`, x => {btn = x;});
 
     function uiErgMode(dom) {
         dom.ergModeBtn.classList.add('active');
@@ -561,14 +598,17 @@ function ControlView(args) {
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:erg-mode');
+        if(vibrate) navigator.vibrate([btn]);
     }, dom.ergModeBtn);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:resistance-mode');
+        if(vibrate) navigator.vibrate([btn]);
     }, dom.resistanceModeBtn);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:slope-mode');
+        if(vibrate) navigator.vibrate([btn]);
     }, dom.slopeModeBtn);
 
     xf.sub('key:e', e => {
@@ -608,11 +648,27 @@ function WatchView(args) {
         watchState = db.watchState;
     });
 
-    xf.sub('pointerup', e => xf.dispatch('ui:watchStart'),   dom.start);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchPause'),   dom.pause);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchLap'),     dom.lap);
-    xf.sub('pointerup', e => xf.dispatch('ui:watchStop'),    dom.stop);
-    xf.sub('pointerup', e => xf.dispatch('ui:workoutStart'), dom.workout);
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:watchStart');
+        if(vibrate) navigator.vibrate([btn]);
+    },   dom.start);
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:watchPause');
+        if(vibrate) navigator.vibrate([btn]);
+    },   dom.pause);
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:watchLap');
+        if(vibrate) navigator.vibrate([btn]);
+    },     dom.lap);
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:watchStop');
+        if(vibrate) navigator.vibrate([btn]);
+    },    dom.stop);
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:workoutStart');
+        if(vibrate) navigator.vibrate([btn]);
+    }, dom.workout);
+
     xf.sub('key:space', e => {
         console.log(watchState);
         if(watchState === 'paused' || watchState === 'stopped') {

@@ -58,25 +58,6 @@ function DeviceController(args) {
     });
 }
 
-function Vibrate(args) {
-    let lapTime = 0;
-    let vibrate = args.vibrate;
-    let long = args.long;
-
-    xf.sub('db:lapTime', time => {
-        lapTime = time;
-
-        if(vibrate) {
-            if(lapTime === 3 && long) {
-                window.navigator.vibrate([200, 800, 200, 800, 200, 800, 1000]);
-            }
-            if(lapTime === 0 && !long) {
-                window.navigator.vibrate([250]);
-            }
-        }
-    });
-}
-
 function FileController() {
 
     xf.sub('db:workoutFile', workoutFile => {
@@ -142,4 +123,4 @@ function WorkoutController() {
     });
 }
 
-export { DeviceController, FileController, WorkoutController, Vibrate };
+export { DeviceController, FileController, WorkoutController };

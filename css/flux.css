@@ -122,7 +122,6 @@ body {
 }
 .zone-three {
     background-color: var(--zone-gray);
-    /* background-color: var(--zone-teal); */
 }
 .zone-four {
     background-color: var(--zone-green);
@@ -219,8 +218,6 @@ body.white-theme {
 
     /* color: var(--white); */
     /* background-color: var(--chrome); */
-
-    /* box-shadow: 0px 1px 1px 0px var(--black-opacity-01); */
 }
 .white-theme .menu-cont {
     background-color: var(--white);
@@ -384,6 +381,7 @@ body.dark-theme {
 }
 .menu-cont.active {
     border-top: 1px solid rgba(255, 255, 255, .1);
+    /* remove or replace with repeated image */
     box-shadow: 1px 2px 2px 3px rgba(0,0,0, 0.1);
 }
 .tab-btn {
@@ -452,7 +450,7 @@ body.dark-theme {
 }
 .t3 {
     font-size: 17px;
-    line-spacing: 26px;
+    font-weight: bold;
     line-height: 22px;
 }
 .t4 { /* tab text, workout list, */
@@ -514,6 +512,9 @@ body.dark-theme {
 .indicator.on {
     background-color: var(--green);
 }
+.indicator.loading {
+    background-color: var(--yellow);
+}
 .indicator.off {
     background-color: var(--red);
 }
@@ -566,6 +567,12 @@ body.dark-theme {
     width: 50%;
     padding: 10px;
     text-align: center;
+}
+.tile-value-small {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
 }
 
 /* Data Bar */
@@ -725,6 +732,10 @@ body.dark-theme {
 .control-icon {
     fill: #fff;
 }
+#watch-pause, #watch-lap, #watch-stop, #activity-save {
+    display: none;
+}
+
 .control-point .tile {
     display: inline-block;
     vertical-align: middle;
@@ -1195,6 +1206,11 @@ body.dark-theme {
     justify-content: center;
     margin: 0 auto 5px;
 }
+.settings-card .t2 {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0px;
+}
 .device-info {
     display: flex;
     flex-direction: row;
@@ -1234,6 +1250,12 @@ body.dark-theme {
     margin-right: 10px;
 }
 .connection-content {}
+
+#version {
+    text-align: center;
+    margin: 10px 0 0 0;
+    padding: 10px 10px;
+}
 
 @media all and (min-width: 1800px) {
 }
@@ -1362,6 +1384,27 @@ body.dark-theme {
     }
     #dark-mode {
         width: 95px;
+    }
+}
+
+@media all and (max-height: 650px) {
+    .data-tile-small {
+        display: none;
+    }
+}
+
+@media all and (max-height: 559px) {
+    .graph {
+        height: 80px;
+    }
+    .graph-screen {
+        height: 80px;
+    }
+    .workout-graph {
+        height: 80px;
+    }
+    .t1 {
+        font-size: 26px;
     }
 }
 
