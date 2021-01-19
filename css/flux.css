@@ -1387,6 +1387,27 @@ body.dark-theme {
     }
 }
 
+@media all and (max-height: 650px) {
+    .data-tile-small {
+        display: none;
+    }
+}
+
+@media all and (max-height: 559px) {
+    .graph {
+        height: 80px;
+    }
+    .graph-screen {
+        height: 80px;
+    }
+    .workout-graph {
+        height: 80px;
+    }
+    .t1 {
+        font-size: 26px;
+    }
+}
+
 /* Mobile Device Specific Queries */
 
 /* Portrait and Landscape Tablets */

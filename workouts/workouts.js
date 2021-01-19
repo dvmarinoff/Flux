@@ -216,7 +216,7 @@ let workouts =
     <tags>
     </tags>
     <workout>
-        <Warmup Duration="600" PowerLow="0.32" PowerHigh="0.63"/>
+        <SteadyState Duration="600" Power="0.39"/>
         <SteadyState Duration="600" Power="0.63"/>
         <SteadyState Duration="300" Power="0.55"/>
         <SteadyState Duration="600" Power="0.67"/>
@@ -230,7 +230,7 @@ let workouts =
         <SteadyState Duration="600" Power="0.67"/>
         <SteadyState Duration="300" Power="0.55"/>
         <SteadyState Duration="600" Power="0.63"/>
-        <Cooldown Duration="600" PowerLow="0.32" PowerHigh="0.63"/>
+        <SteadyState Duration="600" Power="0.39"/>
     </workout>
 </workout_file>`
 },

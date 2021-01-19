@@ -55,6 +55,8 @@ let db = {
 
     points: [],
 
+    vibrate: true,
+    vibrateBtn: 10,
     controllableFeatures: {},
 };
 

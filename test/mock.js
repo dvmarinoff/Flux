@@ -19,24 +19,33 @@ function DataMock(args) {
         power = pwr;
     });
 
+    const randMember = (xs) => xs[rand(0, (xs.length-1))];;
+
     xf.sub('watch:started', e => {
 
-        interval = setInterval(function() {
-            // let power    = (count % 60) < 30 ?  100 : 300;
+        xf.dispatch('watch:elapsed', 4190);
+        xf.dispatch('controllable:connected');
+        xf.dispatch('hrb:connected');
 
-            let hr       = (count % 60) < 30 ?  120 : 160;
-            let cadence  = (count % 60) < 30 ?   75 : 90;
-            let speed    = (count % 60) < 30 ? 27.0 : 39.0;
-            // let distance = count * mps(speed);
+        interval = setInterval(function() {
+            // B+
+            // let hr       = 147;
+            // let speed    = 32.17;
+            // let distance = 37400;
+
+            // D
+            let hr       = 171;
+            let speed    = 32.17;
+            let distance = 37400;
 
             if(args.hr) {
-                xf.dispatch('device:hr', hr);
+                xf.dispatch('device:hr', hr + rand(-2, 2));
             }
             if(args.pwr) {
-                xf.dispatch('device:pwr',  power + rand(-10, 10));
-                xf.dispatch('device:cad',  cadence);
+                xf.dispatch('device:pwr',  power + rand(-20, 10));
+                xf.dispatch('device:cad',  85 + rand(-3, 3));
                 xf.dispatch('device:spd',  speed);
-                // xf.dispatch('device:dist', distance);
+                xf.dispatch('device:dist', distance);
             }
             console.log(`mock ${power}`);
             count += 1;

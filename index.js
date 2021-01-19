@@ -9,10 +9,10 @@ import { WakeLock } from './lock.js';
 import { Views } from './views.js';
 import { DeviceController,
          FileController,
-         WorkoutController,
-         Vibrate } from './controllers.js';
+         WorkoutController } from './controllers.js';
 import { FileHandler } from './file.js';
 import { IDB, Storage } from './storage.js';
+import { Vibrate } from './vibrate.js';
 import { DataMock } from './test/mock.js';
 
 'use strict';
@@ -34,7 +34,7 @@ async function start() {
 
     xf.dispatch('app:start');
 
-    // Vibrate({vibrate: true, long: false});
+    Vibrate({turnOn: true});
     // DataMock({hr: true, pwr: true});
 };
 
