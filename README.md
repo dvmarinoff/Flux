@@ -13,10 +13,20 @@ The web version is free to use and open source. It is developed as a serverless 
 Everything happens in your Browser and stays in there. It uses Web Bluetooth, IndexDB, Local Storage, WakeLock API, Vibration API.
 
 ## Screenshots
-![Main Page](/doc/images/home-page.jpg)
-![Workouts Page](/doc/images/workouts-page.jpg)
-![Settings Page](/doc/images/settings-page.jpg)
 
+<table>
+  <tr>
+     <td>
+       <img alt="Home Page" width="320px" src="doc/images/home-page.jpg" />
+     </td>
+     <td>
+       <img alt="Workouts Page" width="320px" src="doc/images/workouts-page.jpg" />
+     </td>
+     <td>
+       <img alt="Settings-page" width="320px" src="doc/images/settings-page.jpg" />
+     </td>
+  </tr>
+</table>
 
 ## Supported Platforms
 
@@ -39,6 +49,7 @@ Works with all trainers that implement the Fitness Machine (FTMS) bluetooth Prof
 
 ## The Demo
 You can check a pre-release demo of the web version at [Demo](https://dvmarinoff.github.io/Flux/)
+
 Keep in mind it is in active development and will change and brake on daily bases, that's until the first stable version is released.
 
 
