@@ -249,3 +249,5 @@ xf.reg('file:download:activity', (e, db) => {
     db.targetPwr    = 0;
 });
 // Session end
+
+export { db };
