@@ -229,13 +229,21 @@
                 <div class="settings-tiles">
                     <div id="ftp-settings" class="settings-tile">
                         <label for="ftp-value" class="settings-tile-label">FTP</label>
-                        <input id="ftp-value" class="settings-tile-input" name="ftp-value" type="text" value="---"/>
+                        <input id="ftp-value" class="settings-tile-input" name="ftp-value" type="number" value="200"/>
                         <div id="ftp-btn" class="settings-tile-btn">Set</div>
                     </div>
                     <div id="weight-settings" class="settings-tile">
                         <label for="weight-value" class="settings-tile-label">kg</label>
-                        <input id="weight-value" class="settings-tile-input" name="weight-value" type="text" value="--"/>
+                        <input id="weight-value" class="settings-tile-input" name="weight-value" type="number" value="75"/>
                         <div id="weight-btn" class="settings-tile-btn">Set</div>
+                    </div>
+                </div>
+                <div class="settings-btn-row">
+                    <div id="theme-settings" class="settings-switch-btn-cont">
+                        <div id="theme-btn" class="settings-switch-bnt">Dark</div>
+                    </div>
+                    <div id="msystem-settings" class="settings-switch-btn-cont">
+                        <div id="msystem-btn" class="settings-switch-bnt">Metric</div>
                     </div>
                 </div>
 
@@ -299,6 +307,35 @@
                             <div class="info-cell">
                                 <h3 class="">Battery</h3>
                                 <div class="value" id="hrb-settings-battery">--- %</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row border">
+                    <div class="settings-card power-meter">
+                        <div class="device-controls">
+                            <div id="power-meter-settings-btn" class="switch">
+                                <div class="indicator off"></div>
+                                <div id="power-meter-settings-name" class="text t2">Power Meter</div>
+                            </div>
+                        </div>
+                        <div class="device-info">
+                            <div class="info-cell">
+                                <h3 class="">Model</h3>
+                                <div class="value">
+                                    <span id="power-meter-settings-manufacturer">---</span>
+                                    <span id="power-meter-settings-model"></span>
+                                    <span id="power-meter-settings-firmware"></span>
+                                </div>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Power</h3>
+                                <div class="value" id="power-meter-settings-power">-- W</div>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Cadence</h3>
+                                <div class="value" id="power-meter-settings-cadence">-- rpm</div>
                             </div>
                         </div>
                     </div>

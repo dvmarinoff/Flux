@@ -1184,6 +1184,34 @@ body.dark-theme {
     cursor: pointer;
 }
 
+.settings-btn-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 480px;
+    margin: 0 auto 10px;
+}
+.settings-switch-btn-cont {
+    margin: 10px auto;
+}
+.settings-switch-bnt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* width: 70px; */
+    width: 120px;
+    height: 40px;
+    padding: 4px 10px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    /* border: 1px solid var(--white-opacity-01); */
+    border-radius: 50%;
+    cursor: pointer;
+}
+
 .row.border {
     border-top: 1px solid var(--white-opacity-01);
     /* border-bottom: 1px solid var(--white-opacity-01); */
@@ -1208,7 +1236,7 @@ body.dark-theme {
 }
 .settings-card .t2 {
     font-size: 12px;
-    font-weight: bold;
+    /* font-weight: bold; */
     letter-spacing: 0px;
 }
 .device-info {

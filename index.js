@@ -3,6 +3,7 @@ import 'regenerator-runtime/runtime';
 import { xf } from './xf.js';
 import { db } from './db.js';
 import { Controllable } from './ble/controllable.js';
+import { PowerMeter } from './ble/power-meter.js';
 import { Hrb } from './ble/hrb.js';
 import { Watch } from './watch.js';
 import { WakeLock } from './lock.js';
@@ -21,6 +22,7 @@ import { DataMock } from './test/mock.js';
 async function start() {
     let hrb   = new Hrb({name: 'hrb'});
     let flux  = new Controllable({name: 'controllable'});
+    let pm    = new PowerMeter({name: 'pm'});
     let watch = new Watch();
     let lock  = new WakeLock();
 
@@ -28,7 +30,7 @@ async function start() {
 
     FileController();
     WorkoutController();
-    DeviceController({controllable: flux, watch: watch, hrb: hrb});
+    DeviceController({controllable: flux, powerMeter: pm, watch: watch, hrb: hrb});
 
     let storage = new Storage();
 

@@ -10,47 +10,28 @@ import { avgOfArray,
          fixInRange } from './functions.js';
 import { parseZwo, intervalsToGraph } from './parser.js';
 
-function ControllableConnectionView(dom) {
-    xf.sub('pointerup', e => xf.dispatch('ui:controllableSwitch'), dom.switchBtn);
 
-    xf.sub('controllable:disconnected', e => {
+function ConnectionView(args) {
+    let dom  = args.dom;
+    let name = args.name;
+
+    xf.sub('pointerup', e => xf.dispatch(`ui:${name}:switch`), dom.switchBtn);
+
+    xf.sub(`${name}:disconnected`, e => {
         dom.indicator.classList.remove('loading');
         dom.indicator.classList.remove('on');
         dom.indicator.classList.add('off');
     });
 
-    xf.sub('controllable:connecting', e => {
+    xf.sub(`${name}:connecting`, e => {
         dom.indicator.classList.remove('off');
         dom.indicator.classList.remove('on');
         dom.indicator.classList.add('loading');
     });
 
-    xf.sub('controllable:connected', e => {
+    xf.sub(`${name}:connected`, e => {
         dom.indicator.classList.remove('loading');
         dom.indicator.classList.remove('off');
-        dom.indicator.classList.add('on');
-    });
-}
-
-function HrbConnectionView(dom) {
-    xf.sub('pointerup', e => xf.dispatch('ui:hrbSwitch'), dom.switchBtn);
-
-    xf.sub('hrb:disconnected', e => {
-        dom.indicator.classList.remove('loading');
-        dom.indicator.classList.remove('on');
-        dom.indicator.classList.add('off');
-
-    });
-
-    xf.sub('hrb:connecting', e => {
-        dom.indicator.classList.remove('off');
-        dom.indicator.classList.remove('on');
-        dom.indicator.classList.add('loading');
-    });
-
-    xf.sub('hrb:connected', e => {
-        dom.indicator.classList.remove('off');
-        dom.indicator.classList.remove('loading');
         dom.indicator.classList.add('on');
     });
 }
@@ -72,14 +53,19 @@ function ConnectionControlsView() {
         hrbSettings: {
             switchBtn: q.get('#hrb-settings-btn'),
             indicator: q.get('#hrb-settings-btn .indicator'),
-        }
+        },
+        pmSettings: {
+            switchBtn: q.get('#power-meter-settings-btn'),
+            indicator: q.get('#power-meter-settings-btn .indicator'),
+        },
     };
 
-    ControllableConnectionView(dom.controllableHome);
-    HrbConnectionView(dom.hrbHome);
+    ConnectionView({name: 'controllable', dom: dom.controllableHome});
+    ConnectionView({name: 'hrb', dom: dom.hrbHome});
 
-    ControllableConnectionView(dom.controllableSettings);
-    HrbConnectionView(dom.hrbSettings);
+    ConnectionView({name: 'controllable', dom: dom.controllableSettings});
+    ConnectionView({name: 'hrb', dom: dom.hrbSettings});
+    ConnectionView({name: 'pm', dom: dom.pmSettings});
 }
 
 function ControllableSettingsView(args) {
@@ -134,6 +120,35 @@ function HrbSettingsView(args) {
 
     xf.sub('db:hr', hr => {
         dom.value.textContent = `${hr} bpm`;
+    });
+
+    xf.sub(`${name}:info`, data => {
+        console.log(data);
+        dom.name.textContent         = `${data.name}`;
+        dom.model.textContent        = `${data.modelNumberString}`;
+        dom.manufacturer.textContent = `${data.manufacturerNameString}`;
+        dom.firmware.textContent     = `${data.firmwareRevisionString}`;
+    });
+}
+
+function PowerMeterSettingsView(args) {
+    let name = args.name || 'pm';
+    let dom  = {
+        switchBtn:     q.get('#power-meter-settings-btn'),
+        indicator:     q.get('#power-meter-settings-btn .indicator'),
+        name:          q.get('#power-meter-settings-name'),
+        manufacturer:  q.get('#power-meter-settings-manufacturer'),
+        model:         q.get('#power-meter-settings-model'),
+        firmware:      q.get('#power-meter-settings-firmware'),
+        power:         q.get('#power-meter-settings-power'),
+        cadence:       q.get('#power-meter-settings-cadence'),
+    };
+
+    xf.sub('db:power', pwr => {
+        dom.power.textContent = `${pwr}`;
+    });
+    xf.sub('db:cad', cad => {
+        dom.cadence.textContent = `${cad}`;
     });
 
     xf.sub(`${name}:info`, data => {
@@ -411,6 +426,7 @@ function NumberInput(args) {
     let btn = 10;
 
     xf.sub(`db:${prop}`, x => {
+        console.log(`DB:${prop} ${x}`);
         value = x;
         dom.input.value = x;
     });
@@ -457,7 +473,7 @@ function ERG() {
 
     xf.sub('db:powerMin', min => { powerMin = min; updateParams(); });
     xf.sub('db:powerMax', max => { powerMax = max; updateParams(); });
-    xf.sub('db:powerInx', inc => { powerInc = inc; });
+    xf.sub('db:powerInc', inc => { powerInc = inc; });
 
     NumberInput({dom: {input:  dom.powerValue,
                        incBtn: dom.powerInc,
@@ -486,7 +502,7 @@ function Resistance() {
 
     xf.sub('db:resistanceMin', min => { resistanceMin = min; updateParams(); });
     xf.sub('db:resistanceMax', max => { resistanceMax = max; updateParams(); });
-    xf.sub('db:resistanceInx', inc => { resistanceInc = inc; });
+    xf.sub('db:resistanceInc', inc => { resistanceInc = inc; });
 
     NumberInput({dom: {input:  dom.resistanceValue,
                        incBtn: dom.resistanceInc,
@@ -577,16 +593,17 @@ function ControlView(args) {
             xf.dispatch('ui:power-target-manual-inc');
         }
         if(mode === 'resistance') {
-            xf.dispatch('ui:resistance-target-manual-inc');
+            xf.dispatch('ui:resistance-target-inc');
         }
         if(mode === 'slope') {
-            xf.dispatch('ui:slope-target-manual-inc');
+            xf.dispatch('ui:slope-target-inc');
         }
     });
 
     xf.sub('key:down', e => {
+        console.log(mode);
         if(mode === 'erg') {
-            xf.dispatch('ui:power-target-dec');
+            xf.dispatch('ui:power-target-manual-dec');
         }
         if(mode === 'resistance') {
             xf.dispatch('ui:resistance-target-dec');
@@ -638,6 +655,8 @@ function WatchView(args) {
         name:    q.get('#workout-name'),
     };
     let watchState = 'stopped';
+    let vibrate = true;
+    let btn = 10;
 
     xf.reg('db:workout', db => {
         dom.name.textContent = db.workout.name;
@@ -878,6 +897,7 @@ function Views() {
     ConnectionControlsView();
     ControllableSettingsView({name: 'controllable'});
     HrbSettingsView({name: 'hrb'});
+    PowerMeterSettingsView({name: 'pm'});
 
     DataScreen();
     GraphPower();

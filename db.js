@@ -10,6 +10,7 @@ import { avgOfArray, maxOfArray, sum,
 
 let db = {
     pwr: 0,
+    power: 0,
     hr: 0,
     cad: 0,
     spd: 0,
@@ -65,11 +66,12 @@ xf.initDB(db);
 
 
 // Register DB Events
-xf.reg('device:hr',   (x, db) => db.hr       = x);
-xf.reg('device:pwr',  (x, db) => db.pwr      = x);
-xf.reg('device:spd',  (x, db) => db.spd      = x);
-xf.reg('device:cad',  (x, db) => db.cad      = x);
-xf.reg('device:dist', (x, db) => db.distance = x);
+xf.reg('device:hr',    (x, db) => db.hr       = x);
+xf.reg('device:pwr',   (x, db) => db.pwr      = x);
+xf.reg('device:spd',   (x, db) => db.spd      = x);
+xf.reg('device:cad',   (x, db) => db.cad      = x);
+xf.reg('device:dist',  (x, db) => db.distance = x);
+xf.reg('pm:power',     (x, db) => db.power    = x);
 
 xf.reg('ui:ftp',      (x, db) => db.ftp    = x);
 xf.reg('ui:weight',   (x, db) => db.weight = x);
@@ -249,3 +251,5 @@ xf.reg('file:download:activity', (e, db) => {
     db.targetPwr    = 0;
 });
 // Session end
+
+export { db };
