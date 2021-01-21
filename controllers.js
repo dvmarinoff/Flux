@@ -7,6 +7,7 @@ import { RecordedData, RecordedLaps } from './test/mock.js';
 function DeviceController(args) {
     let controllable = args.controllable;
     let hrb          = args.hrb;
+    let powerMeter   = args.powerMeter;
     let watch        = args.watch;
     let mode         = 'erg';
 
@@ -41,7 +42,7 @@ function DeviceController(args) {
         }
     });
 
-    xf.sub('ui:controllableSwitch', e => {
+    xf.sub('ui:controllable:switch', e => {
         if(controllable.device.connected) {
             controllable.disconnect();
         } else {
@@ -49,11 +50,19 @@ function DeviceController(args) {
         }
     });
 
-    xf.sub('ui:hrbSwitch', e => {
+    xf.sub('ui:hrb:switch', e => {
         if(hrb.device.connected) {
             hrb.disconnect();
         } else {
             hrb.connect();
+        }
+    });
+
+    xf.sub('ui:pm:switch', e => {
+        if(powerMeter.isConnected()) {
+            powerMeter.disconnect();
+        } else {
+            powerMeter.connect();
         }
     });
 }

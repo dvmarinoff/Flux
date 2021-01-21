@@ -9,7 +9,11 @@ const services = {
         fitnessMachineStatus: {uuid: 0x2ADA}
     },
     cyclingPower: {
-        uuid: 0x1818
+        uuid: 0x1818,
+        cyclingPowerMeasurement: {uuid: 0x2A63},
+        cyclingPowerFeature: {uuid: 0x2A65},
+        cyclingPowerControlPoint: {uuid: 0x2A66},
+        sensorLocation: {uuid: 0x2A5A},
     },
     heartRate: {
         uuid: 0x180D,

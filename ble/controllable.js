@@ -14,8 +14,7 @@ import { ftms }     from './ftms.js';
 class Controllable {
     constructor(args) {
         this.device = new Device({filter: services.fitnessMachine.uuid,
-                                  optionalServices: [services.deviceInformation.uuid,
-                                                     services.batteryService.uuid],
+                                  optionalServices: [services.deviceInformation.uuid],
                                   name: args.name});
         this.fitnessMachineFeature = {};
         this.fitnessMachineStatus = {};
@@ -125,8 +124,9 @@ class Controllable {
                                  services.fitnessMachine.fitnessMachineStatus.uuid,
                                  self.onFitnessMachineStatus);
     }
-    async onFitnessMachineStatus(dataview) {
+    async onFitnessMachineStatus(e) {
         let self = this;
+        let dataview = e.target.value;
         let fitnessMachineStatus = ftms.dataviewToFitnessMachineStatus(dataview);
 
         console.log(fitnessMachineStatus);
@@ -152,6 +152,7 @@ class Controllable {
 
     }
     async setTargetResistanceLevel(value) {
+        // TEMPORARY DISABLED
         let self  = this;
         let OpCode = 0x04;
         let resistance = value || 0; // unitless - 0.1
@@ -161,10 +162,9 @@ class Controllable {
         view.setUint8(0, OpCode, true);
         // view.setUint8(1, parseInt(resistance), true); // by Spec
         view.setInt16(1, resistance, true); // works with Tacx
-        console.log(`set target resistance: ${resistance}`);
+        console.warn(`TEMPORARY DISABLED: set target resistance: ${resistance}`);
         // console.log(buffer);
-        let res =
-            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+        // let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
 
     }
     async setTargetPower(value) {
@@ -214,7 +214,7 @@ class Controllable {
     onIndoorBikeData (e) {
         let dataview = e.target.value;
         let data     = ftms.dataviewToIndoorBikeData(dataview);
-        // console.log(`onIndoorBikeData: `);
+        // console.log(`onIndoorBikeData: ${data.pwr}`);
         // console.log(data);
         xf.dispatch('device:pwr', data.pwr);
         xf.dispatch('device:spd', data.spd);
