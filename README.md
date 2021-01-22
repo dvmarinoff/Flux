@@ -48,7 +48,7 @@ On Chrome for Linux you might need to turn on the experimental platforms feature
 
 ### Opera
 
-For Opera you might need to enable the web bluetooth flag as
+For Opera you might need to enable the web bluetooth flag at
 
 `opera://flags/#enable-web-bluetooth`
 
@@ -58,7 +58,7 @@ For iOS you can try [WebBLE](https://apps.apple.com/us/app/webble/id1193531073) 
 
 > Very simple web browser that supports an initial subset of the web bluetooth.
 
-It is not tested or supported by this project, but you can give it try if your only choise is iOS.
+It is not tested or supported by this project, but you can give it try if your only option is iOS.
 
 
 
