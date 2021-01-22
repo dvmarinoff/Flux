@@ -39,7 +39,27 @@ Browser support for the web version is the following:
 |--------|----------------|------|-------|---------------|------------------|--------|------------|
 | yes    | yes            | yes  | yes   | no            | yes              | no     | no         |
 
-On Chrome for Linux you might need to turn on the experimental platforms feature flag at `chrome://flags/#enable-experimental-web-platform-features`
+
+### Linux
+On Chrome for Linux you might need to turn on the experimental platforms feature flag at
+
+`chrome://flags/#enable-experimental-web-platform-features`
+
+
+### Opera
+
+For Opera you might need to enable the web bluetooth flag as
+
+`opera://flags/#enable-web-bluetooth`
+
+
+### iOS
+For iOS you can try [WebBLE](https://apps.apple.com/us/app/webble/id1193531073) which is:
+
+> Very simple web browser that supports an initial subset of the web bluetooth.
+
+It is not tested or supported by this project, but you can give it try if your only choise is iOS.
+
 
 
 ## Supported Hardware
@@ -50,7 +70,7 @@ Works with all trainers that implement the Fitness Machine (FTMS) bluetooth Prof
 ## The Demo
 You can check a pre-release demo of the web version at [Demo](https://dvmarinoff.github.io/Flux/)
 
-Keep in mind it is in active development and will change and brake on daily bases, that's until the first stable version is released.
+Keep in mind it is in active development and will change and break on daily bases, that's until the first stable version is released.
 
 
 
