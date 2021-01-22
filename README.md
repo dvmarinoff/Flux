@@ -64,7 +64,35 @@ It is not tested or supported by this project, but you can give it try if your o
 
 ## Supported Hardware
 
-Works with all trainers that implement the Fitness Machine (FTMS) bluetooth Profile or simply put Bluetooth Smart.
+Works with all trainers that implement the bluetooth Fitness Machine Service (FTMS).
+
+List of known trainers that implement FTMS:
+
+- Tacx Flux 1 / S / 2
+- Tacx Flow Smart 
+
+- Elite Direto 
+- Elite Suito
+- Elite Tuo
+- Elite Zumo 
+
+- Saris H3
+- Saris M2
+
+- Wahoo Kickr Core
+<!-- - Wahoo Snap  -->
+
+List of major trainers without FTMS:
+
+Tacx Neo / 2 / 2T (using custom bluetooth solution)
+Wahoo Kickr (using custom bluetooth solution)
+
+
+
+#### ANT+ FE-C
+
+I am currently researching options for FE-C on the web. It just might work.
+
 
 
 ## The Demo

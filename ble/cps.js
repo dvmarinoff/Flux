@@ -1,4 +1,3 @@
-
 const cyclingPowerMeasurment =
 [
     {name: 'Flags',
@@ -48,36 +47,79 @@ const cyclingPowerMeasurment =
      format: 'Int16', unit: 'Watt', decimalExponent: 0,
      informativeText: 'Unit is in watts with a resolution of 1.',
     },
-    {name: 'Pedal Power Balance', requirement: 'Optional',
+    {name: 'PedalPowerBalance', requirement: 'Optional',
      format: 'Uint8', unit: 'Percentage', binaryExponent: -1,
      informativeText: 'Unit is in percentage with a resolution of 1/2.',
     },
-    {name: '',
-     requirement: '',
-     format: '',
-     unit: '',
-     decimalExponent: 0,
-     informativeText: '',
+    {name: 'AccumulatedTorque', requirement: 'Optional',
+     format: 'Uint16',
+     unit: 'N m',
+     binaryExponent: -5,
+     informativeText: 'Unit is in newton metres with a resolution of 1/32.',
     },
 
-    {name: '',
-     requirement: '',
-     format: '',
-     unit: '',
-     decimalExponent: 0,
-     informativeText: '',
+    {name: 'WheelRevolutionDataCumulativeWheelRevolutions', requirement: 'C1',
+     format: 'Uint32', unit: 'unitless', decimalExponent: 0,
+     informativeText: 'Unitless. C1:When present, these fields are always present as a pair.',
     },
-    {name: '',
-     requirement: '',
-     format: '',
-     unit: '',
-     decimalExponent: 0,
-     informativeText: '',
+    {name: 'WheelRevolutionDataLastWheelEventTime', requirement: 'C1',
+     format: 'Uint16', unit: 'second', binaryExponent: -11,
+     informativeText: 'Unit is in seconds with a resolution of 1/2048. C1:When present, these fields are always present as a pair.',
     },
 
-    // {name: 'Flags',
-    //  requirement: 'Mandatory',
-    //  format: 'Uint16',
+    {name: 'CrankRevolutionDataCumulativeCrankRevolutions', requirement: 'C2',
+     format: 'Uint16', unit: 'unitless', decimalExponent: 0,
+     informativeText: 'Unitless. C2:When present, these fields are always present as a pair.',
+    },
+    {name: 'CrankRevolutionDataLastCrankEventTime', requirement: 'C3',
+     format: 'Int16', unit: 'N', binaryExponent: -10,
+     informativeText: 'Unit is in newtons with a resolution of 1. C3:When present, these fields are always present as a pair.',
+    },
+
+
+    {name: 'ExtremeForceMagnitudesMinimumForceMagnitude', requirement: 'C3',
+     format: 'Int16', unit: 'N', decimalExponent: 0,
+     informativeText: 'Unit is in newtons with a resolution of 1. C3:When present, these fields are always present as a pair.',
+    },
+    {name: 'ExtremeTorqueMagnitudesMaximumTorqueMagnitude', requirement: 'C4',
+     format: 'Int16', unit: 'N m', binaryExponent: -5,
+     informativeText: 'Unit is in newton metres with a resolution of 1/32. C4:When present, these fields are always present as a pair.',
+    },
+    {name: 'ExtremeTorqueMagnitudesMinimumTorqueMagnitude', requirement: 'C4',
+     format: 'Int16', unit: 'N m', binaryExponent: -5,
+     informativeText: 'Unit is in newton metres with a resolution of 1/32. C4:When present, these fields are always present as a pair.',
+    },
+
+    {name: 'ExtremeAnglesMaximumAngle', requirement: 'C5',
+     format: 'Uint12', unit: 'degree', decimalExponent: 0,
+     informativeText: `Unit is in degrees with a resolution of 1.
+                       C5: When present, this field and the "Extreme Angles - Minimum Angle" field are always present as a
+                       pair and are concatenated into a UINT24 value (3 octets). As an example, if the Maximum Angle is
+                       0xABC and the Minimum Angle is 0x123, the transmitted value is 0x123ABC.`,
+    },
+
+    {name: 'ExtremeAnglesMinimumAngle', requirement: 'C5',
+     format: 'Uint12', unit: 'degree', decimalExponent: 0,
+     informativeText: `Unit is in degrees with a resolution of 1.
+                       C5: When present, this field and the "Extreme Angles - Maximum Angle" field are always present as a
+                       pair and are concatenated into a UINT24 value (3 octets). As an example, if the Maximum Angle is
+                       0xABC and the Minimum Angle is 0x123, the transmitted value is 0x123ABC.`,
+    },
+
+    {name: 'TopDeadSpotAngle', requirement: 'Optional',
+     format: 'Uint16', unit: 'degree', decimalExponent: 0,
+     informativeText: 'Unit is in degrees with a resolution of 1.',
+    },
+
+    {name: 'BottomDeadSpotAngle', requirement: 'Optional',
+     format: 'Uint16', unit: 'degree', binaryExponent: 0,
+     informativeText: 'Unit is in degrees with a resolution of 1.',
+    },
+
+    {name: 'AccumulatedEnergy', requirement: 'Optional',
+     format: 'Uint16', unit: 'J', binaryExponent: 0,
+     informativeText: 'Unit is in kilojoules with a resolution of 1.',
+    },
 ];
 
 let cyclingPowerFeatureSupport =
@@ -123,25 +165,44 @@ let cyclingPowerMeasurementFlags =
 
 
 
+function flagsToFieldsPresent(flags) {
+    return {};
+}
+
+flagsToFieldsPresent(30);
+
+function isCadenceSupported(flags) {}
+
 function dataviewToCyclingPowerMeasurement(dataview) {
 
 //               0  1  2  3  4  5  6  7  8  9 10 11 12 13
 //  value: (0x) 30-00-21-00-2A-00-00-00-C4-60-12-00-F7-04
 //
 
-    const flagsField = 0;
-    const instantaneousPowerField = 2;
+    const flagsFieldIndex = 0;
+    const instantaneousPowerFieldIndex = 2;
+
+    let flags = dataview.getUint16(flagsFieldIndex, true);
+    let power = dataview.getInt16(instantaneousPowerFieldIndex, true);
+
+    let fields = flagsToFieldsPresent(30);
 
     let data = {
-        flags:  dataview.getUint16(flagsField, true),
-        power:  dataview.getInt16(instantaneousPowerField, true),
+        flags:  flags,
+        power: power,
     };
+
+    if(isCadenceSupported(flags)) {
+        const crankRevolutionsFieldIndex = 0;
+        let cadence = dataview.getInt16(crankRevolutionsFieldIndex, true);
+        data['cadence'] = cadence;
+    }
 
     return data;
 }
 
 let cps = {
-    dataviewToCyclingPowerMeasurement: dataviewToCyclingPowerMeasurement,
+    dataviewToCyclingPowerMeasurement,
 };
 
 export { cps };

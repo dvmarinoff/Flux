@@ -93,7 +93,7 @@ function ControllableSettingsView(args) {
         dom.speed.textContent = `${spd}`;
     });
     xf.sub('db:distance', distance => {
-        dom.distance.textContent = `${distance}`;
+        dom.distance.textContent = `${metersToDistance(distance)}`;
     });
 
     xf.sub(`${name}:info`, data => {
@@ -147,7 +147,7 @@ function PowerMeterSettingsView(args) {
     xf.sub('db:power', pwr => {
         dom.power.textContent = `${pwr}`;
     });
-    xf.sub('db:cad', cad => {
+    xf.sub('db:cadence', cad => {
         dom.cadence.textContent = `${cad}`;
     });
 
@@ -840,6 +840,32 @@ function ActivityView(args) {
         xf.dispatch('ui:activity:save');
     }, dom.saveBtn);
 }
+
+function Activity(args) {
+    let dom      = args.dom;
+    let id       = args.id;
+    let activity = args.activity;
+
+    dom.name.textContent = `${activity.name}`;
+
+    xf.sub(`pointerup`, e => {
+        xf.dispatch(`ui:download:activity`, id);
+    }, dom.downloadBtn);
+
+    xf.sub(`pointerup`, e => {
+        xf.dispatch(`ui:delete:activity`, id);
+    }, dom.deleteBtn);
+}
+
+function ActivityList(args) {
+    let dom = {};
+    let activities = [];
+
+    xf.sub(`db:activities`, a => {
+        activities = a;
+    });
+}
+
 
 function Keyboard() {
     xf.sub('keydown', e => {

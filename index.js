@@ -18,6 +18,15 @@ import { DataMock } from './test/mock.js';
 
 'use strict';
 
+// if('serviceWorker' in navigator) {
+//     navigator.serviceWorker.register('./sw.js')
+//         .then(reg => {
+//             console.log(`SW: register success: ${reg}`);
+//         })
+//         .catch(err => {
+//             console.log(`SW: register error: ${err}`);
+//         });
+// };
 
 async function start() {
     let hrb   = new Hrb({name: 'hrb'});
