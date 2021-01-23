@@ -4,8 +4,7 @@
     "description": "Cycling Structured Training",
     "start_url": "/Flux",
     "display": "standalone",
-    "orientation": "portrait",
-    "scope": "/",
+    "orientation": "portrait", "scope": "/",
     "theme_color": "#35363a",
     "background_color": "#28272D",
     "icons": [
@@ -22,7 +21,7 @@
             "purpose": "any"
         },
         {
-            "src": "/images/logo/flux-logo-96dpi-512px-maskable.png",
+            "src": "/images/logo/maskable-512.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "maskable"
