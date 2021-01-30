@@ -9,8 +9,10 @@ Flux is an App for executing structured workouts on a smart trainer.
 - build-in collection of structured workouts to get you started
 - keyboard controls
 
-The web version is free to use and open source. It is developed as a serverless PWA, has zero dependancies and is completly independant to run.
+The web version is free to use and open source. It is developed as a static PWA, has zero dependancies and is completly independant to run.
 Everything happens in your Browser and stays in there. It uses Web Bluetooth, IndexDB, Local Storage, WakeLock API, Vibration API.
+
+_Status_: working on implementing ANT+ over Web Serial API for the browser.
 
 ## Screenshots
 
@@ -30,7 +32,7 @@ Everything happens in your Browser and stays in there. It uses Web Bluetooth, In
 
 ## Supported Platforms
 
-A fully featured web version will be released by the end Jan 2021, and followed with desktop apps later.
+A fully featured web version will be released soon, and followed with desktop apps later.
 
 The Web version is running directly in the browser and relies on some of the latest web platform technologies.
 Browser support for the web version is the following:
@@ -86,9 +88,9 @@ List of known trainers (not exhaustive) that implement FTMS:
 
 List of major trainers without FTMS:
 
-- Tacx Neo / 2 / 2T (using custom bluetooth solution)
+- Tacx Neo / 2 / 2T (using custom solution ANT+ over Bluetooth)
 
-- Wahoo Kickr (using custom bluetooth solution)
+- Wahoo Kickr (using custom solution, but support for FTMS is expected to land with firmware update 1st week of Feb 2021)
 
 
 ### FE-C over BLE (Tacx)
