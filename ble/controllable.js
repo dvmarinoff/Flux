@@ -191,14 +191,13 @@ class Controllable {
         let buffer = new ArrayBuffer(7);
         let view   = new DataView(buffer);
         view.setUint8(0, 0x11, true);
-        view.setInt16(1, hex(wind),  true);
-        view.setInt16(3, hex(grade), true);
-        view.setUint8(5, hex(crr),   true);
-        view.setUint8(6, hex(drag),  true);
+        view.setInt16(1, wind,  true);
+        view.setInt16(3, grade, true);
+        view.setUint8(5, crr,   true);
+        view.setUint8(6, drag,  true);
         console.log(`set simulation: ${wind} ${grade} ${crr} ${drag}`);
         let res =
             await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
-
     }
     async spinDownControl() {
         let self   = this;

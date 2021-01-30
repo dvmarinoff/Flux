@@ -93,7 +93,7 @@ function ControllableSettingsView(args) {
         dom.speed.textContent = `${spd}`;
     });
     xf.sub('db:distance', distance => {
-        dom.distance.textContent = `${distance}`;
+        dom.distance.textContent = `${metersToDistance(distance)}`;
     });
 
     xf.sub(`${name}:info`, data => {
@@ -147,7 +147,7 @@ function PowerMeterSettingsView(args) {
     xf.sub('db:power', pwr => {
         dom.power.textContent = `${pwr}`;
     });
-    xf.sub('db:cad', cad => {
+    xf.sub('db:cadence', cad => {
         dom.cadence.textContent = `${cad}`;
     });
 
@@ -696,6 +696,9 @@ function WatchView(args) {
             xf.dispatch('ui:watchPause');
         }
     });
+    xf.sub('key:l', e => {
+        xf.dispatch('ui:watchLap');
+    });
 
     const init = dom => {
         dom.pause.style.display = 'none';
@@ -841,6 +844,32 @@ function ActivityView(args) {
     }, dom.saveBtn);
 }
 
+function Activity(args) {
+    let dom      = args.dom;
+    let id       = args.id;
+    let activity = args.activity;
+
+    dom.name.textContent = `${activity.name}`;
+
+    xf.sub(`pointerup`, e => {
+        xf.dispatch(`ui:download:activity`, id);
+    }, dom.downloadBtn);
+
+    xf.sub(`pointerup`, e => {
+        xf.dispatch(`ui:delete:activity`, id);
+    }, dom.deleteBtn);
+}
+
+function ActivityList(args) {
+    let dom = {};
+    let activities = [];
+
+    xf.sub(`db:activities`, a => {
+        activities = a;
+    });
+}
+
+
 function Keyboard() {
     xf.sub('keydown', e => {
         let keyCode = e.keyCode;
@@ -855,6 +884,7 @@ function Keyboard() {
         const isKeyE     = (code) => code === 'KeyE';
         const isKeyR     = (code) => code === 'KeyR';
         const isKeyS     = (code) => code === 'KeyS';
+        const isKeyL     = (code) => code === 'KeyL';
         const isKeySpace = (code) => code === 'Space';
 
         if(isKeyUp(code)) {
@@ -873,6 +903,9 @@ function Keyboard() {
         }
         if(isKeyE(code)) {
             xf.dispatch('key:e');
+        }
+        if(isKeyL(code)) {
+            xf.dispatch('key:l');
         }
         if(isKeySpace(code)) {
             e.preventDefault();
@@ -912,6 +945,7 @@ function Views() {
     WorkoutsView();
 
     UploadWorkoutView();
+    // ConnectANT();
 }
 
 export {

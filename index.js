@@ -16,6 +16,17 @@ import { DataMock } from './test/mock.js';
 
 'use strict';
 
+function startServiceWroker() {
+    if('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => {
+                console.log(`SW: register success: ${reg}`);
+            })
+            .catch(err => {
+                console.log(`SW: register error: ${err}`);
+            });
+    };
+}
 
 async function start() {
     let hrb   = new Hrb({name: 'hrb'});
@@ -37,5 +48,7 @@ async function start() {
     Vibrate({turnOn: true});
     // DataMock({hr: true, pwr: true});
 };
+
+// startServiceWroker();
 
 start();

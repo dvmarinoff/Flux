@@ -1,22 +1,30 @@
 {
-  "name": "Flux",
-  "short_name": "Flux",
-  "description": "Cycling Structured Training",
-  "icons": [
-    {
-      "src":   "./images/icons/ic_launcher_xxxhdpi.png",
-      "type":  "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src":   "/images/icons/playstore.png",
-      "type":  "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": "/Flux",
-  "display": "fullscreen",
-  "scope": "/",
-  "theme_color": "#35363a",
-  "background_color": "#35363a"
+    "name": "Flux",
+    "short_name": "Flux",
+    "description": "Cycling Structured Training",
+    "start_url": "/Flux",
+    "display": "standalone",
+    "orientation": "portrait", "scope": "/",
+    "theme_color": "#35363a",
+    "background_color": "#28272D",
+    "icons": [
+        {
+            "src": "/images/logo/flux-logo-36dpi-192px.png",
+            "type": "image/png",
+            "sizes": "192x192",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/logo/flux-logo-96dpi-512px.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/logo/maskable-512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ]
 }
