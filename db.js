@@ -49,6 +49,7 @@ let db = {
 
     ftp: 0,
     weight: 0,
+    measurement: 'metric',
     theme: 'dark',
 
     workout: [],
@@ -80,8 +81,14 @@ xf.reg('ui:theme',    (x, db) => {
     if(db.theme === 'dark')  { db.theme = 'white'; return; }
     if(db.theme === 'white') { db.theme = 'dark';  return; }
 });
-xf.reg('storage:ftp', (x, db) => db.ftp    = x);
+xf.reg('ui:measurement', (x, db) => {
+    if(db.measurement === 'metric')   { db.measurement = 'imperial'; return; }
+    if(db.measurement === 'imperial') { db.measurement = 'metric';   return; }
+});
+xf.reg('storage:ftp',    (x, db) => db.ftp    = x);
 xf.reg('storage:weight', (x, db) => db.weight = x);
+xf.reg('storage:theme',  (x, db) => db.theme = x);
+xf.reg('storage:measurement', (x, db) => db.measurement = x);
 
 xf.reg('ui:workoutFile', (x, db) => db.workoutFile = x);
 xf.reg('ui:workout:set', (x, db) => db.workout = db.workouts[x]);
@@ -214,6 +221,8 @@ function dbToSession(db) {
         workout:       db.workout,
 
         records:       db.records,
+        theme:         db.theme,
+        measurement:   db.measurement,
     };
     return session;
 }

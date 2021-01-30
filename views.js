@@ -5,8 +5,12 @@ import { avgOfArray,
          powerToZone,
          valueToHeight,
          secondsToHms,
-         metersToDistance,
+         formatDistance,
+         formatSpeed,
          parseNumber,
+         kgToLbs,
+         lbsToKg,
+         kmhToMph,
          fixInRange } from './functions.js';
 import { parseZwo, intervalsToGraph } from './parser.js';
 
@@ -83,6 +87,17 @@ function ControllableSettingsView(args) {
         distance:      q.get('#controllable-settings-distance'),
     };
 
+    let measurement = 'metric';
+    let speed       = 0;
+    let distance    = 0;
+
+    xf.sub('db:measurement', m => {
+        measurement = m;
+
+        dom.speed.textContent    = `${formatSpeed(speed, measurement)}`;
+        dom.distance.textContent = `${formatDistance(distance, measurement)}`;
+    });
+
     xf.sub('db:pwr', pwr => {
         dom.power.textContent = `${pwr}`;
     });
@@ -90,10 +105,12 @@ function ControllableSettingsView(args) {
         dom.cadence.textContent = `${cad}`;
     });
     xf.sub('db:spd', spd => {
-        dom.speed.textContent = `${spd}`;
+        speed = spd;
+        dom.speed.textContent = `${formatSpeed(speed, measurement)}`;
     });
-    xf.sub('db:distance', distance => {
-        dom.distance.textContent = `${metersToDistance(distance)}`;
+    xf.sub('db:distance', dist => {
+        distance = dist;
+        dom.distance.textContent = `${formatDistance(distance, measurement)}`;
     });
 
     xf.sub(`${name}:info`, data => {
@@ -172,6 +189,11 @@ function DataScreen(args) {
         heartRate:   q.get('#heart-rate')
     };
 
+    let measurement = 'metric';
+
+    xf.sub('db:measurement', m => {
+        measurement = m;
+    });
     xf.sub('db:hr', hr => {
         dom.heartRate.textContent = `${hr}`;
     });
@@ -179,13 +201,13 @@ function DataScreen(args) {
         dom.power.textContent = `${pwr}`;
     });
     xf.sub('db:distance', distance => {
-        dom.distance.textContent = `${metersToDistance(distance)}`;
+        dom.distance.textContent = `${formatDistance(distance, measurement)}`;
     });
     xf.sub('db:vspd', vspd => {
-        dom.speed.textContent = `${vspd.toFixed(1)}`;
+        dom.speed.textContent = `${formatSpeed(vspd, measurement)}`;
     });
     xf.sub('db:spd', spd => {
-        dom.speed.textContent = `${spd.toFixed(1)}`;
+        dom.speed.textContent = `${formatSpeed(spd, measurement)}`;
     });
     xf.sub('db:cad', cad => {
         dom.cadence.textContent = `${cad}`;
@@ -378,32 +400,58 @@ function NavigationWidget() {
 
 }
 
+function parseWeight(value, measurement = 'metric') {
+    value = parseInt(value);
+    if(measurement === 'imperial') {
+        value = lbsToKg(value);
+    }
+    return value;
+}
+
+function formatWeight(value, measurement = 'metric') {
+    value = parseInt(value);
+    if(measurement === 'imperial') {
+        value = kgToLbs(value);
+    }
+    return value;
+}
+
 function SettingsView(args) {
     let dom = {
-        ftp:       q.get('#ftp-value'),
-        ftpBtn:    q.get('#ftp-btn'),
-        weight:    q.get('#weight-value'),
-        weightBtn: q.get('#weight-btn'),
-        themeBtn:  q.get('#theme-btn'),
-        theme:     q.get('#theme'),
+        ftp:         q.get('#ftp-value'),
+        ftpBtn:      q.get('#ftp-btn'),
+        weightLabel: q.get('#weight-label'),
+        weight:      q.get('#weight-value'),
+        weightBtn:   q.get('#weight-btn'),
+        themeBtn:    q.get('#theme-btn'),
+        theme:       q.get('#theme'),
+        measurementBtn: q.get('#measurement-btn'),
     };
 
     let ftp = 100;
     let weight = 75;
+    let measurement = 'metric';
 
     xf.sub('db:ftp', ftp => {
         dom.ftp.value = ftp;
     });
 
     xf.sub('db:weight', weight => {
-        dom.weight.value = weight;
+        dom.weight.value = formatWeight(weight, measurement);
+    });
+
+    xf.sub('db:measurement', m => {
+        measurement = m;
+
+        dom.measurementBtn.textContent = m;
+        dom.weight.value = formatWeight(weight, measurement);
+        dom.weightLabel.textContent = (m === 'metric') ? 'kg' : 'lbs';
     });
 
     xf.sub('db:theme', name => {
         dom.theme.classList.remove(`dark-theme`);
         dom.theme.classList.remove(`white-theme`);
         dom.theme.classList.add(`${name}-theme`);
-        console.log(name);
     });
 
     xf.sub('change', e => {
@@ -411,7 +459,7 @@ function SettingsView(args) {
     }, dom.ftp);
 
     xf.sub('change', e => {
-        weight = parseInt(e.target.value);
+        weight = parseWeight(e.target.value, measurement);
     }, dom.weight);
 
     xf.sub('pointerup', e => {
@@ -425,6 +473,10 @@ function SettingsView(args) {
     xf.sub('pointerup', e => {
         xf.dispatch('ui:theme');
     }, dom.themeBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:measurement');
+    }, dom.measurementBtn);
 }
 
 

@@ -23,20 +23,20 @@ function DataMock(args) {
 
     xf.sub('watch:started', e => {
 
-        xf.dispatch('watch:elapsed', 4190);
+        // xf.dispatch('watch:elapsed', 4190);
         xf.dispatch('controllable:connected');
         xf.dispatch('hrb:connected');
 
         interval = setInterval(function() {
             // B+
-            // let hr       = 147;
-            // let speed    = 32.17;
-            // let distance = 37400;
+            let hr       = 147;
+            let speed    = 32.17;
+            let distance = 0;
 
             // D
-            let hr       = 171;
-            let speed    = 32.17;
-            let distance = 37400;
+            // let hr       = 171;
+            // let speed    = 32.17;
+            // let distance = 37400;
 
             if(args.hr) {
                 xf.dispatch('device:hr', hr + rand(-2, 2));
@@ -45,9 +45,8 @@ function DataMock(args) {
                 xf.dispatch('device:pwr',  power + rand(-20, 10));
                 xf.dispatch('device:cad',  85 + rand(-3, 3));
                 xf.dispatch('device:spd',  speed);
-                xf.dispatch('device:dist', distance);
+                // xf.dispatch('device:dist', distance);
             }
-            console.log(`mock ${power}`);
             count += 1;
         }, 700);
     });

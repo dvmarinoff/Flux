@@ -15,8 +15,14 @@ let second = xs => xs[1];
 let third  = xs => xs[2];
 let format = (x, precision = 1000) => round(x * precision) / precision;
 let mps    = kph => format(kph / 3.6);
+let mToYd  = m   => 1.09361 * m;
 let kph    = mps => 3.6 * mps;
-let nextToLast = xs => xs[xs.length - 2];
+let mpsToMph   = mps => 2.23694  * mps;
+let kmhToMph   = kmh => 0.621371 * kmh;
+let kgToLbs    = kg  => parseInt(2.20462 * kg);
+let lbsToKg    = lbs => (0.453592 * lbs);
+let nextToLast = xs  => xs[xs.length - 2];
+
 
 const digits  = n => Math.log(n) * Math.LOG10E + 1 | 0;
 const rand    = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -143,10 +149,29 @@ function secondsToHms(elapsed, compact = false) {
     return res ;
 }
 
-function metersToDistance(meters) {
-    let km = (meters / 1000);
-    let s = (meters < 1000) ? `${meters.toFixed(0)} m`  : `${km.toFixed(2)} km`;
-    return s;
+
+function formatSpeed(value, measurement = 'metric') {
+    if(measurement === 'imperial') {
+        value = `${kmhToMph(value).toFixed(1)}`;
+    } else {
+        value = `${(value).toFixed(1)}`;
+    }
+    return value;
+}
+
+function formatDistance(meters, measurement = 'metric') {
+    let value = `0`;
+    let km    = (meters / 1000);
+    let miles = (meters / 1609.34);
+    let yards = mToYd(meters);
+
+    if(measurement === 'imperial') {
+        value = (yards < 1609.34) ? `${(mToYd(meters)).toFixed(0)} yd` : `${miles.toFixed(2)} mi`;
+    } else {
+        value = (meters < 1000) ? `${meters.toFixed(0)} m` : `${km.toFixed(2)} km`;
+    }
+
+    return value;
 }
 
 function toDecimalPoint (x, point = 2) {
@@ -237,6 +262,10 @@ export {
     sqrt,
     mps,
     kph,
+    mpsToMph,
+    kmhToMph,
+    kgToLbs,
+    lbsToKg,
     avg,
     rand,
     digits,
@@ -267,7 +296,8 @@ export {
     dateToDashString,
     timeDiff,
     secondsToHms,
-    metersToDistance,
+    formatDistance,
+    formatSpeed,
     xor,
     exists,
 };
