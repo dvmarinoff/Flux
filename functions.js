@@ -212,6 +212,21 @@ function toBool (n) {
     return !!(x);
 }
 
+function xor(view) {
+    let cs = 0;
+    for (let i=0; i < view.byteLength; i++) {
+        cs ^= view.getUint8(i);
+    }
+    return cs;
+}
+
+function exists(x, msg = 'Does not exist!') {
+    if(x === null || x === undefined) {
+        throw new Error(`ERROR: ${msg}`);
+    }
+    return x;
+}
+
 export {
     sin,
     cos,
@@ -252,5 +267,7 @@ export {
     dateToDashString,
     timeDiff,
     secondsToHms,
-    metersToDistance
+    metersToDistance,
+    xor,
+    exists,
 };

@@ -15,6 +15,10 @@ const services = {
         cyclingPowerControlPoint: {uuid: 0x2A66},
         sensorLocation: {uuid: 0x2A5A},
     },
+    fecOverBle: {
+        uuid: 0xFEC1,
+        fec3: {uuid: 0xFEC3}
+    },
     heartRate: {
         uuid: 0x180D,
         heartRateMeasurement: {uuid: 0x2A37}

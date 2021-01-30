@@ -696,6 +696,9 @@ function WatchView(args) {
             xf.dispatch('ui:watchPause');
         }
     });
+    xf.sub('key:l', e => {
+        xf.dispatch('ui:watchLap');
+    });
 
     const init = dom => {
         dom.pause.style.display = 'none';
@@ -881,6 +884,7 @@ function Keyboard() {
         const isKeyE     = (code) => code === 'KeyE';
         const isKeyR     = (code) => code === 'KeyR';
         const isKeyS     = (code) => code === 'KeyS';
+        const isKeyL     = (code) => code === 'KeyL';
         const isKeySpace = (code) => code === 'Space';
 
         if(isKeyUp(code)) {
@@ -899,6 +903,9 @@ function Keyboard() {
         }
         if(isKeyE(code)) {
             xf.dispatch('key:e');
+        }
+        if(isKeyL(code)) {
+            xf.dispatch('key:l');
         }
         if(isKeySpace(code)) {
             e.preventDefault();
@@ -938,6 +945,7 @@ function Views() {
     WorkoutsView();
 
     UploadWorkoutView();
+    // ConnectANT();
 }
 
 export {

@@ -328,6 +328,10 @@ body.dark-theme {
     min-height: 100vh;
     align-content: center;
     overflow-x: hidden;
+    /* visibility: hidden; */
+}
+#connectFECBtn {
+    /* display: none; */
 }
 .page {
     width: 100%;
