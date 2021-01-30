@@ -49,6 +49,7 @@ let db = {
 
     ftp: 0,
     weight: 0,
+    theme: 'dark',
 
     workout: [],
     workoutFile: '',
@@ -75,6 +76,10 @@ xf.reg('pm:power',     (x, db) => db.power    = x);
 
 xf.reg('ui:ftp',      (x, db) => db.ftp    = x);
 xf.reg('ui:weight',   (x, db) => db.weight = x);
+xf.reg('ui:theme',    (x, db) => {
+    if(db.theme === 'dark')  { db.theme = 'white'; return; }
+    if(db.theme === 'white') { db.theme = 'dark';  return; }
+});
 xf.reg('storage:ftp', (x, db) => db.ftp    = x);
 xf.reg('storage:weight', (x, db) => db.weight = x);
 

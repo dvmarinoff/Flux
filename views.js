@@ -384,6 +384,8 @@ function SettingsView(args) {
         ftpBtn:    q.get('#ftp-btn'),
         weight:    q.get('#weight-value'),
         weightBtn: q.get('#weight-btn'),
+        themeBtn:  q.get('#theme-btn'),
+        theme:     q.get('#theme'),
     };
 
     let ftp = 100;
@@ -395,6 +397,13 @@ function SettingsView(args) {
 
     xf.sub('db:weight', weight => {
         dom.weight.value = weight;
+    });
+
+    xf.sub('db:theme', name => {
+        dom.theme.classList.remove(`dark-theme`);
+        dom.theme.classList.remove(`white-theme`);
+        dom.theme.classList.add(`${name}-theme`);
+        console.log(name);
     });
 
     xf.sub('change', e => {
@@ -412,6 +421,10 @@ function SettingsView(args) {
     xf.sub('pointerup', e => {
         xf.dispatch('ui:weight', weight);
     }, dom.weightBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('ui:theme');
+    }, dom.themeBtn);
 }
 
 
