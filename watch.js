@@ -1,4 +1,5 @@
 import { xf } from './xf.js';
+import { isSet } from './functions.js';
 
 import { avgOfArray, maxOfArray, sum,
          first, last, round, mps, kph,
@@ -230,8 +231,16 @@ xf.reg('watch:intervalIndex', (index, db) => db.intervalIndex    = index);
 xf.reg('watch:stepIndex',     (index, db) => {
     db.stepIndex      = index;
     let intervalIndex = db.intervalIndex;
-    let target        = db.workout.intervals[intervalIndex].steps[index].power;
-    xf.dispatch('ui:power-target-set', target);
+    let powerTarget   = db.workout.intervals[intervalIndex].steps[index].power;
+
+    // xf.dispatch('ui:power-target-set', powerTarget);     // update just the workout defined
+    xf.dispatch('ui:power-target-manual-set', powerTarget); // set both manual and workout defined
+
+    console.log(isSet(db.workout.intervals[intervalIndex].steps[index].slope));
+    if(isSet(db.workout.intervals[intervalIndex].steps[index].slope)) {
+        let slopeTarget = db.workout.intervals[intervalIndex].steps[index].slope;
+        xf.dispatch('ui:slope-target-set', slopeTarget);
+    }
 });
 xf.reg('workout:started', (x, db) => db.workoutState = 'started');
 xf.reg('workout:stopped', (x, db) => db.workoutState = 'stopped');

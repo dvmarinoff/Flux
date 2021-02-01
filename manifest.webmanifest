@@ -10,19 +10,17 @@
     "background_color": "#28272D",
     "icons": [
         {
-            "src": "/images/logo/flux-logo-36dpi-192px.png",
+            "src": "/images/logo/logo-36dpi-192px.png",
             "type": "image/png",
-            "sizes": "192x192",
-            "purpose": "any"
+            "sizes": "192x192"
         },
         {
-            "src": "/images/logo/flux-logo-96dpi-512px.png",
+            "src": "/images/logo/logo-96dpi-512px.png",
             "type": "image/png",
-            "sizes": "512x512",
-            "purpose": "any"
+            "sizes": "512x512"
         },
         {
-            "src": "/images/logo/maskable-512.png",
+            "src": "/images/logo/logo-96dpi-512px.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "maskable"

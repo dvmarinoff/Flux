@@ -251,6 +251,12 @@ function exists(x, msg = 'Does not exist!') {
     }
     return x;
 }
+function isSet(x, msg = 'Does not exist!') {
+    if(x === null || x === undefined) {
+        return false;
+    }
+    return true;
+}
 
 export {
     sin,
@@ -300,4 +306,5 @@ export {
     formatSpeed,
     xor,
     exists,
+    isSet
 };
