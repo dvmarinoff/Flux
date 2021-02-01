@@ -12,11 +12,13 @@ let workouts =
 //     <sporttype>bike</sporttype>
 //     <tags></tags>
 //     <workout>
-//         <Warmup Duration="30" PowerLow="0.30" PowerHigh="0.6"/>
-//         <SteadyState Duration="10" Power="0.88"/>
-//         <SteadyState Duration="10" Power="1.20"/>
-//         <IntervalsT Repeat="2" OnDuration="10" OffDuration="10" OnPower="0.95" OffPower="0.6"/>
-//         <Cooldown Duration="20" PowerLow="0.30" PowerHigh="0.60"/>
+//         <SteadyState Duration="60" Power="0.50"/>
+//         <SteadyState Duration="60" Power="200"/>
+//         <SteadyState Duration="60" Power="0.60" SlopeTarget="3" />
+//         <SteadyState Duration="60" Power="1.21" SlopeTarget="9.5" />
+//         <IntervalsT Repeat="2" OnDuration="60" OffDuration="30" OnPower="1.06" OffPower="0.95" OnSlopeTarget="6.5" OffSlopeTarget="6" />
+
+//         <SteadyState Duration="60" Power="0.50"/>
 //     </workout>
 // </workout_file>`
 // },
@@ -40,9 +42,9 @@ let workouts =
         <SteadyState Duration="60" Power="0.63"/>
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
         <SteadyState Duration="120" Power="0.5"/>
-        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44"/>
+        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44" OffSlopeTarget="0"/>
         <SteadyState Duration="300" Power="0.40"/>
-        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44"/>
+        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44" OffSlopeTarget="0"/>
         <SteadyState Duration="300" Power="0.40"/>
         <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39"/>
     </workout>
@@ -69,11 +71,11 @@ let workouts =
         <SteadyState Duration="60" Power="0.63"/>
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
         <SteadyState Duration="120" Power="0.5"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44"/>
+        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlopeTarget="8" OffSlopeTarget="0"/>
         <SteadyState Duration="300" Power="0.40"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44"/>
+        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlopeTarget="8" OffSlopeTarget="0"/>
         <SteadyState Duration="300" Power="0.40"/>
-        <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39"/>
+        <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39" />
     </workout>
 </workout_file>
 `
@@ -98,9 +100,47 @@ let workouts =
         <SteadyState Duration="60" Power="0.63"/>
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
         <SteadyState Duration="120" Power="0.5"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.31" OffPower="0.3"/>
-        <SteadyState Duration="300" Power="0.39"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.31" OffPower="0.3"/>
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <FreeRide Duration="300" SlopeTarget="3.5" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
+        <SteadyState Duration="40" Power="1.31"/>
+        <FreeRide Duration="20" />
         <SteadyState Duration="300" Power="0.39"/>
         <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39"/>
     </workout>

@@ -2,6 +2,7 @@ import { powerToZone,
          hrToColor,
          valueToHeight,
          toDecimalPoint,
+         fixInRange,
          divisors,
          secondsToHms } from './functions.js';
 
@@ -21,19 +22,34 @@ function readIntervalsT(el) {
     let duration    = (onDuration + offDuration) * repeat;
     let onPower     = parseFloat(el.getAttribute('OnPower'));
     let offPower    = parseFloat(el.getAttribute('OffPower'));
+    let onSlope     = undefined;
+    let offSlope    = undefined;
+    if(el.hasAttribute('OnSlopeTarget')) {
+        onSlope = parseFloat(el.getAttribute('OnSlopeTarget'));
+    }
+    if(el.hasAttribute('OffSlopeTarget')) {
+        offSlope = parseFloat(el.getAttribute('OffSlopeTarget'));
+    }
     return {tag:        'IntervalsT',
             repeat:      repeat,
             onDuration:  onDuration,
             offDuration: offDuration,
             onPower:     onPower,
-            offPower:    offPower};
+            offPower:    offPower,
+            onSlope:     onSlope,
+            offSlope:    offSlope};
 }
 function readSteadyState(el) {
     let duration = parseInt(el.getAttribute('Duration'));
     let power    = parseFloat(el.getAttribute('Power'));
+    let slope    = undefined;
+    if(el.hasAttribute('SlopeTarget')) {
+        slope = parseFloat(el.getAttribute('SlopeTarget'));
+    }
     return {tag:      'SteadyState',
             duration: duration,
-            power:    power};
+            power:    power,
+            slope:    slope};
 }
 function readCooldown(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
@@ -46,8 +62,13 @@ function readCooldown(el) {
 }
 function readFreeRide(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
+    let slope    = undefined;
+    if(el.hasAttribute('SlopeTarget')) {
+        slope = parseFloat(el.getAttribute('SlopeTarget'));
+    }
     return {tag:      'FreeRide',
-            duration: duration};
+            duration: duration,
+            slope: slope};
 }
 function unknownEl(el) {
     console.error(`Unknown Element in .zwo workout: ${el}`);
@@ -130,15 +151,18 @@ function warmupToInterval(step) {
 function intervalsTToInterval(step) {
     let intervals = [];
     for(let i = 0; i < step.repeat; i++) {
-        intervals.push({duration: step.onDuration,  steps: [{duration: step.onDuration,  power: step.onPower}]});
-        intervals.push({duration: step.offDuration, steps: [{duration: step.offDuration, power: step.offPower}]});
+        intervals.push({duration: step.onDuration,
+                        steps: [{duration: step.onDuration, power: step.onPower, slope: step.onSlope}]});
+        intervals.push({duration: step.offDuration,
+                        steps: [{duration: step.offDuration, power: step.offPower, slope: step.offSlope}]});
     };
     return intervals;
 }
 function steadyStateToInterval(step) {
     return {duration: step.duration,
             steps: [{duration: step.duration,
-                     power:    step.power}]};
+                     power:    step.power,
+                     slope:    step.slope}]};
 }
 function cooldownToInterval(step) {
     let interval   = {duration: step.duration, steps: []};
@@ -182,10 +206,10 @@ function stepToInterval(step) {
     }
 }
 
-function zwoToIntervals(zwo) {
-    let intervals = zwo.flatMap(step => stepToInterval(step));
-    return intervals;
-}
+// function zwoToIntervals(zwo) {
+//     let intervals = zwo.flatMap(step => stepToInterval(step));
+//     return intervals;
+// }
 
 function parseZwo(zwo) {
     let parser = new DOMParser();
@@ -211,7 +235,7 @@ function parseZwo(zwo) {
 }
 
 function intervalsToGraph(intervals, ftp) {
-    let scale = 400;
+    let scale = ftp * 1.6;
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration));
         let len = interval.steps.length;
@@ -222,7 +246,7 @@ function intervalsToGraph(intervals, ftp) {
             return a +
                 `<div class="graph-bar zone-${(powerToZone(step.power, ftp)).name}" style="height: ${height}%; width: ${width}%">
                      <div class="graph-info t5">
-                         <div class="power">${step.power}<span>W</span></div>
+                         <div class="power">${step.power === 0 ? 'Free ride' : step.power}${step.power === 0 ? '' : 'W'}</div>
                          <div class="time">${secondsToHms(step.duration, true)}<span></span></div>
                      </div>
                 </div>`;

@@ -119,7 +119,11 @@ function WorkoutController() {
             let workout = parseZwo(w.xml);
             workout.intervals.forEach( interval => {
                 interval.steps.forEach( step => {
-                    step.power = Math.round(ftp * step.power);
+                    if(step.power >= 10) {
+                        step.power = step.power; // abs power
+                    } else {
+                        step.power = Math.round(ftp * step.power); // % FTP power
+                    }
                 });
             });
             let graph  = intervalsToGraph(workout.intervals, ftp);
