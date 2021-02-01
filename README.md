@@ -37,23 +37,21 @@ A fully featured web version will be released soon, and followed with desktop ap
 The Web version is running directly in the browser and relies on some of the latest web platform technologies.
 Browser support for the web version is the following:
 
-| Chrome | Chrome Android | Edge | Opera | Opera Android | Samsung Internet | Safari | Safari iOS |
-|--------|----------------|------|-------|---------------|------------------|--------|------------|
-| yes    | yes            | yes  | yes   | no            | yes              | no     | no         |
+| Chrome | Edge | Opera | Chrome Android | Samsung Internet | Opera Android | Safari | Safari iOS |
+|--------|------|-------|----------------|------------------|---------------|--------|------------|
+| yes    | yes  | yes   | yes            | yes              | no            | no     | no         |
 
 
 ### Linux
-On Chrome for Linux you might need to turn on the experimental platforms feature flag at
+On Chrome, Edge and Opera for Linux you might need to turn on the experimental platforms feature flag at
 
-`chrome://flags/#enable-experimental-web-platform-features`
+- Chrome: `chrome://flags/#enable-experimental-web-platform-features`
 
+- Edge: `edge://flags/#enable-experimental-web-platform-features`
 
-### Opera
+- Opera: `opera://flags/#enable-experimental-web-platform-features`
 
-For Opera you might need to enable the web bluetooth flag at
-
-`opera://flags/#enable-web-bluetooth`
-
+NOTE: Opera support on Linux is a bit shaky at moment. Expect updates.
 
 ### iOS
 For iOS you can try [WebBLE](https://apps.apple.com/us/app/webble/id1193531073) which is:
@@ -84,18 +82,17 @@ List of known trainers (not exhaustive) that implement FTMS:
 - Saris M2
 
 - Wahoo Kickr Core
+- Wahoo Kickr (using custom solution, but support for FTMS is expected to land with firmware update 1st week of Feb 2021)
 <!-- - Wahoo Snap  -->
 
 List of major trainers without FTMS:
 
 - Tacx Neo / 2 / 2T (using custom solution ANT+ over Bluetooth)
 
-- Wahoo Kickr (using custom solution, but support for FTMS is expected to land with firmware update 1st week of Feb 2021)
-
 
 ### FE-C over BLE (Tacx)
 
-Currently researching the implementation documents. Looks hopeful.
+This will enable support for the Tacx Neo trainers. Currently researching the implementation documents. Looks hopeful.
 
 
 ### ANT+ FE-C

@@ -4,7 +4,8 @@
     "description": "Cycling Structured Training",
     "start_url": "/Flux",
     "display": "standalone",
-    "orientation": "portrait", "scope": "/",
+    "orientation": "portrait",
+    "scope": "/",
     "theme_color": "#35363a",
     "background_color": "#28272D",
     "icons": [
