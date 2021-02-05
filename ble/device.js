@@ -18,7 +18,7 @@ class Device {
         this.name = args.name || 'device';
         this.control = false;
         this.connected = false;
-        this.filter = args.filter; // service uuid -> services.fitnessMachine.uuid
+        this.filters = args.filters; // service uuid -> services.fitnessMachine.uuid
         this.optionalServices = args.optionalServices || [];
         this.retry = 0;
     }
@@ -35,7 +35,7 @@ class Device {
     }
     async request() {
         let self = this;
-        return await navigator.bluetooth.requestDevice({filters: [{services: [self.filter]}],
+        return await navigator.bluetooth.requestDevice({filters: self.filters,
                                                         optionalServices: self.optionalServices});
     }
     async connect() {
@@ -43,11 +43,10 @@ class Device {
         if(self.isBleAvailable()) {
             xf.dispatch(`${self.name}:connecting`);
             try {
-
                 self.device = await self.request();
                 self.server = await self.device.gatt.connect();
+                await self.getPrimaryServices();
                 window.sessionStorage.setItem(self.name, self.device.id);
-
             } catch(error) {
                 console.error(error);
                 xf.dispatch(`${self.name}:disconnected`);
@@ -80,10 +79,28 @@ class Device {
         self.device.removeEventListener('gattserverdisconnected', e => e);
         console.log(`Disconnected ${self.device.name}.`);
     }
+    async getPrimaryServices() {
+        let self = this;
+        let services = await self.server.getPrimaryServices();
+        services.forEach( service => {
+            self.services[service.uuid] = service;
+        });
+        // console.log(self.services);
+        return self.services;
+    }
+    hasService(uuid) {
+        let self = this;
+        return !(self.services[uuid] === undefined);
+    }
     async getService(service) {
         let self = this;
-        self.services[service] =
-            await self.server.getPrimaryService(service);
+        if(self.hasService(service)) {
+            return self.services[service];
+        } else {
+            self.services[service] =
+                await self.server.getPrimaryService(service);
+            return self.services[service];
+        }
     }
     async getCharacteristic(service, characteristic) {
         let self = this;

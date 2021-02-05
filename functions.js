@@ -15,8 +15,8 @@ let second = xs => xs[1];
 let third  = xs => xs[2];
 let format = (x, precision = 1000) => round(x * precision) / precision;
 let mps    = kph => format(kph / 3.6);
-let mToYd  = m   => 1.09361 * m;
 let kph    = mps => 3.6 * mps;
+let mToYd  = m   => 1.09361 * m;
 let mpsToMph   = mps => 2.23694  * mps;
 let kmhToMph   = kmh => 0.621371 * kmh;
 let kgToLbs    = kg  => parseInt(2.20462 * kg);
@@ -229,7 +229,9 @@ function dataViewToString (dataview) {
 }
 
 
-const getBitField = (field, bit) => (field >> bit) & 1;
+const getBitField  = (field, bit) => (field >> bit) & 1;
+const bitToBool = (bit) => !!(bit);
+const nthBitToBool = (field, bit) => bitToBool(getBitField(field, bit));
 
 function toBool (n) {
     let x = parseInt(n);
@@ -295,6 +297,7 @@ export {
     hex,
     dataViewToString,
     getBitField,
+    nthBitToBool,
     toBool,
     powerToZone,
     hrToColor,

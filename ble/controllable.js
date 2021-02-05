@@ -1,19 +1,22 @@
 import { stringToHex,
          hexToString,
          hex,
+         kph,
          dataViewToString,
          getBitField,
+         nthBitToBool,
          toBool, }  from '../functions.js';
 
 import { xf }       from '../xf.js';
 import { Device }   from './device.js';
 import { services } from './services.js';
 import { ftms }     from './ftms.js';
-
+import { fecMessage } from './fec-over-ble.js';
 
 class Controllable {
     constructor(args) {
-        this.device = new Device({filter: services.fitnessMachine.uuid,
+        this.device = new Device({filters: [{services: [services.fitnessMachine.uuid]},
+                                            {services: [services.fecOverBle.uuid]}],
                                   optionalServices: [services.deviceInformation.uuid],
                                   name: args.name});
         this.fitnessMachineFeature = {};
@@ -22,26 +25,58 @@ class Controllable {
     }
     async connect() {
         let self = this;
-        await self.device.connectAndNotify(services.fitnessMachine.uuid,
+
+        await self.device.connect();
+
+        if(self.device.hasService(services.fitnessMachine.uuid)) {
+            // FTMS
+            await self.device.notify(services.fitnessMachine.uuid,
                                      services.fitnessMachine.indoorBikeData.uuid,
                                      self.onIndoorBikeData);
-        await self.device.notify(services.fitnessMachine.uuid,
-                                 services.fitnessMachine.fitnessMachineControlPoint.uuid,
-                                 self.onControlPoint);
-        await self.requestControl();
-        await self.device.deviceInformation();
 
-        let fitnessMachineFeature = await self.getFitnessMachineFeature();
-        let features              = await self.setFeatures(fitnessMachineFeature);
+            await self.device.notify(services.fitnessMachine.uuid,
+                                     services.fitnessMachine.fitnessMachineControlPoint.uuid,
+                                     self.onControlPoint);
 
-        await self.notifyFitnessMachineStatus();
+            await self.requestControl();
 
-        self.fitnessMachineFeature = fitnessMachineFeature;
-        self.features = features;
+            await self.device.deviceInformation();
 
-        console.log(features);
+            let fitnessMachineFeature = await self.getFitnessMachineFeature();
+            let features              = await self.setFeatures(fitnessMachineFeature);
+
+            await self.notifyFitnessMachineStatus();
+
+            self.fitnessMachineFeature = fitnessMachineFeature;
+            self.features = features;
+
+            console.log(features);
+
+        } else if(self.device.hasService(services.fecOverBle.uuid)) {
+            // FE-C over BLE
+            console.log('Controllable: falling back to FE-C over BLE.');
+
+            await self.device.notify(services.fecOverBle.uuid,
+                                     services.fecOverBle.fec2.uuid,
+                                     self.onFECdata.bind(self));
+        } else {
+            console.error('Controllable: no FTMS or BLE over FE-C.');
+        }
+    }
+    onFECdata(e) {
+        const self     = this;
+        const dataview = e.target.value;
+        const data     = fecMessage(dataview);
+        if(data.page === 25) {
+            xf.dispatch('device:pwr', data.power);
+            xf.dispatch('device:cad', data.cadence);
+        }
+        if(data.page === 16) {
+            xf.dispatch('device:spd', (data.speed * 0.001 * 3.6));
+        }
     }
     async disconnect() {
+        let self = this;
         this.device.disconnect();
     }
     async startNotifications() {
