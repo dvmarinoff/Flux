@@ -265,6 +265,54 @@ function dataviewToControlPointResponse(dataview) {
     return res;
 }
 
+function powerTargetMsg(args) {
+    let OpCode = 0x05;
+    let buffer = new ArrayBuffer(3);
+    let view   = new DataView(buffer);
+    let power  = args.power;
+    view.setUint8(0, 0x05, true);
+    view.setInt16(1, power, true);
+
+    return view;
+}
+
+function simulationParametersMsg(args) {
+    let OpCode = 0x11;
+    let wind  = args.wind  || 0; // mps      - 0.001
+    let grade = args.grade || 0; // %        - 0.01
+    let crr   = args.crr   || 0; // unitless - 0.0001
+    let drag  = args.drag  || 0; // kg/m     - 0.01
+
+    let buffer = new ArrayBuffer(7);
+    let view   = new DataView(buffer);
+    view.setUint8(0, 0x11, true);
+    view.setInt16(1, wind,  true);
+    view.setInt16(3, grade, true);
+    view.setUint8(5, crr,   true);
+    view.setUint8(6, drag,  true);
+
+    console.log(`set simulation: ${wind} ${grade} ${crr} ${drag}`);
+
+    return view;
+}
+
+function slopeTargetMsg(args) {
+    return simulationParametersMsg(args);
+}
+
+function resistanceTargetMsg(args) {
+    // TEMPORARY DISABLED
+    let OpCode = 0x04;
+    let resistance = value || 0; // unitless - 0.1
+
+    let buffer = new ArrayBuffer(3);
+    let view   = new DataView(buffer);
+    view.setUint8(0, OpCode, true);
+    // view.setUint8(1, parseInt(resistance), true); // by Spec
+    view.setInt16(1, resistance, true); // works with Tacx
+    console.warn(`TEMPORARY DISABLED: set target resistance: ${resistance}`);
+}
+
 let ftms = {
     dataviewToFitnessMachineFeature,
     dataviewToSupportedResistanceLevelRange,
@@ -273,6 +321,11 @@ let ftms = {
     dataviewToIndoorBikeData,
     dataviewToControlPointResponse,
     setSupportFeatures,
+
+    powerTargetMsg,
+    resistanceTargetMsg,
+    slopeTargetMsg,
+    simulationParametersMsg,
 };
 
 export { ftms };

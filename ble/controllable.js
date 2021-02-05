@@ -11,7 +11,7 @@ import { xf }       from '../xf.js';
 import { Device }   from './device.js';
 import { services } from './services.js';
 import { ftms }     from './ftms.js';
-import { fecMessage } from './fec-over-ble.js';
+import { ant } from './fec-over-ble.js';
 
 class Controllable {
     constructor(args) {
@@ -19,9 +19,7 @@ class Controllable {
                                             {services: [services.fecOverBle.uuid]}],
                                   optionalServices: [services.deviceInformation.uuid],
                                   name: args.name});
-        this.fitnessMachineFeature = {};
-        this.fitnessMachineStatus = {};
-        this.supportedPowerRange = false;
+        this.protocol = {};
     }
     async connect() {
         let self = this;
@@ -29,65 +27,112 @@ class Controllable {
         await self.device.connect();
 
         if(self.device.hasService(services.fitnessMachine.uuid)) {
-            // FTMS
-            await self.device.notify(services.fitnessMachine.uuid,
-                                     services.fitnessMachine.indoorBikeData.uuid,
-                                     self.onIndoorBikeData);
-
-            await self.device.notify(services.fitnessMachine.uuid,
-                                     services.fitnessMachine.fitnessMachineControlPoint.uuid,
-                                     self.onControlPoint);
-
-            await self.requestControl();
-
-            await self.device.deviceInformation();
-
-            let fitnessMachineFeature = await self.getFitnessMachineFeature();
-            let features              = await self.setFeatures(fitnessMachineFeature);
-
-            await self.notifyFitnessMachineStatus();
-
-            self.fitnessMachineFeature = fitnessMachineFeature;
-            self.features = features;
-
-            console.log(features);
+            self.protocol = new FTMSProtocol({device: self.device});
 
         } else if(self.device.hasService(services.fecOverBle.uuid)) {
-            // FE-C over BLE
             console.log('Controllable: falling back to FE-C over BLE.');
+            self.protocol = new FECBLEProtocol({device: self.device});
 
-            await self.device.notify(services.fecOverBle.uuid,
-                                     services.fecOverBle.fec2.uuid,
-                                     self.onFECdata.bind(self));
         } else {
             console.error('Controllable: no FTMS or BLE over FE-C.');
-        }
-    }
-    onFECdata(e) {
-        const self     = this;
-        const dataview = e.target.value;
-        const data     = fecMessage(dataview);
-        if(data.page === 25) {
-            xf.dispatch('device:pwr', data.power);
-            xf.dispatch('device:cad', data.cadence);
-        }
-        if(data.page === 16) {
-            xf.dispatch('device:spd', (data.speed * 0.001 * 3.6));
         }
     }
     async disconnect() {
         let self = this;
         this.device.disconnect();
     }
-    async startNotifications() {
-        let self = this;
+    async setPowerTarget(power) {
+        const self = this;
+        self.protocol.setPowerTarget(power);
+        console.log(`set power target: ${power}`);
+    }
+    async setResistanceTarget(level) {
+        const self   = this;
+        self.protocol.setResistanceTarget(level);
+    }
+    async setSlopeTarget(args) {
+        const self   = this;
+        self.protocol.setSlopeTarget(args);
+    }
+    onData(e) {
+        const self     = this;
+        const dataview = e.target.value;
+    }
+}
+
+class FTMSProtocol {
+    constructor(args) {
+        this.device = args.device;
+        this.fitnessMachineFeature = {};
+        this.fitnessMachineStatus = {};
+        this.supportedPowerRange = false;
+    }
+
+    async connect() {
+        const self   = this;
         await self.device.notify(services.fitnessMachine.uuid,
                                  services.fitnessMachine.indoorBikeData.uuid,
-                                 self.onIndoorBikeData);
+                                 self.onData);
+        await self.device.notify(services.fitnessMachine.uuid,
+                                 services.fitnessMachine.fitnessMachineControlPoint.uuid,
+                                 self.onControlPoint);
+        await self.requestControl();
+        await self.device.deviceInformation();
     }
-    stopNotifications() {
+    async setPowerTarget(power) {
+        const self   = this;
+        const msg    = ftms.powerTargetMsg(power);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+    }
+    async setResistanceTarget(level) {
+        const self   = this;
+        const msg    = ftms.resistanceTargetMsg(level);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+    }
+    async setSlopeTarget(args) {
+        const self   = this;
+        const msg    = ftms.slopeTargetMsg(args);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
+    }
+    onData(e) {
+        let dataview = e.target.value;
+        let data     = ftms.dataviewToIndoorBikeData(dataview);
+
+        xf.dispatch('device:pwr', data.pwr);
+        xf.dispatch('device:spd', data.spd);
+        xf.dispatch('device:cad', data.cad);
+        return data;
+    }
+    async config() {
+        const self   = this;
+
+        let fitnessMachineFeature = await self.getFitnessMachineFeature();
+        let features              = await self.setFeatures(fitnessMachineFeature);
+
+        await self.notifyFitnessMachineStatus();
+
+        self.fitnessMachineFeature = fitnessMachineFeature;
+        self.features = features;
+        console.log(features);
+    }
+
+    async requestControl() {
         let self = this;
-        self.device.stopNotifications(services.fitnessMachine.indoorBikeData.uuid);
+        let opCode = new Uint8Array([0x00]);
+        let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, opCode.buffer);
+        return res;
+    }
+    onControlPoint (e) {
+        let dataview = e.target.value;
+        let res = ftms.dataviewToControlPointResponse(dataview);
+
+        console.log(`on control point: ${res.responseCode} ${res.requestCode} ${res.resultCode} | ${res.response} : ${res.operation} : ${res.result}`);
     }
     async setFeatures(fitnessMachineFeature) {
         let self     = this;
@@ -163,103 +208,76 @@ class Controllable {
         let self = this;
         let dataview = e.target.value;
         let fitnessMachineStatus = ftms.dataviewToFitnessMachineStatus(dataview);
-
         console.log(fitnessMachineStatus);
-
         return fitnessMachineStatus;
-    }
-    async requestControl() {
-        let self = this;
-        let opCode = new Uint8Array([0x00]);
-        let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, opCode.buffer);
-        return res;
     }
     async reset() {
         let self  = this;
         let OpCode = 0x01;
-
         let buffer = new ArrayBuffer(1);
         let view   = new DataView(buffer);
         view.setUint8(0, OpCode, true);
-        console.log(`reset`);
-        let res =
-            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
-
-    }
-    async setTargetResistanceLevel(value) {
-        // TEMPORARY DISABLED
-        let self  = this;
-        let OpCode = 0x04;
-        let resistance = value || 0; // unitless - 0.1
-
-        let buffer = new ArrayBuffer(3);
-        let view   = new DataView(buffer);
-        view.setUint8(0, OpCode, true);
-        // view.setUint8(1, parseInt(resistance), true); // by Spec
-        view.setInt16(1, resistance, true); // works with Tacx
-        console.warn(`TEMPORARY DISABLED: set target resistance: ${resistance}`);
-        // console.log(buffer);
-        // let res = await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
-
-    }
-    async setTargetPower(value) {
-        let self   = this;
-        let OpCode = 0x05;
-        let power  = value; // Watt - 1
-        let buffer = new ArrayBuffer(3);
-        let view   = new DataView(buffer);
-        view.setUint8(0, 0x05, true);
-        view.setInt16(1, value, true);
-        console.log(`set target power: ${value} ${hex(value)}`);
-        let res =
-            await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
-
-    }
-    async setSimulationParameters(args) {
-        let self  = this;
-        let OpCode = 0x11;
-        let wind  = args.wind  || 0; // mps      - 0.001
-        let grade = args.grade || 0; // %        - 0.01
-        let crr   = args.crr   || 0; // unitless - 0.0001
-        let drag  = args.drag  || 0; // kg/m     - 0.01
-
-        let buffer = new ArrayBuffer(7);
-        let view   = new DataView(buffer);
-        view.setUint8(0, 0x11, true);
-        view.setInt16(1, wind,  true);
-        view.setInt16(3, grade, true);
-        view.setUint8(5, crr,   true);
-        view.setUint8(6, drag,  true);
-        console.log(`set simulation: ${wind} ${grade} ${crr} ${drag}`);
         let res =
             await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
     }
     async spinDownControl() {
         let self   = this;
         let OpCode = 0x01;
-
         let buffer = new ArrayBuffer(1);
         let view   = new DataView(buffer);
         view.setUint8(0, OpCode, true);
         let res =
             await self.device.writeCharacteristic(services.fitnessMachine.fitnessMachineControlPoint.uuid, buffer);
-
-    }
-    onIndoorBikeData (e) {
-        let dataview = e.target.value;
-        let data     = ftms.dataviewToIndoorBikeData(dataview);
-        // console.log(`onIndoorBikeData: ${data.pwr}`);
-        // console.log(data);
-        xf.dispatch('device:pwr', data.pwr);
-        xf.dispatch('device:spd', data.spd);
-        xf.dispatch('device:cad', data.cad);
-    }
-    onControlPoint (e) {
-        let dataview = e.target.value;
-        let res = ftms.dataviewToControlPointResponse(dataview);
-
-        console.log(`on control point: ${res.responseCode} ${res.requestCode} ${res.resultCode} | ${res.response} : ${res.operation} : ${res.result}`);
     }
 }
+
+class FECBLEProtocol {
+    constructor(args) {
+        this.device = args.device;
+    }
+
+    async connect() {
+        const self   = this;
+        await self.device.notify(services.fecOverBle.uuid,
+                                 services.fecOverBle.fec2.uuid,
+                                 self.onData.bind(self));
+    }
+    async setPowerTarget(value) {
+        const self   = this;
+        const msg    = ant.powerTargetMsg(value);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+    }
+    async setResistanceTarget(value) {
+        const self   = this;
+        const msg    = ant.resistanceTargetMsg(value);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+    }
+    async setSlopeTarget(args) {
+        const self   = this;
+        const msg    = ant.slopeTargetMsg(args.grade);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+    }
+    onData(e) {
+        const self     = this;
+        const dataview = e.target.value;
+        const data     = ant.dataMsg(dataview);
+        if(data.page === 25) {
+            xf.dispatch('device:pwr', data.power);
+            xf.dispatch('device:cad', data.cadence);
+        }
+        if(data.page === 16) {
+            xf.dispatch('device:spd', (data.speed * 0.001 * 3.6));
+        }
+        return data;
+    }
+}
+
+
 
 export { Controllable };

@@ -2,6 +2,14 @@ const nthBit       = (field, bit) => (field >> bit) & 1;
 const toBool       = (bit) => !!(bit);
 const nthBitToBool = (field, bit) => toBool(nthBit(field, bit));
 
+function xor(view) {
+    let cs = 0;
+    for (let i=0; i < view.byteLength; i++) {
+        cs ^= view.getUint8(i);
+    }
+    return cs;
+}
+
 function decodePower(powerMSB, powerLSB) {
     return ((powerMSB & 0b00001111) << 8) + (powerLSB);
 }
@@ -43,7 +51,7 @@ function dataPage16(dataview) {
     return { speed, page: 16 };
 }
 
-function fecMessage(dataview) {
+function dataMsg(dataview) {
     let sync     = dataview.getUint8(0);
     let length   = dataview.getUint8(1);
     let type     = dataview.getUint8(2);
@@ -63,4 +71,91 @@ function fecMessage(dataview) {
     return { page: 0 };
 }
 
-export { fecMessage }
+function dataPage48(resistance) {
+    // Data Page 48 (0x30) – Basic Resistance
+    let buffer   = new ArrayBuffer(8);
+    let view     = new DataView(buffer);
+    let dataPage = 48;
+
+    view.setUint8(0, dataPage, true);
+    view.setUint8(7, resistance, true);
+
+    return view;
+}
+
+function dataPage49(power) {
+    // Data Page 49 (0x31) – Target Power
+    let buffer   = new ArrayBuffer(8);
+    let view     = new DataView(buffer);
+    let dataPage = 49;
+
+    view.setUint8(0, dataPage, true);
+    view.setUint16(6, power, true);
+
+    return view;
+}
+
+function compansateGradeOffset(slope) {
+    // slope is coming as -> 1.8% * 100 = 180
+    // 0 = -200%, 20000 = 0%, 40000 = 200%
+    return 20000 + (slope);
+}
+
+// compansateGradeOffset(0)   === 20000
+// compansateGradeOffset(1)   === 20100
+// compansateGradeOffset(4.5) === 20450
+// compansateGradeOffset(10)  === 21000
+
+function dataPage51(slope) {
+    // Data Page 51 (0x33) – Track Resistance
+    let buffer   = new ArrayBuffer(8);
+    let view     = new DataView(buffer);
+    let dataPage = 51;
+
+    let grade = compansateGradeOffset(slope);
+    let crr   = 0xFF; // default value
+
+    view.setUint8(0, dataPage, true);
+    view.setUint16(5, grade, true);
+    view.setUint8(7, crr , true);
+
+    return view;
+}
+
+function controlMessage(content, channel = 5) {
+    let buffer   = new ArrayBuffer(13);
+    let view     = new DataView(buffer);
+
+    const sync    = 164;
+    const length  = 9;
+    const type    = 79; // Acknowledged 0x4F
+    view.setUint8(0, sync,    true);
+    view.setUint8(1, length,  true);
+    view.setUint8(2, type,    true);
+    view.setUint8(3, channel, true);
+
+    let j = 4;
+    for(let i = 0; i < length; i++) {
+        view.setUint8(j, content.getUint8(i), true);
+        j++;
+    }
+
+    const crc = xor(view);
+    view.setUint8(12, crc, true);
+
+    return view;
+}
+
+function powerTargetMsg(power, channel = 5) {
+    return controlMessage(dataPage49(power, channel));
+}
+function resistanceTargetMsg(level, channel = 5) {
+    return controlMessage(dataPage49(level, channel));
+}
+function slopeTargetMsg(slope, channel = 5) {
+    return controlMessage(dataPage49(slope, channel));
+}
+
+let ant = { dataMsg, powerTargetMsg, resistanceTargetMsg, slopeTargetMsg };
+
+export { ant };
