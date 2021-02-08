@@ -114,7 +114,6 @@ function ControllableSettingsView(args) {
     });
 
     xf.sub(`${name}:info`, data => {
-        console.log(data);
         dom.name.textContent         = `${data.name}`;
         dom.model.textContent        = `${data.modelNumberString}`;
         dom.manufacturer.textContent = `${data.manufacturerNameString}`;
@@ -253,7 +252,8 @@ function GraphPower(args) {
     }
 
     function freeRide() {
-        xf.sub('db:pwr', pwr => {
+        xf.reg('db:pwr', db => {
+            let pwr = db.pwr;
             let h = valueToHeight(scale, pwr);
             count += 1;
             if(count >= size) {
@@ -491,7 +491,6 @@ function NumberInput(args) {
     let btn = 10;
 
     xf.sub(`db:${prop}`, x => {
-        console.log(`DB:${prop} ${x}`);
         value = x;
         dom.input.value = x;
     });

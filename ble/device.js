@@ -1,10 +1,5 @@
 import { xf } from '../xf.js';
-import { stringToHex,
-         hexToString,
-         hex,
-         dataViewToString,
-         getBitField,
-         toBool, } from '../functions.js';
+import { dataViewToString } from '../functions.js';
 import { services } from './services.js';
 
 

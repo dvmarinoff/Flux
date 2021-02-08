@@ -9,8 +9,8 @@ import { avgOfArray, maxOfArray, sum,
          timeDiff, fixInRange } from './functions.js';
 
 let db = {
-    pwr: 0,
-    power: 0,
+    pwr: 0,   // controllable
+    power: 0, // pm
     hr: 0,
     cad: 0,
     spd: 0,
@@ -110,19 +110,23 @@ xf.reg('ui:activity:save', (x, db) => {
 
 // Control Modes
 xf.reg('device:features', (features, db) => {
+    // {targets:  ['Power'],
+    //  readings: ['Power'],
+    //  params:   {power: {min: 0, max: 800, inc: 1}}};
+    console.log(features);
 
     db.controllableFeatures = features;
 
-    db.powerMin = features.power.params.min;
-    db.powerMax = features.power.params.max;
+    db.powerMin = features.params.power.min;
+    db.powerMax = features.params.power.max;
     db.powerInc = 10;
 
-    db.resistanceMin = features.resistance.params.min;
-    db.resistanceMax = features.resistance.params.max;
+    db.resistanceMin = features.params.resistance.min;
+    db.resistanceMax = features.params.resistance.max;
     db.resistanceInc = 100;
 
     db.slopeMin = 0;
-    db.slopeMax = 30;
+    db.slopeMax = 45;
     db.slopeInc = 0.5;
 });
 

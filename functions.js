@@ -228,16 +228,9 @@ function dataViewToString (dataview) {
     return str;
 }
 
-
-const getBitField  = (field, bit) => (field >> bit) & 1;
-const bitToBool = (bit) => !!(bit);
-const nthBitToBool = (field, bit) => bitToBool(getBitField(field, bit));
-
-function toBool (n) {
-    let x = parseInt(n);
-    if(!(x === 0 || x === 1)) throw new Error(`Wrong argument for toBool: ${n}`);
-    return !!(x);
-}
+const nthBit       = (field, bit) => (field >> bit) & 1;
+const toBool       = (bit) => !!(bit);
+const nthBitToBool = (field, bit) => toBool(nthBit(field, bit));
 
 function xor(view) {
     let cs = 0;
@@ -296,9 +289,11 @@ export {
     stringToHex,
     hex,
     dataViewToString,
-    getBitField,
-    nthBitToBool,
+
+    nthBit,
     toBool,
+    nthBitToBool,
+
     powerToZone,
     hrToColor,
     valueToHeight,

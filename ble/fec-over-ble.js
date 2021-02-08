@@ -1,14 +1,5 @@
-const nthBit       = (field, bit) => (field >> bit) & 1;
-const toBool       = (bit) => !!(bit);
-const nthBitToBool = (field, bit) => toBool(nthBit(field, bit));
-
-function xor(view) {
-    let cs = 0;
-    for (let i=0; i < view.byteLength; i++) {
-        cs ^= view.getUint8(i);
-    }
-    return cs;
-}
+import { services } from './services.js';
+import { nthBitToBool, xor } from '../functions.js';
 
 function decodePower(powerMSB, powerLSB) {
     return ((powerMSB & 0b00001111) << 8) + (powerLSB);
@@ -42,12 +33,13 @@ function dataPage25(dataview) {
 
 function dataPage16(dataview) {
     // General FE data, 0x10
+    const resolution    = 0.001;
     const equipmentType = dataview.getUint8(5);
-    const speed         = dataview.getUint16(8, true);
+    let   speed         = dataview.getUint16(8, true);
     const flags         = dataview.getUint8(11);
     // const distance      = dataview.getUint8(7); // 255 rollover
     // const hr            = dataview.getUint8(10); // optional
-
+    speed = (speed * resolution * 3.6);
     return { speed, page: 16 };
 }
 
@@ -59,13 +51,9 @@ function dataMsg(dataview) {
     let dataPage = dataview.getUint8(4);
 
     if(dataPage === 25) {
-        // let { power, cadence, status } = dataPage25(dataview);
-        // console.log(`pwr: ${power}, cad: ${cadence}`);
         return dataPage25(dataview);
     }
     if(dataPage === 16) {
-        // let { speed } = dataPage16(dataview);
-        // console.log(`spd: ${speed}`);
         return dataPage16(dataview);
     }
     return { page: 0 };
@@ -73,9 +61,9 @@ function dataMsg(dataview) {
 
 function dataPage48(resistance) {
     // Data Page 48 (0x30) – Basic Resistance
-    let buffer   = new ArrayBuffer(8);
-    let view     = new DataView(buffer);
-    let dataPage = 48;
+    const dataPage = 48;
+    let buffer     = new ArrayBuffer(8);
+    let view       = new DataView(buffer);
 
     view.setUint8(0, dataPage, true);
     view.setUint8(7, resistance, true);
@@ -85,9 +73,9 @@ function dataPage48(resistance) {
 
 function dataPage49(power) {
     // Data Page 49 (0x31) – Target Power
-    let buffer   = new ArrayBuffer(8);
-    let view     = new DataView(buffer);
-    let dataPage = 49;
+    const dataPage = 49;
+    let buffer     = new ArrayBuffer(8);
+    let view       = new DataView(buffer);
 
     view.setUint8(0, dataPage, true);
     view.setUint16(6, power, true);
@@ -108,12 +96,11 @@ function compansateGradeOffset(slope) {
 
 function dataPage51(slope) {
     // Data Page 51 (0x33) – Track Resistance
-    let buffer   = new ArrayBuffer(8);
-    let view     = new DataView(buffer);
-    let dataPage = 51;
-
-    let grade = compansateGradeOffset(slope);
-    let crr   = 0xFF; // default value
+    const dataPage = 51;
+    const grade    = compansateGradeOffset(slope);
+    const crr      = 0xFF; // default value
+    let buffer     = new ArrayBuffer(8);
+    let view       = new DataView(buffer);
 
     view.setUint8(0, dataPage, true);
     view.setUint16(5, grade, true);
@@ -123,12 +110,11 @@ function dataPage51(slope) {
 }
 
 function controlMessage(content, channel = 5) {
+    const sync   = 164;
+    const length = 9;
+    const type   = 79; // Acknowledged 0x4F
     let buffer   = new ArrayBuffer(13);
     let view     = new DataView(buffer);
-
-    const sync    = 164;
-    const length  = 9;
-    const type    = 79; // Acknowledged 0x4F
     view.setUint8(0, sync,    true);
     view.setUint8(1, length,  true);
     view.setUint8(2, type,    true);
@@ -156,6 +142,68 @@ function slopeTargetMsg(slope, channel = 5) {
     return controlMessage(dataPage49(slope, channel));
 }
 
-let ant = { dataMsg, powerTargetMsg, resistanceTargetMsg, slopeTargetMsg };
+class FECBLE {
+    constructor(args) {
+        this.device    = args.device;
+        this.info      = {};
+        this.features  = {};
+        this.status    = {};
+        this.onPower   = args.onPower;
+        this.onCadence = args.onCadence;
+        this.onSpeed   = args.onSpeed;
+    }
 
-export { ant };
+    async connect() {
+        const self = this;
+        await self.device.notify(services.fecOverBle.uuid,
+                                 services.fecOverBle.fec2.uuid,
+                                 self.onData.bind(self));
+
+        const features = {
+            readings: ['Power', 'Speed', 'Cadence'],
+            targets:  ['Power', 'Resistance', 'Simulation'],
+            params: {
+                power:      {min: 0, max: 4096, inc: 1},
+                resistance: {min: 0, max:  100, inc: 1}
+            }
+        };
+
+        self.onConfig(features);
+    }
+    async setPowerTarget(value) {
+        const self   = this;
+        const msg    = powerTargetMsg(value);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+    }
+    async setResistanceTarget(value) {
+        const self   = this;
+        const msg    = resistanceTargetMsg(value);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+    }
+    async setSlopeTarget(args) {
+        const self   = this;
+        const msg    = slopeTargetMsg(args.grade);
+        const buffer = msg.buffer;
+        let res      =
+            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+    }
+    onData(e) {
+        const self     = this;
+        const dataview = e.target.value;
+        const data     = dataMsg(dataview);
+        if(data.page === 25) {
+            self.onPower(data.power);
+            self.onCadence(data.cadence);
+        }
+        if(data.page === 16) {
+            self.onSpeed(data.speed);
+        }
+        return data;
+    }
+}
+
+export { FECBLE };

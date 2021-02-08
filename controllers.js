@@ -15,19 +15,19 @@ function DeviceController(args) {
 
     xf.sub('db:powerTarget', power => {
         if(mode === 'erg') {
-            controllable.setTargetPower(power);
+            controllable.setPowerTarget(power);
         }
     });
     xf.sub('db:resistanceTarget', target => {
         let resistance = target;
         resistance = parseInt(resistance);
-        controllable.setTargetResistanceLevel(resistance);
+        controllable.setResistanceTarget(resistance);
     });
     xf.sub('db:slopeTarget', target => {
         let slope = target;
         slope *= 100;
         slope = parseInt(slope);
-        controllable.setSimulationParameters({grade: slope});
+        controllable.setSlopeTarget({grade: slope});
     });
     xf.sub('ui:workoutStart', e => { watch.startWorkout();   });
     xf.sub('ui:watchStart',   e => { watch.start();          });

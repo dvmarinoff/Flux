@@ -1,14 +1,7 @@
-import { stringToHex,
-         hexToString,
-         hex,
-         dataViewToString,
-         getBitField,
-         toBool, }  from '../functions.js';
-
 import { xf }       from '../xf.js';
-import { Device }   from './device.js';
 import { services } from './services.js';
-import { hrs }      from './hrs.js';
+import { Device }   from './device.js';
+import { hrs }      from './hrs/hrs.js';
 
 class Hrb {
     constructor(args) {
