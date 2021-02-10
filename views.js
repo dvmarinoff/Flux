@@ -114,7 +114,6 @@ function ControllableSettingsView(args) {
     });
 
     xf.sub(`${name}:info`, data => {
-        console.log(data);
         dom.name.textContent         = `${data.name}`;
         dom.model.textContent        = `${data.modelNumberString}`;
         dom.manufacturer.textContent = `${data.manufacturerNameString}`;
@@ -253,7 +252,8 @@ function GraphPower(args) {
     }
 
     function freeRide() {
-        xf.sub('db:pwr', pwr => {
+        xf.reg('db:pwr', db => {
+            let pwr = db.pwr;
             let h = valueToHeight(scale, pwr);
             count += 1;
             if(count >= size) {
@@ -491,7 +491,6 @@ function NumberInput(args) {
     let btn = 10;
 
     xf.sub(`db:${prop}`, x => {
-        console.log(`DB:${prop} ${x}`);
         value = x;
         dom.input.value = x;
     });
@@ -666,7 +665,6 @@ function ControlView(args) {
     });
 
     xf.sub('key:down', e => {
-        console.log(mode);
         if(mode === 'erg') {
             xf.dispatch('ui:power-target-manual-dec');
         }
@@ -728,7 +726,6 @@ function WatchView(args) {
     });
 
     xf.reg('db:watchState', db => {
-        console.log(`db.watchState: ${db.watchState}`);
         watchState = db.watchState;
     });
 
@@ -754,7 +751,6 @@ function WatchView(args) {
     }, dom.workout);
 
     xf.sub('key:space', e => {
-        console.log(watchState);
         if(watchState === 'paused' || watchState === 'stopped') {
             xf.dispatch('ui:watchStart');
         } else {
@@ -988,6 +984,22 @@ function ScreenChange() {
     });
 }
 
+function SerialConnect() {
+    let dom = {
+        // connectBtn: q.get('#serial-connect-btn'),
+        hrmSettingsAntBtn: q.get('#hrm-settings-ant-btn'),
+    };
+
+    // xf.sub('pointerup', e => {
+    //     xf.dispatch('serial:connect');
+    // }, dom.connectBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('serial:connect');
+    }, dom.hrmSettingsAntBtn);
+
+}
+
 function Views() {
     ScreenChange();
     Keyboard();
@@ -1010,7 +1022,8 @@ function Views() {
     WorkoutsView();
 
     UploadWorkoutView();
-    // ConnectANT();
+
+    SerialConnect();
 }
 
 export {

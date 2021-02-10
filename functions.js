@@ -15,15 +15,15 @@ let second = xs => xs[1];
 let third  = xs => xs[2];
 let format = (x, precision = 1000) => round(x * precision) / precision;
 let mps    = kph => format(kph / 3.6);
-let mToYd  = m   => 1.09361 * m;
 let kph    = mps => 3.6 * mps;
+let mToYd  = m   => 1.09361 * m;
 let mpsToMph   = mps => 2.23694  * mps;
 let kmhToMph   = kmh => 0.621371 * kmh;
 let kgToLbs    = kg  => parseInt(2.20462 * kg);
 let lbsToKg    = lbs => (0.453592 * lbs);
 let nextToLast = xs  => xs[xs.length - 2];
 
-
+const delay   = ms => new Promise(res => setTimeout(res, ms));
 const digits  = n => Math.log(n) * Math.LOG10E + 1 | 0;
 const rand    = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1) + min);
 
@@ -228,14 +228,9 @@ function dataViewToString (dataview) {
     return str;
 }
 
-
-const getBitField = (field, bit) => (field >> bit) & 1;
-
-function toBool (n) {
-    let x = parseInt(n);
-    if(!(x === 0 || x === 1)) throw new Error(`Wrong argument for toBool: ${n}`);
-    return !!(x);
-}
+const nthBit       = (field, bit) => (field >> bit) & 1;
+const toBool       = (bit) => !!(bit);
+const nthBitToBool = (field, bit) => toBool(nthBit(field, bit));
 
 function xor(view) {
     let cs = 0;
@@ -294,8 +289,11 @@ export {
     stringToHex,
     hex,
     dataViewToString,
-    getBitField,
+
+    nthBit,
     toBool,
+    nthBitToBool,
+
     powerToZone,
     hrToColor,
     valueToHeight,

@@ -1,12 +1,7 @@
-import {hexToString,
-         dataViewToString,
-         getBitField,
-         toBool, }  from '../functions.js';
-
 import { xf }       from '../xf.js';
-import { Device }   from './device.js';
-import { cps }      from './cps.js';
 import { services } from './services.js';
+import { Device }   from './device.js';
+import { cps }      from './cps/cps.js';
 
 class PowerMeter {
     constructor(args) {
