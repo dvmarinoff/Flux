@@ -23,6 +23,7 @@ class Controllable {
         await self.device.connect();
 
         if(self.device.hasService(services.fitnessMachine.uuid)) {
+        // if(false) {
             self.protocol = new FTMS({device:    self.device,
                                       onPower:   self.onPower,
                                       onCadence: self.onCadence,
@@ -57,6 +58,7 @@ class Controllable {
         const self = this;
         if(self.isConnected()) {
             self.protocol.setResistanceTarget(level);
+            console.log(`set resistance target: ${level}`);
         }
     }
     async setSlopeTarget(args) {
@@ -66,7 +68,7 @@ class Controllable {
         }
     }
     onConfig(args) {
-        xf.reg('device:features', args.features);
+        xf.dispatch('device:features', args.features);
     }
     onData(e) {
         const self     = this;

@@ -665,7 +665,6 @@ function ControlView(args) {
     });
 
     xf.sub('key:down', e => {
-        console.log(mode);
         if(mode === 'erg') {
             xf.dispatch('ui:power-target-manual-dec');
         }
@@ -727,7 +726,6 @@ function WatchView(args) {
     });
 
     xf.reg('db:watchState', db => {
-        console.log(`db.watchState: ${db.watchState}`);
         watchState = db.watchState;
     });
 
@@ -753,7 +751,6 @@ function WatchView(args) {
     }, dom.workout);
 
     xf.sub('key:space', e => {
-        console.log(watchState);
         if(watchState === 'paused' || watchState === 'stopped') {
             xf.dispatch('ui:watchStart');
         } else {
@@ -987,6 +984,22 @@ function ScreenChange() {
     });
 }
 
+function SerialConnect() {
+    let dom = {
+        // connectBtn: q.get('#serial-connect-btn'),
+        hrmSettingsAntBtn: q.get('#hrm-settings-ant-btn'),
+    };
+
+    // xf.sub('pointerup', e => {
+    //     xf.dispatch('serial:connect');
+    // }, dom.connectBtn);
+
+    xf.sub('pointerup', e => {
+        xf.dispatch('serial:connect');
+    }, dom.hrmSettingsAntBtn);
+
+}
+
 function Views() {
     ScreenChange();
     Keyboard();
@@ -1009,7 +1022,8 @@ function Views() {
     WorkoutsView();
 
     UploadWorkoutView();
-    // ConnectANT();
+
+    SerialConnect();
 }
 
 export {

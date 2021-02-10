@@ -23,7 +23,7 @@ let kgToLbs    = kg  => parseInt(2.20462 * kg);
 let lbsToKg    = lbs => (0.453592 * lbs);
 let nextToLast = xs  => xs[xs.length - 2];
 
-
+const delay   = ms => new Promise(res => setTimeout(res, ms));
 const digits  = n => Math.log(n) * Math.LOG10E + 1 | 0;
 const rand    = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1) + min);
 

@@ -1,5 +1,5 @@
 import { xf           } from './xf.js';
-import { Encode       } from './fit.js';
+import { Encode       } from './ant/fit.js';
 import { FileHandler  } from './file.js';
 import { IDB, Storage } from './storage.js';
 import { Session      } from './session.js';

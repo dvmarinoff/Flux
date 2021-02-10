@@ -318,6 +318,12 @@ body.dark-theme {
     fill: #fff;
 }
 
+.hide {
+    visibility: hidden;
+}
+.control-screen, .menu, .zoom-level-one, .devices {
+    /* visibility: hidden; */
+}
 
 
 
@@ -329,9 +335,6 @@ body.dark-theme {
     align-content: center;
     overflow-x: hidden;
     /* visibility: hidden; */
-}
-#connectFECBtn {
-    /* display: none; */
 }
 .page {
     width: 100%;

@@ -125,7 +125,6 @@ function dataviewToIndoorBikeData(dataview) {
         data['power']    = getPower(dataview);
     }
 
-    console.log(`dataviewToIndoorBikeData: ${data}`);
     return data;
 }
 

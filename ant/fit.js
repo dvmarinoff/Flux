@@ -5,7 +5,7 @@ import { avgOfArray,
          first,
          last,
          round,
-         timeDiff } from './functions.js';
+         timeDiff } from '../functions.js';
 
 const global_msg_numbers = {
     file_id:      0,

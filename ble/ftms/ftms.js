@@ -27,6 +27,7 @@ class FTMS {
         this.onPower   = args.onPower;
         this.onSpeed   = args.onSpeed;
         this.onCadence = args.onCadence;
+        this.onConfig  = args.onConfig;
     }
 
     async connect() {
@@ -47,6 +48,8 @@ class FTMS {
         features      = await self.getTargetParams(features);
         self.features = features;
         self.info     = info;
+
+        self.onConfig({ features });
 
         await self.subFitnessMachineStatus();
     }
@@ -82,9 +85,6 @@ class FTMS {
         self.onPower(data.power);
         self.onSpeed(data.speed);
         self.onCadence(data.cadence);
-        // xf.dispatch('device:pwr', data.power);
-        // xf.dispatch('device:spd', data.speed);
-        // xf.dispatch('device:cad', data.cadence);
 
         return data;
     }
@@ -98,8 +98,7 @@ class FTMS {
     onControlPoint (e) {
         const dataview = e.target.value;
         const res      = dataviewToControlPointResponse(dataview);
-        console.log(`on control point: ${res.responseCode} ${res.requestCode} ${res.resultCode} |
-                                       ${res.response} : ${res.operation} : ${res.result}`);
+        // console.log(`on control point: ${res.responseCode} ${res.requestCode} ${res.resultCode} | ${res.response} : ${res.operation} : ${res.result}`);
     }
     async getTargetParams(feature) {
         const self = this;

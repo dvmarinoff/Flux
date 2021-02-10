@@ -62,11 +62,12 @@ function dataMsg(dataview) {
 function dataPage48(resistance) {
     // Data Page 48 (0x30) – Basic Resistance
     const dataPage = 48;
+    const unit     = 0.5;
     let buffer     = new ArrayBuffer(8);
     let view       = new DataView(buffer);
 
     view.setUint8(0, dataPage, true);
-    view.setUint8(7, resistance, true);
+    view.setUint8(7, resistance / 0.5, true);
 
     return view;
 }
@@ -74,11 +75,12 @@ function dataPage48(resistance) {
 function dataPage49(power) {
     // Data Page 49 (0x31) – Target Power
     const dataPage = 49;
+    const unit     = 0.25;
     let buffer     = new ArrayBuffer(8);
     let view       = new DataView(buffer);
 
-    view.setUint8(0, dataPage, true);
-    view.setUint16(6, power, true);
+    view.setUint8( 0, dataPage, true);
+    view.setUint16(6, power / unit, true);
 
     return view;
 }
@@ -96,15 +98,17 @@ function compansateGradeOffset(slope) {
 
 function dataPage51(slope) {
     // Data Page 51 (0x33) – Track Resistance
-    const dataPage = 51;
-    const grade    = compansateGradeOffset(slope);
-    const crr      = 0xFF; // default value
-    let buffer     = new ArrayBuffer(8);
-    let view       = new DataView(buffer);
+    const dataPage  = 51;
+    const gradeUnit = 0.01;
+    const crrUnit   = 5*Math.pow(10,-5); // 5x10^-5
+    const grade     = compansateGradeOffset(slope);
+    const crr       = 0xFF; // default value
+    let buffer      = new ArrayBuffer(8);
+    let view        = new DataView(buffer);
 
-    view.setUint8(0, dataPage, true);
+    view.setUint8( 0, dataPage,          true);
     view.setUint16(5, grade, true);
-    view.setUint8(7, crr , true);
+    view.setUint8( 7, crr,               true);
 
     return view;
 }
@@ -121,7 +125,7 @@ function controlMessage(content, channel = 5) {
     view.setUint8(3, channel, true);
 
     let j = 4;
-    for(let i = 0; i < length; i++) {
+    for(let i = 0; i < 8; i++) {
         view.setUint8(j, content.getUint8(i), true);
         j++;
     }
@@ -136,10 +140,10 @@ function powerTargetMsg(power, channel = 5) {
     return controlMessage(dataPage49(power, channel));
 }
 function resistanceTargetMsg(level, channel = 5) {
-    return controlMessage(dataPage49(level, channel));
+    return controlMessage(dataPage48(level, channel));
 }
 function slopeTargetMsg(slope, channel = 5) {
-    return controlMessage(dataPage49(slope, channel));
+    return controlMessage(dataPage51(slope, channel));
 }
 
 class FECBLE {
@@ -151,6 +155,7 @@ class FECBLE {
         this.onPower   = args.onPower;
         this.onCadence = args.onCadence;
         this.onSpeed   = args.onSpeed;
+        this.onConfig  = args.onConfig;
     }
 
     async connect() {
@@ -158,6 +163,9 @@ class FECBLE {
         await self.device.notify(services.fecOverBle.uuid,
                                  services.fecOverBle.fec2.uuid,
                                  self.onData.bind(self));
+
+        await self.device.getCharacteristic(services.fecOverBle.uuid,
+                                            services.fecOverBle.fec3.uuid);
 
         const features = {
             readings: ['Power', 'Speed', 'Cadence'],
@@ -168,28 +176,28 @@ class FECBLE {
             }
         };
 
-        self.onConfig(features);
+        self.onConfig({ features });
     }
     async setPowerTarget(value) {
         const self   = this;
         const msg    = powerTargetMsg(value);
         const buffer = msg.buffer;
         let res      =
-            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+            await self.device.writeCharacteristic(services.fecOverBle.fec3.uuid, buffer);
     }
     async setResistanceTarget(value) {
         const self   = this;
         const msg    = resistanceTargetMsg(value);
         const buffer = msg.buffer;
         let res      =
-            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+            await self.device.writeCharacteristic(services.fecOverBle.fec3.uuid, buffer);
     }
     async setSlopeTarget(args) {
         const self   = this;
         const msg    = slopeTargetMsg(args.grade);
         const buffer = msg.buffer;
         let res      =
-            await self.device.writeCharacteristic(services.fec1.fec3.uuid, buffer);
+            await self.device.writeCharacteristic(services.fecOverBle.fec3.uuid, buffer);
     }
     onData(e) {
         const self     = this;

@@ -38,18 +38,26 @@ function powerIndex(flags) {
     let i = fields.flags.size;
     return i;
 }
-function cadenceIndex(flags) {
+function crankRevolutionsIndex(flags) {
     let i = fields.flags.size;
     return i + 7;
+}
+function crankEventIndex(flags) {
+    let i = fields.flags.size;
+    return i + 9;
 }
 
 function getPower(dataview) {
     const flags = dataview.getUint16(0, true);
     return dataview.getInt16(powerIndex(flags), true);
 }
-function getCadence(dataview) {
+function getCrankRevolutions(dataview) {
     const flags = dataview.getUint16(0, true);
-    return dataview.getInt16(cadenceIndex(flags), true);
+    return dataview.getInt16(crankRevolutionsIndex(flags), true);
+}
+function getCrankEvent(dataview) {
+    const flags = dataview.getUint16(0, true);
+    return dataview.getInt16(crankEventIndex(flags), true);
 }
 
 function dataviewToCyclingPowerMeasurement(dataview) {

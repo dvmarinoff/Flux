@@ -8,6 +8,7 @@ import { Hrb } from './ble/hrb.js';
 import { Watch } from './watch.js';
 import { WakeLock } from './lock.js';
 import { Views } from './views.js';
+import { SerialANT } from './ant/ant.js';
 import { DeviceController,
          FileController,
          WorkoutController } from './controllers.js';
