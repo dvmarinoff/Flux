@@ -95,10 +95,10 @@ function slopeTarget(args) {
 }
 
 function resistanceTarget(resistance) {
-    let OpCode = 0x04;
-
-    let buffer = new ArrayBuffer(3);
-    let view   = new DataView(buffer);
+    const OpCode = 0x04;
+    const unit   = 0.1;
+    let buffer   = new ArrayBuffer(3);
+    let view     = new DataView(buffer);
     view.setUint8(0, OpCode, true);
     // view.setUint8(1, parseInt(resistance), true); // by Spec
     view.setInt16(1, resistance, true); // works with Tacx
