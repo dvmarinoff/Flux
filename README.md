@@ -64,9 +64,9 @@ It is not tested or supported by this project, but you can give it try if your o
 
 ## Supported Hardware
 
-### FTMS
+### FTMS, or FE-C over BLE
 
-Works with all trainers that implement the bluetooth Fitness Machine Service (FTMS).
+Works with all trainers that implement the bluetooth Fitness Machine Service (FTMS) or the Tacx FE-C over BLE solution.
 
 List of known trainers (not exhaustive) that implement FTMS:
 
@@ -85,19 +85,14 @@ List of known trainers (not exhaustive) that implement FTMS:
 - Wahoo Kickr (using custom solution, but support for FTMS is expected to land with firmware update 1st week of Feb 2021)
 <!-- - Wahoo Snap  -->
 
-List of major trainers without FTMS:
-
-- Tacx Neo / 2 / 2T (using custom solution ANT+ over Bluetooth)
-
-
-### FE-C over BLE (Tacx)
-
-This will enable support for the Tacx Neo trainers. Currently researching the implementation documents. Looks hopeful.
-
+- Tacx Neo / 2 / 2T (using custom solution ANT+ over Bluetooth, and is currently supported)
 
 ### ANT+ FE-C
 
-Currently researching options for FE-C on the web. It just might work.
+Currently researching options for FE-C on the web.
+When used with an ANT+ usb stick (desktop) the app has now basic support for ANT+ heart rate.
+
+The current development setup is using Suunto movestick mini and Garmin Fenix 5 watch broadcasting heart rate.
 
 
 
