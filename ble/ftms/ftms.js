@@ -12,8 +12,7 @@ import { powerTarget,
 
 import { dataviewToFitnessMachineStatus } from './fitness-machine-status.js';
 
-import { setSupportFeatures,
-         dataviewToFitnessMachineFeature } from './fitness-machine-feature.js';
+import { dataviewToFitnessMachineFeature } from './fitness-machine-feature.js';
 
 import { dataviewToSupportedPowerRange,
          dataviewToSupportedResistanceLevelRange } from './supported.js';

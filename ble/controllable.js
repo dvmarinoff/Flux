@@ -23,7 +23,6 @@ class Controllable {
         await self.device.connect();
 
         if(self.device.hasService(services.fitnessMachine.uuid)) {
-        // if(false) {
             self.protocol = new FTMS({device:    self.device,
                                       onPower:   self.onPower,
                                       onCadence: self.onCadence,
