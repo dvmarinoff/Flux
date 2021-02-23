@@ -23,6 +23,7 @@ let kgToLbs    = kg  => parseInt(2.20462 * kg);
 let lbsToKg    = lbs => (0.453592 * lbs);
 let nextToLast = xs  => xs[xs.length - 2];
 
+const empty   = (arr) => { return ( (arr === undefined) || !(arr.length > 0)); };
 const delay   = ms => new Promise(res => setTimeout(res, ms));
 const digits  = n => Math.log(n) * Math.LOG10E + 1 | 0;
 const rand    = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -214,6 +215,10 @@ function hex (n) {
      return '0x' + h;
 }
 
+function arrayToString(array) {
+    return String.fromCharCode.apply(String, array);
+}
+
 function dataViewToString (dataview) {
     let len = dataview.byteLength;
     let str = '';
@@ -240,12 +245,13 @@ function xor(view) {
     return cs;
 }
 
-function exists(x, msg = 'Does not exist!') {
+function exists(x) {
     if(x === null || x === undefined) {
-        throw new Error(`ERROR: ${msg}`);
+        return false;
     }
     return x;
 }
+
 function isSet(x, msg = 'Does not exist!') {
     if(x === null || x === undefined) {
         return false;
@@ -270,24 +276,27 @@ export {
     avg,
     rand,
     digits,
-    avgOfArray,
-    maxOfArray,
-    sum,
-    parseNumber,
-    toDecimalPoint,
-    divisors,
-    fixInRange,
     first,
     second,
     third,
     last,
     nextToLast,
+    empty,
+    avgOfArray,
+    maxOfArray,
+    sum,
+    delay,
+    parseNumber,
+    toDecimalPoint,
+    divisors,
+    fixInRange,
     round,
     floor,
     ceil,
     hexToString,
     stringToHex,
     hex,
+    arrayToString,
     dataViewToString,
 
     nthBit,

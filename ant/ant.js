@@ -1,9 +1,7 @@
+import { message } from './message.js';
 import { xf } from '../xf.js';
-import { xor, exists } from '../functions.js';
-
-const DynastreamId       = 0x0FCF;
-const ANT_USB_2_Stick_Id = 1008;
-const ANT_USB_m_Stick_Id = 1009;
+import { first, empty, xor, exists, delay } from '../functions.js';
+import { USB } from './usb.js';
 
 const ChannelTypes = {
     slave: {
@@ -22,340 +20,187 @@ const keys = {
     public:  [0xE8, 0xE4, 0x21, 0x3B, 0x55, 0x7A, 0x67, 0xC1],
 };
 
-const msgIds = {
-    channelResponse:  64, // 0x40
-    setNetworkKey:    70, // 0x46
-    unassaignChannel: 65, // 0x41
-    assaignChannel:   66, // 0x42
-    channelPeriod:    67, // 0x43
-    channelFrequency: 69, // 0x45
-    setChannelId:     81, // 0x51
-    channelId:        81, // 0x51 response
-    resetSystem:      74, // 0x4A
-    closeChannel:     76, // 0x4C
-    openChannel:      75, // 0x4B
-    broascastData:    78, // 0x4E
-};
-
-const codes = {
-    response_no_error:        0,
-    event_rx_search_timeout:  1,
-    event_tx:                 3,
-    event_channel_closed:     7,
-    channel_in_wrong_state:  21,
-    channel_id_not_set:      24,
-    invalid_message:         40,
-    invalid_network_number:  41
-};
-
-function SetNetworkKeyMsg(args) {
-    let buffer   = new ArrayBuffer(13);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 9;
-    const id     = 70;  // 0x46
-    const key    = args.key || keys.public;
-    const networkNumber = args.networkNumber || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, networkNumber, true);
-
-    let j = 4;
-    for(let i=0; i<9; i++) {
-        view.setUint8(j, key[i], true);
-        j++;
-    }
-
-    view.setUint8(12, xor(view), true);
-
-    return view;
-}
-
-function AssaignChannelMsg(args) {
-    let buffer   = new ArrayBuffer(7);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 3;
-    const id     = 66;  // 0x42
-    const channelNumber = args.channelNumber || 0;
-    const channelType   = args.channelType   || 0; // 0x00 (0), 0x10 (16), 0x40 (64)
-    const networkNumber = 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, channelType,   true);
-    view.setUint8(5, networkNumber, true);
-    view.setUint8(6, xor(view),     true);
-
-    return view;
-}
-
-function ChannelIdMsg(args) {
-    let buffer   = new ArrayBuffer(9);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 5;
-    const id     = 81; // 0x51
-    const channelNumber   = args.channelNumber || 0;
-    const deviceNumber    = 0;
-    const deviceType      = args.deviceType || 0; // 128, 248
-    const transmitionType = 0;
-
-    view.setUint8(0, sync,            true);
-    view.setUint8(1, length,          true);
-    view.setUint8(2, id,              true);
-    view.setUint8(3, channelNumber,   true);
-    view.setUint8(4, deviceNumber,    true);
-    view.setUint8(5, deviceType,      true);
-    view.setUint8(6, transmitionType, true);
-    view.setUint8(7, 0,               true);
-    view.setUint8(8, xor(view),       true);
-
-    return view;
-}
-
-function ChannelFrequencyMsg(args) {
-    let buffer   = new ArrayBuffer(6);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 2;
-    const id     = 69;  // 0x45
-    const channelNumber = args.channelNumber || 0;
-    const rfFrequency   = args.rfFrequency   || 66;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, rfFrequency,   true);
-    view.setUint8(5, xor(view),     true);
-
-    return view;
-}
-
-function ChannelPeriodMsg(args) {
-    let buffer   = new ArrayBuffer(7);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 3;
-    const id     = 67;  // 0x43
-    const channelNumber = args.channelNumber || 0;
-    const period        = args.channelPeriod || 8192;
-
-    view.setUint8( 0, sync,          true);
-    view.setUint8( 1, length,        true);
-    view.setUint8( 2, id,            true);
-    view.setUint8( 3, channelNumber, true);
-    view.setUint16(4, period,        true);
-    view.setUint8( 6, xor(view),     true);
-
-    return view;
-}
-
-function OpenChannelMsg(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 75;  // 0x4B
-    const channelNumber = args.channelNumber || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, xor(view),     true);
-
-    return view;
-}
-
-function UnassaignChannelMsg(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 65;  // 0x41
-    const channelNumber = args.channelNumber || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, xor(view), true);
-
-    return view;
-}
-
-function CloseChannelMsg(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 76;  //0x4C
-    const channelNumber = args.channelNumber || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, xor(view),     true);
-
-    return view;
-}
-
-function ResetSystemMsg(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 74;  //0x4A
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, 0,             true);
-    view.setUint8(4, xor(view),     true);
-
-    return view;
-}
-
-class ResponseMsg {
+class Channel {
     constructor(args) {
-        this.msg = this.read(args.msg);
+        this._channel    = args.channel    || this.defaultChannel();
+        this._type       = args.type       || this.defaultType();
+        this._deviceType = args.deviceType || this.defaultDeviceType();
+        this._period     = args.period     || this.defaultPeriod();
+        this._frequency  = args.frequency  || this.defaultFrequency();
+        this._key        = args.key        || this.defaultKey();
+        this.write       = args.write      || ((x) => x);
+        this._status     = {};
+        this.isOpen      = false;
+        this.postInit(args);
     }
-    read(msg) {
-        const self = this;
-        const id   = msg[4];
-        const code = msg[5];
-        self.msg   = { id, code };
-        return { id, code };
-    }
-    noError(msgId) {
-        const self = this;
-        return ((self.msg.id === msgId) && (self.msg.code  === codes.response_no_error));
-    }
-    channelClosed() {
-        const self = this;
-        return (self.msg.code === codes.event_channel_closed);
-    }
-}
-
-function isResponse(msg) {
-    const id = msg[2];
-    return id === msgIds.channelResponse;
-}
-function isBroadcast(msg) {
-    const id = msg[2];
-    return id === msgIds.broascastData;
-}
-
-class HRChannel {
-    constructor(args) {
-        this.config = { channelNumber: 0,
-                        channelType:   0,
-                        deviceType:    0,
-                        channelPeriod: 8070,
-                        rfFrequency:   57,
-                        key:           keys.antPlus };
-    }
+    postInit()          { return null; }
+    get channel()       { return this._channel; }
+    set channel(x)      { return this._channel = x; }
+    get type()          { return this._type; }
+    set type(x)         { return this._type = x; }
+    get deviceType()    { return this._deviceType; }
+    set deviceType(x)   { return this._deviceType = x; }
+    get period()        { return this._period; }
+    set period(x)       { return this._period = x; }
+    get frequency()     { return this._frequency; }
+    set frequency(x)    { return this._frequency = x; }
+    get key()           { return this._key; }
+    set key(x)          { return this._key = x; }
+    get status()        { return this._status; }
+    set status(x)       { return this._status = x; }
+    defaultChannel()    { return 0; }
+    defaultType()       { return 0; }
+    defaultDeviceType() { return 0; }
+    defaultPeriod()     { return 8192; }
+    defaultFrequency()  { return 66; }
+    defaultKey()        { return keys.public; }
     async open() {
         const self = this;
-        await self.writer.write(SetNetworkKeyMsg(self.config).buffer);
-    }
-    async onResponse(value) {
-        const self = this;
+        let config = self.toMessageConfig();
+        self.write(message.SetNetworkKey(config).buffer);
+        self.write(message.AssaignChannel(config).buffer);
+        self.write(message.ChannelId(config).buffer);
+        self.write(message.ChannelFrequency(config).buffer);
+        self.write(message.ChannelPeriod(config).buffer);
+        self.write(message.OpenChannel(config).buffer);
+        self.isOpen = true;
+        console.log(`channel:open ${self.channel}`);
 
-        const res = new ResponseMsg({msg: value});
-
-        if(res.noError(msgIds.setNetworkKey)) {
-            await self.write(AssaignChannelMsg(self.config).buffer);
-        }
-        if(res.noError(msgIds.assaignChannel)) {
-            await self.write(ChannelIdMsg(self.config).buffer);
-        }
-        if(res.noError(msgIds.channelId)) {
-            await self.write(ChannelFrequencyMsg(self.config).buffer);
-        }
-        if(res.noError(msgIds.channelFrequency)) {
-            await self.write(ChannelPeriodMsg(self.config).buffer);
-        }
-        if(res.noError(msgIds.channelPeriod)) {
-            await self.write(OpenChannelMsg(self.config).buffer);
-        }
-        if(res.channelClosed()) {
-            await self.write(UnassaignChannelMsg(self.config).buffer);
-        }
-        console.log(`serial:response ${value}`);
+        self.write(message.Request({channelNumber: self.channel, request: 82}).buffer);
     }
-    async onBroadcast(value) {
+    close() {
         const self = this;
-        const hr   = value[11];
-        if(!(hr === undefined) && !isNaN(hr)) {
-            xf.dispatch('device:hr', hr);
+        let config = self.toMessageConfig();
+        self.write(message.UnassaignChannel(config).buffer);
+        self.write(message.CloseChannel(config).buffer);
+        self.isOpen = false;
+        console.log(`channel:close ${self.channel}`);
+    }
+    toggle() {
+        const self = this;
+        if(self.isOpen) {
+            self.close();
+        } else {
+            self.open();
         }
     }
-    serial(writer) {
-        const self  = this;
-        self.writer = writer;
-    }
-    async write(buffer) {
+    connect() {
         const self = this;
-        return await self.writer.write(buffer);
+        self.open();
+    }
+    onData(data) {
+        const self = this;
+        if(self.isOpen) {
+            if(message.isBroadcast(data))   { self.onBroadcast(data);   }
+            if(message.isResponse(data))    { self.onResponse(data);    }
+            if(message.isEvent(data))       { self.onEvent(data);       }
+            if(message.isSerialError(data)) { self.onSerialError(data); }
+        }
+    }
+    onBroadcast(data) {
+        const self = this;
+        return data;
+    }
+    onResponse(data) {
+        const self = this;
+        const { channel, id, code } = message.readResponse(data);
+        console.log(`Channel ${channel} ${message.idToString(id)}: ${message.eventCodeToString(code)} ${data}`);
+    }
+    onEvent(data) {
+        const self = this;
+        const { channel, code } = message.readEvent(data);
+        console.log(`Channel ${channel} event: ${message.eventCodeToString(code)} ${data}`);
+    }
+    onSerialError(error) {
+        const self = this;
+        console.log(`Serial error: ${error}`);
+    }
+    toMessageConfig() {
+        const self = this;
+        return {
+            channelNumber: self.channel,
+            channelType:   self.type,
+            deviceType:    self.deviceType,
+            channelPeriod: self.period,
+            rfFrequency:   self.frequency,
+            key:           self.key
+        };
     }
 }
 
-// xf.sub('serial:data', data => {
-//     console.log(`serial:data  ${data}`);
-//     hrChannel.open(writer, data);
-// });
-
-let hrChannel = new HRChannel();
-
-async function SerialANT() {
-    const filter = [{usbVendorId: DynastreamId}];
-
-    const port = await navigator.serial.requestPort({filters: filter});
-
-    let info = port.getInfo();
-
-    console.log(info);
-
-    await port.open({ baudRate: 115200 });
-    console.log(port);
-
-    const writer = port.writable.getWriter();
-    const reader = port.readable.getReader();
-
-    hrChannel.serial(writer);
-    hrChannel.open();
-
-    while (true) {
-        const { value, done } = await reader.read();
-        if (done) {
-            console.log('Serial DONE');
-            reader.releaseLock();
-            break;
-        }
-
-        if(isResponse(value)) {
-            hrChannel.onResponse(value);
-        }
-        if(isBroadcast(value)) {
-            hrChannel.onBroadcast(value);
-        }
-        // xf.dispatch(`serial:data`, value);
+class Hrm extends Channel {
+    postInit(args) {
+        xf.dispatch('ant:hrm:disconnected');
     }
-    writer.releaseLock();
+    defaultChannel()    { return 1; }
+    defaultType()       { return 0; }
+    defaultDeviceType() { return 120; }
+    defaultPeriod()     { return 8070; }
+    defaultFrequency()  { return 57; }
+    defaultKey()        { return keys.antPlus; }
+    onBroadcast(data) {
+        const { hr } = message.HRPage(data);
+        if(!isNaN(hr)) {
+            xf.dispatch('ant:hr', hr);
+        }
+    }
+    connect() {
+        const self = this;
+        console.log(self.toMessageConfig());
+        self.open();
+        xf.dispatch('ant:hrm:connected');
+    }
+    disconnect() {
+        const self = this;
+        console.log(self.toMessageConfig());
+        self.close();
+        xf.dispatch('ant:hrm:disconnected');
+    }
 }
 
+class ANT {
+    constructor(args) {
+        this.usb = {};
+        this.hrm = {};
+    }
+    async init() {
+        const self = this;
+        self.hrm = new Hrm({write: self.write.bind(self)});
 
-xf.sub('serial:connect', async function(e) {
-    console.log(`connect`);
-    SerialANT();
-});
+        xf.sub('usb:ready', _ => {
+            console.log('usb:ready');
+        });
 
-export { SerialANT };
+        xf.sub('ui:ant:hrm:switch', _ => {
+            if(self.hrm.isOpen) {
+                self.hrm.disconnect();
+            } else {
+                self.hrm.connect();
+            }
+        });
+
+        self.usb = new USB({onData: self.onData.bind(self)});
+        await self.usb.init();
+    }
+    onData(data) {
+        const self = this;
+        if(message.isValid(data)) {
+            let channel = message.readChannel(data);
+            if(channel === self.hrm.channel) {
+                self.hrm.onData(data);
+            }
+        }
+    }
+    write(buffer) {
+        const self = this;
+        self.usb.write(buffer);
+    }
+    async reset() {
+        // reset system
+    }
+}
+
+const ant = new ANT();
+ant.init();
+
+export { ant };

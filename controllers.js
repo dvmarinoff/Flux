@@ -88,7 +88,7 @@ function WorkoutController() {
 
     xf.reg('file:upload:workout', e => {
         let graph   = ``;
-        let xml     = e.detail.data;
+        let xml     = e;
         let workout = parseZwo(xml);
 
         workout.intervals.forEach( interval => {
