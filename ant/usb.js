@@ -26,6 +26,7 @@ class USB {
         this._reader     = {};
         this._writer     = {};
         this._baudRate   = args.baudRate || this.defaultBaudRate();
+        this._isOpen     = this.defaultIsOpen();
         this.keepReading = true;
         this.onData      = args.onData  || ((x) => x);
         this.onReady     = args.onReady || ((x) => x);
@@ -33,6 +34,9 @@ class USB {
     get baudRate() { return this._baudRate; }
     set baudRate(x) { this._baudRate = x; }
     defaultBaudRate() { return 115200; }
+    get isOpen() { return this._isOpen; }
+    set isOpen(x) { this._isOpen = x; }
+    defaultIsOpen() { return false; }
     get port()  { return this._port; }
     set port(x) {
         const self = this;
@@ -79,17 +83,11 @@ class USB {
             return;
         }
 
-        xf.sub('ant:enable', async function(e) {
-            self.port = await self.request();
-            self.start();
-        });
-        xf.sub('ant:disable', async function(e) {
-            self.close();
-        });
-        xf.sub('ant:toggle', async function(e) {
-            if(self.isOpen()) {
-                self.close();
+        xf.sub('ui:ant:switch', async function(e) {
+            if(self.isOpen) {
+                await self.close();
             } else {
+                self.port = await self.request();
                 self.start();
             }
         });
@@ -160,21 +158,17 @@ class USB {
             self.read();
         };
     }
-    isOpen() {
-        if(self.isPort(self.port)) {
-            return self.port.readable !== null;
-        }
-        return false;
-    }
     async open() {
         const self = this;
         await self.port.open({ baudRate: 115200 });
         self.writer = self.port.writable.getWriter();
+        self.isOpen = true;
     }
-    close() {
-        const self       = this;
+    async close() {
+        const self = this;
         self.keepReading = false;
-        self.reader.cancel();
+        self.isOpen = false;
+        await self.reader.cancel();
         xf.dispatch('ant:disconnected');
     }
     async read() {
@@ -193,6 +187,7 @@ class USB {
                 self.reader.releaseLock();
             }
         }
+        self.writer.releaseLock();
         await self.port.close();
     }
     async write(buffer) {
