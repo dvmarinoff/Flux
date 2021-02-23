@@ -12,6 +12,7 @@ let db = {
     pwr: 0,   // controllable
     power: 0, // pm
     hr: 0,
+    hrAnt: 0,
     cad: 0,
     spd: 0,
     distance: 0,
@@ -51,6 +52,7 @@ let db = {
     weight: 0,
     measurement: 'metric',
     theme: 'dark',
+    page: 'home',
 
     workout: [],
     workoutFile: '',
@@ -74,7 +76,9 @@ xf.reg('device:spd',   (x, db) => db.spd      = x);
 xf.reg('device:cad',   (x, db) => db.cad      = x);
 xf.reg('device:dist',  (x, db) => db.distance = x);
 xf.reg('pm:power',     (x, db) => db.power    = x);
+xf.reg('ant:hr',       (x, db) => db.hrAnt    = x);
 
+xf.reg('ui:page',     (x, db) => db.page   = x);
 xf.reg('ui:ftp',      (x, db) => db.ftp    = x);
 xf.reg('ui:weight',   (x, db) => db.weight = x);
 xf.reg('ui:theme',    (x, db) => {
@@ -85,9 +89,9 @@ xf.reg('ui:measurement', (x, db) => {
     if(db.measurement === 'metric')   { db.measurement = 'imperial'; return; }
     if(db.measurement === 'imperial') { db.measurement = 'metric';   return; }
 });
-xf.reg('storage:ftp',    (x, db) => db.ftp    = x);
+xf.reg('storage:ftp', (x, db) => db.ftp = x);
 xf.reg('storage:weight', (x, db) => db.weight = x);
-xf.reg('storage:theme',  (x, db) => db.theme = x);
+xf.reg('storage:theme', (x, db) => db.theme = x);
 xf.reg('storage:measurement', (x, db) => db.measurement = x);
 
 xf.reg('ui:workoutFile', (x, db) => db.workoutFile = x);
@@ -95,7 +99,7 @@ xf.reg('ui:workout:set', (x, db) => {
     db.workout = db.workouts[x];
     // console.log(db.workout.intervals);
 });
-xf.reg('workout:add',    (x, db) => db.workouts.push(x));
+xf.reg('workout:add', (x, db) => db.workouts.push(x));
 
 // Watch
 // >> watch.js
@@ -233,6 +237,7 @@ function dbToSession(db) {
 
         records:           db.records,
         theme:             db.theme,
+        page:              db.page,
         measurement:       db.measurement,
     };
     return session;

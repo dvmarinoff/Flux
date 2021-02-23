@@ -58,6 +58,14 @@ function ConnectionControlsView() {
             switchBtn: q.get('#hrb-settings-btn'),
             indicator: q.get('#hrb-settings-btn .indicator'),
         },
+        ant: {
+            switchBtn: q.get('#enable-ant-btn'),
+            indicator: q.get('#enable-ant-btn .indicator'),
+        },
+        hrmAnt: {
+            switchBtn: q.get('#hrm-ant-btn'),
+            indicator: q.get('#hrm-ant-btn .indicator'),
+        },
         pmSettings: {
             switchBtn: q.get('#power-meter-settings-btn'),
             indicator: q.get('#power-meter-settings-btn .indicator'),
@@ -70,6 +78,8 @@ function ConnectionControlsView() {
     ConnectionView({name: 'controllable', dom: dom.controllableSettings});
     ConnectionView({name: 'hrb', dom: dom.hrbSettings});
     ConnectionView({name: 'pm', dom: dom.pmSettings});
+    ConnectionView({name: 'ant', dom: dom.ant});
+    ConnectionView({name: 'ant:hrm', dom: dom.hrmAnt});
 }
 
 function ControllableSettingsView(args) {
@@ -380,22 +390,29 @@ function NavigationWidget() {
         dom.menu.classList.remove('active');
     }
 
+
+    xf.sub('db:page', page => {
+        if(page === 'home')     uiHomePage(dom);
+        if(page === 'settings') uiSettingsPage(dom);
+        if(page === 'workouts') uiWorkoutsPage(dom);
+    });
+
     xf.sub('pointerup', e => {
         e.stopPropagation();
         e.preventDefault();
-        uiHomePage(dom);
+        xf.dispatch('ui:page', 'home');
     }, dom.homeBtn);
 
     xf.sub('pointerup', e => {
         e.stopPropagation();
         e.preventDefault();
-        uiSettingsPage(dom);
+        xf.dispatch('ui:page', 'settings');
     }, dom.settingsBtn);
 
     xf.sub('pointerup', e => {
         e.stopPropagation();
         e.preventDefault();
-        uiWorkoutsPage(dom);
+        xf.dispatch('ui:page', 'workouts');
     }, dom.workoutsBtn);
 
 }
@@ -984,20 +1001,16 @@ function ScreenChange() {
     });
 }
 
-function SerialConnect() {
+function HrmAnt() {
     let dom = {
-        // connectBtn: q.get('#serial-connect-btn'),
-        hrmSettingsAntBtn: q.get('#hrm-settings-ant-btn'),
+        enableAntBtn: q.get('#enable-ant-btn'),
+        hrmAntBtn:    q.get('#hrm-ant-btn'),
+        hrmAntValue:  q.get('#hrm-ant-value'),
     };
 
-    // xf.sub('pointerup', e => {
-    //     xf.dispatch('serial:connect');
-    // }, dom.connectBtn);
-
-    xf.sub('pointerup', e => {
-        xf.dispatch('serial:connect');
-    }, dom.hrmSettingsAntBtn);
-
+    xf.sub('db:hrAnt', hr => {
+        dom.hrmAntValue.textContent = `${hr}`;
+    });
 }
 
 function Views() {
@@ -1023,10 +1036,9 @@ function Views() {
 
     UploadWorkoutView();
 
-    SerialConnect();
+    HrmAnt();
 }
 
 export {
     Views,
 };
-
