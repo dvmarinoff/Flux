@@ -66,6 +66,10 @@ function ConnectionControlsView() {
             switchBtn: q.get('#hrm-ant-btn'),
             indicator: q.get('#hrm-ant-btn .indicator'),
         },
+        fec: {
+            switchBtn: q.get('#fec-ant-btn'),
+            indicator: q.get('#fec-ant-btn .indicator'),
+        },
         pmSettings: {
             switchBtn: q.get('#power-meter-settings-btn'),
             indicator: q.get('#power-meter-settings-btn .indicator'),
@@ -80,6 +84,7 @@ function ConnectionControlsView() {
     ConnectionView({name: 'pm', dom: dom.pmSettings});
     ConnectionView({name: 'ant', dom: dom.ant});
     ConnectionView({name: 'ant:hrm', dom: dom.hrmAnt});
+    ConnectionView({name: 'ant:fec', dom: dom.fec});
 }
 
 function ControllableSettingsView(args) {
@@ -1003,8 +1008,6 @@ function ScreenChange() {
 
 function HrmAnt() {
     let dom = {
-        enableAntBtn: q.get('#enable-ant-btn'),
-        hrmAntBtn:    q.get('#hrm-ant-btn'),
         hrmAntValue:  q.get('#hrm-ant-value'),
     };
 
@@ -1036,7 +1039,7 @@ function Views() {
 
     UploadWorkoutView();
 
-    HrmAnt();
+    // HrmAnt();
 }
 
 export {

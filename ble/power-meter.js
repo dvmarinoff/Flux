@@ -5,8 +5,9 @@ import { cps }      from './cps/cps.js';
 
 class PowerMeter {
     constructor(args) {
-        this.device = new Device({filter: services.cyclingPower.uuid,
-                                  optionalServices: [services.deviceInformation.uuid],
+        this.device = new Device({filters: [{services: [services.cyclingPower.uuid]}],
+                                  optionalServices:    [services.deviceInformation.uuid,
+                                                        services.batteryService.uuid],
                                   name: args.name});
         this.cyclingPowerFeature = {};
     }
@@ -28,7 +29,6 @@ class PowerMeter {
     onCyclingPowerMeasurementData(e) {
         let dataview = e.target.value;
         let data = cps.dataviewToCyclingPowerMeasurement(dataview);
-        console.log(data);
         xf.dispatch('pm:power', data.power);
     }
 }
