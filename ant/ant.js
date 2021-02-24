@@ -57,12 +57,12 @@ class Channel {
     async open() {
         const self = this;
         let config = self.toMessageConfig();
-        self.write(message.SetNetworkKey(config).buffer);
-        self.write(message.AssaignChannel(config).buffer);
-        self.write(message.ChannelId(config).buffer);
-        self.write(message.ChannelFrequency(config).buffer);
-        self.write(message.ChannelPeriod(config).buffer);
-        self.write(message.OpenChannel(config).buffer);
+        await self.write(message.SetNetworkKey(config).buffer);
+        await self.write(message.AssaignChannel(config).buffer);
+        await self.write(message.ChannelId(config).buffer);
+        await self.write(message.ChannelFrequency(config).buffer);
+        await self.write(message.ChannelPeriod(config).buffer);
+        await self.write(message.OpenChannel(config).buffer);
         self.isOpen = true;
         console.log(`channel:open ${self.channel}`);
 
@@ -103,8 +103,11 @@ class Channel {
     }
     onResponse(data) {
         const self = this;
-        const { channel, id, code } = message.readResponse(data);
-        console.log(`Channel ${channel} ${message.idToString(id)}: ${message.eventCodeToString(code)} ${data}`);
+        const { channel, id, toId, code } = message.readResponse(data);
+        const idStr   = message.idToString(id);
+        const toIdStr = message.idToString(toId);
+        const codeStr = message.eventCodeToString(code);
+        console.log(`Channel ${channel} ${toIdStr}: ${codeStr} ${data}`);
     }
     onEvent(data) {
         const self = this;
@@ -129,19 +132,24 @@ class Channel {
 }
 
 class Hrm extends Channel {
-    postInit(args) {
-        xf.dispatch('ant:hrm:disconnected');
-    }
+    postInit(args) {}
     defaultChannel()    { return 1; }
     defaultType()       { return 0; }
     defaultDeviceType() { return 120; }
-    defaultPeriod()     { return 8070; }
+    defaultPeriod()     { return (32280 / 4); }
     defaultFrequency()  { return 57; }
     defaultKey()        { return keys.antPlus; }
     onBroadcast(data) {
-        const { hr } = message.HRPage(data);
-        if(!isNaN(hr)) {
-            xf.dispatch('ant:hr', hr);
+        const page = message.HRPage(data);
+        if(!isNaN(page.hr)) {
+            xf.dispatch('ant:hr', page.hr);
+            xf.dispatch('device:hr', page.hr);
+        }
+        if('model' in page) {
+            console.log(`model: ${page.model}`);
+        }
+        if('level' in page) {
+            console.log(`level: ${page.level}`);
         }
     }
     connect() {
@@ -158,6 +166,43 @@ class Hrm extends Channel {
     }
 }
 
+class FEC extends Channel {
+    postInit(args) {}
+    defaultChannel()    { return 2; }
+    defaultType()       { return 0; }
+    defaultDeviceType() { return 17; }
+    defaultPeriod()     { return (32768 / 4); } // 8192
+    defaultFrequency()  { return 57; }
+    defaultKey()        { return keys.antPlus; }
+    onBroadcast(data) {
+        const page = message.FECPage(data);
+        if(('power' in page) && !isNaN(page.power))   {
+            xf.dispatch('ant:fec:power', page.power);
+            xf.dispatch('device:pwr', page.power);
+        };
+        if(('cadence' in page) && !isNaN(page.cadence)) {
+            xf.dispatch('ant:fec:cadence', page.cadence);
+            xf.dispatch('device:cad', page.cadence);
+        };
+        if(('speed' in page) && !isNaN(page.speed)) {
+            xf.dispatch('ant:fec:speed', page.speed);
+            xf.dispatch('device:spd', page.speed);
+        };
+    }
+    connect() {
+        const self = this;
+        console.log(self.toMessageConfig());
+        self.open();
+        xf.dispatch('ant:fec:connected');
+    }
+    disconnect() {
+        const self = this;
+        console.log(self.toMessageConfig());
+        self.close();
+        xf.dispatch('ant:fec:disconnected');
+    }
+}
+
 class ANT {
     constructor(args) {
         this.usb = {};
@@ -166,9 +211,13 @@ class ANT {
     async init() {
         const self = this;
         self.hrm = new Hrm({write: self.write.bind(self)});
+        self.fec = new FEC({write: self.write.bind(self)});
 
         xf.sub('usb:ready', _ => {
             console.log('usb:ready');
+        });
+        xf.sub('ant:disconnected', _ => {
+            self.hrm.disconnect();
         });
 
         xf.sub('ui:ant:hrm:switch', _ => {
@@ -176,6 +225,14 @@ class ANT {
                 self.hrm.disconnect();
             } else {
                 self.hrm.connect();
+            }
+        });
+
+        xf.sub('ui:ant:fec:switch', _ => {
+            if(self.fec.isOpen) {
+                self.fec.disconnect();
+            } else {
+                self.fec.connect();
             }
         });
 
@@ -188,6 +245,9 @@ class ANT {
             let channel = message.readChannel(data);
             if(channel === self.hrm.channel) {
                 self.hrm.onData(data);
+            }
+            if(channel === self.fec.channel) {
+                self.fec.onData(data);
             }
         }
     }

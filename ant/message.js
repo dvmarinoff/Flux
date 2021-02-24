@@ -351,13 +351,13 @@ function decodeStatus(bits) {
     };
 }
 
-function dataPage25(dataview) {
+function dataPage25(msg) {
     // Specific Tr data, 0x19
-    const updateEventCount = dataview.getUint8(5);
-    const cadence          = dataview.getUint8(6);  // rpm
-    const powerLSB         = dataview.getUint8(9);  // 8bit Power Lsb
-    const powerMSB         = dataview.getUint8(10); // 4bit Power Msb + 4bit Status
-    const flags            = dataview.getUint8(11);
+    const updateEventCount = msg[5];
+    const cadence          = msg[6];  // rpm
+    const powerLSB         = msg[9];  // 8bit Power Lsb
+    const powerMSB         = msg[10]; // 4bit Power Msb + 4bit Status
+    const flags            = msg[11];
 
     const power  = decodePower(powerMSB, powerLSB);
     const status = decoupleStatus(powerMSB);
@@ -365,32 +365,16 @@ function dataPage25(dataview) {
     return { power, cadence, status, page: 25 };
 }
 
-function dataPage16(dataview) {
+function dataPage16(msg) {
     // General FE data, 0x10
     const resolution    = 0.001;
-    const equipmentType = dataview.getUint8(5);
-    let   speed         = dataview.getUint16(8, true);
-    const flags         = dataview.getUint8(11);
-    // const distance      = dataview.getUint8(7); // 255 rollover
-    // const hr            = dataview.getUint8(10); // optional
+    const equipmentType = msg[5];
+    let speed           = (msg[9] << 8) + (msg[8]);
+    const flags         = msg[11];
+    // const distance      = msg.getUint8(7); // 255 rollover
+    // const hr            = msg.getUint8(10); // optional
     speed = (speed * resolution * 3.6);
     return { speed, page: 16 };
-}
-
-function dataMsg(dataview) {
-    let sync     = dataview.getUint8(0);
-    let length   = dataview.getUint8(1);
-    let type     = dataview.getUint8(2);
-    let channel  = dataview.getUint8(3);
-    let dataPage = dataview.getUint8(4);
-
-    if(dataPage === 25) {
-        return dataPage25(dataview);
-    }
-    if(dataPage === 16) {
-        return dataPage16(dataview);
-    }
-    return { page: 0 };
 }
 
 function dataPage48(resistance) {
@@ -523,8 +507,9 @@ function readResponse(msg) {
     // response to write
     const channel = readChannel(msg);
     const id      = readId(msg);
+    const toId    = msg[4];
     const code    = msg[5];
-    return { channel, id, code };
+    return { channel, id, toId, code };
 }
 function readEvent(msg) {
     const channel = readChannel(msg);
@@ -555,6 +540,33 @@ function isValid(data) {
     return true;
 }
 
+function DataPage2(msg) {
+    // HR Manufacturer Information (0x02)
+    const manufacturerId = msg[5];
+    const serialNumber   = (msg[7] << 8) + (msg[6]);
+}
+function DataPage3(msg) {
+    // HR Product Information (0x03)
+    const hardware = msg[5];
+    const software = msg[6];
+    const model    = msg[7];
+
+    return { hardware, software, model };
+}
+
+function toBatteryPercentage(x) {
+    if(x === 255) return 'not supported';
+    if(x > 100)   return '--';
+    return x;
+}
+function DataPage7(msg) {
+    // HR Battery Status (0x07)
+    const level       = toBatteryPercentage(msg[5]);
+    const voltage     = msg[6];
+    const descriptive = msg[7];
+
+    return { level, voltage, descriptive };
+}
 
 function HRPage(msg) {
     const page         = msg[4] & 0b01111111; // just bit 0 to 6
@@ -562,7 +574,25 @@ function HRPage(msg) {
     const hrbEventTime = (msg[9] << 8) + msg[8];
     const hbCount      = msg[10];
     const hr           = msg[11];
-    return { hr, page, hrbEventTime, hbCount };
+    let specific       = {};
+
+    if(page === 2) {
+        specific = DataPage2(msg);
+    }
+    if(page === 3) {
+        specific = DataPage3(msg);
+    }
+    if(page === 7) {
+        specific = DataPage7(msg);
+    }
+    return { hr, page, hrbEventTime, hbCount, ...specific };
+}
+
+function FECPage(msg) {
+    const page = msg[4];
+    if(page === 25) return dataPage25(msg);
+    if(page === 16) return dataPage16(msg);
+    return { page: 0 };
 }
 
 const message = {
@@ -597,6 +627,7 @@ const message = {
     eventCodeToString,
     idToString,
     HRPage,
+    FECPage,
 };
 
 export { message };

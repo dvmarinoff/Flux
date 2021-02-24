@@ -70,13 +70,16 @@ xf.initDB(db);
 
 
 // Register DB Events
-xf.reg('device:hr',    (x, db) => db.hr       = x);
-xf.reg('device:pwr',   (x, db) => db.pwr      = x);
-xf.reg('device:spd',   (x, db) => db.spd      = x);
-xf.reg('device:cad',   (x, db) => db.cad      = x);
-xf.reg('device:dist',  (x, db) => db.distance = x);
-xf.reg('pm:power',     (x, db) => db.power    = x);
-xf.reg('ant:hr',       (x, db) => db.hrAnt    = x);
+xf.reg('device:hr',       (x, db) => db.hr       = x);
+xf.reg('device:pwr',      (x, db) => db.pwr      = x);
+xf.reg('device:spd',      (x, db) => db.spd      = x);
+xf.reg('device:cad',      (x, db) => db.cad      = x);
+xf.reg('device:dist',     (x, db) => db.distance = x);
+xf.reg('pm:power',        (x, db) => db.power    = x);
+xf.reg('ant:hr',          (x, db) => db.hrAnt    = x);
+xf.reg('ant:fec:power',   (x, db)=> db.pwr       = x);
+xf.reg('ant:fec:speed',   (x, db)=> db.spd       = x);
+xf.reg('ant:fec:cadence', (x, db)=> db.cadence   = x);
 
 xf.reg('ui:page',     (x, db) => db.page   = x);
 xf.reg('ui:ftp',      (x, db) => db.ftp    = x);
@@ -94,7 +97,11 @@ xf.reg('storage:weight', (x, db) => db.weight = x);
 xf.reg('storage:theme', (x, db) => db.theme = x);
 xf.reg('storage:measurement', (x, db) => db.measurement = x);
 
-xf.reg('ui:workoutFile', (x, db) => db.workoutFile = x);
+xf.reg('ui:workoutFile', (x, db) => {
+    db.workoutFile = x;
+    console.log('ui:workoutFile');
+    console.log(x);
+});
 xf.reg('ui:workout:set', (x, db) => {
     db.workout = db.workouts[x];
     // console.log(db.workout.intervals);

@@ -87,20 +87,21 @@ class USB {
             if(self.isOpen) {
                 await self.close();
             } else {
-                self.port = await self.request();
-                self.start();
+                self.port = await self.requestAnt();
+                self.open();
             }
         });
 
         xf.sub('connect', e => {
             self.onConnect(e);
+            self.restore();
         }, navigator.serial);
 
         xf.sub('disconnect', e => {
             self.onDisconnect(e);
         }, navigator.serial);
 
-        await self.start();
+        self.restore();
     }
     isAvailable() {
         const self = this;
@@ -116,7 +117,6 @@ class USB {
         const info = port.getInfo();
         if(isAntStick(info)) {
             console.log('ANT+ usb connected');
-            self.start();
         }
     }
     onDisconnect(e) {
@@ -125,44 +125,42 @@ class USB {
         const info = port.getInfo();
         if(isAntStick(info)) {
             console.log('ANT+ usb disconnected');
+            xf.dispatch('ant:disconnected');
         }
     }
-    async request() {
+    async requestAnt() {
         const self   = this;
         const filter = [{usbVendorId: DynastreamId}];
         const port   = await navigator.serial.requestPort({filters: filter});
         return port;
     }
-    async ports() {
-        const ports = await navigator.serial.getPorts();
-        return ports;
-    }
-    async getAnt() {
+    async getKnownAnt() {
         const self  = this;
-        const ports = await self.ports();
+        const ports = await navigator.serial.getPorts();
         if(includesAntStick(ports)) {
             self.port = getAntStick(ports);
             console.log(`ANT+ stick found ${self.port}`);
+            return true;
         } else {
             console.warn('ANT+ stick not found');
+            return false;
         }
     }
-    async start() {
-        const self = this;
-        await self.getAnt();
-        if(self.isPort(self.port)) {
-            await self.open();
-            xf.dispatch('usb:ready');
-            xf.dispatch('ant:connected');
-            self.onReady();
-            self.read();
-        };
+    async restore() {
+        const self   = this;
+        const hasAnt = await self.getKnownAnt();
+        if(hasAnt) { self.open(); }
     }
     async open() {
         const self = this;
         await self.port.open({ baudRate: 115200 });
         self.writer = self.port.writable.getWriter();
         self.isOpen = true;
+        self.onReady();
+        xf.dispatch('usb:ready');
+        xf.dispatch('ant:connected');
+
+        self.read();
     }
     async close() {
         const self = this;
