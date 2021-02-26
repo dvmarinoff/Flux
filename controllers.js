@@ -1,7 +1,7 @@
 import { xf } from './xf.js';
 import { FileHandler } from './file.js';
 import { workouts } from './workouts/workouts.js';
-import { parseZwo, intervalsToGraph } from './parser.js';
+import { zwo, intervalsToGraph } from './workouts/parser.js';
 import { RecordedData, RecordedLaps } from './test/mock.js';
 
 function DeviceController(args) {
@@ -89,7 +89,7 @@ function WorkoutController() {
     xf.reg('file:upload:workout', e => {
         let graph   = ``;
         let xml     = e;
-        let workout = parseZwo(xml);
+        let workout = zwo.parse(xml);
 
         workout.intervals.forEach( interval => {
             interval.steps.forEach( step => {
@@ -116,7 +116,7 @@ function WorkoutController() {
     xf.reg('workouts:init', e => {
         let workoutFiles = e;
         workoutFiles.forEach( w => {
-            let workout = parseZwo(w.xml);
+            let workout = zwo.parse(w.xml);
             workout.intervals.forEach( interval => {
                 interval.steps.forEach( step => {
                     if(step.power >= 10) {

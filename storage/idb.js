@@ -1,4 +1,4 @@
-import { xf } from './xf.js';
+import { xf } from '../xf.js';
 
 const types = {
     transaction: ['readonly', 'readwrite', 'versionchange'],
@@ -10,7 +10,7 @@ class IDB {
         this.init();
     }
     init() {
-        let self = this;
+        const self = this;
         xf.sub('idb:open-success', idb => {
             console.log(`idb:open-success`);
             self.db = idb;
@@ -20,7 +20,7 @@ class IDB {
         });
     }
     open(name, version, storeName = '') {
-        let self = this;
+        const self = this;
         console.log(`idb:open ${name}:${storeName} ...`);
         let openReq = window.indexedDB.open(name, version);
 
@@ -45,7 +45,7 @@ class IDB {
         });
     }
     delete(idb, name) {
-        let self = this;
+        const self = this;
         let deleteReq = idb.deleteDatabase(name);
 
         return self.promisify(deleteReq).then(res => {
@@ -57,12 +57,12 @@ class IDB {
         });
     }
     update(idb) {
-        let self = this;
+        const self = this;
         xf.dispatch('idb:update-success', idb);
         return idb;
     }
     createStore(idb, name) {
-        let self = this;
+        const self = this;
         if (!idb.objectStoreNames.contains(name)) {
             idb.createObjectStore(name, {keyPath: 'id'});
             xf.dispatch('idb:create-success', idb);
@@ -71,37 +71,34 @@ class IDB {
         }
     }
     add(idb, storeName, item) {
-        let self = this;
+        const self = this;
         return self.transaction(idb, storeName, 'add', item, 'readwrite');
     }
     put(idb, storeName, item) {
-        let self = this;
+        const self = this;
         return self.transaction(idb, storeName, 'put', item, 'readwrite');
     }
     get(idb, storeName, key) {
-        let self = this;
+        const self = this;
         return self.transaction(idb, storeName, 'get', key, 'readonly');
     }
     getAll(idb, storeName) {
-        let self = this;
+        const self = this;
         return self.transaction(idb, storeName, 'getAll', undefined, 'readonly');
     }
     deleteEntry(idb, storeName, id) {
-        let self = this;
+        const self = this;
         return self.transaction(idb, storeName, 'delete', id, 'readwrite');
     }
     clearEntries(idb, storeName) {
-        let self = this;
+        const self = this;
         return self.transaction(idb, storeName, 'clear', undefined, 'readwrite');
     }
     transaction(idb, storeName, method, param = undefined, type = 'readonly') {
-        let self = this;
+        const self = this;
         let transaction = idb.transaction(storeName, type);
         let store = transaction.objectStore(storeName);
         let req;
-        // console.log(`${storeName}: ${method}`);
-        // console.log(transaction);
-        // console.log(store);
 
         if(param === undefined) {
             req = store[method]();
@@ -129,83 +126,4 @@ class IDB {
     }
 }
 
-class Storage {
-    constructor(){
-        this.init();
-    }
-    init() {
-        let self        = this;
-        let ftp         = window.localStorage.getItem('ftp');
-        let weight      = window.localStorage.getItem('rkg');
-        let theme       = window.localStorage.getItem('theme');
-        let measurement = window.localStorage.getItem('measurement');
-
-        if(ftp === null || ftp === undefined) {
-            ftp = 250;
-            self.setFtp(ftp);
-        }
-        if(weight === null || weight === undefined) {
-            weight = 75;
-            self.setWeight(weight);
-        }
-        if(measurement === null || measurement === undefined) {
-            measurement = 'metric';
-            self.setMeasurement(measurement);
-        }
-        if(theme === null || theme === undefined) {
-            theme = 'dark';
-            self.setTheme(theme);
-        }
-
-        xf.dispatch('storage:ftp', parseInt(ftp));
-        xf.dispatch('storage:weight', parseInt(weight));
-        xf.dispatch('storage:theme', theme);
-        xf.dispatch('storage:measurement', measurement);
-
-        xf.sub('ui:ftp', ftp => {
-            self.setFtp(parseInt(ftp));
-        });
-        xf.sub('ui:weight', weight => {
-            self.setWeight(parseInt(weight));
-        });
-        xf.sub('db:theme', theme => {
-            self.setTheme(theme);
-        });
-        xf.sub('db:measurement', measurement => {
-            self.setMeasurement(measurement);
-        });
-    }
-    setFtp(ftp) {
-        if(isNaN(ftp) || ftp > 600 || ftp < 30) {
-            console.warn(`Trying to enter Invalid FTP value in Storage: ${ftp}`);
-        } else {
-            window.localStorage.setItem('ftp', Math.round(ftp));
-            xf.dispatch('storage:ftp', ftp);
-        }
-    }
-    setWeight(weight) {
-        if(isNaN(weight) || weight > 400 || weight < 20) {
-            console.warn(`Trying to enter Invalid FTP value in Storage: ${weight}`);
-
-        } else {
-            window.localStorage.setItem('rkg', Math.round(weight));
-            xf.dispatch('storage:weight', weight);
-        }
-    }
-    setTheme(theme) {
-        if(theme === 'dark' || theme === 'white') {
-            window.localStorage.setItem('theme', theme);
-        } else {
-            console.warn(`Trying to enter Invalid Theme system value in Storage: ${theme}`);
-        }
-    }
-    setMeasurement(measurement) {
-        if(measurement === 'metric' || measurement === 'imperial') {
-            window.localStorage.setItem('measurement', measurement);
-        } else {
-            console.warn(`Trying to enter Invalid Measurement system value in Storage: ${measurement}`);
-        }
-    }
-}
-
-export { Storage, IDB };
+export { IDB };

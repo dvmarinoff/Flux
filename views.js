@@ -12,8 +12,6 @@ import { avgOfArray,
          lbsToKg,
          kmhToMph,
          fixInRange } from './functions.js';
-import { parseZwo, intervalsToGraph } from './parser.js';
-
 
 function ConnectionView(args) {
     let dom  = args.dom;

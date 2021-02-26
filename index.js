@@ -13,7 +13,7 @@ import { DeviceController,
          FileController,
          WorkoutController } from './controllers.js';
 import { FileHandler } from './file.js';
-import { IDB, Storage } from './storage.js';
+import { LocalStorage } from './storage/local-storage.js';
 import { Vibrate } from './vibrate.js';
 import { DataMock } from './test/mock.js';
 
@@ -44,7 +44,7 @@ async function start() {
     WorkoutController();
     DeviceController({controllable: flux, powerMeter: pm, watch: watch, hrb: hrb});
 
-    let storage = new Storage();
+    let localStorage = new LocalStorage();
 
     xf.dispatch('app:start');
 
