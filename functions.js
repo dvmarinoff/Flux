@@ -52,6 +52,18 @@ function sum(xs, prop = false) {
     }
 };
 
+function splitAt(xs, at) {
+    let i = -1;
+    return xs.reduce((acc, x) => {
+        if((x === at) || (acc.length === 0 && x !== at)) {
+            acc.push([x]); i++;
+        } else {
+            acc[i].push(x);
+        }
+        return acc;
+    },[]);
+}
+
 function parseNumber(n, type = 'Int') {
     let value = 0;
     if(type === 'Int') {
@@ -285,6 +297,7 @@ export {
     avgOfArray,
     maxOfArray,
     sum,
+    splitAt,
     delay,
     parseNumber,
     toDecimalPoint,

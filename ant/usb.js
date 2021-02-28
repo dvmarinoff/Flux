@@ -1,5 +1,6 @@
 import { xf } from '../xf.js';
-import { first, empty, xor, exists, delay } from '../functions.js';
+import { first, empty, splitAt } from '../functions.js';
+import { message } from './message.js';
 
 const DynastreamId       = 4047;
 const ANT_USB_2_Stick_Id = 1008;
@@ -18,6 +19,23 @@ function includesAntStick(ports) {
 
 function getAntStick(ports) {
     return first(ports.filter(p => isAntStick(p.getInfo())));
+}
+
+class MessageTransformer {
+    constructor() {
+        this.container = [];
+    }
+    transform(chunk, controller) {
+        const self = this;
+        self.container.push(chunk);
+        let msgs = splitAt(chunk, 164);
+        self.container = msgs.pop();
+        msgs.forEach(msg => controller.enqueue(msg));
+    }
+    flush(controller) {
+        const self = this;
+        controller.enqueue(self.container);
+    }
 }
 
 class USB {
@@ -172,7 +190,9 @@ class USB {
     async read() {
         const self = this;
         while (self.port.readable && self.keepReading) {
-            self.reader = self.port.readable.getReader();
+            self.reader = self.port.readable
+                .pipeThrough(new TransformStream(new MessageTransformer()))
+                .getReader();
             try {
                 while (true) {
                     const { value, done } = await self.reader.read();
