@@ -5,9 +5,13 @@ import { zwo, intervalsToGraph } from './workouts/parser.js';
 import { RecordedData, RecordedLaps } from './test/mock.js';
 
 function DeviceController(args) {
-    let controllable = args.controllable;
-    let hrb          = args.hrb;
-    let powerMeter   = args.powerMeter;
+    const controllable = args.controllable;
+    const hrb          = args.hrb;
+    const powerMeter   = args.powerMeter;
+
+    const antFec       = args.antFec;
+    const antHrm       = args.antHrm;
+
     let watch        = args.watch;
     let mode         = 'erg';
 
@@ -15,19 +19,35 @@ function DeviceController(args) {
 
     xf.sub('db:powerTarget', power => {
         if(mode === 'erg') {
-            controllable.setPowerTarget(power);
+            console.log();
+            if(controllable.device.connected) {
+                controllable.setPowerTarget(power);
+            }
+            if(antFec.connected) {
+                antFec.setPowerTarget(power);
+            }
         }
     });
     xf.sub('db:resistanceTarget', target => {
         let resistance = target;
         resistance = parseInt(resistance);
-        controllable.setResistanceTarget(resistance);
+        if(controllable.device.connected) {
+            controllable.setResistanceTarget(resistance);
+        }
+        if(antFec.connected) {
+            antFec.setResistanceTarget(resistance);;
+        }
     });
     xf.sub('db:slopeTarget', target => {
         let slope = target;
         slope *= 100;
         slope = parseInt(slope);
-        controllable.setSlopeTarget({grade: slope});
+        if(controllable.device.connected) {
+            controllable.setSlopeTarget({grade: slope});
+        }
+        if(antFec.connected) {
+            antFec.setSlopeTarget({grade: slope});
+        }
     });
     xf.sub('ui:workoutStart', e => { watch.startWorkout();   });
     xf.sub('ui:watchStart',   e => { watch.start();          });
@@ -63,6 +83,22 @@ function DeviceController(args) {
             powerMeter.disconnect();
         } else {
             powerMeter.connect();
+        }
+    });
+
+    xf.sub('ui:antHrm:switch', e => {
+        if(antHrm.connected) {
+            antHrm.disconnect();
+        } else {
+            antHrm.connect();
+        }
+    });
+
+    xf.sub('ui:antFec:switch', e => {
+        if(antFec.connected) {
+            antFec.disconnect();
+        } else {
+            antFec.connect();
         }
     });
 }

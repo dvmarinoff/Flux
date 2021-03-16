@@ -9,10 +9,6 @@ let ceil   = x => Math.ceil(x);
 let exp    = x => Math.exp(x);
 let sqr    = x => x * x;
 let avg    = (x, y) => (x + y) / 2;
-let last   = xs => xs[xs.length - 1];
-let first  = xs => xs[0];
-let second = xs => xs[1];
-let third  = xs => xs[2];
 let format = (x, precision = 1000) => round(x * precision) / precision;
 let mps    = kph => format(kph / 3.6);
 let kph    = mps => 3.6 * mps;
@@ -27,6 +23,21 @@ const empty   = (arr) => { return ( (arr === undefined) || !(arr.length > 0)); }
 const delay   = ms => new Promise(res => setTimeout(res, ms));
 const digits  = n => Math.log(n) * Math.LOG10E + 1 | 0;
 const rand    = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1) + min);
+
+let last   = xs => xs[xs.length - 1];
+let first  = xs => xs[0];
+let second = xs => xs[1];
+let third  = xs => xs[2];
+
+function isArray(x) {
+    return Array.isArray(x);
+}
+function isObject(x) {
+    return typeof x === 'object' && !isArray(x);
+}
+function conj(target, source) {
+    return Object.assign(target, source);
+}
 
 function avgOfArray(xs, prop = false) {
     if(prop !== false) {
@@ -288,6 +299,7 @@ export {
     avg,
     rand,
     digits,
+    conj,
     first,
     second,
     third,

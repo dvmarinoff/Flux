@@ -11,7 +11,10 @@ import { avgOfArray,
          kgToLbs,
          lbsToKg,
          kmhToMph,
-         fixInRange } from './functions.js';
+         fixInRange,
+         fisrt,
+         last,
+       } from './functions.js';
 
 function ConnectionView(args) {
     let dom  = args.dom;
@@ -60,7 +63,7 @@ function ConnectionControlsView() {
             switchBtn: q.get('#enable-ant-btn'),
             indicator: q.get('#enable-ant-btn .indicator'),
         },
-        hrmAnt: {
+        antHrm: {
             switchBtn: q.get('#hrm-ant-btn'),
             indicator: q.get('#hrm-ant-btn .indicator'),
         },
@@ -81,8 +84,8 @@ function ConnectionControlsView() {
     ConnectionView({name: 'hrb', dom: dom.hrbSettings});
     ConnectionView({name: 'pm', dom: dom.pmSettings});
     ConnectionView({name: 'ant', dom: dom.ant});
-    ConnectionView({name: 'ant:hrm', dom: dom.hrmAnt});
-    ConnectionView({name: 'ant:fec', dom: dom.fec});
+    ConnectionView({name: 'antHrm', dom: dom.antHrm});
+    ConnectionView({name: 'antFec', dom: dom.fec});
 }
 
 function ControllableSettingsView(args) {
@@ -187,6 +190,76 @@ function PowerMeterSettingsView(args) {
         dom.manufacturer.textContent = `${data.manufacturerNameString}`;
         dom.firmware.textContent     = `${data.firmwareRevisionString}`;
     });
+}
+
+function SearchListView(args) {
+    let dom = {
+        chooser: q.get(`#device-chooser`),
+        list:    q.get(`#device-chooser .device-chooser-list`),
+        cancel:  q.get('#chooser-cancel-btn'),
+        pair:    q.get('#chooser-pair-btn'),
+    };
+
+    let devices = [];
+    let selected = false;
+
+    const item = (args) => {
+        return `<div class="device-chooser-item" id="${args.deviceNumber}">
+            <div class="device-connection-type t2">ANT+</div>
+            <div class="device-number t3">${args.deviceNumber}</div>
+            <div class="device-type t2">${args.deviceType}</div>
+         </div>`;
+    };
+
+    xf.sub(`ant:search:started`, e => {
+        dom.chooser.style.display = 'block';
+    });
+    xf.sub(`ant:search:stopped`, e => {
+        dom.chooser.style.display = 'none';
+    });
+
+    // xf.sub(`db:antSearchList`, list => {
+    //     devices = list;
+    //     console.log(list);
+    //     dom.list.insertAdjacentHTML('beforeend', item(last(devices)));
+    // });
+    xf.sub(`ant:search:device-found`, device => {
+        devices.push(device);
+        dom.list.insertAdjacentHTML('beforeend', item(device));
+    });
+
+    xf.sub('pointerup', e => {
+        const el = e.target.closest('.device-chooser-item');
+        const els = q.getAll('.device-chooser-item');
+
+        if(el === undefined || el === null) return;
+        if(el.id === undefined) return;
+
+        const id = el.id;
+        selected = id;
+
+        els.forEach(el => el.style.backgroundColor = '#fff');
+        el.style.backgroundColor = '#efefef';
+        console.log(`view: device selected ${id}`);
+        xf.dispatch(`ui:ant:device:selected`, id);
+    }, dom.list);
+
+    xf.sub(`pointerup`, e => {
+        xf.dispatch('ui:ant:device:cancel');
+        devices = [];
+        selected = false;
+        dom.list.innerHTML = ``;
+        dom.chooser.style.display = 'none';
+    }, dom.cancel);
+
+    xf.sub(`pointerup`, e => {
+        if(!selected) return;
+        xf.dispatch('ui:ant:device:pair');
+        devices = [];
+        selected = false;
+        dom.list.innerHTML = ``;
+        dom.chooser.style.display = 'none';
+    }, dom.pair);
 }
 
 function DataScreen(args) {
@@ -752,19 +825,23 @@ function WatchView(args) {
     xf.sub('pointerup', e => {
         xf.dispatch('ui:watchStart');
         if(vibrate) navigator.vibrate([btn]);
-    },   dom.start);
+    }, dom.start);
+
     xf.sub('pointerup', e => {
         xf.dispatch('ui:watchPause');
         if(vibrate) navigator.vibrate([btn]);
-    },   dom.pause);
+    }, dom.pause);
+
     xf.sub('pointerup', e => {
         xf.dispatch('ui:watchLap');
         if(vibrate) navigator.vibrate([btn]);
-    },     dom.lap);
+    }, dom.lap);
+
     xf.sub('pointerup', e => {
         xf.dispatch('ui:watchStop');
         if(vibrate) navigator.vibrate([btn]);
-    },    dom.stop);
+    }, dom.stop);
+
     xf.sub('pointerup', e => {
         xf.dispatch('ui:workoutStart');
         if(vibrate) navigator.vibrate([btn]);
@@ -777,6 +854,7 @@ function WatchView(args) {
             xf.dispatch('ui:watchPause');
         }
     });
+
     xf.sub('key:l', e => {
         xf.dispatch('ui:watchLap');
     });
@@ -836,22 +914,24 @@ function WorkoutsView() {
         select:       [],
         descriptions: [],
     };
+
     let id  = 0;
 
-    let off = `
+    const off = `
         <svg class="radio radio-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
             <path d="M0 0h24v24H0V0z" fill="none"/>
             <path class="path" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12
                     2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
         </svg>`;
 
-    let on = `
+    const on = `
         <svg class="radio radio-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
             <path d="M0 0h24v24H0V0z" fill="none"/>
             <path class="path" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0
                     18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
             <circle class="circle" cx="12" cy="12" r="5"/>
         </svg>`;
+
     xf.reg('workouts:init', e => {
         dom.list.innerHTML = '';
     });
@@ -877,9 +957,9 @@ function WorkoutsView() {
 
         dom.list.insertAdjacentHTML('beforeend', item);
 
-        dom.items.push(document.querySelector(`.list #li${w.id} .first-row`));
-        dom.select.push(document.querySelector(`.list #btn${w.id}`));
-        dom.descriptions.push(document.querySelector(`.list #li${w.id} .desc`));
+        dom.items.push(document.querySelector(`#workouts .list #li${w.id} .first-row`));
+        dom.select.push(document.querySelector(`#workouts .list #btn${w.id}`));
+        dom.descriptions.push(document.querySelector(`#workouts .list #li${w.id} .desc`));
 
         xf.sub('pointerup', e => {
             let display = window.getComputedStyle(dom.descriptions[w.id])
@@ -1004,16 +1084,6 @@ function ScreenChange() {
     });
 }
 
-function HrmAnt() {
-    let dom = {
-        hrmAntValue:  q.get('#hrm-ant-value'),
-    };
-
-    xf.sub('db:hrAnt', hr => {
-        dom.hrmAntValue.textContent = `${hr}`;
-    });
-}
-
 function Views() {
     ScreenChange();
     Keyboard();
@@ -1022,6 +1092,8 @@ function Views() {
     ControllableSettingsView({name: 'controllable'});
     HrbSettingsView({name: 'hrb'});
     PowerMeterSettingsView({name: 'pm'});
+
+    SearchListView();
 
     DataScreen();
     GraphPower();
@@ -1037,7 +1109,6 @@ function Views() {
 
     UploadWorkoutView();
 
-    // HrmAnt();
 }
 
 export {

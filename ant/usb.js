@@ -27,8 +27,9 @@ class MessageTransformer {
     }
     transform(chunk, controller) {
         const self = this;
-        self.container.push(chunk);
-        let msgs = splitAt(chunk, 164);
+        self.container.push(Array.from(chunk));
+        self.container = self.container.flat();
+        let msgs = splitAt(self.container, 164);
         self.container = msgs.pop();
         msgs.forEach(msg => controller.enqueue(msg));
     }
@@ -49,13 +50,13 @@ class USB {
         this.onData      = args.onData  || ((x) => x);
         this.onReady     = args.onReady || ((x) => x);
     }
-    get baudRate() { return this._baudRate; }
-    set baudRate(x) { this._baudRate = x; }
     defaultBaudRate() { return 115200; }
-    get isOpen() { return this._isOpen; }
-    set isOpen(x) { this._isOpen = x; }
-    defaultIsOpen() { return false; }
-    get port()  { return this._port; }
+    defaultIsOpen()   { return false; }
+    get baudRate()    { return this._baudRate; }
+    set baudRate(x)   { this._baudRate = x; }
+    get isOpen()      { return this._isOpen; }
+    set isOpen(x)     { this._isOpen = x; }
+    get port()        { return this._port; }
     set port(x) {
         const self = this;
         if(self.isPort(x)) {
@@ -131,7 +132,7 @@ class USB {
     }
     async onConnect(e) {
         const self = this;
-        const port = e.port;
+        const port = e.target;
         const info = port.getInfo();
         if(isAntStick(info)) {
             console.log('ANT+ usb connected');
@@ -139,7 +140,7 @@ class USB {
     }
     onDisconnect(e) {
         const self = this;
-        const port = e.port;
+        const port = e.target;
         const info = port.getInfo();
         if(isAntStick(info)) {
             console.log('ANT+ usb disconnected');
@@ -190,9 +191,7 @@ class USB {
     async read() {
         const self = this;
         while (self.port.readable && self.keepReading) {
-            self.reader = self.port.readable
-                .pipeThrough(new TransformStream(new MessageTransformer()))
-                .getReader();
+            self.reader = self.port.readable.pipeThrough(new TransformStream(new MessageTransformer())).getReader();
             try {
                 while (true) {
                     const { value, done } = await self.reader.read();

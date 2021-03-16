@@ -8,7 +8,7 @@ import { Hrb } from './ble/hrb.js';
 import { Watch } from './watch.js';
 import { WakeLock } from './lock.js';
 import { Views } from './views.js';
-import { ant } from './ant/ant.js';
+import { ant, AntHrm, AntFec } from './ant/ant.js';
 import { DeviceController,
          FileController,
          WorkoutController } from './controllers.js';
@@ -32,17 +32,27 @@ function startServiceWroker() {
 }
 
 async function start() {
-    let hrb   = new Hrb({name: 'hrb'});
-    let flux  = new Controllable({name: 'controllable'});
-    let pm    = new PowerMeter({name: 'pm'});
-    let watch = new Watch();
-    let lock  = new WakeLock();
+    const hrb    = new Hrb({name: 'hrb'});
+    const flux   = new Controllable({name: 'controllable'});
+    const pm     = new PowerMeter({name: 'pm'});
+
+    const antHrm = new AntHrm({});
+    const antFec = new AntFec({});
+
+    let watch    = new Watch();
+    let lock     = new WakeLock();
 
     Views();
 
     FileController();
     WorkoutController();
-    DeviceController({controllable: flux, powerMeter: pm, watch: watch, hrb: hrb});
+    DeviceController({controllable: flux,
+                      powerMeter: pm,
+                      watch: watch,
+                      hrb: hrb,
+                      antHrm: antHrm,
+                      antFec: antFec,
+                     });
 
     let localStorage = new LocalStorage();
 

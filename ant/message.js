@@ -2,28 +2,34 @@ import { xor, nthBitToBool, arrayToString } from '../functions.js';
 
 const ids = {
     // config
-    setNetworkKey:    70, // 0x46
-    unassaignChannel: 65, // 0x41
-    assaignChannel:   66, // 0x42
-    channelPeriod:    67, // 0x43
-    channelFrequency: 69, // 0x45
-    setChannelId:     81, // 0x51
-    serialNumberSet: 101, // 0x65
+    setNetworkKey:     70, // 0x46
+    unassignChannel:   65, // 0x41
+    assignChannel:     66, // 0x42
+    channelPeriod:     67, // 0x43
+    channelFrequency:  69, // 0x45
+    setChannelId:      81, // 0x51
+    serialNumberSet:  101, // 0x65
+    searchTimeout:     68, // 0x44
+    searchLowTimeout:  99, // 0x63
+    enableExtRx:      102, // 0x66
 
     // control
-    resetSystem:      74, // 0x4A
-    openChannel:      75, // 0x4B
-    closeChannel:     76, // 0x4C
-    requestMessage:   77, // 0x4D
-    sleepMessage:    197, // 0xC5
+    resetSystem:       74, // 0x4A
+    openChannel:       75, // 0x4B
+    closeChannel:      76, // 0x4C
+    requestMessage:    77, // 0x4D
+    sleepMessage:     197, // 0xC5
 
     // notification
-    startUp:         111, // 0x6F
-    serialError:     174, // 0xAE
+    startUp:          111, // 0x6F
+    serialError:      174, // 0xAE
 
     // data
-    broascastData:    78, // 0x4E
-    acknowledgedData: 79, // 0x4F
+    broascastData:     78, // 0x4E
+    acknowledgedData:  79, // 0x4F
+    broascastExtData:  93, // 0x5D
+    burstData:         80, // 0x50
+    burstAdvData:     114, // 0x72
 
     // channel
     // channelEvent:     64, // 0x40
@@ -38,7 +44,7 @@ const ids = {
     serialNumber:     97  // 0x61
 };
 
-const eventCodes = {
+const events = {
     response_no_error:                0,
     event_rx_search_timeout:          1,
     event_rx_fail:                    2,
@@ -88,6 +94,7 @@ function SetNetworkKey(args) {
     view.setUint8(2, id,            true);
     view.setUint8(3, networkNumber, true);
 
+
     let j = 4;
     for(let i=0; i<9; i++) {
         view.setUint8(j, key[i], true);
@@ -99,15 +106,16 @@ function SetNetworkKey(args) {
     return view;
 }
 
-function AssaignChannel(args) {
+function AssignChannel(args) {
+    const sync     = 164; // 0xA4
+    const length   = 3;
+    const id       = 66;  // 0x42
+    const channelNumber = args.channelNumber || 0;
+    const channelType   = args.channelType   || 0;
+    const networkNumber = 0;
+
     let buffer   = new ArrayBuffer(7);
     let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 3;
-    const id     = 66;  // 0x42
-    const channelNumber = args.channelNumber || 0;
-    const channelType   = args.channelType   || 0; // 0x00 (0), 0x10 (16), 0x40 (64)
-    const networkNumber = 0;
 
     view.setUint8(0, sync,          true);
     view.setUint8(1, length,        true);
@@ -120,6 +128,30 @@ function AssaignChannel(args) {
     return view;
 }
 
+function AssignChannelExt(args) {
+    const sync     = 164; // 0xA4
+    const length   = 4;
+    const id       = 66;  // 0x42
+    const channelNumber = args.channelNumber || 0;
+    const channelType   = args.channelType   || 0;
+    const networkNumber = 0;
+    const extended      = args.extended      || 0x01;
+
+    let buffer   = new ArrayBuffer(8);
+    let view     = new DataView(buffer);
+
+    view.setUint8(0, sync,          true);
+    view.setUint8(1, length,        true);
+    view.setUint8(2, id,            true);
+    view.setUint8(3, channelNumber, true);
+    view.setUint8(4, channelType,   true);
+    view.setUint8(5, networkNumber, true);
+    view.setUint8(6, extended,      true);
+    view.setUint8(7, xor(view),     true);
+
+    return view;
+}
+
 function ChannelId(args) {
     let buffer   = new ArrayBuffer(9);
     let view     = new DataView(buffer);
@@ -127,9 +159,9 @@ function ChannelId(args) {
     const length = 5;
     const id     = 81; // 0x51
     const channelNumber   = args.channelNumber || 0;
-    const deviceNumber    = 0;
-    const deviceType      = args.deviceType || 0; // 128, 248
-    const transmitionType = 0;
+    const deviceNumber    = args.deviceNumber  || 0;
+    const deviceType      = args.deviceType    || 0;
+    const transmitionType = args.transType     || 0;
 
     view.setUint8( 0, sync,            true);
     view.setUint8( 1, length,          true);
@@ -198,7 +230,7 @@ function OpenChannel(args) {
     return view;
 }
 
-function UnassaignChannel(args) {
+function UnassignChannel(args) {
     let buffer   = new ArrayBuffer(5);
     let view     = new DataView(buffer);
     const sync   = 164; // 0xA4
@@ -210,7 +242,7 @@ function UnassaignChannel(args) {
     view.setUint8(1, length,        true);
     view.setUint8(2, id,            true);
     view.setUint8(3, channelNumber, true);
-    view.setUint8(4, xor(view), true);
+    view.setUint8(4, xor(view),     true);
 
     return view;
 }
@@ -239,11 +271,66 @@ function ResetSystem(args) {
     const length = 1;
     const id     = 74;  //0x4A
 
+    view.setUint8(0, sync,      true);
+    view.setUint8(1, length,    true);
+    view.setUint8(2, id,        true);
+    view.setUint8(3, 0,         true);
+    view.setUint8(4, xor(view), true);
+
+    return view;
+}
+
+function SearchTimeout(args) {
+    let buffer   = new ArrayBuffer(6);
+    let view     = new DataView(buffer);
+    const sync   = 164; // 0xA4
+    const length = 2;
+    const id     = 68;  // 0x44
+    const channelNumber = args.channelNumber || 0;
+    const timeout       = args.timeout; // 12 * 2.5 = 30s, 255 is infinite
+
     view.setUint8(0, sync,          true);
     view.setUint8(1, length,        true);
     view.setUint8(2, id,            true);
-    view.setUint8(3, 0,             true);
-    view.setUint8(4, xor(view),     true);
+    view.setUint8(3, channelNumber, true);
+    view.setUint8(4, timeout,       true);
+    view.setUint8(5, xor(view),     true);
+
+    return view;
+}
+
+function LowPrioritySearchTimeout(args) {
+    let buffer   = new ArrayBuffer(6);
+    let view     = new DataView(buffer);
+    const sync   = 164; // 0xA4
+    const length = 2;
+    const id     = 99;  // 0x63
+    const channelNumber = args.channelNumber || 0;
+    const timeout       = args.timeoutLow    || 2; // 2 * 2.5 = 5s, 255 is infinite
+
+    view.setUint8(0, sync,          true);
+    view.setUint8(1, length,        true);
+    view.setUint8(2, id,            true);
+    view.setUint8(3, channelNumber, true);
+    view.setUint8(4, timeout,       true);
+    view.setUint8(5, xor(view),     true);
+
+    return view;
+}
+
+function EnableExtRxMessages(args) {
+    let buffer   = new ArrayBuffer(6);
+    let view     = new DataView(buffer);
+    const sync   = 164; // 0xA4
+    const length = 2;
+    const id     = 102; // 0x66
+
+    view.setUint8(0, sync,        true);
+    view.setUint8(1, length,      true);
+    view.setUint8(2, id,          true);
+    view.setUint8(3, 0,           true);
+    view.setUint8(4, args.enable, true);
+    view.setUint8(5, xor(view),   true);
 
     return view;
 }
@@ -252,7 +339,7 @@ function Request(args) {
     let buffer   = new ArrayBuffer(6);
     let view     = new DataView(buffer);
     const sync   = 164; // 0xA4
-    const length = 1;
+    const length = 2;
     const id     = 77;  // 0x4D
     const channelNumber = args.channelNumber || 0;
     const request       = args.request       || 0;
@@ -265,6 +352,17 @@ function Request(args) {
     view.setUint8(5, xor(view),     true);
 
     return view;
+}
+
+function readExtendedData(data) {
+    const length        = data[1];
+    const id            = data[2];
+    const channelNumber = data[3];
+    const flag          = data[12];
+    const deviceNumber  = (data[14] << 8) + (data[13]);
+    const deviceType    = data[15];
+    const transType     = data[16];
+    return { deviceNumber, deviceType, transType };
 }
 
 function readChannelStatus(data) {
@@ -280,21 +378,21 @@ function readChannelStatus(data) {
 }
 
 function readChannelId(data) {
-    const id               = 81; // 0x51
-    const channelNumber    = data[3];
-    const deviceNumber     = (data[4] << 8) + data[5];
-    const deviceType       = data[6];
-    const transmissionType = data[7];
-    return { channelNumber, deviceNumber, deviceType, transmissionType };
+    const id            = 81; // 0x51
+    const channelNumber = data[3];
+    const deviceNumber  = (data[5] << 8) + data[4];
+    const deviceType    = data[6];
+    const transType     = data[7];
+    return { channelNumber, deviceNumber, deviceType, transType };
 }
 
-function readAntVersion(data) {
+function readANTVersion(data) {
     const id      = 62; // 0x3E
     const version = arrayToString(data.slice(3));
     return { version };
 }
 
-function readDeviceSerialNumber(data) {
+function readSerialNumber(data) {
     const id = 97; // 0x61
     const sn = data.slice(3);
     return { sn };
@@ -455,13 +553,13 @@ function controlMessage(content, channel = 5) {
 }
 
 function powerTarget(power, channel = 5) {
-    return controlMessage(dataPage49(power, channel));
+    return controlMessage(dataPage49(power), channel);
 }
 function resistanceTarget(level, channel = 5) {
-    return controlMessage(dataPage48(level, channel));
+    return controlMessage(dataPage48(level), channel);
 }
 function slopeTarget(slope, channel = 5) {
-    return controlMessage(dataPage51(slope, channel));
+    return controlMessage(dataPage51(slope), channel);
 }
 
 function readSync(msg) {
@@ -478,13 +576,13 @@ function readChannel(msg) {
 }
 
 function isValidEventCode(code) {
-    return Object.values(eventCodes).includes(code);
+    return Object.values(events).includes(code);
 }
 function eventCodeToString(code) {
-    if(!isValidEventCode) {
+    if(!isValidEventCode(code)) {
         return `invalid event code`;
     }
-    const prop = Object.entries(eventCodes)
+    const prop = Object.entries(events)
           .filter(e => e[1] === code)[0][0];
     const str  = prop.split('_').join(' ');
     return `${str}`;
@@ -494,11 +592,10 @@ function isValidId(id) {
     return Object.values(ids).includes(id);
 }
 function idToString(id) {
-    if(!isValidId) {
+    if(!isValidId(id)) {
         return `invalid message id`;
     }
-    const prop = Object.entries(ids)
-          .filter(e => e[1] === id)[0][0];
+    const prop = Object.entries(ids).filter(e => e[1] === id)[0][0];
     const str  = prop.split('_').join(' ');
     return `${str}`;
 }
@@ -521,8 +618,28 @@ function readEvent(msg) {
 function isResponse(msg) {
     return readId(msg) === message.ids.channelResponse;
 }
+function isRequestedResponse(msg) {
+    return [message.ids.channelId,
+            message.ids.channelStatus,
+            message.ids.ANTVersion,
+            message.ids.capabilities,
+            message.ids.serialNumber
+           ].includes(readId(msg));
+}
 function isBroadcast(msg) {
     return readId(msg) === message.ids.broascastData;
+}
+function isBroadcastExt(msg) {
+    return readId(msg) === message.ids.broascastExtData;
+}
+function isAcknowledged(msg) {
+    return readId(msg) === message.ids.acknowledgedData;
+}
+function isBurst(msg) {
+    return readId(msg) === message.ids.burstData;
+}
+function isBurstAdv(msg) {
+    return readId(msg) === message.ids.burstAdvData;
 }
 function isEvent(msg) {
     return readId(msg) === message.ids.channelEvent;
@@ -530,13 +647,28 @@ function isEvent(msg) {
 function isSerialError(msg) {
     return readId(msg) === message.ids.serialError;
 }
+function isChannelId(msg) {
+    return message.ids.channelId === readId(msg);
+}
+function isChannelStatus(msg) {
+    return message.ids.channelStatus === readId(msg);
+}
+function isANTVersion(msg) {
+    return message.ids.ANTVersion === readId(msg);
+}
+function isCapabilities(msg) {
+    return message.ids.capabilities === readId(msg);
+}
+function isSerialNumber(msg) {
+    return message.ids.serialNumber === readId(msg);
+}
 
 const startsWithSync = (data) => readSync(data) === 0xA4;
 const isFullLength   = (data) => readLength(data) !== (data.length + 3);
 
 function isValid(data) {
     if(!startsWithSync(data)) return false;
-    if(!isFullLength(data))   return false;
+    // if(!isFullLength(data))   return false;
     return true;
 }
 
@@ -596,8 +728,9 @@ function FECPage(msg) {
 }
 
 const message = {
-    UnassaignChannel,
-    AssaignChannel,
+    UnassignChannel,
+    AssignChannel,
+    AssignChannelExt,
     ChannelId,
     ChannelPeriod,
     ChannelFrequency,
@@ -605,6 +738,9 @@ const message = {
     ResetSystem,
     OpenChannel,
     CloseChannel,
+    SearchTimeout,
+    LowPrioritySearchTimeout,
+    EnableExtRxMessages,
     Request,
     Sleep,
     readChannelStatus,
@@ -613,17 +749,34 @@ const message = {
     resistanceTarget,
     slopeTarget,
     ids,
+    events,
     isResponse,
+    isRequestedResponse,
     isBroadcast,
+    isAcknowledged,
+    isBurst,
+    isBurstAdv,
+    isBroadcastExt,
     isEvent,
     isSerialError,
     isValid,
+    isChannelId,
+    isChannelStatus,
+    isANTVersion,
+    isCapabilities,
+    isSerialNumber,
     readSync,
     readLength,
     readId,
     readChannel,
     readResponse,
     readEvent,
+    readExtendedData,
+    readChannelId,
+    readChannelStatus,
+    readANTVersion,
+    readCapabilities,
+    readSerialNumber,
     eventCodeToString,
     idToString,
     HRPage,

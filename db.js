@@ -64,11 +64,27 @@ let db = {
     vibrate: true,
     vibrateBtn: 10,
     controllableFeatures: {},
+
+    antSearchList: [],
+    antDeviceId: {},
+    antHrm: {},
+    antFec: {},
 };
 
 xf.initDB(db);
 
-
+xf.reg('ui:ant:device:selected', (x, db) => {
+    db.antDeviceId = db.antSearchList.filter(d => {
+        return d.deviceNumber === parseInt(x);
+    })[0];
+});
+function includesDevice(devices, id) {
+    return devices.filter(d => d.deviceNumber === id.deviceNumber).length > 0;
+}
+xf.reg(`ant:search:device-found`, (x, db) => {
+    if(includesDevice(db.antSearchList, x)) return;
+    db.antSearchList.push(x);
+});
 
 // Register DB Events
 xf.reg('device:hr',       (x, db) => db.hr       = x);
