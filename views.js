@@ -12,7 +12,7 @@ import { avgOfArray,
          lbsToKg,
          kmhToMph,
          fixInRange,
-         fisrt,
+         first,
          last,
        } from './functions.js';
 
