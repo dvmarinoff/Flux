@@ -6,4 +6,4 @@ class Workout extends IDBStore {
     postInit() {}
 }
 
-export {  };
+export { Workout };
