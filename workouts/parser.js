@@ -4,7 +4,7 @@ import { powerToZone,
          toDecimalPoint,
          fixInRange,
          divisors,
-         secondsToHms } from './functions.js';
+         secondsToHms } from '../functions.js';
 
 function readWarmup(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
@@ -211,7 +211,7 @@ function stepToInterval(step) {
 //     return intervals;
 // }
 
-function parseZwo(zwo) {
+function parse(zwo) {
     let parser = new DOMParser();
     let doc = parser.parseFromString(zwo, 'text/xml');
 
@@ -255,4 +255,8 @@ function intervalsToGraph(intervals, ftp) {
     }, ``);
 }
 
-export { parseZwo, intervalsToGraph };
+const zwo = {
+    parse: parse,
+};
+
+export { zwo, intervalsToGraph };

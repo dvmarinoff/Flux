@@ -866,11 +866,7 @@ body.dark-theme {
     transition: all 0.2s ease-in-out 0s;
 }
 .btn:hover {
-    /* color: #000; */
-    background-color: var(--white-opacity-01);
-    background-color: rgba(255,255,255, 0.4);
-    /* background-color: #000; */
-
+    background-color: #777;
     cursor: pointer;
 }
 
@@ -1146,6 +1142,55 @@ body.dark-theme {
     margin: 0 auto;
 }
 
+/**/
+#device-chooser {
+    display: none;
+    position: absolute;
+    top: 43px;
+    left: 10px;
+    right: 10px;
+    height: 320px;
+    padding: 5px 0px 48px;
+    color: #444;
+    background: var(--white);
+    box-shadow: 1px 2px 4px 0px rgba(0,0,0, 0.2);
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    z-index: 4;
+}
+.device-chooser-item {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    margin: 0 10px 6px;
+    padding: 0 10px;
+    height: 48px;
+    border-bottom: 1px solid #ddd;
+}
+.device-connection-type {
+    width: 50px;
+}
+.device-number {
+    min-width: 120px;
+}
+.device-type {}
+.device-chooser-bootom-bar {
+    position: absolute;
+    height: 48px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.device-chooser-bootom-bar .status {
+    margin: 0 20px;
+}
+.chooser-btns {
+    margin: 0 20px;
+}
 
 /* Settings Page */
 .settings-tiles {

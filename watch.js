@@ -236,7 +236,7 @@ xf.reg('watch:stepIndex',     (index, db) => {
     // xf.dispatch('ui:power-target-set', powerTarget);     // update just the workout defined
     xf.dispatch('ui:power-target-manual-set', powerTarget); // set both manual and workout defined
 
-    console.log(isSet(db.workout.intervals[intervalIndex].steps[index].slope));
+    // console.log(isSet(db.workout.intervals[intervalIndex].steps[index].slope));
     if(isSet(db.workout.intervals[intervalIndex].steps[index].slope)) {
         let slopeTarget = db.workout.intervals[intervalIndex].steps[index].slope;
         xf.dispatch('ui:slope-target-set', slopeTarget);

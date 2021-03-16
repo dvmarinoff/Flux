@@ -1,8 +1,9 @@
 import { xf           } from './xf.js';
 import { Encode       } from './ant/fit.js';
 import { FileHandler  } from './file.js';
-import { IDB, Storage } from './storage.js';
-import { Session      } from './session.js';
+import { IDB          } from './storage/idb.js';
+import { Session      } from './storage/session.js';
+import { Workout      } from './storage/workout.js';
 
 import { avgOfArray, maxOfArray, sum,
          first, last, round, mps, kph,
@@ -63,11 +64,27 @@ let db = {
     vibrate: true,
     vibrateBtn: 10,
     controllableFeatures: {},
+
+    antSearchList: [],
+    antDeviceId: {},
+    antHrm: {},
+    antFec: {},
 };
 
 xf.initDB(db);
 
-
+xf.reg('ui:ant:device:selected', (x, db) => {
+    db.antDeviceId = db.antSearchList.filter(d => {
+        return d.deviceNumber === parseInt(x);
+    })[0];
+});
+function includesDevice(devices, id) {
+    return devices.filter(d => d.deviceNumber === id.deviceNumber).length > 0;
+}
+xf.reg(`ant:search:device-found`, (x, db) => {
+    if(includesDevice(db.antSearchList, x)) return;
+    db.antSearchList.push(x);
+});
 
 // Register DB Events
 xf.reg('device:hr',       (x, db) => db.hr       = x);
@@ -252,16 +269,16 @@ function dbToSession(db) {
 
 xf.reg('app:start', async function (x, db) {
     await idb.open('store', 1, 'session');
-    session = new Session({idb: idb});
+    session = new Session({idb: idb, name: 'session'});
     await session.restore();
 
 });
 
 xf.reg('lock:beforeunload', (e, db) => {
-    session.backup(idb, dbToSession(db));
+    session.save(idb, dbToSession(db));
 });
 xf.reg('lock:release', (e, db) => {
-    session.backup(idb, dbToSession(db));
+    session.save(idb, dbToSession(db));
 });
 xf.reg(`session:restore`, (session, db) => {
 

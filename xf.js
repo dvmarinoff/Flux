@@ -25,6 +25,9 @@ class XF {
     dispatch(name, value) {
         document.dispatchEvent(evt(name)(value));
     }
+    remove(name, handler) {
+        document.removeEventListener(name, handler);
+    }
     store(data) {
         let self = this;
         let handler = {
