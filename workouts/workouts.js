@@ -1,27 +1,5 @@
 let workouts =
 [
-// { name: 'Software Test',
-//   type: 'Debug',
-//   description: 'Software Test',
-//   duration: 60,
-//   xml:
-//       `<workout_file>
-//     <author>Marinov</author>
-//     <name>Software Test</name>
-//     <description>Software Test</description>
-//     <sporttype>bike</sporttype>
-//     <tags></tags>
-//     <workout>
-//         <SteadyState Duration="60" Power="0.50"/>
-//         <SteadyState Duration="60" Power="200"/>
-//         <SteadyState Duration="60" Power="0.60" SlopeTarget="3" />
-//         <SteadyState Duration="60" Power="1.21" SlopeTarget="9.5" />
-//         <IntervalsT Repeat="2" OnDuration="60" OffDuration="30" OnPower="1.06" OffPower="0.95" OnSlopeTarget="6.5" OffSlopeTarget="6" />
-
-//         <SteadyState Duration="60" Power="0.50"/>
-//     </workout>
-// </workout_file>`
-// },
 { name: 'Dijon',
   type: 'VO2 Max',
   description: '60/60s or 60 sec ON at 121% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.',

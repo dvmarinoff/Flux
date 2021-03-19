@@ -4,10 +4,11 @@ import { FileHandler  } from './file.js';
 import { IDB          } from './storage/idb.js';
 import { Session      } from './storage/session.js';
 import { Workout      } from './storage/workout.js';
+import { values       } from './values.js';
 
 import { avgOfArray, maxOfArray, sum,
          first, last, round, mps, kph,
-         timeDiff, fixInRange } from './functions.js';
+         timeDiff, fixInRange, memberOf } from './functions.js';
 
 let db = {
     pwr: 0,   // controllable
@@ -49,11 +50,11 @@ let db = {
     timestamp: Date.now(),
     inProgress: false,
 
-    ftp: 0,
-    weight: 0,
-    measurement: 'metric',
-    theme: 'dark',
-    page: 'home',
+    ftp:         values.ftp.defaultValue(),
+    weight:      values.weight.defaultValue(),
+    theme:       values.theme.defaultValue(),
+    measurement: values.measurement.defaultValue(),
+    page:        values.page.defaultValue(),
 
     workout: [],
     workoutFile: '',
@@ -72,6 +73,7 @@ let db = {
 };
 
 xf.initDB(db);
+
 
 xf.reg('ui:ant:device:selected', (x, db) => {
     db.antDeviceId = db.antSearchList.filter(d => {
@@ -94,25 +96,25 @@ xf.reg('device:cad',      (x, db) => db.cad      = x);
 xf.reg('device:dist',     (x, db) => db.distance = x);
 xf.reg('pm:power',        (x, db) => db.power    = x);
 xf.reg('ant:hr',          (x, db) => db.hrAnt    = x);
-xf.reg('ant:fec:power',   (x, db)=> db.pwr       = x);
-xf.reg('ant:fec:speed',   (x, db)=> db.spd       = x);
-xf.reg('ant:fec:cadence', (x, db)=> db.cadence   = x);
+xf.reg('ant:fec:power',   (x, db) => db.pwr      = x);
+xf.reg('ant:fec:speed',   (x, db) => db.spd      = x);
+xf.reg('ant:fec:cadence', (x, db) => db.cadence  = x);
 
 xf.reg('ui:page',     (x, db) => db.page   = x);
 xf.reg('ui:ftp',      (x, db) => db.ftp    = x);
 xf.reg('ui:weight',   (x, db) => db.weight = x);
-xf.reg('ui:theme',    (x, db) => {
-    if(db.theme === 'dark')  { db.theme = 'white'; return; }
-    if(db.theme === 'white') { db.theme = 'dark';  return; }
+xf.reg('ui:theme', (_, db) => {
+    db.theme = values.theme.switch(db.theme);
 });
-xf.reg('ui:measurement', (x, db) => {
-    if(db.measurement === 'metric')   { db.measurement = 'imperial'; return; }
-    if(db.measurement === 'imperial') { db.measurement = 'metric';   return; }
+xf.reg('ui:measurement', (_, db) => {
+    db.measurement = values.measurement.switch(db.measurement);
 });
-xf.reg('storage:ftp', (x, db) => db.ftp = x);
-xf.reg('storage:weight', (x, db) => db.weight = x);
-xf.reg('storage:theme', (x, db) => db.theme = x);
-xf.reg('storage:measurement', (x, db) => db.measurement = x);
+xf.reg('storage:set:ftp',         (x, db) => {
+    db.ftp = x;
+});
+xf.reg('storage:set:weight',      (x, db) => db.weight = x);
+xf.reg('storage:set:theme',       (x, db) => db.theme = x);
+xf.reg('storage:set:measurement', (x, db) => db.measurement = x);
 
 xf.reg('ui:workoutFile', (x, db) => {
     db.workoutFile = x;
@@ -121,7 +123,6 @@ xf.reg('ui:workoutFile', (x, db) => {
 });
 xf.reg('ui:workout:set', (x, db) => {
     db.workout = db.workouts[x];
-    // console.log(db.workout.intervals);
 });
 xf.reg('workout:add', (x, db) => db.workouts.push(x));
 
@@ -260,9 +261,11 @@ function dbToSession(db) {
         workout:           db.workout,
 
         records:           db.records,
-        theme:             db.theme,
+
         page:              db.page,
-        measurement:       db.measurement,
+        // theme:             db.theme,
+        // weight:            db.weight,
+        // measurement:       db.measurement,
     };
     return session;
 }
@@ -271,7 +274,7 @@ xf.reg('app:start', async function (x, db) {
     await idb.open('store', 1, 'session');
     session = new Session({idb: idb, name: 'session'});
     await session.restore();
-
+    xf.dispatch('db:ready');
 });
 
 xf.reg('lock:beforeunload', (e, db) => {
@@ -305,5 +308,7 @@ xf.reg('file:download:activity', (e, db) => {
     db.targetPwr    = 0;
 });
 // Session end
+
+// values.theme.init();
 
 export { db };

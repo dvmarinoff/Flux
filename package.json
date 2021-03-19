@@ -9,7 +9,5 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "regenerator-runtime": "^0.13.7"
-  }
+  "dependencies": {}
 }

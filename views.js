@@ -12,9 +12,10 @@ import { avgOfArray,
          lbsToKg,
          kmhToMph,
          fixInRange,
-         fisrt,
+         first,
          last,
        } from './functions.js';
+import { values } from './values.js';
 
 function ConnectionView(args) {
     let dom  = args.dom;
@@ -521,15 +522,18 @@ function SettingsView(args) {
         measurementBtn: q.get('#measurement-btn'),
     };
 
-    let ftp = 100;
-    let weight = 75;
-    let measurement = 'metric';
+    let ftp         = values.ftp.defaultValue();
+    let weight      = values.weight.defaultValue();
+    let theme       = values.theme.defaultValue();
+    let measurement = values.measurement.defaultValue();
 
-    xf.sub('db:ftp', ftp => {
+    xf.sub('db:ftp', value => {
+        ftp = value;
         dom.ftp.value = ftp;
     });
 
-    xf.sub('db:weight', weight => {
+    xf.sub('db:weight', value => {
+        weight = value;
         dom.weight.value = formatWeight(weight, measurement);
     });
 
@@ -545,6 +549,7 @@ function SettingsView(args) {
         dom.theme.classList.remove(`dark-theme`);
         dom.theme.classList.remove(`white-theme`);
         dom.theme.classList.add(`${name}-theme`);
+        dom.themeBtn.textContent = `${values.theme.switch(name)}`;
     });
 
     xf.sub('change', e => {
@@ -559,9 +564,23 @@ function SettingsView(args) {
         xf.dispatch('ui:ftp', ftp);
     }, dom.ftpBtn);
 
+    xf.sub('keyup', e => {
+        if(e.keyCode === 13) {
+            e.preventDefault();
+            xf.dispatch('ui:ftp', ftp);
+        }
+    }, dom.ftp);
+
     xf.sub('pointerup', e => {
         xf.dispatch('ui:weight', weight);
     }, dom.weightBtn);
+
+    xf.sub('keyup', e => {
+        if(e.keyCode === 13) {
+            e.preventDefault();
+            xf.dispatch('ui:weight', weight);
+        }
+    }, dom.weight);
 
     xf.sub('pointerup', e => {
         xf.dispatch('ui:theme');
@@ -915,7 +934,7 @@ function WorkoutsView() {
         descriptions: [],
     };
 
-    let id  = 0;
+    let id = 0;
 
     const off = `
         <svg class="radio radio-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
@@ -1104,8 +1123,8 @@ function Views() {
 
     NavigationWidget();
     ActivityView();
-    SettingsView();
     WorkoutsView();
+    SettingsView();
 
     UploadWorkoutView();
 
