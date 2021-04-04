@@ -44,7 +44,7 @@ class IDB {
             };
         });
     }
-    delete(idb, name) {
+    deleteStore(idb, name) {
         const self = this;
         let deleteReq = idb.deleteDatabase(name);
 
@@ -56,11 +56,6 @@ class IDB {
             return {};
         });
     }
-    update(idb) {
-        const self = this;
-        xf.dispatch('idb:update-success', idb);
-        return idb;
-    }
     createStore(idb, name) {
         const self = this;
         if (!idb.objectStoreNames.contains(name)) {
@@ -69,6 +64,11 @@ class IDB {
         } else {
             console.error(`idb trying to create store with existing name: ${name}`);
         }
+    }
+    update(idb) {
+        const self = this;
+        xf.dispatch('idb:update-success', idb);
+        return idb;
     }
     add(idb, storeName, item) {
         const self = this;
@@ -86,7 +86,7 @@ class IDB {
         const self = this;
         return self.transaction(idb, storeName, 'getAll', undefined, 'readonly');
     }
-    deleteEntry(idb, storeName, id) {
+    delete(idb, storeName, id) {
         const self = this;
         return self.transaction(idb, storeName, 'delete', id, 'readwrite');
     }

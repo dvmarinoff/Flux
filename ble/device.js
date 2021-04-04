@@ -163,26 +163,32 @@ class Device {
     }
     async deviceInformation() {
         let self = this;
-        await self.getService(services.deviceInformation.uuid);
-        await self.getCharacteristic(services.deviceInformation.uuid,
-                                            services.deviceInformation.manufacturerNameString.uuid);
-        await self.getCharacteristic(services.deviceInformation.uuid,
-                                            services.deviceInformation.modelNumberString.uuid);
-        await self.getCharacteristic(services.deviceInformation.uuid,
-                                     services.deviceInformation.firmwareRevisionString.uuid);
 
-        let manufacturerNameString =
+        let manufacturerNameString = 'Unknown';
+        let modelNumberString = '';
+        let firmwareRevisionString = '';
+
+        if(self.hasService(services.deviceInformation.uuid)) {
+            // await self.getService(services.deviceInformation.uuid);
+            await self.getCharacteristic(services.deviceInformation.uuid,
+                                         services.deviceInformation.manufacturerNameString.uuid);
+            await self.getCharacteristic(services.deviceInformation.uuid,
+                                         services.deviceInformation.modelNumberString.uuid);
+            await self.getCharacteristic(services.deviceInformation.uuid,
+                                         services.deviceInformation.firmwareRevisionString.uuid);
+        let manufacturerName =
             await self.readCharacteristic(services.deviceInformation.manufacturerNameString.uuid);
 
-        let modelNumberString =
+        let modelNumber =
             await self.readCharacteristic(services.deviceInformation.modelNumberString.uuid);
 
-        let firmwareRevisionString =
+        let firmwareRevision =
             await self.readCharacteristic(services.deviceInformation.firmwareRevisionString.uuid);
 
-        manufacturerNameString = dataViewToString(manufacturerNameString) || 'Unknown';
-        modelNumberString      = dataViewToString(modelNumberString)      || '';
-        firmwareRevisionString = dataViewToString(firmwareRevisionString) || '';
+            manufacturerNameString = dataViewToString(manufacturerName);
+            modelNumberString      = dataViewToString(modelNumber);
+            firmwareRevisionString = dataViewToString(firmwareRevision);
+        }
 
         self.info = {manufacturerNameString: manufacturerNameString,
                      modelNumberString:      modelNumberString,

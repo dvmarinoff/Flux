@@ -29,6 +29,10 @@ let first  = xs => xs[0];
 let second = xs => xs[1];
 let third  = xs => xs[2];
 
+function memberOf(xs, y) {
+    return xs.filter(x => x === y).length > 0;
+}
+
 function isArray(x) {
     return Array.isArray(x);
 }
@@ -310,6 +314,7 @@ export {
     maxOfArray,
     sum,
     splitAt,
+    memberOf,
     delay,
     parseNumber,
     toDecimalPoint,

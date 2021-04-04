@@ -11,7 +11,6 @@ import { DeviceController,
          FileController,
          WorkoutController } from './controllers.js';
 import { FileHandler } from './file.js';
-import { LocalStorage } from './storage/local-storage.js';
 import { Vibrate } from './vibrate.js';
 import { DataMock } from './test/mock.js';
 
@@ -51,8 +50,6 @@ async function start() {
                       antHrm: antHrm,
                       antFec: antFec,
                      });
-
-    let localStorage = new LocalStorage();
 
     xf.dispatch('app:start');
 

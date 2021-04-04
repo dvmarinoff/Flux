@@ -71,12 +71,12 @@ Works with all trainers that implement the bluetooth Fitness Machine Service (FT
 List of known trainers (not exhaustive) that implement FTMS:
 
 - Tacx Flux 1 / S / 2
-- Tacx Flow Smart 
+- Tacx Flow Smart
 
-- Elite Direto 
+- Elite Direto
 - Elite Suito
 - Elite Tuo
-- Elite Zumo 
+- Elite Zumo
 
 - Saris H3
 - Saris M2
@@ -87,12 +87,14 @@ List of known trainers (not exhaustive) that implement FTMS:
 
 - Tacx Neo / 2 / 2T (using custom solution ANT+ over Bluetooth, and is currently supported)
 
-### ANT+ FE-C
+### ANT+
 
-Currently researching options for FE-C on the web.
-When used with an ANT+ usb stick (desktop) the app has now basic support for ANT+ heart rate.
+Support for ANT+ is experimental at the moment. Works only on desktop in combination with ANT+ stick,
+and can be very frigile. To connect ANT+ device use the special ANT+ row at the bottom of Settings Page.
+Better support and full integration are coming soon.
 
-The current development setup is using Suunto movestick mini and Garmin Fenix 5 watch broadcasting heart rate.
+The current development setup is using Suunto movestick mini, Garmin Fenix 5 watch broadcasting heart rate,
+Tacx Heart Rate monitor, and Tacx Flux S trainer.
 
 
 
@@ -100,7 +102,3 @@ The current development setup is using Suunto movestick mini and Garmin Fenix 5 
 You can check a pre-release demo of the web version at [Demo](https://dvmarinoff.github.io/Flux/)
 
 Keep in mind it is in active development and will change and break on daily bases, that's until the first stable version is released.
-
-
-
-
