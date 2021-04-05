@@ -162,14 +162,12 @@ class Device {
         return res;
     }
     async deviceInformation() {
-        let self = this;
-
-        let manufacturerNameString = 'Unknown';
+        const self = this;
+        let manufacturerNameString = self.device.name;
         let modelNumberString = '';
         let firmwareRevisionString = '';
 
         if(self.hasService(services.deviceInformation.uuid)) {
-            // await self.getService(services.deviceInformation.uuid);
             await self.getCharacteristic(services.deviceInformation.uuid,
                                          services.deviceInformation.manufacturerNameString.uuid);
             await self.getCharacteristic(services.deviceInformation.uuid,
