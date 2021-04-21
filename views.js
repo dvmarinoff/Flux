@@ -45,12 +45,12 @@ function ConnectionView(args) {
 function ConnectionControlsView() {
     let dom = {
         controllableHome: {
-            switchBtn: q.get('#controllable-connection-btn'),
-            indicator: q.get('#controllable-connection-btn .indicator'),
+            switchBtn: q.get('#switch-controllable'),
+            indicator: q.get('#switch-controllable .switch--indicator'),
         },
         hrbHome: {
-            switchBtn: q.get('#hrb-connection-btn'),
-            indicator: q.get('#hrb-connection-btn .indicator'),
+            switchBtn: q.get('#switch-hrm'),
+            indicator: q.get('#switch-hrm .switch--indicator'),
         },
         controllableSettings: {
             switchBtn: q.get('#controllable-settings-btn'),
@@ -268,11 +268,11 @@ function DataScreen(args) {
         time:        q.get('#time'),
         interval:    q.get('#interval-time'),
         powerTarget: q.get('#power-target'),
-        power:       q.get('#power'),
-        cadence:     q.get('#cadence'),
-        speed:       q.get('#speed'),
-        distance:    q.get('#distance'),
-        heartRate:   q.get('#heart-rate')
+        power:       q.get('#power-value'),
+        cadence:     q.get('#cadence-value'),
+        speed:       q.get('#speed-value'),
+        distance:    q.get('#distance-value'),
+        heartRate:   q.get('#heart-rate-value')
     };
 
     let measurement = 'metric';
@@ -318,8 +318,7 @@ function DataScreen(args) {
 function GraphPower(args) {
     let dom = {
         cont:  q.get('#graph-power'),
-        graph: q.get('#graph-power .graph'),
-        // ftp:   q.get('#ftp-line-value')
+        graph: q.get('#graph-power--cont'),
     };
     let ftp = 100;
     let size = dom.cont.getBoundingClientRect().width;
@@ -334,7 +333,7 @@ function GraphPower(args) {
             let pwr = db.pwr;
             let h = valueToHeight(scale, pwr);
             dom.graph.insertAdjacentHTML('beforeend',
-        `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width}px;"></div>`);
+        `<div class="graph--bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width}px;"></div>`);
         });
     }
 
@@ -347,7 +346,7 @@ function GraphPower(args) {
                 dom.graph.removeChild(dom.graph.childNodes[0]);
             }
             dom.graph.insertAdjacentHTML('beforeend',
-        `<div class="graph-bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width}px;"></div>`);
+        `<div class="graph--bar zone-${(powerToZone(pwr, ftp)).name}" style="height: ${h}%; width: ${width}px;"></div>`);
         });
     }
 
@@ -373,7 +372,7 @@ function GraphPower(args) {
 function GraphWorkout() {
     let dom = {
         name:      q.get('#current-workout-name'),
-        graph:     q.get('#current-workout-graph'),
+        graph:     q.get('#graph-current-workout'),
         intervals: [],
         steps:     [],
     };
@@ -398,8 +397,8 @@ function GraphWorkout() {
 
         dom.progress  = document.querySelector('#progress');
         dom.active    = document.querySelector('#progress-active');
-        dom.intervals = document.querySelectorAll('#current-workout-graph .graph-interval');
-        dom.steps     = document.querySelectorAll('#current-workout-graph .graph-bar');
+        dom.intervals = document.querySelectorAll('#graph-current-workout .graph--bar-group');
+        dom.steps     = document.querySelectorAll('#graph-current-workout .graph--bar');
 
         setProgress(interval);
     });
@@ -418,8 +417,8 @@ function GraphWorkout() {
 
 function NavigationWidget() {
     let dom = {
-        menu:         q.get('.menu-cont'),
-        tabBtns:      q.getAll('.menu .tab-btn'),
+        menu:         q.get('#menu .menu--row'),
+        tabBtns:      q.getAll('#menu .menu--btn'),
         pages:        q.getAll('.page'),
         homeBtn:      q.get('#home-tab-btn'),
         settingsBtn:  q.get('#settings-tab-btn'),
@@ -427,7 +426,7 @@ function NavigationWidget() {
         homePage:     q.get('#home-page'),
         settingsPage: q.get('#settings-page'),
         workoutsPage: q.get('#workouts-page'),
-        controls:     q.get('.control-screen'),
+        controls:     q.get('#controls'),
     };
 
     function uiSettingsPage(dom) {
@@ -631,9 +630,9 @@ function NumberInput(args) {
 
 function ERG() {
     let dom = {
-        powerValue: q.get('#power-target-value'),
-        powerInc:   q.get('#power-inc'),
-        powerDec:   q.get('#power-dec'),
+        powerValue: q.get('#power-target-input'),
+        powerInc:   q.get('#power-target-inc'),
+        powerDec:   q.get('#power-target-dec'),
         ergParams:  q.get('#erg-mode-params'),
     };
 
@@ -661,9 +660,9 @@ function ERG() {
 
 function Resistance() {
     let dom = {
-        resistanceValue:  q.get('#resistance-value'),
-        resistanceInc:    q.get('#resistance-inc'),
-        resistanceDec:    q.get('#resistance-dec'),
+        resistanceValue:  q.get('#resistance-target-input'),
+        resistanceInc:    q.get('#resistance-target-inc'),
+        resistanceDec:    q.get('#resistance-target-dec'),
         resistanceParams: q.get('#resistance-mode-params'),
     };
 
@@ -690,9 +689,9 @@ function Resistance() {
 
 function Slope() {
     let dom = {
-        slopeValue:  q.get('#slope-value'),
-        slopeInc:    q.get('#slope-inc'),
-        slopeDec:    q.get('#slope-dec'),
+        slopeValue:  q.get('#slope-target-input'),
+        slopeInc:    q.get('#slope-target-inc'),
+        slopeDec:    q.get('#slope-target-dec'),
         slopeParams: q.get('#slope-mode-params'),
     };
 
@@ -968,7 +967,7 @@ function WorkoutsView() {
                 </div>
                 <div class="second-row">
                     <div class="desc">
-                        <div class="workout-graph">${w.graph}</div>
+                        <div class="graph-workout--cont">${w.graph}</div>
                         <div class="content t5">${w.description}</div>
                     </div>
                 </div>

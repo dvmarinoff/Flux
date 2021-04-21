@@ -244,13 +244,13 @@ function intervalsToGraph(intervals, ftp) {
             let width = 100 / len;
             let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
             return a +
-                `<div class="graph-bar zone-${(powerToZone(step.power, ftp)).name}" style="height: ${height}%; width: ${width}%">
-                     <div class="graph-info t5">
-                         <div class="power">${step.power === 0 ? 'Free ride' : step.power}${step.power === 0 ? '' : 'W'}</div>
-                         <div class="time">${secondsToHms(step.duration, true)}<span></span></div>
+                `<div class="graph--bar zone-${(powerToZone(step.power, ftp)).name}" style="height: ${height}%; width: ${width}%">
+                     <div class="graph--info t5">
+                         <div class="graph--info--power">${step.power === 0 ? 'Free ride' : step.power}${step.power === 0 ? '' : 'W'}</div>
+                         <div class="graph--info--time">${secondsToHms(step.duration, true)}<span></span></div>
                      </div>
                 </div>`;
-        }, `<div class="graph-interval" style="width: ${width}px">`) + `</div>`;
+        }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
 
     }, ``);
 }
