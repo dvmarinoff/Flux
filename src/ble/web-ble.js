@@ -49,7 +49,8 @@ class WebBLE {
         return device;
     }
     isConnected(device) {
-        return device.server.connected;
+        if(!exists(device.gatt)) return false;
+        return device.gatt.connected;
     }
     async sub(characteristic, handler) {
         const self = this;
@@ -133,7 +134,6 @@ class WebBLE {
     async writeCharacteristic(characteristic, value) {
         const self = this;
         let res = undefined;
-        console.log(value);
         try{
             if('writeValueWithResponse' in characteristic) {
                 res = await characteristic.writeValueWithResponse(value);

@@ -9,7 +9,7 @@
         <title>Flux</title>
 
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
         <link href="css/flux.css" rel="stylesheet"/>
     </head>
 
@@ -19,53 +19,66 @@
             <div id="home-page" class="page">
 
                 <header class="switch-connections page-header cf">
-                    <div id="switch-controllable" class="switch-connection switch">
+
+                    <connection-switch id="switch-controllable" class="switch-connection switch" name="controllable">
                         <div class="switch--indicator off"></div>
                         <div class="switch--label">Controllable</div>
-                    </div>
+                    </connection-switch>
 
-                    <div id="switch-hrm" class="switch-connection switch">
+                    <connection-switch id="switch-hrm" class="switch-connection switch" name="hrm">
                         <div class="switch--indicator off"></div>
                         <div class="switch--label">HRM</div>
-                    </div>
+                    </connection-switch>
                 </header>
 
                 <div class="data-tiles cf">
                         <div class="data-tile">
                             <h2 class="data-tile--heading">Power</h2>
                             <div class="data-tile--value-cont">
-                                <div id="power-value" class="data-tile--value">237</div>
+                                <data-display id=power-value"
+                                              class="data-tile--value"
+                                              prop="power">--</data-display>
                             </div>
                         </div>
                         <div class="data-tile">
                             <h2 class="data-tile--heading">Interval Time</h2>
                             <div class="data-tile--value-cont">
-                                <div id="interval-time" class="data-tile--value">--:--</div>
+                                <time-display id="interval-time"
+                                              class="data-tile--value"
+                                              prop="intervalTime">--:--</time-display>
                             </div>
                         </div>
                         <div class="data-tile">
                             <h2 class="data-tile--heading">Heart Rate</h2>
                             <div class="data-tile--value-cont">
-                                <div id="heart-rate-value" class="data-tile--value">134</div>
+                                <data-display id="heart-rate-value"
+                                              class="data-tile--value"
+                                              prop="heartRate">--</data-display>
                             </div>
                         </div>
 
                         <div class="data-tile">
                             <h2 class="data-tile--heading">Target</h2>
                             <div class="data-tile--value-cont">
-                                <div id="power-target" class="data-tile--value">196</div>
+                                <data-display id=power-target-value"
+                                              class="data-tile--value"
+                                              prop="powerTarget">--</data-display>
                             </div>
                         </div>
                         <div class="data-tile">
                             <h2 class="data-tile--heading">Elapsed Time</h2>
                             <div class="data-tile--value-cont">
-                                <div id="time" class="data-tile--value">01:47:53</div>
+                                <time-display id="elapsed-time"
+                                              class="data-tile--value"
+                                              prop="elapsedTime">--:--:--</time-display>
                             </div>
                         </div>
                         <div class="data-tile">
                             <h2 class="data-tile--heading">Cadence</h2>
                             <div class="data-tile--value-cont">
-                                <div id="cadence" class="data-tile--value">84</div>
+                                <data-display id=cadence-value"
+                                              class="data-tile--value"
+                                              prop="cadence">--</data-display>
                             </div>
                         </div>
                     </div>
@@ -74,13 +87,17 @@
                         <div class="data-tile--small">
                             <h2 class="data-tile-small--heading">Speed</h2>
                             <div class="data-tile-small--value-cont">
-                                <div id="speed" class="data-tile-small--value">--</div>
+                                <data-display id="speed-value"
+                                              class="data-tile--value"
+                                              prop="speed">--</data-display>
                             </div>
                         </div>
                         <div class="data-tile--small">
                             <h2 class="data-tile-small--heading">Distance</h2>
                             <div class="data-tile-small--value-cont">
-                                <div id="distance" class="data-tile-small--value">--</div>
+                                <data-display id="distance-value"
+                                              class="data-tile--value"
+                                              prop="distance">--</data-display>
                             </div>
                         </div>
                     </div>
@@ -112,17 +129,61 @@
                         </div>
                         <div id="erg-mode-controls" class="erg-mode mode-controls">
                             <header>
-                                <!-- <div class="h3">Power</div> -->
                                 <div id="erg-mode-params" class="t4">0 to 0 W</div>
                             </header>
                             <div id="power-control-btn" class="number-btn">
                                 <div class="number-btn">
-                                    <button id="power-target-dec" class="number-btn--dec number-btn--btn btn">-</button>
-                                    <input id="power-target-input" class="number-btn--value input" value="0" autocomplete="off"/>
-                                    <button id="power-target-inc" class="number-btn--inc number-btn--btn btn">+</button>
+                                    <button is="effect-button" id="power-target-dec" class="number-btn--dec number-btn--btn btn" effect="power-target-dec">-</button>
+                                    <input is="target-input"
+                                           id="power-target-input"
+                                           class="number-btn--value input"
+                                           type="number"
+                                           value="0"
+                                           autocomplete="off"
+                                           prop="powerTarget"
+                                           effect="power-target-set" />
+                                    <button is="effect-button" id="power-target-inc" class="number-btn--inc number-btn--btn btn" effect="power-target-inc">+</button>
                                 </div>
                             </div>
                         </div> <!-- end erg mode -->
+                        <div id="resistance-mode-controls" class="resistance-mode mode-controls">
+                            <header>
+                                <div id="resistance-mode-params" class="t4">0 to 0 W</div>
+                            </header>
+                            <div id="resistance-control-btn" class="number-btn">
+                                <div class="number-btn">
+                                    <button is="effect-button" id="resistance-target-dec" class="number-btn--dec number-btn--btn btn" effect="power-target-dec">-</button>
+                                    <input is="target-input"
+                                           id="resistance-target-input"
+                                           class="number-btn--value input"
+                                           type="number"
+                                           value="0"
+                                           autocomplete="off"
+                                           prop="resistanceTarget"
+                                           effect="resistance-target-set" />
+                                    <button is="effect-button" id="resistance-target-inc" class="number-btn--inc number-btn--btn btn" effect="power-target-inc">+</button>
+                                </div>
+                            </div>
+                        </div> <!-- end slope mode -->
+                        <div id="slope-mode-controls" class="slope-mode mode-controls">
+                            <header>
+                                <div id="slope-mode-params" class="t4">0 to 0 W</div>
+                            </header>
+                            <div id="slope-control-btn" class="number-btn">
+                                <div class="number-btn">
+                                    <button is="effect-button" id="slope-target-dec" class="number-btn--dec number-btn--btn btn" effect="power-target-dec">-</button>
+                                    <input is="target-input"
+                                           id="slope-target-input"
+                                           class="number-btn--value input"
+                                           type="number"
+                                           value="0"
+                                           autocomplete="off"
+                                           prop="slopeTarget"
+                                           effect="slope-target-set" />
+                                    <button is="effect-button" id="slope-target-inc" class="number-btn--inc number-btn--btn btn" effect="power-target-inc">+</button>
+                                </div>
+                            </div>
+                        </div> <!-- end slope mode -->
                     </div> <!-- end targets -->
 
             </div> <!-- end page-home -->

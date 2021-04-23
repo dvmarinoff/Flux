@@ -1,4 +1,5 @@
 import { prn } from './functions.js';
+import './db.js';
 import './views/views.js';
 import './controllers/controllers.js';
 

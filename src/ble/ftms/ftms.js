@@ -15,9 +15,9 @@ import { fitnessMachineFeatureDecoder } from './fitness-machine-feature.js';
 import { supportedPowerRange,
          supportedResistanceLevelRange } from './supported.js';
 
-function eventToValue(decoder, cb) {
+function eventToValue(decoder, callback) {
     return function (e) {
-        return cb(decoder(e.target.value));
+        return callback(decoder(e.target.value));
     };
 }
 
@@ -70,16 +70,19 @@ class FitnessMachineService {
         return await self.ble.writeCharacteristic(self.characteristics.fitnessMachineControlPoint, requestControl().buffer);
     }
     async setTargetPower(value) {
+        const self = this;
         const buffer = powerTarget(value);
         const characteristic = self.characteristics.fitnessMachineControlPoint;
         self.ble.writeCharacteristic(characteristic, buffer);
     }
     async setTargetResistance(value) {
+        const self = this;
         const buffer = resistanceTarget(value);
         const characteristic = self.characteristics.fitnessMachineControlPoint;
         self.ble.writeCharacteristic(characteristic, buffer);
     }
     async setTargetSlope(value) {
+        const self = this;
         const buffer = slopeTarget(value);
         const characteristic = self.characteristics.fitnessMachineControlPoint;
         self.ble.writeCharacteristic(characteristic, buffer);

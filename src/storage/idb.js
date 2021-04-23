@@ -1,4 +1,4 @@
-import { xf } from '../xf.js';
+import { xf, exists, equals, prn } from '../functions.js';
 
 const types = {
     transaction: ['readonly', 'readwrite', 'versionchange'],

@@ -171,7 +171,11 @@ function xor(view) {
     return cs;
 }
 function hex(n) {
-    return '0x'+(n).toString(16);
+    let h = parseInt(n).toString(16).toUpperCase();
+    if(h.length === 1) {
+        h = '0'+ h;
+    }
+    return '0x' + h;
 }
 function dataviewToString(dataview) {
     let utf8decoder = new TextDecoder('utf-8');

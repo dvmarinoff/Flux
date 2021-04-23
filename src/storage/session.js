@@ -1,5 +1,4 @@
-import { xf } from '../xf.js';
-import { first, second, third, last } from '../functions.js';
+import { xf, exists, equals, last, prn } from '../functions.js';
 import { IDBStore } from './idb-store.js';
 
 class Session extends IDBStore {
