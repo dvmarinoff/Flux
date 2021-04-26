@@ -1,10 +1,10 @@
 import { xf, exists, equals, prn } from '../functions.js';
 import { q } from './q.js';
 
-import { ConnectionSwitch } from './connection-switch.js';
-import { DataDisplay } from './data-display.js';
-import { TargetInput, EffectButton } from './inputs.js';
-import { Tabs } from './tabs.js';
+import './connection-switch.js';
+import './data-display.js';
+import './inputs.js';
+import './tabs.js';
 
 function start() {
     prn('start views.');

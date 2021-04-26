@@ -15,8 +15,8 @@
 
     <body id="theme" class="dark-theme">
         <div class="wrapper">
-
-            <div id="home-page" class="page">
+            <page-group prop="page">
+                <div id="home-page" class="page active" page="home">
 
                 <header class="switch-connections page-header cf">
 
@@ -122,77 +122,175 @@
                     <div class="line"></div>
 
                     <div id="targets">
-                        <div id="mode-selector" class="mode-selector">
-                            <div id="erg-mode-btn" class="mode active">ERG</div>
-                            <div id="resistance-mode-btn" class="mode">Resistance</div>
-                            <div id="slope-mode-btn" class="mode">Slope</div>
-                        </div>
-                        <div id="erg-mode-controls" class="erg-mode mode-controls">
-                            <header>
-                                <div id="erg-mode-params" class="t4">0 to 0 W</div>
-                            </header>
-                            <div id="power-control-btn" class="number-btn">
-                                <div class="number-btn">
-                                    <button is="effect-button" id="power-target-dec" class="number-btn--dec number-btn--btn btn" effect="power-target-dec">-</button>
-                                    <input is="target-input"
-                                           id="power-target-input"
-                                           class="number-btn--value input"
-                                           type="number"
-                                           value="0"
-                                           autocomplete="off"
-                                           prop="powerTarget"
-                                           effect="power-target-set" />
-                                    <button is="effect-button" id="power-target-inc" class="number-btn--inc number-btn--btn btn" effect="power-target-inc">+</button>
+                        <tab-btn-group group="targets">
+                            <div id="mode-selector" class="mode-selector">
+                                <tab-btn id="erg-mode-btn"
+                                        class="mode active"
+                                        effect="mode-set"
+                                        param="erg">ERG</tab-btn>
+                                <tab-btn id="resistance-mode-btn"
+                                        class="mode"
+                                        effect="mode-set"
+                                        param="resistance">Resistance</tab-btn>
+                                <tab-btn id="slope-mode-btn"
+                                        class="mode"
+                                        effect="mode-set"
+                                        param="slope">Slope</tab-btn>
+                            </div> <!-- end mode selector -->
+                        </tab-btn-group>
+                        <tab-group prop="mode">
+                            <div id="erg-mode-controls" class="tab active mode-controls" tab="erg">
+                                <header>
+                                    <div id="erg-mode-params" class="t4">0 to 0 W</div>
+                                </header>
+                                <div id="power-control-btn" class="number-btn">
+                                    <div class="number-btn">
+                                        <button is="effect-button"
+                                                id="power-target-dec"
+                                                class="number-btn--dec number-btn--btn btn"
+                                                effect="power-target-dec">-</button>
+                                        <input is="int-input"
+                                               id="power-target-input"
+                                               class="number-btn--value input"
+                                               type="number"
+                                               value="0"
+                                               autocomplete="off"
+                                               prop="powerTarget"
+                                               effect="power-target-set" />
+                                        <button is="effect-button"
+                                                id="power-target-inc"
+                                                class="number-btn--inc number-btn--btn btn"
+                                                effect="power-target-inc">+</button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div> <!-- end erg mode -->
-                        <div id="resistance-mode-controls" class="resistance-mode mode-controls">
-                            <header>
-                                <div id="resistance-mode-params" class="t4">0 to 0 W</div>
-                            </header>
-                            <div id="resistance-control-btn" class="number-btn">
-                                <div class="number-btn">
-                                    <button is="effect-button" id="resistance-target-dec" class="number-btn--dec number-btn--btn btn" effect="power-target-dec">-</button>
-                                    <input is="target-input"
-                                           id="resistance-target-input"
-                                           class="number-btn--value input"
-                                           type="number"
-                                           value="0"
-                                           autocomplete="off"
-                                           prop="resistanceTarget"
-                                           effect="resistance-target-set" />
-                                    <button is="effect-button" id="resistance-target-inc" class="number-btn--inc number-btn--btn btn" effect="power-target-inc">+</button>
+                            </div> <!-- end erg mode -->
+                            <div id="resistance-mode-controls" class="tab mode-controls" tab="resistance">
+                                <header>
+                                    <div id="resistance-mode-params" class="t4">0 to 100</div>
+                                </header>
+                                <div id="resistance-control-btn" class="number-btn">
+                                    <div class="number-btn">
+                                        <button is="effect-button"
+                                                id="resistance-target-dec"
+                                                class="number-btn--dec number-btn--btn btn"
+                                                effect="resistance-target-dec">-</button>
+                                        <input is="int-input"
+                                               id="resistance-target-input"
+                                               class="number-btn--value input"
+                                               type="number"
+                                               value="0"
+                                               autocomplete="off"
+                                               prop="resistanceTarget"
+                                               effect="resistance-target-set" />
+                                        <button is="effect-button"
+                                                id="resistance-target-inc"
+                                                class="number-btn--inc number-btn--btn btn"
+                                                effect="resistance-target-inc">+</button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div> <!-- end slope mode -->
-                        <div id="slope-mode-controls" class="slope-mode mode-controls">
-                            <header>
-                                <div id="slope-mode-params" class="t4">0 to 0 W</div>
-                            </header>
-                            <div id="slope-control-btn" class="number-btn">
-                                <div class="number-btn">
-                                    <button is="effect-button" id="slope-target-dec" class="number-btn--dec number-btn--btn btn" effect="power-target-dec">-</button>
-                                    <input is="target-input"
-                                           id="slope-target-input"
-                                           class="number-btn--value input"
-                                           type="number"
-                                           value="0"
-                                           autocomplete="off"
-                                           prop="slopeTarget"
-                                           effect="slope-target-set" />
-                                    <button is="effect-button" id="slope-target-inc" class="number-btn--inc number-btn--btn btn" effect="power-target-inc">+</button>
+                            </div> <!-- end resistance mode -->
+                            <div id="slope-mode-controls" class="tab mode-controls" tab="slope">
+                                <header>
+                                    <div id="slope-mode-params" class="t4">0 to 0%</div>
+                                </header>
+                                <div id="slope-control-btn" class="number-btn">
+                                    <div class="number-btn">
+                                        <button is="effect-button"
+                                                id="slope-target-dec"
+                                                class="number-btn--dec number-btn--btn btn"
+                                                effect="slope-target-dec">-</button>
+                                        <input is="float-input"
+                                               id="slope-target-input"
+                                               class="number-btn--value input"
+                                               type="number"
+                                               value="0"
+                                               autocomplete="off"
+                                               points="1"
+                                               prop="slopeTarget"
+                                               effect="slope-target-set" />
+                                        <button is="effect-button"
+                                                id="slope-target-inc"
+                                                class="number-btn--inc number-btn--btn btn"
+                                                effect="slope-target-inc">+</button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div> <!-- end slope mode -->
+                            </div> <!-- end slope mode -->
+                        </tab-group>
                     </div> <!-- end targets -->
 
             </div> <!-- end page-home -->
 
-            <div class="page" id="workouts-page">
+            <div id="workouts-page" class="page" page="workouts">
+                <div class="workouts-list" id="workouts">
+                    <header class="page-header">
+                        <h2 class="t2">Workouts</h2>
+                    </header>
+
+                    <div class="buildin-workouts">
+                        <div class="list"> </div>
+                    </div>
+
+                    <div class="workout-load-file">
+                        <h2 class="h2">Load workout:</h2>
+                        <div class="file-btn">
+                            <label for="workout-file" class="file-btn-label">Select</label>
+                            <input id="workout-file" class="file-btn-native" name="workout-file" type="file" value=""/>
+                        </div>
+                    </div>
+                    <br/><br/><br/>
+                </div>
             </div>
 
-            <div class="page" id="settings-page">
+            <div id="settings-page" class="page" page="settings">
+                <header class="page-header">
+                    <h2 class="t2">Settings</h2>
+                </header>
+                <div class="settings-tiles">
+                    <div id="ftp-settings" class="settings-tile">
+                        <label for="ftp-value" class="settings-tile-label">FTP</label>
+                        <input is="int-input"
+                               id="ftp-value"
+                               class="settings-tile-input"
+                               name="ftp-value"
+                               type="number"
+                               value="200"
+                               prop="ftp"
+                               effect="ftp-set" />
+                        <div is="set-button"
+                             id="ftp-btn"
+                             class="settings-tile-btn"
+                             effect="ftp-set"
+                             prop="ftp">Set</div>
+                    </div>
+                    <div id="weight-settings" class="settings-tile">
+                        <label id="weight-label" for="weight-value" class="settings-tile-label">kg</label>
+                        <input is="int-input"
+                               id="weight-value"
+                               class="settings-tile-input"
+                               name="weight-value"
+                               type="number"
+                               value="75"
+                               prop="weight"
+                               effect="weight-set" />
+
+                        <div is="set-button"
+                             id="weight-btn"
+                             class="settings-tile-btn"
+                             effect="weight-set"
+                             prop="weight">Set</div>
+                    </div>
+                </div>
+                <div class="settings-btn-row">
+                    <div id="theme-settings" class="settings-switch-btn-cont">
+                        <div id="theme-btn" class="settings-switch-bnt">Dark</div>
+                    </div>
+                    <div id="msystem-settings" class="settings-switch-btn-cont">
+                        <div id="measurement-btn" class="settings-switch-bnt">Metric</div>
+                    </div>
+                </div>
             </div>
+
+            </page-group>
 
             <div class="fixed-bottom">
                 <div class="controls">
@@ -253,8 +351,8 @@
                 </div> <!-- end controls -->
 
                 <div id="menu" class="menu">
-                    <div class="menu--row">
-                        <div id="settings-tab-btn" class="menu--btn data-index="2">
+                    <page-btn-group group="pages" class="menu--row">
+                        <page-btn id="settings-tab-btn" class="menu--btn" effect="page-set" param="settings">
                             <svg class="menu--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                                 <path d="M0 0h24v24H0V0z" fill="none"/>
                                 <path class="menu--btn--icon--fill" d="M19.44 12.99l-.01.02c.04-.33.08-.67.08-1.01
@@ -268,26 +366,25 @@
                                             0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
                             </svg>
                             <div class="menu--btn--label">Settings</div>
-                        </div>
-                        <div id="home-tab-btn" class="menu--btn active" data-index="0">
+                        </page-btn>
+                        <page-btn id="home-tab-btn" class="menu--btn active" effect="page-set" param="home">
                             <svg class="menu--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                                 <path d="M0 0h24v24H0V0z" fill="none" />
                                 <path class="menu--btn--icon--fill" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z" />
                             </svg>
                             <div class="menu--btn--label">Home</div>
-                        </div>
-                        <div id="workouts-tab-btn" class="menu--btn" data-index="1">
+                        </page-btn>
+                        <page-btn id="workouts-tab-btn" class="menu--btn" effect="page-set" param="workouts">
                             <svg class="menu--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                                 <path d="M0 0h24v24H0V0z" fill="none"/>
                                 <path class="menu--btn--icon--fill" fill="#aaa" d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/>
                             </svg>
                             <div class="menu--btn--label">Workouts</div>
-                        </div>
-                    </div>
+                        </page-btn>
+                    </page-btn-group>
                 </div> <!-- end menu -->
 
             </div> <!-- end fixed-bottom -->
-
         </div> <!-- end wrapper -->
     </body>
     <script type="module" src="index.js"></script>

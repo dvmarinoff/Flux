@@ -334,13 +334,19 @@ body.dark-theme {
 #home-page {
     z-index: 1;
 }
-#workouts-page {
-    display: none;
-}
-#settings-page {
-    display: none;
-}
+/* #workouts-page { */
+/*     display: none; */
+/* } */
+/* #settings-page.page.active { */
+/*     display: none; */
+/* } */
 
+.page {
+    display: none;
+}
+.page.active {
+    display: block;
+}
 
 /* Page Header */
 .page-header {
@@ -903,22 +909,21 @@ body.dark-theme {
 .mode.active {
     font-weight: bold;
 }
-.resistance-mode {
-    display: none;
-    /* margin-bottom: 20px; */
-}
-.slope-mode {
-    display: none;
-    /* margin-bottom: 50px; */
-}
-.erg-mode {
-    /* margin-bottom: 50px; */
-}
 .mode-controls {
     margin-bottom: 10px;
 }
 .mode-controls header {
     margin: 0px auto 5px;
+}
+
+
+
+
+.tab.active {
+    display: block;
+}
+.tab {
+    display: none;
 }
 
 

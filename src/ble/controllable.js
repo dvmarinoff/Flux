@@ -29,10 +29,10 @@ class Controllable extends Device {
         xf.sub(`db:mode`, value => mode = mode);
 
         xf.sub('db:powerTarget', power => {
-            // if(mode === 'erg') {
-            // if(self.device.connected)
-            // }
-            self.ftms.setTargetPower(power);
+            if(mode === 'erg') {
+            if(self.device.connected)
+                self.ftms.setTargetPower(power);
+            }
         });
 
         xf.sub('db:resistanceTarget', resistance => {

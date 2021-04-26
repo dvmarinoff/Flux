@@ -10,6 +10,7 @@ class Model {
         this.set = args.set || this.defaultSet;
         this.isValid = args.isValid || this.defaultIsValid;
         this.onInvalid = args.onInvalid || this.defaultOnInvalid;
+        this.storage = this.defaultStorage();
         this.init();
         this.postInit(args);
     }
@@ -26,14 +27,22 @@ class Model {
             return self.default;
         }
     }
-    backup() { return; }
-    restore() {
-        const self = this;
-        return self.default;
-    }
     defaultOnInvalid(x) {
         const self = this;
         console.error(`Trying to set invalid ${self.prop}.`, x);
+    }
+    defaultStorage() {
+        const self = this;
+        return {set: ((x)=>x),
+                restore: ((_)=> self.default)};
+    }
+    backup(value) {
+        const self = this;
+        self.storage.set(value);
+    }
+    restore() {
+        const self = this;
+        return self.storage.restore();
     }
 }
 
@@ -125,8 +134,8 @@ class PowerTarget extends Target {
 class ResistanceTarget extends Target {
     postInit(args) {
         this.min = args.min || 0;
-        this.max = args.max || 1000;
-        this.step = args.step || 100;
+        this.max = args.max || 100;
+        this.step = args.step || 10;
     }
 }
 
@@ -140,7 +149,7 @@ class SlopeTarget extends Target {
         const self = this;
         return Number.isFloat(value) && inRange(self.min, self.max, value);
     }
-    parse(value) { parseFloat(value); }
+    parse(value) { return parseFloat(value); }
 }
 
 class Mode extends Model {
@@ -148,7 +157,15 @@ class Mode extends Model {
         this.values = ['erg', 'resistance', 'slope'];
     }
     defaultValue() { return 'erg'; }
-    defaultIsValid(value) { this.values.includes(value); }
+    defaultIsValid(value) { return this.values.includes(value); }
+}
+
+class Page extends Model {
+    postInit(args) {
+        this.values = ['settings', 'home', 'workouts'];
+    }
+    defaultValue() { return 'home'; }
+    defaultIsValid(value) { return this.values.includes(value); }
 }
 
 class FTP extends Model {
@@ -157,7 +174,8 @@ class FTP extends Model {
         const storageModel = {
             key: self.prop,
             default: self.defaultValue(),
-            set: self.set.bind(self)
+            // isValid: self.defaultIsValid,
+            // set: self.set.bind(self)
         };
         self.min = args.min || 0;
         self.max = args.max || 500;
@@ -168,13 +186,39 @@ class FTP extends Model {
         const self = this;
         return Number.isInteger(value) && inRange(self.min, self.max, value);
     }
-    backup(value) {
+}
+
+class Weight extends Model {
+    postInit(args) {
         const self = this;
-        self.storage.set(value);
+        const storageModel = {
+            key: self.prop,
+            default: self.defaultValue(),
+            // isValid: self.defaultIsValid,
+        };
+        self.min = args.min || 0;
+        self.max = args.max || 500;
+        self.storage = new args.storage(storageModel);
     }
-    restore() {
-        return self.storage.restore();
+    defaultValue() { return 75; }
+    defaultIsValid(value) {
+        const self = this;
+        return Number.isInteger(value) && inRange(self.min, self.max, value);
     }
+}
+class Theme extends Model {
+    postInit(args) {
+        this.values = ['dark', 'light'];
+    }
+    defaultValue() { return 'dark'; }
+    defaultIsValid(value) { return this.values.includes(value); }
+}
+class Measurement extends Model {
+    postInit(args) {
+        this.values = ['metric', 'imperial'];
+    }
+    defaultValue() { return 'metric'; }
+    defaultIsValid(value) { return this.values.includes(value); }
 }
 
 const power = new Power({prop: 'power'});
@@ -186,8 +230,12 @@ const powerTarget = new PowerTarget({prop: 'powerTarget'});
 const resistanceTarget = new ResistanceTarget({prop: 'resistanceTarget'});
 const slopeTarget = new SlopeTarget({prop: 'slopeTarget'});
 const mode = new Mode({prop: 'mode'});
+const page = new Page({prop: 'page'});
 
 const ftp = new FTP({prop: 'ftp', storage: LocalStorageItem});
+const weight = new Weight({prop: 'weight', storage: LocalStorageItem});
+const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
+const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 
 let models = { power,
                heartRate,
@@ -197,6 +245,11 @@ let models = { power,
                resistanceTarget,
                slopeTarget,
                mode,
-               ftp };
+               page,
+               ftp,
+               weight,
+               theme,
+               measurement
+             };
 
 export { models };
