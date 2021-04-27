@@ -1,6 +1,8 @@
-import { xf, exists, equals, inRange, fixInRange, prn } from '../functions.js';
+import { xf, exists, equals, first, second, last, inRange, fixInRange, prn } from '../functions.js';
 import { LocalStorageItem } from '../storage/local-storage.js';
 import { IDB } from '../storage/idb.js';
+import { workouts } from '../workouts/workouts.js';
+import { zwo } from '../workouts/parser.js';
 
 class Model {
     constructor(args) {
@@ -174,8 +176,6 @@ class FTP extends Model {
         const storageModel = {
             key: self.prop,
             default: self.defaultValue(),
-            // isValid: self.defaultIsValid,
-            // set: self.set.bind(self)
         };
         self.min = args.min || 0;
         self.max = args.max || 500;
@@ -194,7 +194,6 @@ class Weight extends Model {
         const storageModel = {
             key: self.prop,
             default: self.defaultValue(),
-            // isValid: self.defaultIsValid,
         };
         self.min = args.min || 0;
         self.max = args.max || 500;
@@ -208,17 +207,61 @@ class Weight extends Model {
 }
 class Theme extends Model {
     postInit(args) {
-        this.values = ['dark', 'light'];
+        const self = this;
+        const storageModel = {
+            key: self.prop,
+            default: self.defaultValue(),
+        };
+        self.storage = new args.storage(storageModel);
+        self.values = ['dark', 'light'];
     }
     defaultValue() { return 'dark'; }
     defaultIsValid(value) { return this.values.includes(value); }
+    switch(theme) {
+        const self = this;
+        if(theme === first(self.values)) return second(self.values);
+        if(theme === second(self.values)) return first(self.values);
+        self.onInvalid(theme);
+        return self.default;
+    }
 }
 class Measurement extends Model {
     postInit(args) {
-        this.values = ['metric', 'imperial'];
+        const self = this;
+        const storageModel = {
+            key: self.prop,
+            default: self.defaultValue(),
+        };
+        self.storage = new args.storage(storageModel);
+        self.values = ['metric', 'imperial'];
     }
     defaultValue() { return 'metric'; }
     defaultIsValid(value) { return this.values.includes(value); }
+    switch(theme) {
+        const self = this;
+        if(theme === first(self.values)) return second(self.values);
+        if(theme === second(self.values)) return first(self.values);
+        self.onInvalid(theme);
+        return self.default;
+    }
+}
+
+class Workout extends Model {
+    postInit(args) {
+        const self = this;
+        // const storageModel = {
+        //     key: self.prop,
+        //     default: self.defaultValue(),
+        // };
+        // self.storage = new args.storage(storageModel);
+    }
+    defaultValue() { return this.parse((first(workouts)).xml); }
+    defaultIsValid(value) {
+        return exists(value);
+    }
+    parse(workout) {
+        return zwo.parse(workout);
+    }
 }
 
 const power = new Power({prop: 'power'});
@@ -237,6 +280,8 @@ const weight = new Weight({prop: 'weight', storage: LocalStorageItem});
 const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 
+const workout = new Workout({prop: 'workout'});
+
 let models = { power,
                heartRate,
                cadence,
@@ -249,7 +294,8 @@ let models = { power,
                ftp,
                weight,
                theme,
-               measurement
+               measurement,
+               workout
              };
 
 export { models };

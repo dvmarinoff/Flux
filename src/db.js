@@ -1,4 +1,4 @@
-import { xf, exists, equals, prn } from '../functions.js';
+import { xf, exists, equals, rand, prn } from '../functions.js';
 import { models } from './models/models.js';
 
 let db = {
@@ -7,6 +7,7 @@ let db = {
     heartRate: models.heartRate.default,
     cadence: models.cadence.default,
     speed: models.speed.default,
+    distance: 0,
 
     // Targets
     powerTarget: models.powerTarget.default,
@@ -21,6 +22,29 @@ let db = {
     weight: models.weight.default,
     theme: models.theme.default,
     measurement: models.measurement.default,
+
+    // Workouts
+    workouts: [],
+    workout: models.workout.default,
+
+    // Recording
+    records: [],
+    lap: [],
+    laps: [],
+    lapStartTime: Date.now(),
+    timestamp: Date.now(),
+    inProgress: false,
+
+    // Watch
+    elapsed: 0,
+    lapTime: 0,
+    stepTime: 0,
+    intervalIndex: 0,
+    stepIndex: 0,
+    intervalDuration: 0,
+    stepDuration: 0,
+    watchStatus: 'stopped',
+    workoutStatus: 'stopped',
 };
 
 xf.create(db);
@@ -93,22 +117,37 @@ xf.reg('ui:weight-set', (weight, db) => {
     db.weight = models.weight.set(weight);
     models.weight.backup(db.weight);
 });
-xf.reg('ui:theme-set', (theme, db) => {
-    db.theme = models.theme.set(theme);
+xf.reg('ui:theme-switch', (_, db) => {
+    db.theme = models.theme.switch(db.theme);
     models.theme.backup(db.theme);
 });
-xf.reg('ui:measurement-set', (measurement, db) => {
-    db.measurement = models.measurement.set(measurement);
+xf.reg('ui:measurement-switch', (_, db) => {
+    db.measurement = models.measurement.switch(db.measurement);
     models.measurement.backup(db.measurement);
 });
 
+// Wake Lock
+xf.reg('lock:beforeunload', (e, db) => {
+    // backup session
+});
+xf.reg('lock:release', (e, db) => {
+    // backup session
+});
+
+// Workouts
+xf.reg('workout', (workout, db) => {
+    db.workout = models.workout.set(workout);
+});
 
 //
 xf.reg('app:start', (_, db) => {
+    db.workout = models.workout.restore();
+
     db.ftp = models.ftp.restore();
     db.weight = models.weight.restore();
     db.theme = models.theme.restore();
     db.measurement = models.measurement.restore();
+
 });
 
 export { db };

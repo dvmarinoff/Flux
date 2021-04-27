@@ -117,6 +117,22 @@ function splitAt(xs, at) {
     },[]);
 }
 
+function avg(xs, prop = false) {
+    if(prop !== false) {
+        return xs.reduce( (acc,v,i) => acc+(v[prop]-acc)/(i+1), 0);
+    } else {
+        return xs.reduce( (acc,v,i) => acc+(v-acc)/(i+1), 0);
+    }
+}
+
+function max(xs, prop = false) {
+    if(prop !== false) {
+        return xs.reduce( (acc,v,i) => v[prop] > acc ? v[prop] : acc, 0);
+    } else {
+        return xs.reduce( (acc,v,i) => v > acc ? v : acc, 0);
+    }
+};
+
 // Math
 function digits(n) {
     return Math.log(n) * Math.LOG10E + 1 | 0;
@@ -145,10 +161,74 @@ function fixInRange(min, max, value) {
     }
 }
 
+function divisors(number) {
+    let divisors = [1];
+    for(let i=2; i < number/2; i++) {
+        if(number % i === 0) { divisors.push(i); }
+    }
+    return divisors;
+}
+
+function toDecimalPoint (x, point = 2) {
+    return Number((x).toFixed(point));
+}
+
+
 // Util
 function prn(str) {
     console.log(str);
 }
+function secondsToHms(elapsed, compact = false) {
+    let hour = Math.floor(elapsed / 3600);
+    let min  = Math.floor(elapsed % 3600 / 60);
+    let sec  = elapsed % 60;
+    let sD   = (sec < 10)  ? `0${sec}`  : `${sec}`;
+    let mD   = (min < 10)  ? `0${min}`  : `${min}`;
+    let hD   = (hour < 10) ? `0${hour}` : `${hour}`;
+    let hDs  = (hour < 10) ? `${hour}`  : `${hour}`;
+    let res  = ``;
+    if(compact) {
+        if(elapsed < 3600) {
+            res = `${mD}:${sD}`;
+        } else {
+            res = `${hD}:${mD}:${sD}`;
+        }
+    } else {
+        res = `${hD}:${mD}:${sD}`;
+    }
+    return res ;
+}
+function timeDiff(timestamp1, timestamp2) {
+    let difference = (timestamp1 / 1000) - (timestamp2 / 1000);
+    return Math.round(Math.abs(difference));
+};
+function format(x, precision = 1000) {
+    return Math.round(x * precision) / precision;
+}
+function kphToMps(kph) {
+    return format(kph / 3.6);
+};
+function mpsToKph(mps) {
+    return 3.6 * mps;
+};
+function mToYd(meters) {
+    return 1.09361 * meters;
+}
+function formatDistance(meters, measurement = 'metric') {
+    let value = `0`;
+    let km    = (meters / 1000);
+    let miles = (meters / 1609.34);
+    let yards = mToYd(meters);
+
+    if(measurement === 'imperial') {
+        value = (yards < 1609.34) ? `${(mToYd(meters)).toFixed(0)} yd` : `${miles.toFixed(2)} mi`;
+    } else {
+        value = (meters < 1000) ? `${meters.toFixed(0)} m` : `${km.toFixed(2)} km`;
+    }
+
+    return value;
+}
+
 
 // Bits
 function nthBit(field, bit) {
@@ -284,6 +364,8 @@ export {
     filterByValue,
     findByValue,
     splitAt,
+    avg,
+    max,
 
     // math
     digits,
@@ -294,9 +376,16 @@ export {
     lt,
     inRange,
     fixInRange,
+    toDecimalPoint,
+    divisors,
 
     // utils
     prn,
+    secondsToHms,
+    timeDiff,
+    kphToMps,
+    mpsToKph,
+    formatDistance,
 
     // bits
     nthBit,

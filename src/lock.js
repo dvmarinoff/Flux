@@ -1,4 +1,4 @@
-import { xf } from './xf.js';
+import { xf } from './functions.js';
 
 class WakeLock {
     constructor(args) {
@@ -24,7 +24,6 @@ class WakeLock {
     checkVisibility() {
         let isVisible = false;
         let visibilityState = document.visibilityState;
-        // console.log(visibilityState);
 
         if(visibilityState === 'visible') {
             isVisible = true;
@@ -45,7 +44,6 @@ class WakeLock {
         if(self.isLocable && self.isVisible) {
             let lock = await navigator.wakeLock.request('screen');
             self.isLocked = true;
-            // console.log(`lock screen`);
 
             lock.addEventListener('release', e => {
                 self.isLocked = false;
@@ -56,4 +54,6 @@ class WakeLock {
     }
 }
 
-export { WakeLock };
+const lock = new WakeLock();
+
+export { lock };

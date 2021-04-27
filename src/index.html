@@ -45,7 +45,8 @@
                             <div class="data-tile--value-cont">
                                 <time-display id="interval-time"
                                               class="data-tile--value"
-                                              prop="intervalTime">--:--</time-display>
+                                              form="mm:ss"
+                                              prop="lapTime">--:--</time-display>
                             </div>
                         </div>
                         <div class="data-tile">
@@ -70,7 +71,8 @@
                             <div class="data-tile--value-cont">
                                 <time-display id="elapsed-time"
                                               class="data-tile--value"
-                                              prop="elapsedTime">--:--:--</time-display>
+                                              form="hh:mm:ss"
+                                              prop="elapsed">--:--:--</time-display>
                             </div>
                         </div>
                         <div class="data-tile">
@@ -95,9 +97,9 @@
                         <div class="data-tile--small">
                             <h2 class="data-tile-small--heading">Distance</h2>
                             <div class="data-tile-small--value-cont">
-                                <data-display id="distance-value"
-                                              class="data-tile--value"
-                                              prop="distance">--</data-display>
+                                <distance-display id="distance-value"
+                                                  class="data-tile--value"
+                                                  prop="distance">--</distance-display>
                             </div>
                         </div>
                     </div>
@@ -107,14 +109,16 @@
 
                         <div id="graph-power" class="graph">
                             <h4 class="graph--heading">Power</h4>
-                            <div class="graph--cont cf"></div>
+                            <data-graph class="graph--cont cf" prop="power" metric="ftp" scale="400"></data-graph>
                         </div>
 
                         <div class="line"></div>
 
                         <div id="graph-workout" class="graph">
-                            <h4 id="current-workout-name" class="graph--heading">Baguette +1</h4>
-                            <div id="graph-current-workout" class="graph-workout--cont"></div>
+                            <h4 id="current-workout-name" class="graph--heading">
+                                <data-display prop="workout" path="name"></data-display>
+                            </h4>
+                            <workout-graph class="graph-workout--cont" prop="workout" metric="ftp"></workout-graph>
                         </div>
 
                     </div>
@@ -256,11 +260,12 @@
                                value="200"
                                prop="ftp"
                                effect="ftp-set" />
-                        <div is="set-button"
-                             id="ftp-btn"
-                             class="settings-tile-btn"
-                             effect="ftp-set"
-                             prop="ftp">Set</div>
+                        <button is="set-button"
+                                id="ftp-btn"
+                                class="flat-btn settings-tile-btn"
+                                default="200"
+                                effect="ftp-set"
+                                prop="ftp">Set</button>
                     </div>
                     <div id="weight-settings" class="settings-tile">
                         <label id="weight-label" for="weight-value" class="settings-tile-label">kg</label>
@@ -272,30 +277,55 @@
                                value="75"
                                prop="weight"
                                effect="weight-set" />
-
-                        <div is="set-button"
-                             id="weight-btn"
-                             class="settings-tile-btn"
-                             effect="weight-set"
-                             prop="weight">Set</div>
+                        <button is="set-button"
+                                id="weight-btn"
+                                class="flat-btn settings-tile-btn"
+                                default="75"
+                                effect="weight-set"
+                                prop="weight">Set</button>
                     </div>
                 </div>
                 <div class="settings-btn-row">
-                    <div id="theme-settings" class="settings-switch-btn-cont">
-                        <div id="theme-btn" class="settings-switch-bnt">Dark</div>
+                    <button is="effect-button"
+                            id="theme-settings"
+                            class="flat-btn settings-switch-btn-cont"
+                            effect="theme-switch">
+                        <data-display id="theme-btn"
+                                      class="settings-switch-bnt"
+                                      prop="theme">Dark</data-display>
+                    </button>
+                    <button is="effect-button"
+                            id="msystem-settings"
+                            class="flat-btn settings-switch-btn-cont"
+                            effect="measurement-switch">
+                        <data-display id="measurement-btn"
+                                      class="settings-switch-bnt"
+                                      prop="measurement">Metric</data-display>
+                    </button>
+                </div> <!-- end settings btn row -->
+                <div class="connections">
+                    <h2 class="h2">Connections</h2>
+                    <div class="connection">
+                        <img class="connection-icon" alt="GC" src="images/connections/garmin-connect.jpg"/>
+                        <div class="connection-content">
+                            <h3 class="h3">Garmin</h3>
+                            <a class="a t2" href="https://connect.garmin.com/modern/import-data" target="_blank">Garmin Connect Import Page</a>
+                        </div>
                     </div>
-                    <div id="msystem-settings" class="settings-switch-btn-cont">
-                        <div id="measurement-btn" class="settings-switch-bnt">Metric</div>
-                    </div>
+                </div> <!-- end connections -->
+                <div id="version">
+                    <p class="t4">Version: 0.0.7</p>
                 </div>
-            </div>
+            </div> <!-- end settings page -->
 
             </page-group>
 
             <div class="fixed-bottom">
                 <div class="controls">
-                    <div id="watch" class="watch cf">
-                        <div id="workout-name">Free ride</div>
+                    <watch-control id="watch" class="watch cf">
+                        <div id="workout-name">
+                            <data-display prop="workout" path="name">Free ride</data-display>
+                        </div>
                         <div id="start-workout" class="control--btn">
                             <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
                                 height="24" viewBox="0 0 24 24" width="24">
@@ -347,7 +377,7 @@
                                             11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
                             </svg>
                         </div>
-                    </div>
+                    </watch-control>
                 </div> <!-- end controls -->
 
                 <div id="menu" class="menu">

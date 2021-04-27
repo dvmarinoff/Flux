@@ -1,8 +1,5 @@
-import { xf } from './xf.js';
-import { isSet } from './functions.js';
-
-import { avgOfArray, maxOfArray, sum,
-         first, last, round, mps, kph,
+import { exists, first, last, xf,
+         avg, max, kphToMps, mpsToKph,
          timeDiff, fixInRange } from './functions.js';
 
 class Watch {
@@ -27,15 +24,15 @@ class Watch {
         xf.sub('db:workout',       workout => {
             self.intervals     = workout.intervals;
         });
-        xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed;           });
-        xf.sub('db:lapTime',          time => { self.lapTime       = time;              });
-        xf.sub('db:stepTime',         time => { self.stepTime      = time;              });
-        xf.sub('db:intervalDuration', time => { self.lapDuration   = time;              });
-        xf.sub('db:stepDuration',     time => { self.stepDuration  = time;              });
-        xf.sub('db:intervalIndex',   index => { self.intervalIndex = index;             });
-        xf.sub('db:stepIndex',       index => { self.stepIndex     = index;             });
-        xf.sub('db:watchState',      state => { self.state         = state;             });
-        xf.sub('db:workoutState',    state => {
+        xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed; });
+        xf.sub('db:lapTime',          time => { self.lapTime       = time; });
+        xf.sub('db:stepTime',         time => { self.stepTime      = time; });
+        xf.sub('db:intervalDuration', time => { self.lapDuration   = time; });
+        xf.sub('db:stepDuration',     time => { self.stepDuration  = time; });
+        xf.sub('db:intervalIndex',   index => { self.intervalIndex = index; });
+        xf.sub('db:stepIndex',       index => { self.stepIndex     = index; });
+        xf.sub('db:watchStatus',     state => { self.state         = state; });
+        xf.sub('db:workoutStatus',   state => {
             self.stateWorkout = state;
 
             if(self.isWorkoutDone()) {
@@ -45,10 +42,10 @@ class Watch {
         });
     }
     isStarted()        { return this.state        === 'started'; };
-    isPaused()         { return this.state        === 'paused';  };
+    isPaused()         { return this.state        === 'paused'; };
     isStopped()        { return this.state        === 'stopped'; };
     isWorkoutStarted() { return this.stateWorkout === 'started'; };
-    isWorkoutDone()    { return this.stateWorkout === 'done';    };
+    isWorkoutDone()    { return this.stateWorkout === 'done'; };
     start() {
         let self = this;
         if(self.isStarted() && !self.isWorkoutStarted()) {
@@ -138,7 +135,6 @@ class Watch {
         if((self.isWorkoutStarted()) && (stepTime <= 0)) {
             self.step();
         }
-        // console.log(`lap: ${self.intervalIndex} ${lapTime}, step: ${self.stepIndex} ${stepTime}`);
     }
     lap() {
         let self = this;
@@ -236,24 +232,24 @@ xf.reg('watch:stepIndex',     (index, db) => {
     // xf.dispatch('ui:power-target-set', powerTarget);     // update just the workout defined
     xf.dispatch('ui:power-target-manual-set', powerTarget); // set both manual and workout defined
 
-    // console.log(isSet(db.workout.intervals[intervalIndex].steps[index].slope));
-    if(isSet(db.workout.intervals[intervalIndex].steps[index].slope)) {
+    // console.log(exists(db.workout.intervals[intervalIndex].steps[index].slope));
+    if(exists(db.workout.intervals[intervalIndex].steps[index].slope)) {
         let slopeTarget = db.workout.intervals[intervalIndex].steps[index].slope;
         xf.dispatch('ui:slope-target-set', slopeTarget);
     }
 });
-xf.reg('workout:started', (x, db) => db.workoutState = 'started');
-xf.reg('workout:stopped', (x, db) => db.workoutState = 'stopped');
-xf.reg('workout:done',    (x, db) => db.workoutState = 'done');
+xf.reg('workout:started', (x, db) => db.workoutStatus = 'started');
+xf.reg('workout:stopped', (x, db) => db.workoutStatus = 'stopped');
+xf.reg('workout:done',    (x, db) => db.workoutStatus = 'done');
 xf.reg('watch:started',   (x, db) => {
-    db.watchState = 'started';
+    db.watchStatus = 'started';
     db.lapStartTime = Date.now(); // ??
 });
-xf.reg('watch:paused',  (x, db) => db.watchState = 'paused');
-xf.reg('watch:stopped', (x, db) => db.watchState = 'stopped');
+xf.reg('watch:paused',  (x, db) => db.watchStatus = 'paused');
+xf.reg('watch:stopped', (x, db) => db.watchStatus = 'stopped');
 xf.reg('watch:elapsed', (x, db) => {
     db.elapsed = x;
-    db.distance  += 1 * mps(db.spd);
+    db.distance  += 1 * kphToMps(db.spd);
     let record = {timestamp: Date.now(),
                   power:     db.pwr,
                   cadence:   db.cad,
@@ -272,11 +268,26 @@ xf.reg('watch:lap', (x, db) => {
         db.laps.push({timestamp:        timeEnd,
                       startTime:        timeStart,
                       totalElapsedTime: elapsed,
-                      avgPower:         round(avgOfArray(db.lap, 'power')),
-                      maxPower:         maxOfArray(db.lap, 'power')});
+                      avgPower:         Math.round(avg(db.lap, 'power')),
+                      maxPower:         max(db.lap, 'power')});
     }
     db.lap = [];
     db.lapStartTime = timeEnd + 0;
 });
 
-export { Watch };
+const watch = new Watch();
+
+xf.sub('ui:workoutStart', e => { watch.startWorkout();   });
+xf.sub('ui:watchStart',   e => { watch.start();          });
+xf.sub('workout:restore', e => { watch.restoreWorkout(); });
+xf.sub('ui:watchPause',   e => { watch.pause();          });
+xf.sub('ui:watchResume',  e => { watch.resume();         });
+xf.sub('ui:watchLap',     e => { watch.lap();            });
+xf.sub('ui:watchStop',    e => {
+    const stop = confirm('Confirm Stop?');
+    if(stop) {
+        watch.stop();
+    }
+});
+
+export { watch };

@@ -1,10 +1,4 @@
-import { powerToZone,
-         hrToColor,
-         valueToHeight,
-         toDecimalPoint,
-         fixInRange,
-         divisors,
-         secondsToHms } from '../functions.js';
+import { exists, toDecimalPoint, divisors } from '../functions.js';
 
 function readWarmup(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
@@ -206,11 +200,6 @@ function stepToInterval(step) {
     }
 }
 
-// function zwoToIntervals(zwo) {
-//     let intervals = zwo.flatMap(step => stepToInterval(step));
-//     return intervals;
-// }
-
 function parse(zwo) {
     let parser = new DOMParser();
     let doc = parser.parseFromString(zwo, 'text/xml');
@@ -234,29 +223,22 @@ function parse(zwo) {
     return {intervals: intervals, duration: duration, name: name, description: description};
 }
 
-function intervalsToGraph(intervals, ftp) {
-    let scale = ftp * 1.6;
-    return intervals.reduce( (acc, interval) => {
-        let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration));
-        let len = interval.steps.length;
-        return acc + interval.steps.reduce((a, step) => {
-            // let width = (step.duration) < 1 ? 1 : parseInt(Math.round(step.duration));
-            let width = 100 / len;
-            let height = valueToHeight(scale, (step.power === 0) ? 80 : step.power);
-            return a +
-                `<div class="graph--bar zone-${(powerToZone(step.power, ftp)).name}" style="height: ${height}%; width: ${width}%">
-                     <div class="graph--info t5">
-                         <div class="graph--info--power">${step.power === 0 ? 'Free ride' : step.power}${step.power === 0 ? '' : 'W'}</div>
-                         <div class="graph--info--time">${secondsToHms(step.duration, true)}<span></span></div>
-                     </div>
-                </div>`;
-        }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
+function isValid(zwo) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(zwo, 'text/xml');
 
-    }, ``);
+    const workoutEl = doc.querySelector('workout');
+    const nameEl    = doc.querySelector('name');
+    const descEl    = doc.querySelector('description');
+
+    if(!exists(workoutEl)) return false;
+    if(!exists(nameEl)) return false;
+    if(!exists(descEl)) return false;
+    return true;
 }
 
 const zwo = {
     parse: parse,
 };
 
-export { zwo, intervalsToGraph };
+export { zwo };

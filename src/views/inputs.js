@@ -80,10 +80,10 @@ class SetButton extends HTMLButtonElement {
         super();
         this.effect = this.getAttribute('effect');
         this.prop = this.getAttribute('prop');
-        this.state = this.value;
+        this.state = this.default;
     }
     connectedCallback() {
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this));
+        xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
         this.addEventListener('pointerup', this.onEffect.bind(this));
     }
     disconnectedCallback() {

@@ -5,6 +5,8 @@ import './connection-switch.js';
 import './data-display.js';
 import './inputs.js';
 import './tabs.js';
+import './graphs.js';
+import './watch.js';
 
 function start() {
     prn('start views.');

@@ -597,7 +597,7 @@ body.dark-theme {
 .graph--heading {
     font-family: var(--ssb-font-family);
     font-size: 10px; /*.h4*/
-    /* font-weight: bold; */
+    font-weight: bold;
     text-align: center;
     text-transform: uppercase;
 }
@@ -608,6 +608,7 @@ body.dark-theme {
     justify-content: flex-start;
     align-items: flex-end;
     position: absolute;
+    width: 100%;
     height: var(--graph-height);
     left: 0px;
     bottom: 0px;
@@ -658,7 +659,7 @@ body.dark-theme {
     flex-wrap: nowrap;
     justify-content: center;
     align-items: flex-end;
-    height: 110px;
+    height: 98px;
     padding: 0;
 }
 #progress {
@@ -704,6 +705,11 @@ body.dark-theme {
     border-radius: 3px;
     webkit-transition: all 0.2s ease-in-out 0s;
     transition: all 0.2s ease-in-out 0s;
+}
+.flat-btn {
+    background-color: transparent;
+    border: none;
+    color: #fff;
 }
 
 
@@ -829,6 +835,7 @@ body.dark-theme {
 
 
 .watch {
+    display: block;
     padding: 5px 0 5px;
     width: 100%;
     text-align: right;
