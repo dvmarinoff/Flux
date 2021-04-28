@@ -1,25 +1,37 @@
 import { first, last, xf, rand, } from '../src/functions.js';
 
-
-
-
 class TrainerMock {
     constructor() {
+        this.powerTarget = 180;
+        this.init();
+    }
+    init() {
+        const self = this;
+
+        xf.sub('db:powerTarget', self.onPowerTarget.bind(self));
+        xf.sub('ui:workoutStart', self.run.bind(self));
+        xf.sub('ui:watchPause', self.stop.bind(self));
     }
     run() {
-        this.interval = this.broadcast(this.indoorBikeData.bind(this));
+        const self = this;
+        self.interval = self.broadcast(self.indoorBikeData.bind(self));
     }
     stop() {
-        clearInterval(this.interval);
+        const self = this;
+        clearInterval(self.interval);
     }
     broadcast(handler) {
         const interval = setInterval(handler, 1000);
         return interval;
     }
     indoorBikeData() {
-        xf.dispatch('power', this.power(180));
-        xf.dispatch('speed', this.speed(20));
-        xf.dispatch('cadence', this.cadence(80));
+        const self = this;
+        xf.dispatch('power', self.power(self.powerTarget));
+        xf.dispatch('speed', self.speed(20));
+        xf.dispatch('cadence', self.cadence(80));
+    }
+    onPowerTarget(powerTarget) {
+        this.powerTarget = powerTarget;
     }
     power(prev) {
         return prev + rand(-4, 4);
@@ -33,6 +45,5 @@ class TrainerMock {
 }
 
 const tm = new TrainerMock();
-// tm.run();
 
 export { TrainerMock };

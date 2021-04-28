@@ -529,7 +529,7 @@ body.dark-theme {
     --data-tile-small--height: 40px;
 
     --data-tile-small--heading-font-size: 16px;
-    --data-tile-small--value-font-size: 34px;
+    --data-tile-small--value-font-size: 30px;
 
     display: flex;
     flex-wrap: wrap;
@@ -556,8 +556,6 @@ body.dark-theme {
     font-family: var(--ssb-font-family);
     font-size: var(--data-tile--value-font-size);
     font-weight: bold;
-    text-transform: uppercase;
-
 }
 
 .data-tile--small {
@@ -579,7 +577,6 @@ body.dark-theme {
 .data-tile-small--value {
     font-size: var(--data-tile-small--value-font-size);
     font-weight: bold;
-    text-transform: uppercase;
 }
 
 
@@ -587,7 +584,7 @@ body.dark-theme {
 /* Graphs */
 .graph {
     --graph-total-height: 120px;
-    --graph-height: 100px;
+    --graph-height: 98px;
 
     position: relative;
     height: var(--graph-total-height);
@@ -599,7 +596,7 @@ body.dark-theme {
     font-size: 10px; /*.h4*/
     font-weight: bold;
     text-align: center;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
 }
 .graph--cont {
     display: flex;
@@ -628,7 +625,6 @@ body.dark-theme {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-
     margin: 0;
     padding: 0;
     width: 1px;
@@ -659,7 +655,7 @@ body.dark-theme {
     flex-wrap: nowrap;
     justify-content: center;
     align-items: flex-end;
-    height: 98px;
+    height: var(--graph-height);
     padding: 0;
 }
 #progress {

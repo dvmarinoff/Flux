@@ -229,8 +229,8 @@ xf.reg('watch:stepIndex',     (index, db) => {
     let intervalIndex = db.intervalIndex;
     let powerTarget   = db.workout.intervals[intervalIndex].steps[index].power;
 
-    // xf.dispatch('ui:power-target-set', powerTarget);     // update just the workout defined
-    xf.dispatch('ui:power-target-manual-set', powerTarget); // set both manual and workout defined
+    xf.dispatch('ui:power-target-set', 256 * powerTarget);     // update just the workout defined
+    // xf.dispatch('ui:power-target-manual-set', powerTarget); // set both manual and workout defined
 
     // console.log(exists(db.workout.intervals[intervalIndex].steps[index].slope));
     if(exists(db.workout.intervals[intervalIndex].steps[index].slope)) {
@@ -249,12 +249,13 @@ xf.reg('watch:paused',  (x, db) => db.watchStatus = 'paused');
 xf.reg('watch:stopped', (x, db) => db.watchStatus = 'stopped');
 xf.reg('watch:elapsed', (x, db) => {
     db.elapsed = x;
-    db.distance  += 1 * kphToMps(db.spd);
+    db.distance  += 1 * kphToMps(db.speed);
+
     let record = {timestamp: Date.now(),
-                  power:     db.pwr,
-                  cadence:   db.cad,
-                  speed:     db.spd,
-                  hr:        db.hr,
+                  power:     db.power,
+                  cadence:   db.cadence,
+                  speed:     db.speed,
+                  hr:        db.heartRate,
                   distance:  db.distance};
     db.records.push(record);
     db.lap.push(record);

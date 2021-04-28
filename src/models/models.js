@@ -89,7 +89,16 @@ class Speed extends Model {
     }
     defaultValue() { return 0; }
     defaultIsValid(value) {
-        return Number.isInteger(value) && inRange(self.min, self.max, value);
+        return (Number.isInteger(value) || Number.isFloat(value)) &&
+            inRange(self.min, self.max, value);
+    }
+}
+
+class Distance extends Model {
+    postInit(args) {}
+    defaultValue() { return 0; }
+    defaultIsValid(value) {
+        return Number.isInteger(value) || Number.isFloat(value);
     }
 }
 
@@ -268,6 +277,7 @@ const power = new Power({prop: 'power'});
 const heartRate = new HeartRate({prop: 'heartRate'});
 const cadence = new Cadence({prop: 'cadence'});
 const speed = new Speed({prop: 'speed'});
+const distance = new Distance({prop: 'distance'});
 
 const powerTarget = new PowerTarget({prop: 'powerTarget'});
 const resistanceTarget = new ResistanceTarget({prop: 'resistanceTarget'});

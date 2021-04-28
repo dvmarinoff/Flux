@@ -1,4 +1,4 @@
-import { xf, exists, equals, rand, prn } from '../functions.js';
+import { xf, exists, equals, rand } from '../functions.js';
 import { models } from './models/models.js';
 
 let db = {
@@ -141,13 +141,15 @@ xf.reg('workout', (workout, db) => {
 
 //
 xf.reg('app:start', (_, db) => {
-    db.workout = models.workout.restore();
 
     db.ftp = models.ftp.restore();
     db.weight = models.weight.restore();
     db.theme = models.theme.restore();
     db.measurement = models.measurement.restore();
 
+    db.workout = models.workout.restore();
 });
+
+
 
 export { db };

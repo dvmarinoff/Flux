@@ -58,8 +58,7 @@ class DistanceDisplay extends DataDisplay {
     }
     onMeasurement(measurement) { this.measurement = measurement; }
     render() {
-        // this.textContent = formatDistance(this.state, this.measurement);
-        this.textContent = '--';
+        this.textContent = formatDistance(this.state, this.measurement);
     }
 }
 

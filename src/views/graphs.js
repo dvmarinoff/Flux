@@ -110,7 +110,7 @@ class WorkoutGraph extends HTMLElement {
         this.workout = {};
         this.metricValue = 0;
         this.dom = {};
-        this.index = 4;
+        this.index = 0;
     }
     connectedCallback() {
         this.prop = this.getAttribute('prop');
@@ -119,6 +119,11 @@ class WorkoutGraph extends HTMLElement {
 
         xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
         xf.sub(`db:${this.metric}`, this.onMetric.bind(this));
+
+        xf.sub('db:intervalIndex', index => {
+            this.index = index;
+            this.progress(this.index);
+        });
     }
     disconnectedCallback() {
         document.removeEventListener(`db:${this.prop}`, this.onUpdate);
@@ -129,24 +134,28 @@ class WorkoutGraph extends HTMLElement {
     }
     onMetric(value) {
         this.metricValue = value;
-        this.render();
+        if(exists(this.workout.intervals)) this.initRender();
     }
     onUpdate(value) {
         this.workout = value;
-        this.dom.progress  = this.querySelector('#progress');
-        this.dom.active    = this.querySelector('#progress-active');
-        this.dom.intervals = this.querySelectorAll('.graph--bar-group');
-        this.dom.steps     = this.querySelectorAll('.graph--bar');
-        this.render();
+        this.initRender();
     }
     progress() {
         const rect = this.dom.intervals[this.index].getBoundingClientRect();
         this.dom.active.style.left  = `${rect.left}px`;
         this.dom.active.style.width = `${rect.width}px`;
+
     }
-    render() {
+    initRender() {
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
         this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue);
+
+        this.dom.progress  = this.querySelector('#progress');
+        this.dom.active    = this.querySelector('#progress-active');
+        this.dom.intervals = this.querySelectorAll('.graph--bar-group');
+        this.dom.steps     = this.querySelectorAll('.graph--bar');
+
+        this.progress();
     }
 }
 
