@@ -527,9 +527,11 @@ body.dark-theme {
     --data-tile--value-font-size: 34px;   /*.t1*/
     --data-tile--height: 50px;
     --data-tile-small--height: 40px;
+    --data-tile--unit-font-size: 18px;
 
     --data-tile-small--heading-font-size: 16px;
     --data-tile-small--value-font-size: 30px;
+    --data-tile-small--unit-font-size: 18px;
 
     display: flex;
     flex-wrap: wrap;
@@ -577,6 +579,10 @@ body.dark-theme {
 .data-tile-small--value {
     font-size: var(--data-tile-small--value-font-size);
     font-weight: bold;
+}
+.data-tile-small--unit {
+    font-size: var(--data-tile-small--unit-font-size);
+    /* font-weight: bold; */
 }
 
 

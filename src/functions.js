@@ -211,24 +211,6 @@ function kphToMps(kph) {
 function mpsToKph(mps) {
     return 3.6 * mps;
 };
-function mToYd(meters) {
-    return 1.09361 * meters;
-}
-function formatDistance(meters, measurement = 'metric') {
-    let value = `0`;
-    let km    = (meters / 1000);
-    let miles = (meters / 1609.34);
-    let yards = mToYd(meters);
-
-    if(measurement === 'imperial') {
-        value = (yards < 1609.34) ? `${(mToYd(meters)).toFixed(0)} yd` : `${miles.toFixed(2)} mi`;
-    } else {
-        value = (meters < 1000) ? `${meters.toFixed(0)} m` : `${km.toFixed(2)} km`;
-    }
-
-    return value;
-}
-
 
 // Bits
 function nthBit(field, bit) {
@@ -385,7 +367,6 @@ export {
     timeDiff,
     kphToMps,
     mpsToKph,
-    formatDistance,
 
     // bits
     nthBit,

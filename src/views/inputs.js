@@ -1,4 +1,5 @@
 import { xf, exists, equals, prn } from '../functions.js';
+import { models } from '../models/models.js';
 
 class IntInput extends HTMLInputElement {
     constructor() {
@@ -45,9 +46,44 @@ class FloatInput extends IntInput {
     }
 }
 
+class WeightInput extends IntInput {
+    postInit() {
+        this.measurement = models.measurement.default;
+        xf.sub(`db:measurement`, this.onMeasurement.bind(this));
+    }
+    onMeasurement(measurement) {
+        this.measurement = measurement;
+        this.render();
+    }
+    kgToLbs(kg) {
+        return Math.round(2.20462 * kg);
+    };
+    parseKg(weight) {
+        if(this.measurement === 'imperial') {
+            return Math.round(0.453592 * weight);
+        }
+        return Math.round(weight);
+    }
+    formatWeight(value, measurement) {
+        if(measurement === 'imperial') {
+            value = `${this.kgToLbs(value)}`;
+        } else {
+            value = `${value}`;
+        }
+        return value;
+    }
+    onChange(e) {
+        this.state = this.parseKg(e.target.value);
+        xf.dispatch(`ui:${this.effect}`, this.state);
+    }
+    render() {
+        this.value = this.formatWeight(this.state, this.measurement);
+    }
+}
+
 customElements.define('int-input', IntInput, {extends: 'input'});
 customElements.define('float-input', FloatInput, {extends: 'input'});
-
+customElements.define('weight-input', WeightInput, {extends: 'input'});
 
 
 class EffectButton extends HTMLButtonElement {
@@ -80,7 +116,7 @@ class SetButton extends HTMLButtonElement {
         super();
         this.effect = this.getAttribute('effect');
         this.prop = this.getAttribute('prop');
-        this.state = this.default;
+        this.state = 0;
     }
     connectedCallback() {
         xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
@@ -90,7 +126,7 @@ class SetButton extends HTMLButtonElement {
         this.removeEventListener('pointerup', this.onEffect);
     }
     onEffect(e) {
-        xf.dispatch(`ui:${this.effect}`, this.state);
+        xf.dispatch(`ui:${this.effect}`, parseInt(this.state));
     }
     onUpdate(value) {
         this.state = value;
@@ -98,5 +134,6 @@ class SetButton extends HTMLButtonElement {
 }
 
 customElements.define('set-button', SetButton, {extends: 'button'});
+
 
 export { IntInput, FloatInput, EffectButton };

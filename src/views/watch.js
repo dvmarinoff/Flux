@@ -42,13 +42,11 @@ class Watch extends HTMLElement {
     onStop(e)  { xf.dispatch('ui:watchStop'); }
     onWorkoutStart(e) { xf.dispatch('ui:workoutStart'); }
     onWatchStatus(status) {
-        prn(status);
         if(status === 'started') { this.renderStarted(this.dom); }
         if(status === 'paused')  { this.renderPaused(this.dom);  }
         if(status === 'stopped') { this.renderStopped(this.dom); }
     }
     onWorkoutStatus(status) {
-        prn(status);
         if(status === 'started') { this.renderWorkoutStarted(this.dom); }
         if(status === 'done')    { console.log(`Workout done!`); }
     }

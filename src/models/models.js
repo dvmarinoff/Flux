@@ -31,7 +31,7 @@ class Model {
     }
     defaultOnInvalid(x) {
         const self = this;
-        console.error(`Trying to set invalid ${self.prop}.`, x);
+        console.error(`Trying to set invalid ${self.prop}. ${typeof x}`, x);
     }
     defaultStorage() {
         const self = this;

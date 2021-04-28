@@ -89,9 +89,12 @@
                         <div class="data-tile--small">
                             <h2 class="data-tile-small--heading">Speed</h2>
                             <div class="data-tile-small--value-cont">
-                                <data-display id="speed-value"
+                                <speed-display id="speed-value"
                                               class="data-tile-small--value"
-                                              prop="speed">--</data-display>
+                                              prop="speed">
+                                    <value>--</value>
+                                    <unit class="data-tile-small--unit"></unit>
+                                </speed-display>
                             </div>
                         </div>
                         <div class="data-tile--small">
@@ -99,7 +102,10 @@
                             <div class="data-tile-small--value-cont">
                                 <distance-display id="distance-value"
                                                   class="data-tile-small--value"
-                                                  prop="distance">--</distance-display>
+                                                  prop="distance">
+                                    <value>--</value>
+                                    <unit class="data-tile-small--unit"></unit>
+                                </distance-display>
                             </div>
                         </div>
                     </div>
@@ -268,8 +274,10 @@
                                 prop="ftp">Set</button>
                     </div>
                     <div id="weight-settings" class="settings-tile">
-                        <label id="weight-label" for="weight-value" class="settings-tile-label">kg</label>
-                        <input is="int-input"
+                        <label id="weight-label" for="weight-value" class="settings-tile-label">
+                            <unit-display type="weight">kg</unit-display>
+                        </label>
+                        <input is="weight-input"
                                id="weight-value"
                                class="settings-tile-input"
                                name="weight-value"
