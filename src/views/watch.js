@@ -20,6 +20,7 @@ class Watch extends HTMLElement {
         this.dom.lap.addEventListener('pointerup', this.onLap);
         this.dom.stop.addEventListener('pointerup', this.onStop);
         this.dom.workout.addEventListener('pointerup', this.onWorkoutStart);
+        this.dom.save.addEventListener(`pointerup`, this.onSave);
 
         this.renderInit(this.dom);
 
@@ -33,13 +34,15 @@ class Watch extends HTMLElement {
        this.dom.lap.removeEventListener(`pointerup`, this.onLap);
        this.dom.stop.removeEventListener(`pointerup`, this.onStop);
        this.dom.workout.removeEventListener(`pointerup`, this.onWorkoutStart);
+       this.dom.save.removeEventListener(`pointerup`, this.onSave);
        document.removeEventListener(`db:watchStatus`, this.onWatchStatus);
        document.removeEventListener(`db:workoutStatus`, this.onWorkoutStatus);
     }
-    onStart(e) { xf.dispatch('ui:watchStart'); prn(`start`); }
+    onStart(e) { xf.dispatch('ui:watchStart'); }
     onPause(e) { xf.dispatch('ui:watchPause'); }
     onLap(e)   { xf.dispatch('ui:watchLap'); }
     onStop(e)  { xf.dispatch('ui:watchStop'); }
+    onSave(e)  { xf.dispatch('ui:activity:save'); }
     onWorkoutStart(e) { xf.dispatch('ui:workoutStart'); }
     onWatchStatus(status) {
         if(status === 'started') { this.renderStarted(this.dom); }

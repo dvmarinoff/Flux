@@ -1,8 +1,10 @@
-import { xf, exists, equals, first, second, last, inRange, fixInRange, prn } from '../functions.js';
+import { xf, exists, equals, first, second, last, inRange, fixInRange, dateToDashString } from '../functions.js';
 import { LocalStorageItem } from '../storage/local-storage.js';
 import { IDB } from '../storage/idb.js';
 import { workouts } from '../workouts/workouts.js';
 import { zwo } from '../workouts/parser.js';
+import { fileHandler } from '../file.js';
+import { Encode } from '../ant/fit.js';
 
 class Model {
     constructor(args) {
@@ -270,6 +272,25 @@ class Workout extends Model {
     }
     parse(workout) {
         return zwo.parse(workout);
+    }
+    fileName () {
+        const self = this;
+        const now = new Date();
+        return `workout-${dateToDashString(now)}.fit`;
+    }
+    encode(db) {
+        const self = this;
+        let activity = Encode({data: db.records, laps: db.laps});
+        return activity;
+    }
+    download(activity) {
+        const self = this;
+        const blob = new Blob([activity], {type: 'application/octet-stream'});
+        fileHandler.saveFile()(blob, self.fileName());
+    }
+    save(db) {
+        const self = this;
+        self.download(self.encode(db));
     }
 }
 

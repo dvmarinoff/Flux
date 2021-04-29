@@ -1,4 +1,4 @@
-import { xf, exists, empty, first, filterIn, prn } from '../functions.js';
+import { xf, exists, empty, first } from '../functions.js';
 import { Hrm } from '../ble/hrm.js';
 import { Controllable } from '../ble/controllable.js';
 

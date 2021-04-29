@@ -132,6 +132,13 @@ function max(xs, prop = false) {
         return xs.reduce( (acc,v,i) => v > acc ? v : acc, 0);
     }
 };
+function sum(xs, path = false) {
+    if(path !== false) {
+        return xs.reduce( (acc,v,i) => acc + v[path], 0);
+    } else {
+        return xs.reduce( (acc,v,i) => acc + v, 0);
+    }
+};
 
 // Math
 function digits(n) {
@@ -202,6 +209,14 @@ function timeDiff(timestamp1, timestamp2) {
     let difference = (timestamp1 / 1000) - (timestamp2 / 1000);
     return Math.round(Math.abs(difference));
 };
+function dateToDashString(date) {
+    const day    = (date.getDate()).toString().padStart(2, '0');
+    const month  = (date.getMonth()+1).toString().padStart(2, '0');
+    const year   = date.getFullYear().toString();
+    const hour   = (date.getHours()).toString().padStart(2, '0');
+    const minute = (date.getMinutes()).toString().padStart(2, '0');
+    return `${day}-${month}-${year}-at-${hour}-${minute}h`;
+}
 function format(x, precision = 1000) {
     return Math.round(x * precision) / precision;
 }
@@ -348,6 +363,7 @@ export {
     splitAt,
     avg,
     max,
+    sum,
 
     // math
     digits,
@@ -365,6 +381,7 @@ export {
     prn,
     secondsToHms,
     timeDiff,
+    dateToDashString,
     kphToMps,
     mpsToKph,
 

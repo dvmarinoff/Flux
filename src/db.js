@@ -137,6 +137,19 @@ xf.reg('lock:release', (e, db) => {
 xf.reg('workout', (workout, db) => {
     db.workout = models.workout.set(workout);
 });
+xf.reg('ui:activity:save', (_, db) => {
+    models.workout.save(db);
+    xf.dispatch('workout:downloaded');
+});
+xf.reg('activity:save:success', (e, db) => {
+    // file:download:activity
+    // reset db session:
+    db.records     = [];
+    db.resistanceTarget = 0;
+    db.slopeTarget = 0;
+    db.targetPwr    = 0;
+});
+
 
 //
 xf.reg('app:start', (_, db) => {
@@ -161,6 +174,8 @@ class TrainerMock {
         xf.sub('db:powerTarget', self.onPowerTarget.bind(self));
         xf.sub('ui:workoutStart', self.run.bind(self));
         xf.sub('ui:watchPause', self.stop.bind(self));
+
+        console.warn('Trainer Mock Data is ON!');
     }
     run() {
         const self = this;
