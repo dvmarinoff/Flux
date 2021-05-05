@@ -138,16 +138,21 @@ xf.reg('workout', (workout, db) => {
     db.workout = models.workout.set(workout);
 });
 xf.reg('ui:activity:save', (_, db) => {
-    models.workout.save(db);
-    xf.dispatch('workout:downloaded');
+    try {
+        models.workout.save(db);
+        xf.dispatch('activity:save:success');
+    } catch (err) {
+        console.error(`Error on activity save: `, err);
+        xf.dispatch('activity:save:fail');
+    }
 });
 xf.reg('activity:save:success', (e, db) => {
     // file:download:activity
     // reset db session:
-    db.records     = [];
+    db.records = [];
     db.resistanceTarget = 0;
     db.slopeTarget = 0;
-    db.targetPwr    = 0;
+    db.powerTarget = 0;
 });
 
 
