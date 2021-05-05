@@ -191,11 +191,42 @@ class FTP extends Model {
         self.min = args.min || 0;
         self.max = args.max || 500;
         self.storage = new args.storage(storageModel);
+        self.zones = args.zones || self.defaultZones();
+        self.percentages = args.percentages || self.defaultPercentages();
     }
     defaultValue() { return 200; }
     defaultIsValid(value) {
         const self = this;
         return Number.isInteger(value) && inRange(self.min, self.max, value);
+    }
+    defaultZones() {
+        return ['one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+    }
+    defaultPercentages() {
+        return {'one': 0.55, 'two': 0.76, 'three': 0.88, 'four': 0.95, 'five': 1.06, 'six': 1.20};
+    }
+    powerToZone(value, ftp, zones) {
+        const self = this;
+        if(!exists(ftp)) ftp = self.default;
+        if(!exists(zones)) zones = self.zones;
+
+        let name = zones[0];
+        if(value < (ftp * self.percentages.one)) {
+            name = zones[0];
+        } else if(value < (ftp * self.percentages.two)) {
+            name = zones[1];
+        } else if(value < (ftp * self.percentages.three)) {
+            name = zones[2];
+        } else if(value < (ftp * self.percentages.four)) {
+            name = zones[3];
+        } else if(value < (ftp * self.percentages.five)) {
+            name = zones[4];
+        } else if (value < (ftp * self.percentages.six)) {
+            name = zones[5];
+        } else {
+            name = zones[6];
+        }
+        return {name: name};
     }
 }
 

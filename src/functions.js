@@ -226,6 +226,9 @@ function kphToMps(kph) {
 function mpsToKph(mps) {
     return 3.6 * mps;
 };
+function scale(value, max = 100) {
+    return 100 * (value/max);
+}
 
 // Bits
 function nthBit(field, bit) {
@@ -384,6 +387,7 @@ export {
     dateToDashString,
     kphToMps,
     mpsToKph,
+    scale,
 
     // bits
     nthBit,
