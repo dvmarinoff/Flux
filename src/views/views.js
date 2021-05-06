@@ -7,6 +7,7 @@ import './inputs.js';
 import './tabs.js';
 import './data-graph.js';
 import './workout-graph.js';
+import './list.js';
 import './watch.js';
 
 function start() {

@@ -1,13 +1,15 @@
-import { xf, exists, equals, first, second, last, inRange, fixInRange, dateToDashString } from '../functions.js';
+import { xf, exists, empty, equals, first, second, last, inRange, fixInRange, dateToDashString } from '../functions.js';
 import { LocalStorageItem } from '../storage/local-storage.js';
 import { IDB } from '../storage/idb.js';
-import { workouts } from '../workouts/workouts.js';
+import { uuid } from '../storage/uuid.js';
+import { workouts as workoutsFile }  from '../workouts/workouts.js';
 import { zwo } from '../workouts/parser.js';
 import { fileHandler } from '../file.js';
 import { Encode } from '../ant/fit.js';
 
 class Model {
     constructor(args) {
+        this.init(args);
         this.prop = args.prop;
         this.default = args.default || this.defaultValue();
         this.prev = args.default;
@@ -15,7 +17,6 @@ class Model {
         this.isValid = args.isValid || this.defaultIsValid;
         this.onInvalid = args.onInvalid || this.defaultOnInvalid;
         this.storage = this.defaultStorage();
-        this.init();
         this.postInit(args);
     }
     init() { return; }
@@ -297,9 +298,12 @@ class Workout extends Model {
         // };
         // self.storage = new args.storage(storageModel);
     }
-    defaultValue() { return this.parse((first(workouts)).xml); }
+    defaultValue() { return this.parse((first(workoutsFile))); }
     defaultIsValid(value) {
         return exists(value);
+    }
+    restore(db) {
+        return first(db.workouts);
     }
     parse(workout) {
         return zwo.parse(workout);
@@ -325,6 +329,41 @@ class Workout extends Model {
     }
 }
 
+class Workouts extends Model {
+    init(args) {
+        const self = this;
+        self.workoutModel = args.workoutModel;
+    }
+    postInit(args) {
+        // const storageModel = {
+        //     key: self.prop,
+        //     default: self.defaultValue(),
+        // };
+        // self.storage = new args.storage(storageModel);
+    }
+    defaultValue() {
+        const self = this;
+        return workoutsFile.map((w) => Object.assign(self.workoutModel.parse(w), {id: uuid()}));
+    }
+    defaultIsValid(value) {
+        const self = this;
+        return exists(value);
+    }
+    restore() {
+        const self = this;
+        return self.default;
+    }
+    get(workouts, id) {
+        for(let workout of workouts) {
+            if(equals(workout.id, id)) {
+                return workout;
+            }
+        }
+        console.error(`tring to get a missing workout: ${id}`, workouts);
+        return first(workouts);
+    }
+}
+
 const power = new Power({prop: 'power'});
 const heartRate = new HeartRate({prop: 'heartRate'});
 const cadence = new Cadence({prop: 'cadence'});
@@ -343,6 +382,7 @@ const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 
 const workout = new Workout({prop: 'workout'});
+const workouts = new Workouts({prop: 'workouts', workoutModel: workout});
 
 let models = { power,
                heartRate,
@@ -357,7 +397,8 @@ let models = { power,
                weight,
                theme,
                measurement,
-               workout
+               workout,
+               workouts,
              };
 
 export { models };

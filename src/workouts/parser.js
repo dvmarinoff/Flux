@@ -207,6 +207,7 @@ function parse(zwo) {
     let workoutEl = doc.querySelector('workout');
     let nameEl    = doc.querySelector('name');
     let descEl    = doc.querySelector('description');
+    let effortEl  = doc.querySelector('effort-type');
 
     let elements = Array.from(workoutEl.children);
 
@@ -217,10 +218,15 @@ function parse(zwo) {
 
     let intervals   = steps.flatMap(step => stepToInterval(step));
     let duration    = Math.round(intervals.reduce( (acc, x) => acc + (x.duration / 60), 0));
-    let name        = nameEl.textContent;
-    let description = descEl.textContent;
+    let name        = nameEl.textContent || 'Custom';
+    let description = descEl.textContent || 'Custom Workout';
+    let effort      = effortEl.textContent || 'Custom';
 
-    return {intervals: intervals, duration: duration, name: name, description: description};
+    return {intervals: intervals,
+            duration: duration,
+            name: name,
+            description: description,
+            effort: effort};
 }
 
 function isValid(zwo) {

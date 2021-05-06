@@ -137,6 +137,9 @@ xf.reg('lock:release', (e, db) => {
 xf.reg('workout', (workout, db) => {
     db.workout = models.workout.set(workout);
 });
+xf.reg('ui:workout:select', (id, db) => {
+    db.workout = models.workouts.get(db.workouts, id);
+});
 xf.reg('ui:activity:save', (_, db) => {
     try {
         models.workout.save(db);
@@ -164,56 +167,15 @@ xf.reg('app:start', (_, db) => {
     db.theme = models.theme.restore();
     db.measurement = models.measurement.restore();
 
-    db.workout = models.workout.restore();
+    db.workouts = models.workouts.restore();
+    db.workout = models.workout.restore(db);
 });
 
-
-class TrainerMock {
-    constructor() {
-        this.powerTarget = 180;
-        this.init();
-    }
-    init() {
-        const self = this;
-
-        xf.sub('db:powerTarget', self.onPowerTarget.bind(self));
-        xf.sub('ui:workoutStart', self.run.bind(self));
-        xf.sub('ui:watchPause', self.stop.bind(self));
-
-        console.warn('Trainer Mock Data is ON!');
-    }
-    run() {
-        const self = this;
-        self.interval = self.broadcast(self.indoorBikeData.bind(self));
-    }
-    stop() {
-        const self = this;
-        clearInterval(self.interval);
-    }
-    broadcast(handler) {
-        const interval = setInterval(handler, 1000);
-        return interval;
-    }
-    indoorBikeData() {
-        const self = this;
-        xf.dispatch('power', self.power(self.powerTarget));
-        xf.dispatch('speed', self.speed(20));
-        xf.dispatch('cadence', self.cadence(80));
-    }
-    onPowerTarget(powerTarget) {
-        this.powerTarget = powerTarget;
-    }
-    power(prev) {
-        return prev + rand(-4, 4);
-    }
-    cadence(prev) {
-        return prev + rand(-3, 3);
-    }
-    speed(prev) {
-        return prev + rand(-0.1, 0.1);
-    }
+function start () {
+    console.log('start db');
+    xf.dispatch('db:start');
 }
 
-const tm = new TrainerMock();
+start();
 
 export { db };

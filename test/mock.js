@@ -11,6 +11,8 @@ class TrainerMock {
         xf.sub('db:powerTarget', self.onPowerTarget.bind(self));
         xf.sub('ui:workoutStart', self.run.bind(self));
         xf.sub('ui:watchPause', self.stop.bind(self));
+
+        console.warn('Trainer Mock Data is ON!');
     }
     run() {
         const self = this;

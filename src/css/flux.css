@@ -417,7 +417,7 @@ body.dark-theme {
 }
 .t5 { /* workout desc, */
     font-size: 14px;
-    font-weight: bold;
+    /* font-weight: bold; */
     /* letter-spacing: 1px; */
 }
 .t6 { /* workout first-row, */
@@ -1063,8 +1063,9 @@ body.dark-theme {
     text-align: left;
 }
 .workout {
-    padding: 0 5px 5px 5px;
+    display: block;
     margin-bottom: 5px;
+    padding: 0 5px 5px 5px;
 }
 .workout .first-row {
     cursor: pointer;
@@ -1102,6 +1103,7 @@ body.dark-theme {
     text-align: left;
     max-width: 470px;
     margin: 0 auto;
+    padding-top: 15px;
 }
 
 /**/

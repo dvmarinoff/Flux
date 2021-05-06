@@ -21,9 +21,7 @@ class Watch {
     }
     init() {
         let self = this;
-        xf.sub('db:workout',       workout => {
-            self.intervals     = workout.intervals;
-        });
+        xf.sub('db:workout',       workout => { self.intervals     = workout.intervals; });
         xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed; });
         xf.sub('db:lapTime',          time => { self.lapTime       = time; });
         xf.sub('db:stepTime',         time => { self.stepTime      = time; });
@@ -229,8 +227,7 @@ xf.reg('watch:stepIndex',     (index, db) => {
     let intervalIndex = db.intervalIndex;
     let powerTarget   = db.workout.intervals[intervalIndex].steps[index].power;
 
-    xf.dispatch('ui:power-target-set', 256 * powerTarget);     // update just the workout defined
-    // xf.dispatch('ui:power-target-manual-set', powerTarget); // set both manual and workout defined
+    xf.dispatch('ui:power-target-set', db.ftp * powerTarget); // update just the workout defined
 
     // console.log(exists(db.workout.intervals[intervalIndex].steps[index].slope));
     if(exists(db.workout.intervals[intervalIndex].steps[index].slope)) {
