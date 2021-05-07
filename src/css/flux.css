@@ -1092,7 +1092,7 @@ body.dark-theme {
     padding: 10px;
 }
 .workout:first-child .desc{
-    display: block;
+    /* display: block; */
 }
 
 .workout .desc .workout-graph {

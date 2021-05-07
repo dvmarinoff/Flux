@@ -3,6 +3,7 @@ import { models } from '../models/models.js';
 
 function intervalsToGraph(intervals, ftp) {
     let scaleMax = ftp * 1.6;
+
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
         let stepsCount = interval.steps.length;
@@ -59,7 +60,7 @@ function workoutTemplate(workout) {
             </li>`;
 }
 
-class List extends HTMLUListElement {
+class WorkoutList extends HTMLUListElement {
     constructor() {
         super();
         this.state = [];
@@ -73,6 +74,7 @@ class List extends HTMLUListElement {
         this.metricProp = this.getAttribute('metric');
         xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
         xf.sub(`db:${this.metricProp}`, this.onMetric.bind(this));
+
     }
     disconnectedCallback() {
         document.removeEventListener(`db:${this.prop}`, this.onUpdate);
@@ -91,17 +93,22 @@ class List extends HTMLUListElement {
             this.render();
         }
     }
+    stateToHtml (state, metric) {
+        return state.reduce((acc, workout, i) => {
+            const graph = intervalsToGraph(workout.intervals, metric);
+            workout = Object.assign(workout, {graph: graph});
+            return acc + workoutTemplate(workout);
+        }, '');
+    }
     render() {
         // console.log(this.state);
-        this.innerHTML = this.state.reduce((acc, workout, i) => {
-            return acc +
-                workoutTemplate(Object.assign(workout, {graph: intervalsToGraph(workout.intervals, this.metric)}));
-        }, '');
+        this.innerHTML = this.stateToHtml(this.state, this.metric);
     }
 }
 
 
-class Workout extends HTMLLIElement {
+
+class WorkoutListItem extends HTMLLIElement {
     constructor() {
         super();
         this.state = '';
@@ -113,40 +120,59 @@ class Workout extends HTMLLIElement {
     connectedCallback() {
         this.summary = this.querySelector('.first-row');
         this.description = this.querySelector('.second-row .desc');
-        this.select = this.querySelector('.select');
-        this.indicator = this.select;
+        this.selectBtn = this.querySelector('.select');
+        this.indicator = this.selectBtn;
         this.id = this.getAttribute('id');
 
-        xf.sub('ui:workout:select', this.toggleSelect.bind(this));
-        this.summary.addEventListener('pointerup', this.onExpand.bind(this));
-        this.select.addEventListener('pointerup', this.onRadio.bind(this));
+        xf.sub('db:workout', this.onWorkout.bind(this));
+        this.summary.addEventListener('pointerup', this.toggleExpand.bind(this));
+        this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this));
     }
     disconnectedCallback() {
-        document.removeEventListener('ui:workout:select', this.toggleSelect);
-        this.summary.removeEventListener('pointerup', this.onExpand);
-        this.select.removeEventListener('pointerup', this.onRadio);
+        document.removeEventListener('db:workout', this.onWorkout);
+        this.summary.removeEventListener('pointerup', this.toggleExpand);
+        this.selectBtn.removeEventListener('pointerup', this.onRadio);
     }
-    onExpand(e) {
+
+    onWorkout(workout) {
+        this.toggleSelect(workout.id);
+    }
+    toggleExpand(e) {
         if(this.isExpanded) {
-            this.description.style.display = 'none';
-            this.isExpanded = false;
+            this.collapse();
         } else {
-            this.description.style.display = 'block';
-            this.isExpanded = true;
+            this.expand();
         }
     }
-    onRadio(e) {
-        e.stopPropagation();
-        xf.dispatch('ui:workout:select', this.id);
+    expand() {
+        this.description.style.display = 'block';
+        this.isExpanded = true;
+    }
+    collapse() {
+        this.description.style.display = 'none';
+        this.isExpanded = false;
     }
     toggleSelect(id) {
         if(equals(this.id, id)) {
             if(!this.isSelected) {
-                this.onSelect();
+                this.select();
+                this.expand();
             }
         } else {
-            this.onDiselect();
+            this.diselect();
         }
+    }
+    select() {
+        this.indicator.innerHTML = radioOn;
+        this.isSelected = true;
+    }
+    diselect() {
+        this.indicator.innerHTML = radioOff;
+        this.isSelected = false;
+    }
+    onRadio(e) {
+        e.stopPropagation();
+        xf.dispatch('ui:workout:select', this.id);
     }
     onUpdate(value) {
         if(!equals(value, this.state)) {
@@ -154,18 +180,10 @@ class Workout extends HTMLLIElement {
             this.render();
         }
     }
-    onSelect() {
-        this.indicator.innerHTML = radioOn;
-        this.isSelected = true;
-    }
-    onDiselect() {
-        this.indicator.innerHTML = radioOff;
-        this.isSelected = false;
-    }
     render() {
         // this.innerHTML = workoutTemplate(this.state);
     }
 }
 
-customElements.define('workout-list', List, {extends: 'ul'});
-customElements.define('workout-item', Workout, {extends: 'li'});
+customElements.define('workout-list', WorkoutList, {extends: 'ul'});
+customElements.define('workout-item', WorkoutListItem, {extends: 'li'});
