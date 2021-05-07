@@ -305,6 +305,10 @@ class Workout extends Model {
     restore(db) {
         return first(db.workouts);
     }
+    async readFromFile(workoutFile) {
+        const workout = await fileHandler.readTextFile(workoutFile);
+        return workout;
+    }
     parse(workout) {
         return zwo.parse(workout);
     }
@@ -361,6 +365,11 @@ class Workouts extends Model {
         }
         console.error(`tring to get a missing workout: ${id}`, workouts);
         return first(workouts);
+    }
+    add(workouts, workout) {
+        const self = this;
+        workouts.push(Object.assign(workout, {id: uuid()}));
+        return workouts;
     }
 }
 

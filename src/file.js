@@ -1,22 +1,31 @@
-
 import { exists, first, xf, dateToDashString } from './functions.js';
 
 class FileHandler {
     constructor(args) {}
-    async readTextFile(file) {
+    readTextFile(file) {
         const self = this;
         let reader = new FileReader();
         reader.readAsText(file);
-        reader.onload = _ => {
-            let res = reader.result;
-            console.log(res);
-            xf.dispatch('file:upload:workout', res);
-        };
-        reader.onerror = _ => {
-            let err = reader.error;
-            console.error(`Error reading local file: `);
-            console.error(reader.error);
-        };
+
+        return new Promise((resolve, reject) => {
+            reader.onload = function(event) {
+                return resolve(reader.result);
+            };
+            reader.onerror = function(event) {
+                return reject(reader.error);
+            };
+        });
+        // reader.onload = _ => {
+        //     let res = reader.result;
+        //     console.log(res);
+        //     // xf.dispatch('file:upload:workout', res);
+        // };
+        // reader.onerror = _ => {
+        //     let err = reader.error;
+        //     console.error(`Error reading local file: `);
+        //     console.error(reader.error);
+        // };
+
     }
     async readBinaryFile() {
         self.unsupportedFormat();

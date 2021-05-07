@@ -49,7 +49,7 @@ function workoutTemplate(workout) {
                     <div class="name t6">${workout.name}</div>
                     <div class="type t6">${workout.effort}</div>
                     <div class="time t6">${workout.duration} min</div>
-                    <div class="select" id="btn${workout.id}">${radioOff}</div>
+                    <div class="select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
                 </div>
                 <div class="second-row">
                     <div class="desc">
@@ -67,6 +67,7 @@ class WorkoutList extends HTMLUListElement {
         this.metric = 0;
         this.items = [];
         this.postInit();
+        this.workout = {};
     }
     postInit() { return; }
     connectedCallback() {
@@ -74,10 +75,13 @@ class WorkoutList extends HTMLUListElement {
         this.metricProp = this.getAttribute('metric');
         xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
         xf.sub(`db:${this.metricProp}`, this.onMetric.bind(this));
-
+        xf.sub('db:workout', this.onWorkout.bind(this));
     }
     disconnectedCallback() {
         document.removeEventListener(`db:${this.prop}`, this.onUpdate);
+    }
+    onWorkout(workout) {
+        this.workout = workout;
     }
     onMetric(value) {
         if(!equals(value, this.metric)) {
@@ -88,21 +92,21 @@ class WorkoutList extends HTMLUListElement {
         }
     }
     onUpdate(value) {
-        if(!equals(value, this.state)) {
+        // if(!equals(value, this.state)) {
             this.state = value;
             this.render();
-        }
+        // }
     }
-    stateToHtml (state, metric) {
+    stateToHtml (state, metric, selectedWorkout) {
         return state.reduce((acc, workout, i) => {
             const graph = intervalsToGraph(workout.intervals, metric);
-            workout = Object.assign(workout, {graph: graph});
+            const selected = equals(workout.id, selectedWorkout.id);
+            workout = Object.assign(workout, {graph: graph, selected: selected});
             return acc + workoutTemplate(workout);
         }, '');
     }
     render() {
-        // console.log(this.state);
-        this.innerHTML = this.stateToHtml(this.state, this.metric);
+        this.innerHTML = this.stateToHtml(this.state, this.metric, this.workout);
     }
 }
 
@@ -132,10 +136,6 @@ class WorkoutListItem extends HTMLLIElement {
         document.removeEventListener('db:workout', this.onWorkout);
         this.summary.removeEventListener('pointerup', this.toggleExpand);
         this.selectBtn.removeEventListener('pointerup', this.onRadio);
-    }
-
-    onWorkout(workout) {
-        this.toggleSelect(workout.id);
     }
     toggleExpand(e) {
         if(this.isExpanded) {
@@ -170,6 +170,10 @@ class WorkoutListItem extends HTMLLIElement {
         this.indicator.innerHTML = radioOff;
         this.isSelected = false;
     }
+    onWorkout(workout) {
+        this.workout = workout;
+        this.toggleSelect(workout.id);
+    }
     onRadio(e) {
         e.stopPropagation();
         xf.dispatch('ui:workout:select', this.id);
@@ -180,9 +184,7 @@ class WorkoutListItem extends HTMLLIElement {
             this.render();
         }
     }
-    render() {
-        // this.innerHTML = workoutTemplate(this.state);
-    }
+    render() {}
 }
 
 customElements.define('workout-list', WorkoutList, {extends: 'ul'});

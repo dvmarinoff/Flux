@@ -220,7 +220,13 @@ function parse(zwo) {
     let duration    = Math.round(intervals.reduce( (acc, x) => acc + (x.duration / 60), 0));
     let name        = nameEl.textContent || 'Custom';
     let description = descEl.textContent || 'Custom Workout';
-    let effort      = effortEl.textContent || 'Custom';
+
+    let effort;
+    if(exists(effortEl)) {
+        effort = effortEl.textContent;
+    } else {
+        effort = 'Custom';
+    }
 
     return {intervals: intervals,
             duration: duration,

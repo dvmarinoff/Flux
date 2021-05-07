@@ -9,6 +9,7 @@ import './data-graph.js';
 import './workout-graph.js';
 import './list.js';
 import './watch.js';
+import './upload.js';
 
 function start() {
     prn('start views.');

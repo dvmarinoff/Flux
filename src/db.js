@@ -140,6 +140,12 @@ xf.reg('workout', (workout, db) => {
 xf.reg('ui:workout:select', (id, db) => {
     db.workout = models.workouts.get(db.workouts, id);
 });
+xf.reg('ui:workout:upload', async function(workoutFile, db) {
+    const workoutText = await models.workout.readFromFile(workoutFile);
+    const workout = models.workout.parse(workoutText);
+    models.workouts.add(db.workouts, workout);
+    xf.dispatch('db:workouts', db);
+});
 xf.reg('ui:activity:save', (_, db) => {
     try {
         models.workout.save(db);

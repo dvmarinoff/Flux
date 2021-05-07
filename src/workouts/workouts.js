@@ -135,6 +135,24 @@ let workouts =
 ,
 `<workout_file>
     <author>Marinov</author>
+    <name>Potato Chips</name>
+    <effort-type>Threshold</effort-type>
+    <description>5 by 5 min at 100% of FTP with 5 min recovery in between. Perfect to get you accustome to first intensite sessions after a base block, or just that new FTP value.</description>
+    <sportType>bike</sportType>
+    <tags>
+    </tags>
+    <workout>
+        <SteadyState Duration="300" Power="0.39"/>
+        <SteadyState Duration="120" Power="0.60"/>
+        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.5"/>
+        <SteadyState Duration="120" Power="0.56"/>
+        <IntervalsT Repeat="5" OnDuration="300" OffDuration="300" OnPower="1" OffPower="0.5"/>
+        <SteadyState Duration="300" Power="0.39"/>
+    </workout>
+</workout_file>`
+,
+`<workout_file>
+    <author>Marinov</author>
     <name>Maple</name>
     <effort-type>Sweet Spot</effort-type>
     <description>4 times 10 min Sweet Spot intervals with 5 min recovery in between and warm-up Ramp.</description>
@@ -178,13 +196,13 @@ let workouts =
     <workout>
         <Warmup Duration="600" PowerLow="0.32" PowerHigh="0.63"/>
         <SteadyState Duration="600" Power="0.63"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.71"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.71"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.71"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.63"/>
         <Cooldown Duration="600" PowerLow="0.32" PowerHigh="0.63"/>
     </workout>
@@ -201,17 +219,17 @@ let workouts =
     <workout>
         <SteadyState Duration="600" Power="0.39"/>
         <SteadyState Duration="600" Power="0.63"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.67"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.71"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.71"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.71"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.67"/>
-        <SteadyState Duration="300" Power="0.55"/>
+        <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.63"/>
         <SteadyState Duration="600" Power="0.39"/>
     </workout>
