@@ -8,7 +8,7 @@ import { values       } from './values.js';
 
 import { avgOfArray, maxOfArray, sum,
          first, last, round, mps, kph,
-         timeDiff, fixInRange, memberOf } from './functions.js';
+         exists, timeDiff, fixInRange, memberOf } from './functions.js';
 
 let db = {
     pwr: 0,   // controllable
@@ -225,6 +225,11 @@ xf.reg('ui:slope-target-dec', (_, db) => {
 
 xf.reg('ui:erg-mode', (e, db) => {
     db.mode = 'erg';
+
+    if(e !== undefined) {
+        if(e.update === false) { return; }
+    }
+
     xf.dispatch('ui:power-target-manual-set', db.powerTargetManual);
     // xf.dispatch('ui:power-target-set', db.powerTargetManual);
 });
@@ -234,6 +239,11 @@ xf.reg('ui:resistance-mode', (e, db) => {
 });
 xf.reg('ui:slope-mode', (e, db) => {
     db.mode = 'slope';
+
+    if(e !== undefined) {
+        if(e.update === false) { return; }
+    }
+
     xf.dispatch('ui:slope-target-set', db.slopeTarget);
 });
 // Control Modes end

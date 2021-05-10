@@ -2,7 +2,7 @@ import { xf } from './xf.js';
 import { isSet } from './functions.js';
 
 import { avgOfArray, maxOfArray, sum,
-         first, last, round, mps, kph,
+         first, last, round, mps, kph, delay,
          timeDiff, fixInRange } from './functions.js';
 
 class Watch {
@@ -192,7 +192,7 @@ class Watch {
         let stepDuration     = self.intervalsToStepDuration(intervals, intervalIndex, stepIndex);
 
         self.dispatchInterval(intervalDuration, intervalIndex);
-        self.dispatchStep(stepDuration, stepIndex);
+        // self.dispatchStep(stepDuration, stepIndex);
     }
     nextStep(intervals, intervalIndex, stepIndex) {
         let self         = this;
@@ -228,18 +228,25 @@ xf.reg('watch:stepDuration',   (time, db) => db.stepDuration     = time);
 xf.reg('watch:lapTime',        (time, db) => db.lapTime          = time);
 xf.reg('watch:stepTime',       (time, db) => db.stepTime         = time);
 xf.reg('watch:intervalIndex', (index, db) => db.intervalIndex    = index);
-xf.reg('watch:stepIndex',     (index, db) => {
+xf.reg('watch:stepIndex', async (index, db) => {
     db.stepIndex      = index;
     let intervalIndex = db.intervalIndex;
     let powerTarget   = db.workout.intervals[intervalIndex].steps[index].power;
 
-    // xf.dispatch('ui:power-target-set', powerTarget);     // update just the workout defined
-    xf.dispatch('ui:power-target-manual-set', powerTarget); // set both manual and workout defined
-
-    // console.log(isSet(db.workout.intervals[intervalIndex].steps[index].slope));
     if(isSet(db.workout.intervals[intervalIndex].steps[index].slope)) {
         let slopeTarget = db.workout.intervals[intervalIndex].steps[index].slope;
+        xf.dispatch('ui:power-target-set', powerTarget);     // update just the workout defined
+        await delay(200);
+        if(db.mode !== 'slope') {
+            xf.dispatch('ui:slope-mode', {update: false});
+        }
         xf.dispatch('ui:slope-target-set', slopeTarget);
+    } else {
+        if(db.mode !== 'erg') {
+            xf.dispatch('ui:erg-mode', {update: false});
+        }
+        xf.dispatch('ui:power-target-manual-set', powerTarget); // set both manual and workout defined
+        // xf.dispatch('ui:power-target-set', powerTarget);     // update just the workout defined
     }
 });
 xf.reg('workout:started', (x, db) => db.workoutState = 'started');
