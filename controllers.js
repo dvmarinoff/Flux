@@ -2,7 +2,6 @@ import { xf } from './xf.js';
 import { FileHandler } from './file.js';
 import { workouts } from './workouts/workouts.js';
 import { zwo, intervalsToGraph } from './workouts/parser.js';
-import { RecordedData, RecordedLaps } from './test/mock.js';
 
 function DeviceController(args) {
     const controllable = args.controllable;

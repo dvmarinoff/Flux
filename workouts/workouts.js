@@ -31,13 +31,14 @@ let workouts =
 },
 { name: 'Chili Pepper',
   type: 'VO2 Max',
-  description: '40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each.',
+  description: '40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each. This one uses Slope mode for the intervals, switching between 8% for the work interval to 0% for recovery. It shows the power target and gives you resistance, but you have to match it.',
   duration: 45,
   xml:
 `<workout_file>
     <author>Marinov</author>
     <name>Chili Pepper</name>
-    <description>40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each.</description>
+    <description>40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each. This one uses Slope mode for the intervals, switching between 8% for the work interval to 0% for recovery. It shows the power target and gives you resistance, but you have to match it.
+    </description>
     <sportType>bike</sportType>
     <tags>
     </tags>
@@ -98,7 +99,7 @@ let workouts =
         <FreeRide Duration="20" />
         <SteadyState Duration="40" Power="1.31"/>
         <FreeRide Duration="20" />
-        <FreeRide Duration="300" SlopeTarget="3.5" />
+        <FreeRide Duration="300" />
         <SteadyState Duration="40" Power="1.31"/>
         <FreeRide Duration="20" />
         <SteadyState Duration="40" Power="1.31"/>

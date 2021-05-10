@@ -12,19 +12,18 @@ import { DeviceController,
          WorkoutController } from './controllers.js';
 import { FileHandler } from './file.js';
 import { Vibrate } from './vibrate.js';
-import { DataMock } from './test/mock.js';
 
 'use strict';
 
 function startServiceWroker() {
     if('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => {
-                console.log(`SW: register success: ${reg}`);
-            })
-            .catch(err => {
-                console.log(`SW: register error: ${err}`);
-            });
+        try {
+            const reg = navigator.serviceWorker.register('./sw.js');
+            console.log(`SW: register success.`);
+            console.log('Cache Version: Flux-v001');
+        } catch(err) {
+            console.log(`SW: register error: `, err);
+        }
     };
 }
 
@@ -54,9 +53,8 @@ async function start() {
     xf.dispatch('app:start');
 
     Vibrate({turnOn: true});
-    // DataMock({hr: true, pwr: true});
 };
 
-// startServiceWroker();
+startServiceWroker();
 
 start();
