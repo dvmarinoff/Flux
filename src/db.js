@@ -31,9 +31,9 @@ let db = {
     records: [],
     lap: [],
     laps: [],
-    lapStartTime: Date.now(),
-    timestamp: Date.now(),
-    inProgress: false,
+    lapStartTime: false,
+    gpsData: [],
+    gps: false,
 
     // Watch
     elapsed: 0,
@@ -125,14 +125,6 @@ xf.reg('ui:measurement-switch', (_, db) => {
     models.measurement.backup(db.measurement);
 });
 
-// Wake Lock
-xf.reg('lock:beforeunload', (e, db) => {
-    // backup session
-});
-xf.reg('lock:release', (e, db) => {
-    // backup session
-});
-
 // Workouts
 xf.reg('workout', (workout, db) => {
     db.workout = models.workout.set(workout);
@@ -164,9 +156,18 @@ xf.reg('activity:save:success', (e, db) => {
     db.powerTarget = 0;
 });
 
+// Wake Lock
+xf.reg('lock:beforeunload', (e, db) => {
+    // backup session
+    models.session.backup(db);
+});
+xf.reg('lock:release', (e, db) => {
+    // backup session
+    models.session.backup(db);
+});
 
 //
-xf.reg('app:start', (_, db) => {
+xf.reg('app:start', async function(_, db) {
 
     db.ftp = models.ftp.restore();
     db.weight = models.weight.restore();
@@ -175,6 +176,11 @@ xf.reg('app:start', (_, db) => {
 
     db.workouts = models.workouts.restore();
     db.workout = models.workout.restore(db);
+
+    await models.session.start();
+    await models.session.restore(db);
+    xf.dispatch('workout:restore');
+
 });
 
 function start () {

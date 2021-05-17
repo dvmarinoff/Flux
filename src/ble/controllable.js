@@ -1,4 +1,4 @@
-import { xf, exists, empty, first, filterIn, prn } from '../functions.js';
+import { xf, isObject, equals, exists, empty, first, filterIn, prn } from '../functions.js';
 import { ble } from './web-ble.js';
 import { Device } from './device.js';
 import { DeviceInformationService } from './dis/dis.js';
@@ -12,11 +12,13 @@ function onIndoorBikeData(value) {
 function onControllableInfo(value) {
     console.log(`Fitness Machine Information: `, value);
 }
-function onFitnessMachineStatus(value) {
-    console.log(`Fitness Machine Status: `, value);
+function onFitnessMachineStatus(res) {
+    let value = '';
+    if(res.value) value = ` :value ${isObject(res.value)? JSON.stringify(res.value) : res.value}`;
+    console.log(`:status '${res.msg}'${value}`);
 }
 function onFitnessMachineControlPoint(value) {
-    console.log(`Fitness Machine Control Point Response: `, value);
+    console.log(`:operation '${value.operation}' :result :${value.result}`);
 }
 
 class Controllable extends Device {
@@ -26,21 +28,19 @@ class Controllable extends Device {
         const self = this;
 
         let mode = 'erg';
-        xf.sub(`db:mode`, value => mode = mode);
+        xf.sub(`db:mode`, value => mode = value);
 
         xf.sub('db:powerTarget', power => {
-            if(mode === 'erg') {
-            if(self.device.connected)
+            if(self.isConnected(self.device) && (equals(mode, 'erg'))) {
                 self.ftms.setTargetPower(power);
             }
         });
-
         xf.sub('db:resistanceTarget', resistance => {
-            if(self.device.connected) self.ftms.setResistanceTarget(resistance);
+            if(self.isConnected(self.device)) self.ftms.setTargetResistance(resistance);
         });
 
         xf.sub('db:slopeTarget', slope => {
-            if(self.device.connected) self.ftms.setSlopeTarget(slope);
+            if(self.isConnected(self.device)) self.ftms.setTargetSlope(slope);
         });
     }
     async initServices(device) {
@@ -56,7 +56,6 @@ class Controllable extends Device {
         await ftms.init();
         self.ftms = ftms;
         self.dis = dis;
-        console.log(self.ftms);
         return { dis, ftms };
     }
 }

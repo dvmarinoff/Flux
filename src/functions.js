@@ -180,6 +180,16 @@ function toDecimalPoint (x, point = 2) {
     return Number((x).toFixed(point));
 }
 
+const bod = Math.pow(2, 31) / 180;
+const dob = 180 / Math.pow(2, 31);
+
+function degToSemicircles(degrees) {
+    return degrees * bod;
+}
+function semicirclesToDeg(semicircles) {
+    return semicircles * dob;
+}
+
 
 // Util
 function prn(str) {

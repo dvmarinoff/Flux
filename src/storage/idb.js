@@ -126,4 +126,6 @@ class IDB {
     }
 }
 
-export { IDB };
+const idb = new IDB();
+
+export { idb };

@@ -99,12 +99,15 @@ let field_definitions = {
     },
 
     record: {
-        timestamp:  FieldDefinition({number: 253, type: 'date_time'}),
-        heart_rate: FieldDefinition({number:   3, type: 'uint8'}),
-        cadence:    FieldDefinition({number:   4, type: 'uint8'}),
-        distance:   FieldDefinition({number:   5, type: 'uint32'}),
-        speed:      FieldDefinition({number:   6, type: 'uint16'}),
-        power:      FieldDefinition({number:   7, type: 'uint16'}),
+        timestamp:     FieldDefinition({number: 253, type: 'date_time'}),
+        // position_lat:  FieldDefinition({number:   0, type: 'sint32'}),
+        // position_long: FieldDefinition({number:   1, type: 'sint32'}),
+        // altitude:      FieldDefinition({number:   2, type: 'uint16'}),
+        heart_rate:    FieldDefinition({number:   3, type: 'uint8'}),
+        cadence:       FieldDefinition({number:   4, type: 'uint8'}),
+        distance:      FieldDefinition({number:   5, type: 'uint32'}),
+        speed:         FieldDefinition({number:   6, type: 'uint16'}),
+        power:         FieldDefinition({number:   7, type: 'uint16'}),
     },
 
     lap: {
@@ -333,6 +336,9 @@ function RecordMsg(args) {
 
     view.setUint8(  0, header,     true);
     view.setUint32( 1, timestamp,  true);
+    // view.setInt32( 5, position_lat,  true);
+    // view.setInt32( 9, position_long, true);
+    // view.setUint16(13, altitude,      true);
     view.setUint16( 5, power,      true);
     view.setUint16( 7, speed,      true);
     view.setUint8(  9, cadence,    true);

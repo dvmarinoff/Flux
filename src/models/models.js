@@ -1,6 +1,8 @@
 import { xf, exists, empty, equals, first, second, last, inRange, fixInRange, dateToDashString } from '../functions.js';
 import { LocalStorageItem } from '../storage/local-storage.js';
-import { IDB } from '../storage/idb.js';
+import { IDBStore } from '../storage/idb-store.js';
+import { Session as IDBSessionStore } from '../storage/session.js';
+import { idb } from '../storage/idb.js';
 import { uuid } from '../storage/uuid.js';
 import { workouts as workoutsFile }  from '../workouts/workouts.js';
 import { zwo } from '../workouts/parser.js';
@@ -292,11 +294,11 @@ class Measurement extends Model {
 class Workout extends Model {
     postInit(args) {
         const self = this;
-        // const storageModel = {
-        //     key: self.prop,
-        //     default: self.defaultValue(),
-        // };
-        // self.storage = new args.storage(storageModel);
+        const storageModel = {
+            key: self.prop,
+            default: self.defaultValue(),
+        };
+        self.storage = new args.storage(storageModel);
     }
     defaultValue() { return this.parse((first(workoutsFile))); }
     defaultIsValid(value) {
@@ -373,6 +375,78 @@ class Workouts extends Model {
     }
 }
 
+class Session {
+    constructor(args) {
+        this.postInit(args);
+    }
+    postInit() {
+        const me = this;
+    }
+    async start() {
+        const me = this;
+        me.store = new IDBSessionStore({idb: idb});
+        await idb.open('store', 1, 'session');
+    }
+    backup(db) {
+        const me = this;
+        console.log('backing up session');
+        me.store.set(idb, me.dbToSession(db));
+    }
+    async restore(db) {
+        const me = this;
+        const sessions = await me.store.restore();
+        let session = last(sessions);
+        if(!me.store.isEmpty(sessions)) {
+          if(session.elapsed > 0) {
+              me.sessionToDb(db, session);
+          } else {
+              me.store.clear(idb);
+          }
+        }
+    }
+    sessionToDb(db, session) {
+        for(let prop in session) {
+            if (session.hasOwnProperty(prop)) {
+                db[prop] = session[prop];
+            }
+        }
+    }
+    dbToSession(db) {
+        const session = {
+            // Watch
+            elapsed: db.elapsed,
+            lapTime: db.lapTime,
+            stepTime: db.stepTime,
+            intervalIndex: db.intervalIndex,
+            stepIndex: db.stepIndex,
+            intervalDuration: db.intervalDuration,
+            stepDuration: db.stepDuration,
+            lapStartTime: db.lapStartTime,
+            watchStatus: db.watchStatus,
+            workoutStatus: db.workoutStatus,
+
+            // Recording
+            records: db.records,
+            laps: db.laps,
+            lap: db.lap,
+
+            // Workouts
+            workout: db.workout,
+            mode: db.mode,
+            page: db.page,
+
+            // Targets
+            powerTarget: db.powerTarget,
+            resistanceTarget: db.resistanceTarget,
+            slopeTarget: db.slopeTarget,
+
+        };
+        return session;
+    }
+}
+
+
+
 const power = new Power({prop: 'power'});
 const heartRate = new HeartRate({prop: 'heartRate'});
 const cadence = new Cadence({prop: 'cadence'});
@@ -390,8 +464,10 @@ const weight = new Weight({prop: 'weight', storage: LocalStorageItem});
 const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 
-const workout = new Workout({prop: 'workout'});
+const workout = new Workout({prop: 'workout', storage: IDBStore});
 const workouts = new Workouts({prop: 'workouts', workoutModel: workout});
+
+const session = new Session();
 
 let models = { power,
                heartRate,
@@ -408,6 +484,7 @@ let models = { power,
                measurement,
                workout,
                workouts,
+               session,
              };
 
 export { models };

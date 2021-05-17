@@ -1,9 +1,9 @@
-import { xf, exists, equals, prn } from '../functions.js';
+import { xf, exists, equals } from '../functions.js';
 
 class IDBStore {
     constructor(args) {
         this._idb   = args.idb || {};
-        this._name  = args.name;
+        this._name  = args.name || this.defaultName();
         this._data  = {};
         this.postInit();
     }
@@ -13,6 +13,7 @@ class IDBStore {
     set idb(x)  { this.idb = x; }
     get data()  { return this._data; }
     set data(x) { this.data = x; }
+    defaultName() { return 'IdbStore'; }
     postInit() {}
     async restore() {
         const self = this;
@@ -27,7 +28,7 @@ class IDBStore {
         self.data = data;
         return data;
     }
-    async save(idb, data, id = false) {
+    async set(idb, data, id = false) {
         const self = this;
         idb.put(idb.db, `${self.name}`, self.setId(data, id));
     }

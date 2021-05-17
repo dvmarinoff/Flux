@@ -3,6 +3,7 @@ import { ble } from './web-ble.js';
 
 class Device {
     constructor(args) {
+        this.init(args);
         if(!exists(args)) args = {};
         this.id       = args.id     || this.defaultId();
         this.name     = args.name   || this.defaultName();
@@ -10,12 +11,13 @@ class Device {
         this.device   = {};
         this.server   = {};
         this.services = {};
-        this.init();
+        this.postInit(args);
+        this.start();
     }
     defaultFilter() { return  ble.requestFilters.all; }
     defaultId()     { return 'ble-device'; }
     defaultName()   { return 'Unknown'; }
-    init() {
+    start() {
         const self = this;
 
         xf.sub(`ui:${self.id}:switch`, async () => {
@@ -26,7 +28,8 @@ class Device {
             }
         });
     }
-    postInit() { return; }
+    init(args) { return; }
+    postInit(args) { return; }
     isConnected() {
         const self = this;
         return ble.isConnected(self.device);
@@ -43,7 +46,6 @@ class Device {
             self.name     = self.device.name;
 
             await self.initServices(res);
-            self.postInit();
 
             xf.dispatch(`${self.id}:connected`);
         } catch(err) {

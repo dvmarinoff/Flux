@@ -1,6 +1,6 @@
 import { exists, first, last, xf,
          avg, max, kphToMps, mpsToKph,
-         timeDiff, fixInRange } from './functions.js';
+         timeDiff, fixInRange, delay } from './functions.js';
 
 class Watch {
     constructor(args) {
@@ -20,6 +20,7 @@ class Watch {
         this.init();
     }
     init() {
+        console.log('Watch.init()');
         let self = this;
         xf.sub('db:workout',       workout => { self.intervals     = workout.intervals; });
         xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed; });
@@ -186,7 +187,6 @@ class Watch {
         let stepDuration     = self.intervalsToStepDuration(intervals, intervalIndex, stepIndex);
 
         self.dispatchInterval(intervalDuration, intervalIndex);
-        self.dispatchStep(stepDuration, stepIndex);
     }
     nextStep(intervals, intervalIndex, stepIndex) {
         let self         = this;
@@ -227,20 +227,22 @@ xf.reg('watch:stepIndex',     (index, db) => {
     let intervalIndex = db.intervalIndex;
     let powerTarget   = db.workout.intervals[intervalIndex].steps[index].power;
 
-    xf.dispatch('ui:power-target-set', db.ftp * powerTarget); // update just the workout defined
+    xf.dispatch('ui:power-target-set', parseInt(db.ftp * powerTarget)); // update just the workout defined
 
-    // console.log(exists(db.workout.intervals[intervalIndex].steps[index].slope));
-    if(exists(db.workout.intervals[intervalIndex].steps[index].slope)) {
-        let slopeTarget = db.workout.intervals[intervalIndex].steps[index].slope;
-        xf.dispatch('ui:slope-target-set', slopeTarget);
-    }
+    // if(exists(db.workout.intervals[intervalIndex].steps[index].slope)) {
+        // let slopeTarget = db.workout.intervals[intervalIndex].steps[index].slope;
+        // delay(100);
+        // xf.dispatch('ui:slope-target-set', slopeTarget);
+    // }
 });
 xf.reg('workout:started', (x, db) => db.workoutStatus = 'started');
 xf.reg('workout:stopped', (x, db) => db.workoutStatus = 'stopped');
 xf.reg('workout:done',    (x, db) => db.workoutStatus = 'done');
 xf.reg('watch:started',   (x, db) => {
     db.watchStatus = 'started';
-    db.lapStartTime = Date.now(); // ??
+    if(db.lapStartTime === false) {
+        db.lapStartTime = Date.now(); // if first lap
+    }
 });
 xf.reg('watch:paused',  (x, db) => db.watchStatus = 'paused');
 xf.reg('watch:stopped', (x, db) => db.watchStatus = 'stopped');
@@ -268,6 +270,10 @@ xf.reg('watch:lap', (x, db) => {
                       totalElapsedTime: elapsed,
                       avgPower:         Math.round(avg(db.lap, 'power')),
                       maxPower:         max(db.lap, 'power')});
+        // console.log(`lap: `,
+        //             {timestamp:        new Date(timeEnd),
+        //              startTime:        new Date(timeStart),
+        //              totalElapsedTime: elapsed});
     }
     db.lap = [];
     db.lapStartTime = timeEnd + 0;

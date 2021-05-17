@@ -1309,6 +1309,12 @@ body.dark-theme {
     margin: 10px 0 0 0;
     padding: 10px 10px;
 }
+#outdoor-settings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+}
 
 @media all and (min-width: 1800px) {
 }

@@ -71,32 +71,38 @@ function powerTarget(power) {
 }
 
 function simulationParameters(args) {
-    let OpCode = 0x11;
-    let wind  = args.wind  || 0; // mps      - 0.001
-    let grade = args.grade || 0; // %        - 0.01
-    let crr   = args.crr   || 0; // unitless - 0.0001
-    let drag  = args.drag  || 0; // kg/m     - 0.01
+    const OpCode = 0x11;
+    const windResolution  = 1000;
+    const gradeResolution = 100;
+    const crrResolution   = 10000;
+    const dragResolution  = 100;
+    const wind  = args.wind  * windResolution  || 0; // mps      - 0.001
+    const grade = args.grade * gradeResolution || 0; // %        - 0.01
+    const crr   = args.crr   * crrResolution   || 0; // unitless - 0.0001
+    const drag  = args.drag  * dragResolution  || 0; // kg/m     - 0.01
 
     let buffer = new ArrayBuffer(7);
     let view   = new DataView(buffer);
-    view.setUint8(0, 0x11, true);
+    view.setUint8(0, OpCode, true);
     view.setInt16(1, wind,  true);
     view.setInt16(3, grade, true);
     view.setUint8(5, crr,   true);
     view.setUint8(6, drag,  true);
 
-    console.log(`set simulation: ${wind} ${grade} ${crr} ${drag}`);
+    console.log(`:simulation {:wind ${wind} :grade ${grade} :crr ${crr} :drag ${drag}}`);
 
     return view;
 }
 
-function slopeTarget(args) {
-    return simulationParameters(args);
+function slopeTarget(slope) {
+    return simulationParameters({grade: slope});
 }
 
 function resistanceTarget(resistance) {
     const OpCode = 0x04;
-    const unit   = 0.1;
+    const resolution = 1; // 10
+    resistance = resistance * resolution;
+
     let buffer   = new ArrayBuffer(3);
     let view     = new DataView(buffer);
     view.setUint8(0, OpCode, true);
