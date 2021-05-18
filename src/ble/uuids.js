@@ -21,7 +21,7 @@ const characteristics = {
     cyclingPowerMeasurement:       '00002a63-0000-1000-8000-00805f9b34fb',
     cyclingPowerFeature:           '00002a65-0000-1000-8000-00805f9b34fb',
     cyclingPowerControlPoint:      '00002a66-0000-1000-8000-00805f9b34fb',
-    sensorLocation:                '00002a5A-0000-1000-8000-00805f9b34fb',
+    sensorLocation:                '00002a5d-0000-1000-8000-00805f9b34fb',
 
     // Heart Rate
     heartRateMeasurement:          '00002a37-0000-1000-8000-00805f9b34fb',

@@ -317,11 +317,24 @@
                                       prop="measurement">Metric</data-display>
                     </button>
                 </div> <!-- end settings btn row -->
-                <div id="outdoor-settings">
-                    <connection-switch id="switch-gps" class="switch-connection switch" name="gps">
-                        <div class="switch--indicator off"></div>
-                        <div class="switch--label">GPS</div>
-                    </connection-switch>
+
+
+                <div class="settings-card">
+                    <div class="settings-card-cont">
+                        <connection-switch id="switch-power-meter" class="switch-connection switch" name="powerMeter">
+                            <div class="switch--indicator off"></div>
+                            <div class="switch--label">Power Meter</div>
+                        </connection-switch>
+                    </div>
+                </div>
+
+                <div class="settings-card row-border">
+                    <div id="outdoor-settings" class="settings-card-cont">
+                        <connection-switch id="switch-gps" class="switch-connection switch" name="gps">
+                            <div class="switch--indicator off"></div>
+                            <div class="switch--label">GPS</div>
+                        </connection-switch>
+                    </div>
                 </div>
                 <div class="connections">
                     <h2 class="h2">Connections</h2>

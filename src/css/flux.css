@@ -1237,15 +1237,18 @@ body.dark-theme {
     cursor: pointer;
 }
 
-.row.border {
+.row-border {
     border-top: 1px solid var(--white-opacity-01);
-    /* border-bottom: 1px solid var(--white-opacity-01); */
 }
 .settings-card {
+}
+.settings-card-cont {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 5px 5px;
-    max-width: 480px;
+    /* max-width: 480px; */
     margin: 10px auto;
-    /* margin: 10px 10px; */
     text-align: center;
 }
 .settings-card .switch {
