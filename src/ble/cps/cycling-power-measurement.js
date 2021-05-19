@@ -38,6 +38,27 @@ function powerIndex(flags) {
     let i = fields.flags.size;
     return i;
 }
+function wheelRevolutionsIndex(flags) {
+    let i = fields.flags.size + fields.power.size;
+    if(pedalPowerBalance(flags)) {
+        i+= fields.pedalPowerBalance.size;
+    }
+    if(accumulatedTorque(flags)) {
+        i+= fields.accumulatedTorque.size;
+    }
+    return i;
+}
+function wheelEventIndex(flags) {
+    let i = fields.flags.size + fields.power.size;
+    if(pedalPowerBalance(flags)) {
+        i+= fields.pedalPowerBalance.size;
+    }
+    if(accumulatedTorque(flags)) {
+        i+= fields.accumulatedTorque.size;
+    }
+    i+= fields.cumulativeWheelRevolutions.size;
+    return i;
+}
 function crankRevolutionsIndex(flags) {
     let i = fields.flags.size + fields.power.size;
     if(pedalPowerBalance(flags)) {
@@ -53,21 +74,84 @@ function crankRevolutionsIndex(flags) {
     return i;
 }
 function crankEventIndex(flags) {
-    let i = fields.flags.size;
-    return i + 9;
+    let i = fields.flags.size + fields.power.size;
+    if(pedalPowerBalance(flags)) {
+        i+= fields.pedalPowerBalance.size;
+    }
+    if(accumulatedTorque(flags)) {
+        i+= fields.accumulatedTorque.size;
+    }
+    if(wheelRevolutionData(flags)) {
+        i+= fields.cumulativeWheelRevolutions.size;
+        i+= fields.lastWheelEventTime.size;
+    }
+    i+= fields.cumulativeCrankRevolutions.size;
+    return i;
 }
 
 function getPower(dataview) {
     const flags = dataview.getUint16(0, true);
     return dataview.getInt16(powerIndex(flags), true);
 }
+function getWheelRevolutions(dataview) {
+    const flags = dataview.getUint16(0, true);
+    return dataview.getUint32(wheelRevolutionsIndex(flags), true);
+}
+function getWheelEvent(dataview) {
+    const flags = dataview.getUint16(0, true);
+    return dataview.getUint16(wheelEventIndex(flags), true);
+}
 function getCrankRevolutions(dataview) {
     const flags = dataview.getUint16(0, true);
-    return dataview.getInt16(crankRevolutionsIndex(flags), true);
+    return dataview.getUint16(crankRevolutionsIndex(flags), true);
 }
 function getCrankEvent(dataview) {
     const flags = dataview.getUint16(0, true);
-    return dataview.getInt16(crankEventIndex(flags), true);
+    return dataview.getUint16(crankEventIndex(flags), true);
+}
+
+
+
+// Instantaneous Speed = (Difference in two successive Cumulative Wheel Revolution values * Wheel Circumference) /
+//                       (Difference in two successive Last Wheel Event Time values)
+
+let wheel_rev_1 = -1;
+let wheel_time_1 = -1;
+function calculateSpeed(wheel_rev_2, wheel_time_2) {
+    const resolution = 2048 * 60;
+    const rollover = 2048 * 32;
+    const wheel_circumference = 1; //2.105; // mm -> 700x25
+    if(wheel_rev_1 < 0) wheel_rev_1 = wheel_rev_2;
+    if(wheel_time_1 < 0) wheel_time_1 = wheel_time_2;
+
+    if(wheel_time_2 < wheel_time_1) wheel_time_1 = wheel_time_2 - rollover; // clock rolls over
+    if(wheel_rev_2 === wheel_rev_1) return 0; // coasting
+
+    const speed = Math.round((wheel_rev_1 - wheel_rev_2) * wheel_circumference * resolution /
+                             ((wheel_time_1 - wheel_time_2)));
+    wheel_rev_1 = wheel_rev_2;
+    wheel_time_1 = wheel_time_2;
+    return speed;
+}
+
+// Instantaneous Cadence = (Difference in two successive Cumulative Crank Revolutions values) /
+//                         (Difference in two successive Last Crank Event Time values)
+let revolutions_1 = -1;
+let eventTime_1 = -1;
+
+function calculateCadence(revolutions_2, eventTime_2) {
+    const resolution = 1024 * 60;
+    const rollover = 1024 * 64;
+    if(revolutions_1 < 0) revolutions_1 = revolutions_2; // set initial value
+    if(eventTime_1 < 0) eventTime_1 = eventTime_2; // set initial value
+
+    if(eventTime_2 < eventTime_1) eventTime_1 = eventTime_1 - rollover; // clock rolls over
+    if(revolutions_1 === revolutions_2) return 0; // coasting
+
+    const cadence = Math.round((revolutions_1 - revolutions_2) / ((eventTime_1 - eventTime_2) / resolution));
+    revolutions_1 = revolutions_2;
+    eventTime_1 = eventTime_2;
+    return cadence;
 }
 
 function cyclingPowerMeasurementDecoder(dataview) {
@@ -81,9 +165,15 @@ function cyclingPowerMeasurementDecoder(dataview) {
     data['power'] = getPower(dataview);
     data['offsetIndicator'] = offsetIndicator(flags);
 
+    if(wheelRevolutionData(flags)) {
+        data['wheelRevolutions'] = getWheelRevolutions(dataview);
+        data['wheelEvent'] = getWheelEvent(dataview);
+        // data['speed'] = calculateSpeed(data['wheelRevolutions'], data['wheelEvent']);
+    }
     if(crankRevolutionData(flags)) {
         data['crankRevolutions'] = getCrankRevolutions(dataview);
         data['crankEvent'] = getCrankEvent(dataview);
+        data['cadence'] = calculateCadence(data['crankRevolutions'], data['crankEvent']);
     }
 
     return data;

@@ -5,9 +5,9 @@ import { DeviceInformationService } from './dis/dis.js';
 import { FitnessMachineService }    from './ftms/ftms.js';
 
 function onIndoorBikeData(value) {
-    if(value.power)   xf.dispatch(`power`, value.power);
-    if(value.cadence) xf.dispatch(`cadence`, value.cadence);
-    if(value.speed)   xf.dispatch(`speed`, value.speed);
+    if(exists(value.power))   xf.dispatch(`power`, value.power);
+    if(exists(value.cadence)) xf.dispatch(`cadence`, value.cadence);
+    if(exists(value.speed))   xf.dispatch(`speed`, value.speed);
 }
 function onControllableInfo(value) {
     console.log(`Fitness Machine Information: `, value);

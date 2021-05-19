@@ -33,16 +33,15 @@ class PowerMeter extends Device {
 }
 
 function onPowerData(data) {
-    if(data.power) xf.dispatch(`power`, data.power);
+    if(exists(data.power)) xf.dispatch('power', data.power);
+    if(exists(data.cadence)) xf.dispatch('cadence', data.cadence);
+    // if(exists(data.speed)) xf.dispatch('speed', data.speed);
+    if(exists(data.offsetIndicator)) xf.dispatch('offsetIndicator', data.offsetIndicator);
     // console.log(data);
 }
 function onCyclingPowerInfo() {
 }
 function onCyclingPowerControlPoint() {
 }
-
-// Calculate cadence:
-// Cadence = (Difference in two successive Cumulative Crank Revolution values) /
-//           (Difference in two successive Last Crank Event Time values)
 
 export { PowerMeter };
