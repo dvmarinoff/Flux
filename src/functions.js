@@ -395,6 +395,7 @@ export {
     secondsToHms,
     timeDiff,
     dateToDashString,
+    format,
     kphToMps,
     mpsToKph,
     scale,

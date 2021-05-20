@@ -1,4 +1,4 @@
-import { nthBitToBool } from '../../functions.js';
+import { nthBitToBool, format } from '../../functions.js';
 
 const pedalPowerBalance       = (flags) => nthBitToBool(flags,  0);
 const pedalPowerBalanceRef    = (flags) => nthBitToBool(flags,  1);
@@ -118,17 +118,21 @@ function getCrankEvent(dataview) {
 let wheel_rev_1 = -1;
 let wheel_time_1 = -1;
 function calculateSpeed(wheel_rev_2, wheel_time_2) {
-    const resolution = 2048 * 60;
+    const resolution = 2048;
     const rollover = 2048 * 32;
-    const wheel_circumference = 1; //2.105; // mm -> 700x25
+    const wheel_circumference = 2.105; // m -> 700x25
+    const toKmh = 3.6;
+
     if(wheel_rev_1 < 0) wheel_rev_1 = wheel_rev_2;
     if(wheel_time_1 < 0) wheel_time_1 = wheel_time_2;
 
-    if(wheel_time_2 < wheel_time_1) wheel_time_1 = wheel_time_2 - rollover; // clock rolls over
+    if(wheel_time_2 < wheel_time_1) wheel_time_1 = wheel_time_1 - rollover; // clock rolls over
     if(wheel_rev_2 === wheel_rev_1) return 0; // coasting
 
-    const speed = Math.round((wheel_rev_1 - wheel_rev_2) * wheel_circumference * resolution /
-                             ((wheel_time_1 - wheel_time_2)));
+    let speed = ((wheel_rev_1 - wheel_rev_2) * wheel_circumference /
+                   ((wheel_time_1 - wheel_time_2) / resolution)) * toKmh;
+        speed = format(speed, 100);
+
     wheel_rev_1 = wheel_rev_2;
     wheel_time_1 = wheel_time_2;
     return speed;
@@ -136,21 +140,23 @@ function calculateSpeed(wheel_rev_2, wheel_time_2) {
 
 // Instantaneous Cadence = (Difference in two successive Cumulative Crank Revolutions values) /
 //                         (Difference in two successive Last Crank Event Time values)
-let revolutions_1 = -1;
-let eventTime_1 = -1;
+let crank_revs_1 = -1;
+let crank_time_1 = -1;
 
-function calculateCadence(revolutions_2, eventTime_2) {
-    const resolution = 1024 * 60;
+function calculateCadence(crank_revs_2, crank_time_2) {
+    const resolution = 1024;
     const rollover = 1024 * 64;
-    if(revolutions_1 < 0) revolutions_1 = revolutions_2; // set initial value
-    if(eventTime_1 < 0) eventTime_1 = eventTime_2; // set initial value
+    const toRpm =  60;
+    if(crank_revs_1 < 0) crank_revs_1 = crank_revs_2; // set initial value
+    if(crank_time_1 < 0) crank_time_1 = crank_time_2; // set initial value
 
-    if(eventTime_2 < eventTime_1) eventTime_1 = eventTime_1 - rollover; // clock rolls over
-    if(revolutions_1 === revolutions_2) return 0; // coasting
+    if(crank_time_2 < crank_time_1) crank_time_1 = crank_time_1 - rollover; // clock rolls over
+    if(crank_revs_1 === crank_revs_2) return 0; // coasting
 
-    const cadence = Math.round((revolutions_1 - revolutions_2) / ((eventTime_1 - eventTime_2) / resolution));
-    revolutions_1 = revolutions_2;
-    eventTime_1 = eventTime_2;
+    const cadence = Math.round((crank_revs_1 - crank_revs_2) /
+                               ((crank_time_1 - crank_time_2) / (resolution * toRpm)));
+    crank_revs_1 = crank_revs_2;
+    crank_time_1 = crank_time_2;
     return cadence;
 }
 
@@ -159,6 +165,13 @@ function cyclingPowerMeasurementDecoder(dataview) {
 //               0  1  2  3  4  5  6  7  8  9 10 11 12 13
 //  value: (0x) 30-00-21-00-2A-00-00-00-C4-60-12-00-F7-04
 //
+// power    , speed                       , cadence
+// 86 0x0056, 0 0x00-00-00-00, 0    0x0000, 0    0 0x0000
+// 94 0x005E, 3 0x00-00-00-03  2838 0x0B16, 79 778 0x030A
+//
+// (0x) 30-00 -56-00 -00-00-00-00 -00-00 -00-00-F7-04
+// (0x) 30-00 -5E-00 -03-00-00-00 -16-0B -01-00-0A-03
+
     const flags = dataview.getUint16(0, true);
 
     let data = {};
@@ -168,7 +181,7 @@ function cyclingPowerMeasurementDecoder(dataview) {
     if(wheelRevolutionData(flags)) {
         data['wheelRevolutions'] = getWheelRevolutions(dataview);
         data['wheelEvent'] = getWheelEvent(dataview);
-        // data['speed'] = calculateSpeed(data['wheelRevolutions'], data['wheelEvent']);
+        data['speed'] = calculateSpeed(data['wheelRevolutions'], data['wheelEvent']);
     }
     if(crankRevolutionData(flags)) {
         data['crankRevolutions'] = getCrankRevolutions(dataview);

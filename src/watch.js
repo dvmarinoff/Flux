@@ -20,7 +20,6 @@ class Watch {
         this.init();
     }
     init() {
-        console.log('Watch.init()');
         let self = this;
         xf.sub('db:workout',       workout => { self.intervals     = workout.intervals; });
         xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed; });

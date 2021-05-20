@@ -33,8 +33,15 @@ const distributeSystemSupported            = (flags) => {
 };
 
 
+
 function cpsFeatureDecoder(dataview) {
-    // 0x31d40140c490
+    // nRF Connect value 0x0C-07-08-00
+    //               22 1111 1111 11
+    //               10 9876 5432 1098 7654 3210
+    // 0b0000-0000-0000-1000-0000-0111-0000-1100
+    // 0x00        08        07        0C
+    //    0         8         7        12
+
     const flags = dataview.getUint32(0, true);
 
     const feature = {

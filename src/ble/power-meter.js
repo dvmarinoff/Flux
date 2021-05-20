@@ -35,9 +35,9 @@ class PowerMeter extends Device {
 function onPowerData(data) {
     if(exists(data.power)) xf.dispatch('power', data.power);
     if(exists(data.cadence)) xf.dispatch('cadence', data.cadence);
-    // if(exists(data.speed)) xf.dispatch('speed', data.speed);
+    if(exists(data.speed)) xf.dispatch('speed', data.speed);
     if(exists(data.offsetIndicator)) xf.dispatch('offsetIndicator', data.offsetIndicator);
-    // console.log(data);
+    console.log(data);
 }
 function onCyclingPowerInfo() {
 }
