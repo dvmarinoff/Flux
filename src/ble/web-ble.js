@@ -83,6 +83,13 @@ class WebBLE {
         const self = this;
         return await device.gatt.disconnect();
     }
+    hasService(device, uuid) {
+        let res = false;
+        for(let service of device.services) {
+            if(service.uuid === uuid) res = true;
+        }
+        return res;
+    }
     async getPrimaryServices(server) {
         const self = this;
         const services = await server.getPrimaryServices();

@@ -12,7 +12,7 @@ function onHrmInfo(value) {
 }
 
 class Hrm extends Device {
-    defaultId() { return `hrm`; }
+    defaultId() { return `ble:hrm`; }
     defaultFilter() { return ble.requestFilters.hrm; }
     postInit() {
         const self = this;

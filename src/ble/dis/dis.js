@@ -25,9 +25,13 @@ class DeviceInformationService {
     }
     async init() {
         const self = this;
-        self.service         = await self.ble.getService(self.server, self.uuid);
-        self.characteristics = await self.getCharacteristics(self.service);
-        self.info            = await self.readInfo(self.characteristics);
+        try {
+            self.service         = await self.ble.getService(self.server, self.uuid);
+            self.characteristics = await self.getCharacteristics(self.service);
+            self.info            = await self.readInfo(self.characteristics);
+        } catch(err) {
+            console.error(err);
+        }
     }
     async getCharacteristics(service) {
         const self = this;

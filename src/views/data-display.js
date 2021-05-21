@@ -1,4 +1,4 @@
-import { xf, exists, equals, secondsToHms } from '../functions.js';
+import { xf, exists, equals, secondsToHms, stringToBool } from '../functions.js';
 import { models } from '../models/models.js';
 
 class DataDisplay extends HTMLElement {
@@ -8,13 +8,28 @@ class DataDisplay extends HTMLElement {
         this.postInit();
     }
     postInit() { return; }
+    static get observedAttributes() {
+        return ['disabled'];
+    }
     connectedCallback() {
         this.prop = this.getAttribute('prop');
         this.path = this.getAttribute('path') || false;
+
+        if(this.hasAttribute('disabled')) {
+            this.disabled = true;
+        } else {
+            this.disabled = false;
+        }
+
         xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
     }
     disconnectedCallback() {
         document.removeEventListener(`db:${this.prop}`, this.onUpdate);
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if(name === 'disabled') {
+            this.disabled = newValue === null ? false : true;
+        }
     }
     onUpdate(value) {
         if(!equals(value, this.state)) {
@@ -27,12 +42,37 @@ class DataDisplay extends HTMLElement {
         }
     }
     render() {
+        if(this.disabled) return;
         this.textContent = this.state;
     }
 }
 
 customElements.define('data-display', DataDisplay);
 
+class EffectDisplay extends HTMLElement {
+    constructor() {
+        super();
+        this.state = '';
+    }
+    connectedCallback() {
+        this.effect = this.getAttribute('effect');
+        xf.sub(`${this.effect}`, this.onEffect.bind(this));
+    }
+    disconnectedCallback() {
+        document.removeEventListener(`${this.effect}`, this.onEffect);
+    }
+    onEffect(value) {
+        if(!equals(value, this.state)) {
+            this.state = value;
+            this.render();
+        }
+    }
+    render() {
+        this.textContent = this.state;
+    }
+}
+
+customElements.define('effect-display', EffectDisplay);
 
 class TimeDisplay extends DataDisplay {
     postInit() {
@@ -166,7 +206,6 @@ class UnitDisplay extends HTMLElement {
 customElements.define('distance-display', DistanceDisplay);
 customElements.define('speed-display', SpeedDisplay);
 customElements.define('unit-display', UnitDisplay);
-
 
 
 

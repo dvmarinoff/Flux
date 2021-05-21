@@ -20,12 +20,12 @@
 
                 <header class="switch-connections page-header cf">
 
-                    <connection-switch id="switch-controllable" class="switch-connection switch" name="controllable">
+                    <connection-switch id="switch-controllable" class="switch-connection switch" name="ble:controllable">
                         <div class="switch--indicator off"></div>
                         <div class="switch--label">Controllable</div>
                     </connection-switch>
 
-                    <connection-switch id="switch-hrm" class="switch-connection switch" name="hrm">
+                    <connection-switch id="switch-hrm" class="switch-connection switch" name="ble:hrm">
                         <div class="switch--indicator off"></div>
                         <div class="switch--label">HRM</div>
                     </connection-switch>
@@ -318,15 +318,113 @@
                     </button>
                 </div> <!-- end settings btn row -->
 
-
+                <!-- controlable settings -->
                 <div class="settings-card">
                     <div class="settings-card-cont">
-                        <connection-switch id="switch-power-meter" class="switch-connection switch" name="powerMeter">
+                        <connection-switch id="switch-controllable" class="switch-connection switch" name="ble:controllable">
+                            <div class="switch--indicator off"></div>
+                            <div class="switch--label">Controllable</div>
+                        </connection-switch>
+                        <div class="device-info">
+                            <div class="info-cell">
+                                <h3 class="">Name</h3>
+                                <effect-display id="controllable-name"
+                                                class="info-cell-value"
+                                                effect="ble:controllable:name"">--</effect-display>
+                            </div>
+                            <div class="info-cell">
+                                <source-switch class="source-switch"
+                                               effect="sources"
+                                               path="power"
+                                               value="ble:controllable">
+                                    <h3 class="">Power</h3>
+                                    <data-display id="controllable-power"
+                                                  class="info-cell-value"
+                                                  prop="power">--</data-display>
+                                </source-switch>
+                            </div>
+                            <div class="info-cell">
+                                <source-switch class="source-switch"
+                                               effect="sources"
+                                               path="cadence"
+                                               value="ble:controllable">
+                                    <h3 class="">Cadence</h3>
+                                    <data-display id="controllable-cadence"
+                                                class="info-cell-value"
+                                                prop="cadence">--</data-display>
+                                </source-switch>
+                            </div>
+                            <div class="info-cell">
+                                <source-switch class="source-switch"
+                                               effect="sources"
+                                               path="speed"
+                                               value="ble:controllable">
+                                    <h3 class="">Speed</h3>
+                                    <speed-display id="controllable-speed"
+                                                   class="info-cell-value"
+                                                   prop="speed">
+                                        <value>--</value>
+                                        <unit class="data-tile-small--unit"></unit>
+                                    </speed-display>
+                                </source-switch>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end controlable settings -->
+
+                <!-- power-meter settings -->
+                <div class="settings-card row-border">
+                    <div class="settings-card-cont">
+                        <connection-switch id="switch-power-meter" class="switch-connection switch" name="ble:power-meter">
                             <div class="switch--indicator off"></div>
                             <div class="switch--label">Power Meter</div>
                         </connection-switch>
+                        <div class="device-info">
+                            <div class="info-cell">
+                                <h3 class="">Name</h3>
+                                <effect-display id="controllable-name"
+                                                class="info-cell-value"
+                                                effect="ble:power-meter:name"">--</effect-display>
+                            </div>
+                            <div class="info-cell">
+                                <source-switch class="source-switch"
+                                               effect="sources"
+                                               path="power"
+                                               value="ble:power-meter">
+                                    <h3 class="">Power</h3>
+                                    <data-display id="power-meter-power"
+                                                  class="info-cell-value"
+                                                  prop="power">--</data-display>
+                                </source-switch>
+                            </div>
+                            <div class="info-cell">
+                                <source-switch class="source-switch"
+                                               effect="sources"
+                                               path="cadence"
+                                               value="ble:power-meter">
+                                    <h3 class="">Cadence</h3>
+                                    <data-display id="power-meter-cadence"
+                                                  class="info-cell-value"
+                                                  prop="cadence">--</data-display>
+                                </source-switch>
+                            </div>
+                            <div class="info-cell">
+                                <source-switch class="source-switch"
+                                               effect="sources"
+                                               path="speed"
+                                               value="ble:power-meter">
+                                    <h3 class="">Speed</h3>
+                                    <speed-display id="power-meter-speed"
+                                                   class="info-cell-value"
+                                                   prop="speed">
+                                        <value>--</value>
+                                        <unit class="data-tile-small--unit"></unit>
+                                    </speed-display>
+                                </source-switch>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </div> <!-- end power-meter settings -->
 
                 <div class="settings-card row-border">
                     <div id="outdoor-settings" class="settings-card-cont">

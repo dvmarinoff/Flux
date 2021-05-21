@@ -239,6 +239,11 @@ function mpsToKph(mps) {
 function scale(value, max = 100) {
     return 100 * (value/max);
 }
+function stringToBool(str) {
+    if(str === 'true') return true;
+    if(str === 'false') return false;
+    return false;
+}
 
 // Bits
 function nthBit(field, bit) {
@@ -399,6 +404,7 @@ export {
     kphToMps,
     mpsToKph,
     scale,
+    stringToBool,
 
     // bits
     nthBit,

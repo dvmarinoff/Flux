@@ -8,6 +8,7 @@ let db = {
     cadence: models.cadence.default,
     speed: models.speed.default,
     distance: 0,
+    sources: models.sources.default,
 
     // Targets
     powerTarget: models.powerTarget.default,
@@ -64,6 +65,11 @@ xf.reg(models.cadence.prop, (cadence, db) => {
 
 xf.reg(models.speed.prop, (speed, db) => {
     db.speed = speed;
+});
+
+xf.reg(models.sources.prop, (sources, db) => {
+    db.sources = models.sources.set(db.sources, sources);
+    console.log(db.sources);
 });
 
 // Pages

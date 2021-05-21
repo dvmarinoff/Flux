@@ -107,6 +107,34 @@ class Distance extends Model {
     }
 }
 
+class Sources extends Model {
+    postInit(args) {
+        const self = this;
+        self.state = self.default;
+        xf.sub('db:sources', value => self.state = value);
+    }
+    defaultSet(target, sources) {
+        return Object.assign(target, sources);
+    }
+    isSource(value, id) {
+        const self = this;
+        if(exists(self.state[value])) {
+            return equals(self.state[value], id);
+        }
+        return false;
+    }
+    defaultValue() {
+        const sources = {
+            power: 'ble:controllable',
+            cadence: 'ble:controllable',
+            speed: 'ble:controllable',
+            control: 'ble:controllable',
+            heartRate: 'ble:hrm'
+        };
+        return sources;
+    }
+}
+
 class Target extends Model {
     postInit(args) {
         this.min = args.min || 0;
@@ -439,6 +467,7 @@ class Session {
             powerTarget: db.powerTarget,
             resistanceTarget: db.resistanceTarget,
             slopeTarget: db.slopeTarget,
+            sources: db.sources,
 
         };
         return session;
@@ -452,6 +481,7 @@ const heartRate = new HeartRate({prop: 'heartRate'});
 const cadence = new Cadence({prop: 'cadence'});
 const speed = new Speed({prop: 'speed'});
 const distance = new Distance({prop: 'distance'});
+const sources = new Sources({prop: 'sources'});
 
 const powerTarget = new PowerTarget({prop: 'powerTarget'});
 const resistanceTarget = new ResistanceTarget({prop: 'resistanceTarget'});
@@ -473,6 +503,7 @@ let models = { power,
                heartRate,
                cadence,
                speed,
+               sources,
                powerTarget,
                resistanceTarget,
                slopeTarget,

@@ -1,4 +1,4 @@
-import { xf, exists, empty, first, filterIn, prn } from '../functions.js';
+import { xf, exists, empty, first, filterIn, equals } from '../functions.js';
 import { ble } from './web-ble.js';
 
 class Device {
@@ -48,6 +48,7 @@ class Device {
             await self.initServices(res);
 
             xf.dispatch(`${self.id}:connected`);
+            xf.dispatch(`${self.id}:name`, self.name);
         } catch(err) {
             xf.dispatch(`${self.id}:disconnected`);
             console.error(`Could not request ${self.id}: `, err);
@@ -64,6 +65,7 @@ class Device {
     onDisconnect() {
         const self = this;
         xf.dispatch(`${self.id}:disconnected`);
+        xf.dispatch(`${self.id}:name`, '--');
         console.log(`Disconnected ${self.id}, ${self.name}.`);
         self.device.removeEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
     }

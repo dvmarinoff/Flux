@@ -3,8 +3,8 @@ import { nthBitToBool }  from '../../functions.js';
 const flags = {
     InstantaneousSpeed:    { flagBit:  0, present: 0 },
     MoreData:              { flagBit:  0, present: 0 },
-    InstantaneousCandence: { flagBit:  1, present: 0 },
-    AverageSpeed:          { flagBit:  2, present: 1 },
+    InstantaneousCandence: { flagBit:  2, present: 1 }, // bit 1, present 0
+    AverageSpeed:          { flagBit:  1, present: 1 }, // bit 2, present 1
     AverageCandence:       { flagBit:  3, present: 1 },
     TotalDistance:         { flagBit:  4, present: 1 },
     ResistanceLevel:       { flagBit:  5, present: 1 },
@@ -105,8 +105,16 @@ function getPower(dataview) {
 //     Instantanious Cadence: 10.0 per min
 //     Instantanious Power: 6 W" received
 //
+//              76543210
 // flags  68, 0b01000100
-// flags 100, 0b01100100
+//
+//                               5432109876543210
+// flags,          66, 0x42,   0b0000000001000100
+// inst speed,   3000, 0x0bb8,
+// inst cadence,  160, 0xa0,
+// inst power,    180, 0xb4,
+//
+// (0x) 42-00- b8-0b- a0-00 b4-00
 
 function indoorBikeDataDecoder(dataview) {
     const flags = dataview.getUint16(0, true);
