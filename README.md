@@ -67,18 +67,20 @@ It is not tested or supported by this project, but you can give it try if your o
 
 Works with all trainers that implement the bluetooth Fitness Machine Service (FTMS) or the Tacx FE-C over BLE solution.
 
-The following table is copied from [DC Rainmaker Trainer Guide](https://www.dcrainmaker.com/2020/11/smart-cycle-trainer-recommendations-guide-winter.html/#technical-considerations) and shows the current protocol support status across the industry.
+The following table is copied from [DC Rainmaker Trainer Guide](https://www.dcrainmaker.com/2020/11/smart-cycle-trainer-recommendations-guide-winter.html/#technical-considerations) and shows current protocol support across the industry.
 
-- Elite: ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
-- Gravat: ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers
+```
+- Elite:    ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
+- Gravat:   ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers
 - JetBlack: ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
-- Kinetic: ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
-- Minoura: ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
-- Saris: ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
-- STAC: ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
-- Tacx: ANT+ FE-C on all ‘Smart’ branded trainers (except Satori). FTMS on all non-NEO models. FEC over BLE on NEO.
-- Wahoo: ANT+ FE-C on all smart trainers. Has private Wahoo Bluetooth Smart control, no proper FTMS support yet.
-- 4iiii: ANT+ FE-C and Bluetooth FTMS on Fliiiight.
+- Kinetic:  ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
+- Minoura:  ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
+- Saris:    ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
+- STAC:     ANT+ FE-C and Bluetooth FTMS on all 2020 smart trainers.
+- Tacx:     ANT+ FE-C on all ‘Smart’ branded trainers (except Satori). FTMS on all non-NEO models. FEC over BLE on NEO.
+- Wahoo:    ANT+ FE-C on all smart trainers. Has private Wahoo Bluetooth Smart control, no proper FTMS support yet.
+- 4iiii:    ANT+ FE-C and Bluetooth FTMS on Fliiiight (--Ed)
+```
 
 The notable misses here are Wahoo Kickr and Kickr Core.
 Wahoo Kickr v5 (the latest version) is expected to land support for FTMS with firmware update in the 1st week of Feb 2021.
@@ -97,7 +99,7 @@ Better support and full integration are coming soon.
 The current development setup is using Suunto movestick mini, Garmin Fenix 5 watch broadcasting heart rate,
 Tacx Heart Rate monitor, and Tacx Flux S trainer.
 
-
+NOTE: ANT+ code as at the beta-archive branch. It's currently being re-written.
 
 ## The Demo
 You can check a pre-release demo of the web version at [Demo](https://dvmarinoff.github.io/Flux/)
