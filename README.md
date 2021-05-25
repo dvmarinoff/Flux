@@ -83,12 +83,7 @@ The following table is copied from [DC Rainmaker Trainer Guide](https://www.dcra
 ```
 
 The notable misses here are Wahoo Kickr and Kickr Core.
-Wahoo Kickr v5 (the latest version) is expected to land support for FTMS with firmware update in the 1st week of Feb 2021.
-
-[Kickr v5 Updates:](https://support.wahoofitness.com/hc/en-us/articles/360016826680-KICKR-v5-Firmware-Updates)
-> KICKR v5 Firmware v4.2.1 - 27 January 2021
-> - Added: Direct Connect Support
-> - Added: Bluetooth FTMS Support
+Wahoo Kickr v5 (the latest version) is expected to land support for FTMS with [firmware update](https://support.wahoofitness.com/hc/en-us/articles/360016826680-KICKR-v5-Firmware-Updates) in the 1st week of Feb 2021.
 
 ### ANT+
 
@@ -99,7 +94,7 @@ Better support and full integration are coming soon.
 The current development setup is using Suunto movestick mini, Garmin Fenix 5 watch broadcasting heart rate,
 Tacx Heart Rate monitor, and Tacx Flux S trainer.
 
-NOTE: ANT+ code as at the beta-archive branch. It's currently being re-written.
+NOTE: ANT+ code is at the beta-archive branch. It's currently being re-written.
 
 ## The Demo
 You can check a pre-release demo of the web version at [Demo](https://dvmarinoff.github.io/Flux/)
