@@ -39,10 +39,10 @@ class FitnessMachineService {
         self.service = await self.ble.getService(self.server, self.uuid);
         self.characteristics = await self.getCharacteristics(self.service);
 
-        self.ble.sub(self.characteristics.fitnessMachineStatus,
+        await self.ble.sub(self.characteristics.fitnessMachineStatus,
                      eventToValue(fitnessMachineStatusDecoder, self.onStatus));
 
-        self.ble.sub(self.characteristics.indoorBikeData,
+        await self.ble.sub(self.characteristics.indoorBikeData,
                      eventToValue(indoorBikeDataDecoder, self.onData));
 
         await self.ble.sub(self.characteristics.fitnessMachineControlPoint,

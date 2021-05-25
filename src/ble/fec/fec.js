@@ -48,8 +48,8 @@ class FEC {
         self.service = await self.ble.getService(self.server, self.uuid);
         self.characteristics = await self.getCharacteristics(self.service);
 
-        self.ble.sub(self.characteristics.fec2,
-                     eventToValue(fec2Decoder, self.onData));
+        await self.ble.sub(self.characteristics.fec2,
+                           eventToValue(fec2Decoder, self.onData));
     }
     async getCharacteristics(service) {
         const self = this;

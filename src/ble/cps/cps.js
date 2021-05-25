@@ -31,8 +31,8 @@ class CyclingPowerService {
         const flags = await self.ble.readCharacteristic(self.characteristics.cyclingPowerFeature);
         self.feature = cpsFeatureDecoder(flags.value);
 
-        self.ble.sub(self.characteristics.cyclingPowerMeasurement,
-                     eventToValue(cyclingPowerMeasurementDecoder, self.onData));
+        await self.ble.sub(self.characteristics.cyclingPowerMeasurement,
+                           eventToValue(cyclingPowerMeasurementDecoder, self.onData));
     }
     async getCharacteristics(service, feature) {
         const self = this;

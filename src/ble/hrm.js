@@ -1,5 +1,6 @@
 import { xf, exists, empty, first, filterIn, prn } from '../functions.js';
 import { ble } from './web-ble.js';
+import { uuids } from './uuids.js';
 import { Device } from './device.js';
 import { HeartRateService } from './hrs/hrs.js';
 import { DeviceInformationService } from './dis/dis.js';
@@ -22,7 +23,10 @@ class Hrm extends Device {
         await hrs.init();
 
         const dis = new DeviceInformationService({ble: ble, onInfo: onHrmInfo, ...device});
-        await dis.init();
+
+        if(ble.hasService(device, uuids.deviceInformation)) {
+            await dis.init();
+        }
 
         return { hrs, dis };
     }
