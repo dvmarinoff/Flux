@@ -32,6 +32,7 @@ class FitnessMachineService {
         this.onStatus = args.onStatus || ((x) => x);
         this.onControl = args.onControl || ((x) => x);
         this.onData = args.onData || ((x) => x);
+        // this.init();
     }
     async init() {
         const self = this;
