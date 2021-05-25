@@ -1,6 +1,4 @@
-import { xf, exists, empty, equals } from '../functions.js';
-// import { models } from './models/models.js';
-
+import { xf, exists, empty, equals } from './functions.js';
 
 var gps = false;
 var watchId;
@@ -18,22 +16,23 @@ function onGPSSwitch() {
 }
 
 function startRecording() {
-    // navigator.geolocation.getCurrentPosition(function (location) {
-    //     console.log(location);
-    // });
+    navigator.geolocation.getCurrentPosition(function (location) {
+        console.log(location);
+        // xf.dispatch('location', location);
+    });
 
     watchId = navigator.geolocation.watchPosition(onPositionWatch);
+    console.log(`:location :on`);
 };
 
 function stopRecording() {
     navigator.geolocation.clearWatch(watchId);
+    console.log(`:location :off`);
 };
 
 function onPositionWatch(position) {
     console.log(position);
 }
 
-// xf.dispatch();
-
-xf.sub('ui:gps:switch', onGPSSwitch);
-xf.sub('db:gps', onGPS);
+// xf.sub('ui:gps:switch', onGPSSwitch);
+// xf.sub('db:gps', onGPS);
