@@ -51,7 +51,7 @@ class Device {
             xf.dispatch(`${self.id}:name`, self.name);
         } catch(err) {
             xf.dispatch(`${self.id}:disconnected`);
-            console.error(`Could not request ${self.id}: `, err);
+            console.error(`:ble 'Could not request ${self.id}'`, err);
         } finally {
             if(self.isConnected()) {
                 self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self));

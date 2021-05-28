@@ -978,7 +978,18 @@ body.dark-theme {
     background-color: #777;
     cursor: pointer;
 }
+.request-btn {
+    padding: 5px 10px;
 
+    color: #fff;
+    background-color: var(--chrome);
+    font-family: var(--ss-font-family);
+
+    border: 1px solid var(--white-opacity-01);
+    border-radius: 3px;
+    webkit-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
+}
 .file-btn {
     position: relative;
     height: 30px;
@@ -1275,6 +1286,15 @@ body.dark-theme {
     flex-wrap: nowrap;
     justify-content: space-between;
     text-align: left;
+    width: 480px;
+}
+.protocol-switch {
+    justify-self: flex-start;
+    width: 40px;
+    height: 40px;
+}
+.protocol-switch .icon {
+    fill: #fff;
 }
 .source-switch {
     display: block;
@@ -1285,7 +1305,8 @@ body.dark-theme {
     color: #fff;
 }
 .info-cell {
-    padding: 0 20px;
+    padding: 0 5px;
+    min-width: 55px;
 }
 .info-cell h3 {
     font-size: 10px;
@@ -1358,6 +1379,10 @@ body.dark-theme {
     .graph {
         --graph-total-height: 100px;
         --graph-height: 80px;
+    }
+
+    .device-info {
+        width: 100%;
     }
 }
 @media all and (max-width: 414px) {

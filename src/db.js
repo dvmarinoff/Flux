@@ -46,6 +46,10 @@ let db = {
     stepDuration: 0,
     watchStatus: 'stopped',
     workoutStatus: 'stopped',
+
+    // Request ANT+ Device
+    antSearchList: [],
+    antDeviceId: {},
 };
 
 xf.create(db);
@@ -170,6 +174,21 @@ xf.reg('lock:beforeunload', (e, db) => {
 xf.reg('lock:release', (e, db) => {
     // backup session
     models.session.backup(db);
+});
+
+// Request ANT+ Device
+xf.reg('ui:ant:request:selected', (x, db) => {
+    db.antDeviceId = db.antSearchList.filter(d => {
+        return d.deviceNumber === parseInt(x);
+    })[0];
+});
+function includesDevice(devices, id) {
+    return devices.filter(d => d.deviceNumber === id.deviceNumber).length > 0;
+}
+xf.reg(`ant:search:device-found`, (x, db) => {
+    if(includesDevice(db.antSearchList, x)) return;
+    db.antSearchList.push(x);
+    db.antSearchList = db.antSearchList;
 });
 
 //

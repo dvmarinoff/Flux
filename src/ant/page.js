@@ -30,7 +30,7 @@ function dataPage7(msg) {
 
 // FE-C
 function dataPage16(dataview) {
-    // General FE data, 0x10
+    // General FE data, 0x10, Dataview input
     const resolution    = 0.001;
     const equipmentType = dataview.getUint8(5);
     let   speed         = dataview.getUint16(8, true);
@@ -63,7 +63,7 @@ function readStatus(status) {
              userConfiguration };
 }
 function dataPage25(dataview) {
-    // Specific Trainer data, 0x19
+    // Specific Trainer data, 0x19, Dataview input
     const updateEventCount = dataview.getUint8(5);
     const cadence          = dataview.getUint8(6);  // rpm
     const powerLSB         = dataview.getUint8(9);  // 8bit Power Lsb
@@ -75,6 +75,36 @@ function dataPage25(dataview) {
 
     return { power, cadence, status, page: 25 };
 }
+
+function DataPage25(msg) {
+    // Specific Tr data, 0x19, Array input
+    const updateEventCount = msg[5];
+    const cadence          = msg[6];  // rpm
+    const powerLSB         = msg[9];  // 8bit Power Lsb
+    const powerMSB         = msg[10]; // 4bit Power Msb + 4bit Status
+    const flags            = msg[11];
+
+    const power  = decodePower(powerMSB, powerLSB);
+    const status = decoupleStatus(powerMSB);
+
+    return { power, cadence, status, page: 25 };
+}
+
+function DataPage16(msg) {
+    // General FE data, 0x10, Array input
+    const resolution    = 0.001;
+    const equipmentType = msg[5];
+    let speed           = (msg[9] << 8) + (msg[8]);
+    const flags         = msg[11];
+    // const distance      = msg.getUint8(7); // 255 rollover
+    // const hr            = msg.getUint8(10); // optional
+    speed = (speed * resolution * 3.6);
+    return { speed, page: 16 };
+}
+
+
+
+
 function compansateGradeOffset(slope) {
     // slope is coming as -> 1.8% * 100 = 180
     // 0 = -200%, 20000 = 0%, 40000 = 200%
@@ -100,7 +130,7 @@ function dataPage48(resistance) {
 function dataPage49(power) {
     // Data Page 49 (0x31) – Target Power
     const dataPage = 49;
-    const unit     = 0.25;
+    const unit     = 0.25; // W, 0 - 4000W
     let buffer     = new ArrayBuffer(8);
     let view       = new DataView(buffer);
 
@@ -112,7 +142,7 @@ function dataPage49(power) {
 function dataPage51(slope) {
     // Data Page 51 (0x33) – Track Resistance
     const dataPage  = 51;
-    const gradeUnit = 0.01;
+    const gradeUnit = 0.01; // %, -200.00 - 200.00%
     const crrUnit   = 5*Math.pow(10,-5); // 5x10^-5
     const grade     = compansateGradeOffset(slope);
     const crr       = 0xFF; // default value
@@ -126,17 +156,49 @@ function dataPage51(slope) {
     return view;
 }
 
+function HRPage(msg) {
+    const page         = msg[4] & 0b01111111; // just bit 0 to 6
+    const pageChange   = msg[4] << 7; // just bit 7
+    const hrbEventTime = (msg[9] << 8) + msg[8];
+    const hbCount      = msg[10];
+    const hr           = msg[11];
+    let specific       = {};
+
+    if(page === 2) {
+        specific = dataPage2(msg);
+    }
+    if(page === 3) {
+        specific = dataPage3(msg);
+    }
+    if(page === 7) {
+        specific = dataPage7(msg);
+    }
+    return { hr, page, hrbEventTime, hbCount, ...specific };
+}
+
+function FECPage(msg) {
+    const page = msg[4];
+    if(page === 25) return DataPage25(msg);
+    if(page === 16) return DataPage16(msg);
+    return { page: 0 };
+}
+
 const page = {
     // HR
     dataPage2,
     dataPage3,
     dataPage7,
+    HRPage,
+
     // FE-C
     dataPage16,
     dataPage25,
+    DataPage16,
+    DataPage25,
     dataPage48,
     dataPage49,
     dataPage51,
+    FECPage,
 };
 
 export { page };

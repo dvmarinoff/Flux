@@ -10,6 +10,7 @@ import './workout-graph.js';
 import './list.js';
 import './watch.js';
 import './upload.js';
+import './request.js';
 
 function start() {
     prn('start views.');

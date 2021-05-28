@@ -4,7 +4,7 @@ import { message } from '../../ant/message.js';
 import { page } from '../../ant/page.js';
 
 function fec2Decoder(dataview) {
-    const data = message.data(dataview);
+    const data = message.Data(dataview);
     if(data.page === 25) {
         // self.onPower(data.power);
         // self.onCadence(data.cadence);
@@ -16,13 +16,13 @@ function fec2Decoder(dataview) {
 }
 
 function powerTarget(value, channel = 5) {
-    return message.control(page.dataPage49(value, channel));
+    return message.Control(page.dataPage49(value, channel));
 }
 function resistanceTarget(value, channel = 5) {
-    return message.control(page.dataPage48(value, channel));
+    return message.Control(page.dataPage48(value, channel));
 }
 function slopeTarget(value, channel = 5) {
-    return message.control(page.dataPage51(value, channel));
+    return message.Control(page.dataPage51(value, channel));
 }
 
 function eventToValue(decoder, callback) {

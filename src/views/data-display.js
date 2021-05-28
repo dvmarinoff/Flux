@@ -173,6 +173,7 @@ class SpeedDisplay extends DataDisplay {
         this.dom.unit.textContent = text;
     }
     render() {
+        if(this.disabled) return;
         this.dom.value.textContent = this.formatSpeed(this.state, this.measurement);;
         this.dom.unit.textContent = this.unit;
     }
