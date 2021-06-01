@@ -244,6 +244,9 @@ function stringToBool(str) {
     if(str === 'false') return false;
     return false;
 }
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 // Bits
 function nthBit(field, bit) {
@@ -405,6 +408,7 @@ export {
     mpsToKph,
     scale,
     stringToBool,
+    capitalize,
 
     // bits
     nthBit,

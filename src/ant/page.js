@@ -5,14 +5,16 @@ function dataPage2(msg) {
     // HR Manufacturer Information (0x02)
     const manufacturerId = msg[5];
     const serialNumber   = (msg[7] << 8) + (msg[6]);
+
+    return { manufacturerId, serialNumber };
 }
 function dataPage3(msg) {
     // HR Product Information (0x03)
-    const hardware = msg[5];
-    const software = msg[6];
-    const model    = msg[7];
+    const hardwareVersion = msg[5];
+    const softwareVersion = msg[6];
+    const modelNumber     = msg[7];
 
-    return { hardware, software, model };
+    return { hardwareVersion, softwareVersion, modelNumber };
 }
 function toBatteryPercentage(x) {
     if(x === 255) return 'not supported';
@@ -21,11 +23,11 @@ function toBatteryPercentage(x) {
 }
 function dataPage7(msg) {
     // HR Battery Status (0x07)
-    const level       = toBatteryPercentage(msg[5]);
-    const voltage     = msg[6];
-    const descriptive = msg[7];
+    const batteryLevel   = toBatteryPercentage(msg[5]);
+    const batteryVoltage = msg[6];
+    const descriptive    = msg[7];
 
-    return { level, voltage, descriptive };
+    return { batteryLevel, batteryVoltage, descriptive };
 }
 
 // FE-C
@@ -161,7 +163,7 @@ function HRPage(msg) {
     const pageChange   = msg[4] << 7; // just bit 7
     const hrbEventTime = (msg[9] << 8) + msg[8];
     const hbCount      = msg[10];
-    const hr           = msg[11];
+    const heartRate    = msg[11];
     let specific       = {};
 
     if(page === 2) {
@@ -173,7 +175,7 @@ function HRPage(msg) {
     if(page === 7) {
         specific = dataPage7(msg);
     }
-    return { hr, page, hrbEventTime, hbCount, ...specific };
+    return { heartRate, page, hrbEventTime, hbCount, ...specific };
 }
 
 function FECPage(msg) {

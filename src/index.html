@@ -592,7 +592,7 @@
                                 <h3 class="">Name</h3>
                                 <effect-display id="controllable-name"
                                                 class="info-cell-value"
-                                                effect="ant:hrm:name"">--</effect-display>
+                                                effect="ant:hrm:name">--</effect-display>
                             </div>
                             <div class="info-cell">
                                 <source-switch class="source-switch"
@@ -604,6 +604,18 @@
                                                   class="info-cell-value"
                                                   prop="heartRate">--</data-display>
                                 </source-switch>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Battery</h3>
+                                <battery-display id="hrm-battery"
+                                                class="info-cell-value"
+                                                effect="ant:hrm:battery">--</battery-display>
+                            </div>
+                            <div class="info-cell">
+                                <h3 class="">Manufacturer</h3>
+                                <device-info-display id="hrm-info"
+                                                    class="info-cell-value"
+                                                    effect="ant:hrm:info">--</device-info-display>
                             </div>
                         </div>
                     </div>

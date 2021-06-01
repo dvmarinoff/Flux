@@ -208,7 +208,58 @@ customElements.define('distance-display', DistanceDisplay);
 customElements.define('speed-display', SpeedDisplay);
 customElements.define('unit-display', UnitDisplay);
 
+class BatteryDisplay extends HTMLElement {
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        this.state = '--';
+        this.effect = this.getAttribute('effect');
 
+        xf.sub(`${this.effect}`, this.onEffect.bind(this));
+    }
+    disconnectedCallback() {
+        document.removeEventListener(`${this.effect}`, this.onEffect);
+    }
+    onEffect(data) {
+        if('level' in data) {
+            this.state = data.level;
+            this.render();
+        }
+    }
+    render() {
+        this.textContent = this.state;
+    }
+}
+
+customElements.define('battery-display', BatteryDisplay);
+
+class DeviceInfoDisplay extends HTMLElement {
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        const self = this;
+        this.state = { manufacturer: '--' };
+        this.effect = this.getAttribute('effect');
+        xf.sub(`${self.effect}`, this.onEffect.bind(this));
+        console.log(this.effect);
+    }
+    disconnectedCallback() {
+        document.removeEventListener(`${this.effect}`, this.onEffect);
+    }
+    onEffect(data) {
+        if('manufacturer' in data) {
+            this.state.manufacturer = data.manufacturer;
+            this.render();
+        }
+    }
+    render() {
+        this.textContent = this.state.manufacturer;
+    }
+}
+
+customElements.define('device-info-display', DeviceInfoDisplay);
 
 
 export { DataDisplay, TimeDisplay };
