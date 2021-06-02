@@ -144,14 +144,9 @@ class Serial {
             }
         });
 
-        xf.sub('connect', e => {
-            self.onConnect(e);
-            self.restore();
-        }, navigator.serial);
+        navigator.serial.addEventListener('connect', self.onConnect.bind(self));
 
-        xf.sub('disconnect', e => {
-            self.onDisconnect(e);
-        }, navigator.serial);
+        navigator.serial.addEventListener('disconnect', self.onDisconnect.bind(self));
 
         self.restore();
     }
@@ -170,6 +165,8 @@ class Serial {
         if(isAntStick(info)) {
             console.log(':serial connected');
         }
+        await self.restore();
+        return;
     }
     onDisconnect(e) {
         const self = this;
