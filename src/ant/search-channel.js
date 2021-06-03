@@ -1,4 +1,4 @@
-import { xf, first, empty, exists } from '../functions.js';
+import { xf, first, empty, exists, delay } from '../functions.js';
 import { Channel } from './channel.js';
 import { message } from './message.js';
 
@@ -25,13 +25,18 @@ class SearchChannel extends Channel {
         const self = this;
         let config = self.toMessageConfig();
         console.log(self.toMessageConfig());
+        let timeout = 100;
 
         await self.write(message.UnassignChannel(config).buffer);
-
+        await delay(timeout);
         await self.write(message.SetNetworkKey(config).buffer);
+        await delay(timeout);
         await self.write(message.AssignChannelExt(Object.assign(config, {extended: 0x01})).buffer);
+        await delay(timeout);
         await self.write(message.ChannelId(config).buffer);
+        await delay(timeout);
         await self.write(message.EnableExtRxMessages(Object.assign(config, {enable: 1})).buffer);
+        await delay(timeout);
         await self.write(message.LowPrioritySearchTimeout(config).buffer);
         await self.write(message.SearchTimeout(config).buffer);
         await self.write(message.ChannelFrequency(config).buffer);
@@ -63,14 +68,13 @@ class SearchChannel extends Channel {
         self.devices = [];
         await self.open();
         xf.dispatch('ant:search:started');
-        let status = await self.requestStatus();
-        console.log(status);
     }
     async stop() {
         const self = this;
         let config = self.toMessageConfig();
         await self.write(message.EnableExtRxMessages(Object.assign(config, {enable: 0})).buffer);
         self.close();
+        self.devices = [];
         xf.dispatch('ant:search:stopped');
     }
     isStarted() {

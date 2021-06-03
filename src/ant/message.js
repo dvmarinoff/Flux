@@ -436,8 +436,8 @@ function readChannelStatus(data) {
     const channelNumber  = data[3];
     const status         = data[4] & 0b00000011; // just bits 0 and 1
     let res              = 'unknown';
-    if(status === 0) res = 'unassaigned';
-    if(status === 1) res = 'assaigned';
+    if(status === 0) res = 'unassigned';
+    if(status === 1) res = 'assigned';
     if(status === 2) res = 'searching';
     if(status === 3) res = 'tracking';
     return res;
@@ -538,51 +538,51 @@ function readEvent(msg) {
 
 
 function isResponse(msg) {
-    return readId(msg) === message.ids.channelResponse;
+    return readId(msg) === ids.channelResponse;
 }
 function isRequestedResponse(msg) {
-    return [message.ids.channelId,
-            message.ids.channelStatus,
-            message.ids.ANTVersion,
-            message.ids.capabilities,
-            message.ids.serialNumber
+    return [ids.channelId,
+            ids.channelStatus,
+            ids.ANTVersion,
+            ids.capabilities,
+            ids.serialNumber
            ].includes(readId(msg));
 }
 function isBroadcast(msg) {
-    return readId(msg) === message.ids.broascastData;
+    return readId(msg) === ids.broascastData;
 }
 function isBroadcastExt(msg) {
-    return readId(msg) === message.ids.broascastExtData;
+    return readId(msg) === ids.broascastExtData;
 }
 function isAcknowledged(msg) {
-    return readId(msg) === message.ids.acknowledgedData;
+    return readId(msg) === ids.acknowledgedData;
 }
 function isBurst(msg) {
-    return readId(msg) === message.ids.burstData;
+    return readId(msg) === ids.burstData;
 }
 function isBurstAdv(msg) {
-    return readId(msg) === message.ids.burstAdvData;
+    return readId(msg) === ids.burstAdvData;
 }
 function isEvent(msg) {
-    return readId(msg) === message.ids.channelEvent;
+    return readId(msg) === ids.channelEvent;
 }
 function isSerialError(msg) {
-    return readId(msg) === message.ids.serialError;
+    return readId(msg) === ids.serialError;
 }
 function isChannelId(msg) {
-    return message.ids.channelId === readId(msg);
+    return ids.channelId === readId(msg);
 }
 function isChannelStatus(msg) {
-    return message.ids.channelStatus === readId(msg);
+    return ids.channelStatus === readId(msg);
 }
 function isANTVersion(msg) {
-    return message.ids.ANTVersion === readId(msg);
+    return ids.ANTVersion === readId(msg);
 }
 function isCapabilities(msg) {
-    return message.ids.capabilities === readId(msg);
+    return ids.capabilities === readId(msg);
 }
 function isSerialNumber(msg) {
-    return message.ids.serialNumber === readId(msg);
+    return ids.serialNumber === readId(msg);
 }
 
 const startsWithSync = (data) => readSync(data) === 0xA4;

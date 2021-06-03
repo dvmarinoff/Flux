@@ -54,16 +54,66 @@ function getAntStick(ports) {
     return first(ports.filter(p => isAntStick(p.getInfo())));
 }
 
+// move
+function isFullMsg(msg) {
+    if(msg.length > 1) {
+        return msg.length === msg[1] + 4;
+    }
+    return false;
+}
+
+function toANTMsg(chunk, msgs = [], i = 0, leftover = false) {
+    if(i >= chunk.length) return msgs;
+    if(chunk[i] === 164) {
+        if(chunk[i+1] === undefined) {
+            msgs.push([chunk[i]]);
+            return toANTMsg(chunk, msgs, i+1);
+        } else {
+            let len = chunk[i+1] + 4;
+            msgs.push(chunk.slice(i, i+len));
+            i += len;
+            // console.log(`len ${len}, i ${i} -> ${chunk[i]}`);
+            return toANTMsg(chunk, msgs, i);
+        }
+    }
+    if(leftover) {
+        let nextSync = chunk.indexOf(164);
+        let len = nextSync > -1 ? nextSync : chunk.length;
+        msgs[i] = msgs[i].concat(chunk.slice(i, len));
+        // console.log(`:leftover len ${len}, i ${i} -> ${chunk[i]}`);
+        return toANTMsg(chunk, msgs, i+len);
+    }
+    return toANTMsg(chunk, msgs, i+1);
+}
+// move end
+
 class MessageTransformer {
     constructor() {
-        this.container = [];
+        this.leftover = [];
     }
     transform(chunk, controller) {
         const self = this;
-        self.container.push(Array.from(chunk));
-        self.container = self.container.flat();
-        let msgs = splitAt(self.container, 164);
-        self.container = msgs.pop();
+        let msgs = [];
+        let achunk = Array.from(chunk);
+
+        if(empty(this.leftover)) {
+            msgs = toANTMsg(achunk, [], 0);
+        } else {
+            msgs = toANTMsg(achunk, this.leftover, 0, true);
+        }
+
+        if(isFullMsg(last(msgs))) {
+            this.leftover = [];
+        } else {
+            this.leftover = [last(msgs)];
+            msgs.pop();
+        }
+
+        // console.log('----------');
+        // console.log(`:leftover `, this.leftover);
+        // console.log(`:chunk `, chunk);
+        // console.log(`:msgs `, msgs);
+
         msgs.forEach(msg => controller.enqueue(msg));
     }
     flush(controller) {
@@ -246,3 +296,4 @@ class Serial {
 }
 
 export { Serial };
+

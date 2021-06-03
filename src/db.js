@@ -190,6 +190,10 @@ xf.reg(`ant:search:device-found`, (x, db) => {
     db.antSearchList.push(x);
     db.antSearchList = db.antSearchList;
 });
+xf.reg(`ant:search:stopped`, (x, db) => {
+    console.log('stopped');
+    db.antSearchList = [];
+});
 
 //
 xf.reg('app:start', async function(_, db) {

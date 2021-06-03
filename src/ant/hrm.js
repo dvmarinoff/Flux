@@ -36,7 +36,6 @@ class Hrm extends Device {
                 manufacturer: idToManufacturer(types.manufacturer, data.manufacturerId)
             };
 
-            console.log(info);
             xf.dispatch('ant:hrm:info', info);
         }
         // Data Page 3 received
@@ -56,7 +55,6 @@ class Hrm extends Device {
                 descriptive: data.descriptive
             };
 
-            console.log(battery);
             xf.dispatch('ant:hrm:battery', battery);
         }
     }

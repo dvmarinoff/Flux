@@ -1,4 +1,4 @@
-import { xf, exists, equals, last } from '../functions.js';
+import { xf, exists, equals, empty, last } from '../functions.js';
 import { models } from '../models/models.js';
 
 class Request extends HTMLElement {
@@ -41,6 +41,7 @@ class Request extends HTMLElement {
         this.show();
     }
     onSearchStopped(e) {
+        this.clear();
         this.hide();
     }
     onRequestPair() {
@@ -53,7 +54,9 @@ class Request extends HTMLElement {
         this.hide();
     }
     onDeviceFound(searchList) {
-        this.add(last(searchList));
+        if(!empty(searchList)) {
+            this.add(last(searchList));
+        }
     }
     onSelect(e) {
         const el = e.target.closest('.device-chooser-item');

@@ -1,4 +1,4 @@
-import { xf, first, empty, xor, exists } from '../functions.js';
+import { xf, first, empty, xor, exists, delay } from '../functions.js';
 import { message } from './message.js';
 
 const ChannelTypes = {
@@ -88,15 +88,19 @@ class Channel {
             timeoutReject  = resolve;
             timeoutResolve = reject;
             timeoutId = setTimeout(() => {
-                timeoutReject(`:channel ${self.number} :timeout :id ${message.idToString(id)}`);
+                // console.log(`:channel-timeout ${self.number} :message '${message.idToString(id)}'`);
+                timeoutReject(false);
                 responseReject();
             }, timeout);
         });
 
         let responsePromise = new Promise((resolve, reject) => {
-            responseReject  = resolve;
-            responseResolve = reject;
-            self.resq[id] = (x) => { responseResolve(x); timeoutResolve(); };
+            responseReject  = reject;
+            responseResolve = resolve;
+            self.resq[id] = (x) => {
+                responseResolve(x);
+                timeoutResolve();
+            };
         });
         await self.write(msg);
         const res = await Promise.race([responsePromise, timeoutPromise])
@@ -109,7 +113,12 @@ class Channel {
     }
     async requestStatus() {
         const self = this;
-        return await self.request(message.ids.channelStatus);
+        const config = { channelNumber: self.number,
+                         request: 82 };
+
+        let status = await self.writeWithResponse(message.Request(config).buffer, 82);
+        return status;
+        // return await self.request(message.ids.channelStatus);
     }
     async requestId() {
         const self = this;
@@ -118,14 +127,21 @@ class Channel {
     async open() {
         const self = this;
         let config = self.toMessageConfig();
+        let timeout = 50;
 
         await self.write(message.UnassignChannel(config).buffer);
+        await delay(100);
 
         await self.write(message.SetNetworkKey(config).buffer);
+        await delay(timeout);
         await self.write(message.AssignChannel(config).buffer);
+        await delay(timeout);
         await self.write(message.ChannelId(config).buffer);
+        await delay(timeout);
         await self.write(message.ChannelFrequency(config).buffer);
+        await delay(timeout);
         await self.write(message.ChannelPeriod(config).buffer);
+        await delay(timeout);
         await self.write(message.OpenChannel(config).buffer);
         self.isOpen = true;
         console.log(`:channel ${self.number} :open`);
@@ -133,26 +149,27 @@ class Channel {
     async close() {
         const self = this;
         let config = self.toMessageConfig();
-        await self.write(message.CloseChannel(config).buffer); // , message.ids.closeChannel
+
+        const status = await self.requestStatus();
+        if(status !== 'unassigned') {
+            await self.writeWithResponse(message.CloseChannel(config).buffer, message.ids.closeChannel);
+        }
         self.isOpen = false;
-        console.log(`:channel ${self.number} :close`);
         return;
     }
     connect()    { this.open(); }
     disconnect() { this.close(); }
     onData(data) {
         const self = this;
-        if(self.isOpen) {
-            if(message.isBroadcast(data))         { self.onBroadcast(data); }
-            if(message.isAcknowledged(data))      { self.onBroadcast(data); }
-            if(message.isBurst(data))             { self.onBroadcast(data); }
-            if(message.isResponse(data))          { self.onResponse(data); }
-            if(message.isRequestedResponse(data)) { self.onRequestedResponse(data); }
-            if(message.isEvent(data))             { self.onEvent(data); }
-            if(message.isSerialError(data))       { self.onSerialError(data); }
-            if(message.isBroadcastExt(data))      { self.onBroadcast(data); }
-            if(message.isBurstAdv(data))          { self.onBroadcast(data); }
-        }
+        if(message.isBroadcast(data))         { self.onBroadcast(data); }
+        if(message.isAcknowledged(data))      { self.onBroadcast(data); }
+        if(message.isBurst(data))             { self.onBroadcast(data); }
+        if(message.isResponse(data))          { self.onResponse(data); }
+        if(message.isRequestedResponse(data)) { self.onRequestedResponse(data); }
+        if(message.isEvent(data))             { self.onEvent(data); }
+        if(message.isSerialError(data))       { self.onSerialError(data); }
+        if(message.isBroadcastExt(data))      { self.onBroadcast(data); }
+        if(message.isBurstAdv(data))          { self.onBroadcast(data); }
     }
     onBroadcast(data) {
         const self = this;
@@ -177,6 +194,7 @@ class Channel {
         }
         if(message.isChannelStatus(data)) {
             res = message.readChannelStatus(data);
+            console.log(`:channel-status ${self.number} :${res} ${data}`);
             self.resq[message.ids.channelStatus](res);
         }
         if(message.isANTVersion(data)) {
