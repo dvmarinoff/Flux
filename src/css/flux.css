@@ -327,7 +327,7 @@ body.dark-theme {
 .page {
     width: 100%;
     min-height: 110vh;
-    padding-bottom: 80px;
+    padding-bottom: 120px;
     -webkit-transition: all 0.2s ease-in-out 0s;
     transition: all 0.2s ease-in-out 0s;
 }
