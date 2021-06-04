@@ -75,7 +75,7 @@ class Channel {
     defaultTimeout()      { return 12; }
     defaultTimeoutLow()   { return 2; }
     defaultKey()          { return keys.public; }
-    async writeWithResponse(msg, id = 0, timeout = 8000) {
+    async writeWithResponse(msg, id = 0, timeout = 3000) {
         const self = this;
 
         let timeoutId;
