@@ -10,7 +10,7 @@ function startServiceWorker() {
         try {
             const reg = navigator.serviceWorker.register('./sw.js');
             console.log(`SW: register success.`);
-            console.log('Cache Version: Flux-v001');
+            console.log('Cache Version: Flux-v003');
         } catch(err) {
             console.log(`SW: register error: `, err);
         }

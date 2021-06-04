@@ -1,4 +1,4 @@
-const cacheName = 'Flux-v001';
+const cacheName = 'Flux-v003';
 const resources = [
     './',
     'index.html',
@@ -14,10 +14,20 @@ const resources = [
     'index.js',
 
     'ant/ant.js',
+    'ant/channel.js',
+    'ant/controllable.js',
+    'ant/device.js',
+    'ant/fec-channel.js',
     'ant/fit.js',
+    'ant/hrm.js',
+    'ant/hrm-channel.js',
     'ant/message.js',
     'ant/page.js',
-    'ant/serial.js',
+    'ant/polyfill.js',
+    'ant/search-channel.js',
+    'ant/types.js',
+    'ant/web-serial.js',
+    'ant/web-usb.js',
 
     'ble/cps/control-point.js',
     'ble/cps/cps.js',
@@ -57,6 +67,7 @@ const resources = [
     'views/inputs.js',
     'views/list.js',
     'views/q.js',
+    'views/request.js',
     'views/tabs.js',
     'views/upload.js',
     'views/views.js',
