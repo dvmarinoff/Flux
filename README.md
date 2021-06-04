@@ -9,7 +9,7 @@ Flux is an App for executing structured workouts on a smart trainer.
 - build-in collection of structured workouts to get you started
 
 The web version is free to use and open source. It is developed as a static PWA, has zero dependancies and is completly independant to run.
-Everything happens in your Browser and stays in there. It uses Web Bluetooth, Web Components, IndexDB, Local Storage, WakeLock API, Vibration API.
+Everything happens in your Browser and stays in there. It uses Web Bluetooth, Web Serial, Web Components, IndexDB, Local Storage, WakeLock API.
 
 _Status_: working on implementing ANT+ over Web Serial API for the browser.
 
@@ -29,7 +29,7 @@ _Status_: working on implementing ANT+ over Web Serial API for the browser.
   </tr>
 </table>
 
-## Supported Platforms
+## Supported Browsers
 
 A fully featured web version will be released soon, and followed with desktop apps later.
 
@@ -61,7 +61,7 @@ It is not tested or supported by this project, but you can give it try if your o
 
 
 
-## Supported Hardware
+## Supported Trainers
 
 ### FTMS, or FE-C over BLE
 
@@ -87,16 +87,15 @@ Wahoo Kickr v5 (the latest version) is expected to land support for FTMS with [f
 
 ### ANT+
 
-Support for ANT+ is experimental at the moment. Works only on desktop in combination with ANT+ stick,
-and can be very frigile. To connect ANT+ device use the special ANT+ row at the bottom of Settings Page.
-Better support and full integration are coming soon.
+Support for ANT+ is experimental at the moment. Works only on Linux desktop in combination with ANT+ stick.
+Follow these [instructions](https://github.com/dvmarinoff/Flux/wiki/How-to:-ANT----stick-on-Ubuntu) to give permissions to the ANT+ USB stick.
+Support for Android and Windows 10 is coming soon.
 
 The current development setup is using Suunto movestick mini, Garmin Fenix 5 watch broadcasting heart rate,
-Tacx Heart Rate monitor, and Tacx Flux S trainer.
-
-NOTE: ANT+ code is at the beta-archive branch. It's currently being re-written.
+Tacx Heart Rate monitor, and Tacx Flux S trainer, on laptop with Ubuntu 20.04.2 LTS.
 
 ## The Demo
-You can check a pre-release demo of the web version at [Demo](https://dvmarinoff.github.io/Flux/)
+You can check a pre-release demo of the web version at
+[Latest Version](https://flux-three.vercel.app/), [Demo Archive](https://dvmarinoff.github.io/Flux/)
 
 Keep in mind it is in active development and will change and break on daily bases, that's until the first stable version is released.
