@@ -25,25 +25,29 @@ class SearchChannel extends Channel {
         const self = this;
         let config = self.toMessageConfig();
         console.log(self.toMessageConfig());
-        let timeout = 100;
 
-        await self.write(message.UnassignChannel(config).buffer);
-        await delay(timeout);
-        await self.write(message.SetNetworkKey(config).buffer);
-        await delay(timeout);
-        await self.write(message.AssignChannelExt(Object.assign(config, {extended: 0x01})).buffer);
-        await delay(timeout);
-        await self.write(message.ChannelId(config).buffer);
-        await delay(timeout);
-        await self.write(message.EnableExtRxMessages(Object.assign(config, {enable: 1})).buffer);
-        await delay(timeout);
-        await self.write(message.LowPrioritySearchTimeout(config).buffer);
-        await self.write(message.SearchTimeout(config).buffer);
-        await self.write(message.ChannelFrequency(config).buffer);
-        await self.write(message.ChannelPeriod(config).buffer);
-        await self.write(message.OpenChannel(config).buffer);
+        await self.writeWithResponse(message.UnassignChannel(config).buffer,
+                                     message.ids.unassignChannel);
+        await self.writeWithResponse(message.SetNetworkKey(config).buffer,
+                                     message.ids.setNetworkKey);
+        await self.writeWithResponse(message.AssignChannelExt(Object.assign(config, {extended: 0x01})),
+                                     message.ids.assignChannelExt);
+        await self.writeWithResponse(message.ChannelId(config).buffer,
+                                     message.ids.setChannelId);
+        await self.writeWithResponse(message.EnableExtRxMessages(Object.assign(config, {enable: 1})).buffer,
+                                     message.ids.enableExtRx);
+        await self.writeWithResponse(message.LowPrioritySearchTimeout(config).buffer,
+                                     message.ids.searchLowTimeout);
+        await self.writeWithResponse(message.SearchTimeout(config).buffer,
+                                     message.ids.searchTimeout);
+        await self.writeWithResponse(message.ChannelFrequency(config).buffer,
+                                     message.ids.channelFrequency);
+        await self.writeWithResponse(message.ChannelPeriod(config).buffer,
+                                     message.ids.channelPeriod);
+        await self.writeWithResponse(message.OpenChannel(config).buffer,
+                                     message.ids.openChannel);
+        await self.requestStatus();
         self.isOpen = true;
-        console.log(`:channel-${self.number} :open`);
     }
     onBroadcast(data) {
         const self = this;
@@ -52,7 +56,7 @@ class SearchChannel extends Channel {
         if(isValidDeviceId(device)) {
             if(!includesDevice(self.devices, device)) {
                 self.devices.push(device);
-                console.log(`Search found: ${deviceNumber} ${deviceType} ${transType}`);
+                console.log(`:channel ${self.number} :search-found: [${deviceNumber} ${deviceType} ${transType}]`);
                 xf.dispatch(`ant:search:device-found`, device);
             }
         }

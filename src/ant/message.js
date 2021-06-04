@@ -1,4 +1,4 @@
-import { nthBitToBool, xor } from '../functions.js';
+import { equals, nthBitToBool, xor } from '../functions.js';
 import { page } from './page.js';
 
 const ids = {
@@ -6,6 +6,7 @@ const ids = {
     setNetworkKey:     70, // 0x46
     unassignChannel:   65, // 0x41
     assignChannel:     66, // 0x42
+    assignChannelExt:  66, // 0x42
     channelPeriod:     67, // 0x43
     channelFrequency:  69, // 0x45
     setChannelId:      81, // 0x51
@@ -79,6 +80,10 @@ const events = {
     nvm_write_error:                 65,
     usb_string_write_fail:          112,
     mesg_serial_error_id:           174
+};
+
+const values = {
+    sync: 164,
 };
 
 function SetNetworkKey(args) {
@@ -371,6 +376,28 @@ function Request(args) {
     return view;
 }
 
+function CommonPage70(pageNumber) {
+    let buffer          = new ArrayBuffer(8);
+    let view            = new DataView(buffer);
+    const commandId     = 70; // 0x46, Data Page Request
+    const transResponse = 2;  // 0b00000010
+    const commandType   = 1;
+
+    view.setUint8(0, commandId,     true);
+    view.setUint8(1, 255,           true);
+    view.setUint8(2, 255,           true);
+    view.setUint8(3, 255,           true);
+    view.setUint8(4, 255,           true);
+    view.setUint8(5, transResponse, true);
+    view.setUint8(6, pageNumber,    true);
+    view.setUint8(7, commandType,   true);
+
+    return view;
+}
+
+function RequestDataPage(pageNumber, channel) {
+    return Control(CommonPage70(pageNumber), channel);
+}
 function targetPower(power, channel = 5) {
     return Control(page.dataPage49(power), channel);
 }
@@ -585,15 +612,30 @@ function isSerialNumber(msg) {
     return ids.serialNumber === readId(msg);
 }
 
-const startsWithSync = (data) => readSync(data) === 0xA4;
-const isFullLength   = (data) => readLength(data) !== (data.length + 3);
+function startsWithSync(msg) {
+    return readSync(msg) === 0xA4;
+}
+function isFullMsg(msg) {
+    if(msg === undefined) return false;
+    if(msg.length > 1) {
+        return msg.length === (readLength(msg) + 4);
+    }
+    return false;
+}
 
 function isValid(data) {
     if(!startsWithSync(data)) return false;
-    // if(!isFullLength(data))   return false;
+    if(!isFullMsg(data))      return false;
     return true;
 }
 
+function deviceTypeToString(deviceType) {
+    if(equals(deviceType, 120)) return 'Heart Rate';
+    if(equals(deviceType, 17))  return 'Trainer';
+    if(equals(deviceType, 11))  return 'Power Meter';
+    if(equals(deviceType, 121)) return 'Speed and Cadence';
+    return 'unsupported';
+}
 
 
 const message = {
@@ -615,6 +657,7 @@ const message = {
     targetPower,
     targetResistance,
     targetSlope,
+    RequestDataPage,
 
     Request,
     Control,
@@ -622,6 +665,7 @@ const message = {
 
     ids,
     events,
+    values,
 
     isResponse,
     isRequestedResponse,
@@ -633,6 +677,7 @@ const message = {
     isEvent,
     isSerialError,
     isValid,
+    isFullMsg,
     isChannelId,
     isChannelStatus,
     isANTVersion,
@@ -654,4 +699,8 @@ const message = {
     idToString,
 };
 
-export { message };
+const utils = {
+    deviceTypeToString,
+};
+
+export { message, utils };

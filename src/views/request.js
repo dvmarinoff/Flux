@@ -1,5 +1,6 @@
 import { xf, exists, equals, empty, last } from '../functions.js';
 import { models } from '../models/models.js';
+import { utils } from '../ant/message.js';
 
 class Request extends HTMLElement {
     constructor() {
@@ -70,7 +71,7 @@ class Request extends HTMLElement {
 
         els.forEach(el => el.style.backgroundColor = '#fff');
         el.style.backgroundColor = '#efefef';
-        console.log(`view: device selected ${id}`);
+        console.log(`:view :device-selected ${id}`);
         xf.dispatch(`ui:ant:request:selected`, id);
     }
     show() {
@@ -87,11 +88,14 @@ class Request extends HTMLElement {
     }
 }
 
+
 function item(args) {
+    let deviceType = utils.deviceTypeToString(args.deviceType);
+
     return `<div class="device-chooser-item" id="${args.deviceNumber}">
             <div class="device-connection-type t2">ANT+</div>
             <div class="device-number t3">${args.deviceNumber}</div>
-            <div class="device-type t2">${args.deviceType}</div>
+            <div class="device-type t2">${deviceType}</div>
          </div>`;
 };
 
