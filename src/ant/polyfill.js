@@ -20,8 +20,8 @@ const SerialPolyfillProtocol = {
 
 const kDefaultPolyfillOptions = {
     protocol: SerialPolyfillProtocol.UsbCdcAcm,
-    usbControlInterfaceClass: 2,
-    usbTransferInterfaceClass: 10,
+    usbControlInterfaceClass: 255,
+    usbTransferInterfaceClass: 255,
 };
 
 // USBDevice, number -> USBInterface
@@ -462,7 +462,8 @@ class Serial {
             usbFilters.push({classCode: polyfillOptions.usbControlInterfaceClass});
         }
 
-        const device = await navigator.usb.requestDevice({'filters': usbFilters});
+        console.log(usbFilters);
+        const device = await navigator.usb.requestDevice({filters: usbFilters});
         const port = new SerialPort(device, polyfillOptions);
         return port;
   }
@@ -503,6 +504,6 @@ class Serial {
 
 
 /* an object to be used for starting the serial workflow */
-const serial = new Serial();
+const serialPolyfill = new Serial();
 
-export { serial, SerialPort };
+export { serialPolyfill, SerialPort };

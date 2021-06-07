@@ -1,5 +1,6 @@
 import { xf, first, last, exists, empty, splitAt } from '../functions.js';
 import { message } from './message.js';
+import { serialPolyfill } from './polyfill.js';
 
 const values = {
     Dynastream_Id:      4047, // 0x0FCF
@@ -8,41 +9,21 @@ const values = {
     Baud_Rate:          115200,
 };
 
+var serial;
+
+if('serial' in navigator) {
+    serial = navigator.serial;
+} else {
+    serial = serialPolyfill;
+}
+
 function filter() {
     return [{usbVendorId: values.Dynastream_Id}];
 }
 
-async function isSupported() {
-    return 'serial' in navigator;
-}
-
-async function request(filters = filter()) {
-    let port;
-    try {
-        port = await navigator.serial.requestPort({ filters: filters });
-        return port;
-    } catch(err) {
-        console.log(`:serial :no-port-selected`);
-    }
-    return port;
-}
-
-async function getPorts() {
-    const ports = await navigator.serial.getPorts();
-    return ports;
-}
-
-async function open(port) {
-    await port.open({ baudRate: values.Baud_Rate });
-    return port;
-}
-
-
-
 function isAntStick(portInfo) {
     return portInfo.usbVendorId === values.Dynastream_Id;
 }
-
 function includesAntStick(ports) {
     if(empty(ports)) return false;
     const antSticks = ports.filter(p => isAntStick(p.getInfo()));
@@ -170,7 +151,7 @@ class Serial {
         const self = this;
         if(!(self.isAvailable())) {
             self.onNotAvailable();
-            return;
+            // return;
         }
 
         xf.sub('ui:ant:switch', async function(e) {
@@ -182,9 +163,9 @@ class Serial {
             }
         });
 
-        navigator.serial.addEventListener('connect', self.onConnect.bind(self));
+        serial.addEventListener('connect', self.onConnect.bind(self));
 
-        navigator.serial.addEventListener('disconnect', self.onDisconnect.bind(self));
+        serial.addEventListener('disconnect', self.onDisconnect.bind(self));
 
         self.restore();
     }
@@ -218,12 +199,12 @@ class Serial {
     }
     async requestAnt() {
         const self = this;
-        const port = await navigator.serial.requestPort({filters: filter()});
+        const port = await serial.requestPort({filters: filter()});
         return port;
     }
     async getKnownAnt() {
         const self  = this;
-        const ports = await navigator.serial.getPorts();
+        const ports = await serial.getPorts();
         if(includesAntStick(ports)) {
             self.port = getAntStick(ports);
             console.log(`:serial :ant-found`, self.port);
