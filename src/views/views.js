@@ -11,6 +11,7 @@ import './list.js';
 import './watch.js';
 import './upload.js';
 import './request.js';
+import './keyboard.js';
 
 function start() {
     prn('start views.');
