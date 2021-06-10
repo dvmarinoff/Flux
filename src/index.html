@@ -139,22 +139,25 @@
                     <div class="line"></div>
 
                     <div id="targets">
-                        <tab-btn-group group="targets">
+                        <div class="tab-btn-group">
                             <div id="mode-selector" class="mode-selector">
                                 <tab-btn id="erg-mode-btn"
-                                        class="mode active"
-                                        effect="mode-set"
-                                        param="erg">ERG</tab-btn>
+                                         class="mode active"
+                                         prop="mode"
+                                         effect="mode-set"
+                                         param="erg">ERG</tab-btn>
                                 <tab-btn id="resistance-mode-btn"
-                                        class="mode"
-                                        effect="mode-set"
-                                        param="resistance">Resistance</tab-btn>
+                                         class="mode"
+                                         prop="mode"
+                                         effect="mode-set"
+                                         param="resistance">Resistance</tab-btn>
                                 <tab-btn id="slope-mode-btn"
-                                        class="mode"
-                                        effect="mode-set"
-                                        param="slope">Slope</tab-btn>
+                                         class="mode"
+                                         prop="mode"
+                                         effect="mode-set"
+                                         param="slope">Slope</tab-btn>
                             </div> <!-- end mode selector -->
-                        </tab-btn-group>
+                        </div> <!-- tab-btn-group -->
                         <tab-group prop="mode">
                             <div id="erg-mode-controls" class="tab active mode-controls" tab="erg">
                                 <header>
@@ -707,8 +710,12 @@
                 </div> <!-- end controls -->
 
                 <div id="menu" class="menu">
-                    <page-btn-group group="pages" class="menu--row">
-                        <page-btn id="settings-tab-btn" class="menu--btn" effect="page-set" param="settings">
+                    <div class="page-btn-group menu--row">
+                        <page-btn id="settings-tab-btn"
+                                  class="menu--btn"
+                                  prop="page"
+                                  effect="page-set"
+                                  param="settings">
                             <svg class="menu--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                                 <path d="M0 0h24v24H0V0z" fill="none"/>
                                 <path class="menu--btn--icon--fill" d="M19.44 12.99l-.01.02c.04-.33.08-.67.08-1.01
@@ -723,21 +730,29 @@
                             </svg>
                             <div class="menu--btn--label">Settings</div>
                         </page-btn>
-                        <page-btn id="home-tab-btn" class="menu--btn active" effect="page-set" param="home">
+                        <page-btn id="home-tab-btn"
+                                  class="menu--btn active"
+                                  prop="page"
+                                  effect="page-set"
+                                  param="home">
                             <svg class="menu--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                                 <path d="M0 0h24v24H0V0z" fill="none" />
                                 <path class="menu--btn--icon--fill" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z" />
                             </svg>
                             <div class="menu--btn--label">Home</div>
                         </page-btn>
-                        <page-btn id="workouts-tab-btn" class="menu--btn" effect="page-set" param="workouts">
+                        <page-btn id="workouts-tab-btn"
+                                  class="menu--btn"
+                                  prop="page"
+                                  effect="page-set"
+                                  param="workouts">
                             <svg class="menu--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                                 <path d="M0 0h24v24H0V0z" fill="none"/>
                                 <path class="menu--btn--icon--fill" fill="#aaa" d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/>
                             </svg>
                             <div class="menu--btn--label">Workouts</div>
                         </page-btn>
-                    </page-btn-group>
+                    </div> <!-- end page-btn-group -->
                 </div> <!-- end menu -->
 
             </div> <!-- end fixed-bottom -->
