@@ -115,7 +115,7 @@ function compansateGradeOffset(slope) {
     // compansateGradeOffset(1)   === 20100
     // compansateGradeOffset(4.5) === 20450
     // compansateGradeOffset(10)  === 21000
-    return 20000 + (slope);
+    return 20000 + (slope * 100);
 }
 function dataPage48(resistance) {
     // Data Page 48 (0x30) – Basic Resistance

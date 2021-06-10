@@ -49,9 +49,9 @@ class Controllable extends Device {
         const buffer = message.targetResistance(level, self.channel.number).buffer;
         self.channel.write(buffer);
     }
-    async setTargetSlope(args) {
+    async setTargetSlope(grade) {
         const self = this;
-        const buffer = message.targetSlope(args.grade, self.channel.number).buffer;
+        const buffer = message.targetSlope(grade, self.channel.number).buffer;
         self.channel.write(buffer);
     }
     onData(data) {

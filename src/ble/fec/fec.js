@@ -5,13 +5,6 @@ import { page } from '../../ant/page.js';
 
 function fec2Decoder(dataview) {
     const data = message.Data(dataview);
-    if(data.page === 25) {
-        // self.onPower(data.power);
-        // self.onCadence(data.cadence);
-    }
-    if(data.page === 16) {
-        // self.onSpeed(data.speed);
-    }
     return data;
 }
 
