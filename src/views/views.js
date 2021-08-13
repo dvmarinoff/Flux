@@ -1,4 +1,4 @@
-import { xf, exists, equals, prn } from '../functions.js';
+import { xf, exists, equals } from '../functions.js';
 import { q } from './q.js';
 
 import './connection-switch.js';
@@ -14,7 +14,7 @@ import './request.js';
 import './keyboard.js';
 
 function start() {
-    prn('start views.');
+    console.log('start views.');
 }
 
 start();

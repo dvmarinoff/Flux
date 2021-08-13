@@ -280,6 +280,7 @@ let workouts =
         <Cooldown Duration="600" PowerLow="0.30" PowerHigh="0.5"/>
     </workout>
 </workout_file>`
+
 ];
 
 export { workouts };

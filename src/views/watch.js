@@ -1,4 +1,4 @@
-import { xf, exists, equals, prn } from '../functions.js';
+import { xf, exists, equals } from '../functions.js';
 import { q } from './q.js';
 
 class Watch extends HTMLElement {

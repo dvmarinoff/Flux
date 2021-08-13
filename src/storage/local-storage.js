@@ -1,4 +1,4 @@
-import { xf, exists, equals, prn } from '../functions.js';
+import { xf, exists, equals } from '../functions.js';
 
 class LocalStorageItem {
     constructor(args) {
