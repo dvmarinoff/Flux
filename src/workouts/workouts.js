@@ -27,7 +27,7 @@ let workouts =
     <author>Marinov</author>
     <name>Chili Pepper</name>
     <effort-type>VO2 Max</effort-type>
-    <description>40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each.</description>
+    <description> NOTE: This is mixed mode workout with Slope targets in the main interval groups. 40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each.</description>
     <sportType>bike</sportType>
     <tags>
     </tags>

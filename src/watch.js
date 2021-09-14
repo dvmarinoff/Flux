@@ -1,4 +1,4 @@
-import { exists, first, last, xf, avg, max, delay } from './functions.js';
+import { exists, existance, first, last, xf, avg, max } from './functions.js';
 import { kphToMps, mpsToKph, timeDiff, fixInRange } from './utils.js';
 
 class Watch {
@@ -224,14 +224,15 @@ xf.reg('watch:stepIndex',     (index, db) => {
     db.stepIndex      = index;
     let intervalIndex = db.intervalIndex;
     let powerTarget   = db.workout.intervals[intervalIndex].steps[index].power;
+    let slopeTarget   = db.workout.intervals[intervalIndex].steps[index].slope;
 
-    xf.dispatch('ui:power-target-set', parseInt(db.ftp * powerTarget)); // update just the workout defined
-
-    // if(exists(db.workout.intervals[intervalIndex].steps[index].slope)) {
-        // let slopeTarget = db.workout.intervals[intervalIndex].steps[index].slope;
-        // delay(100);
-        // xf.dispatch('ui:slope-target-set', slopeTarget);
-    // }
+    if(exists(slopeTarget)) {
+        xf.dispatch('ui:slope-target-set', slopeTarget);
+    } else if(exists(powerTarget)) {
+        xf.dispatch('ui:power-target-set', parseInt(db.ftp * powerTarget)); // update just the workout defined
+    } else {
+        xf.dispatch('ui:power-target-set', 0);
+    }
 });
 xf.reg('workout:started', (x, db) => db.workoutStatus = 'started');
 xf.reg('workout:stopped', (x, db) => db.workoutStatus = 'stopped');
