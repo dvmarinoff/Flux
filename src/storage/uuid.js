@@ -1,6 +1,9 @@
+//
+// UUID
+//
 // Source:
 // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid/65500983#answer-65500983
-
+//
 // Usage:
 // eval: console.log(Xuid.v4New)
 // emits: {1eb4a659-8bdc-4ce0-c002-b1d505d38ea8}

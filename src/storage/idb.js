@@ -1,102 +1,85 @@
-import { xf, exists, equals } from '../functions.js';
+//
+// IDB
+//
 
-const types = {
-    transaction: ['readonly', 'readwrite', 'versionchange'],
-};
+import { xf, exists } from '../functions.js';
+import { uuid } from './uuid.js';
 
-class IDB {
-    constructor() {
-        this.db = undefined;
-        this.init();
+function promisify(request) {
+    return new Promise((resolve, reject) => {
+        request.onsuccess = function(event) {
+            return resolve(request.result);
+        };
+        request.onerror = function(event) {
+            return reject(request.error);
+        };
+    });
+}
+
+function IDB(args = {}) {
+    let db;
+
+    function setDB(idb) {
+        db = idb;
     }
-    init() {
-        const self = this;
-        xf.sub('idb:open-success', idb => {
-            console.log(`idb:open-success`);
-            self.db = idb;
-        });
-        xf.sub('idb:open-error', e => {
-            console.warn(`idb:open-error`);
-        });
-    }
-    open(name, version, storeName = '') {
-        const self = this;
-        console.log(`idb:open ${name}:${storeName} ...`);
+
+    function open(name, version, storeName) {
+        console.log(`:idb :open :db '${name}' :store-name '${storeName}' ...`);
         let openReq = window.indexedDB.open(name, version);
 
         return new Promise((resolve, reject) => {
             openReq.onupgradeneeded = function(e) {
-                let idb = openReq.result;
+                setDB(openReq.result);
+
                 switch(e.oldVersion) {
-                case 0: self.createStore(idb, storeName);
-                case 1: self.update(idb);
+                case 0: createStore(storeName);
+                case 1: update();
                 }
             };
             openReq.onerror = function() {
-                console.error(`idb open error: ${openReq.error}`);
-                xf.dispatch('idb:open-error');
+                console.error(`:idb :error :open :db '${name}'`, openReq.error);
                 return reject(openReq.error);
             };
             openReq.onsuccess = function() {
-                let idb = openReq.result;
-                xf.dispatch('idb:open-success', idb);
+                setDB(openReq.result);
                 return resolve(openReq.result);
             };
         });
     }
-    deleteStore(idb, name) {
-        const self = this;
-        let deleteReq = idb.deleteDatabase(name);
 
-        return self.promisify(deleteReq).then(res => {
-            console.log(`idb delete ${name} success`);
+    function deleteStore(name) {
+        let deleteReq = db.deleteObjectStore(name);
+
+        return promisify(deleteReq).then(res => {
+            console.log(`:idb :delete-store '${name}'`);
             return res;
         }).catch(err => {
-            console.error(`idb delete ${name} error: ${err}`);
+            console.error(`:idb :error :delete-store '${name}'`, err);
             return {};
         });
     }
-    createStore(idb, name) {
-        const self = this;
-        if (!idb.objectStoreNames.contains(name)) {
-            idb.createObjectStore(name, {keyPath: 'id'});
-            xf.dispatch('idb:create-success', idb);
+
+    function createStore(name, keyPath = 'id') {
+        if (!db.objectStoreNames.contains(name)) {
+            db.createObjectStore(name, {keyPath: keyPath});
+            console.log(`:idb :create-store '${name}'`);
         } else {
-            console.error(`idb trying to create store with existing name: ${name}`);
+            console.error(`:idb :error :createStore 'trying to create store with existing name: ${name}'`);
         }
     }
-    update(idb) {
-        const self = this;
-        xf.dispatch('idb:update-success', idb);
-        return idb;
+
+    function createStores(storeNames, keyPaths) {
+        storeNames.forEach((storeName, i) => {
+            createStore(storeName, keyPaths[i]);
+        });
     }
-    add(idb, storeName, item) {
-        const self = this;
-        return self.transaction(idb, storeName, 'add', item, 'readwrite');
+
+    function update() {
+        console.log(`:idb :update`);
     }
-    put(idb, storeName, item) {
-        const self = this;
-        return self.transaction(idb, storeName, 'put', item, 'readwrite');
-    }
-    get(idb, storeName, key) {
-        const self = this;
-        return self.transaction(idb, storeName, 'get', key, 'readonly');
-    }
-    getAll(idb, storeName) {
-        const self = this;
-        return self.transaction(idb, storeName, 'getAll', undefined, 'readonly');
-    }
-    delete(idb, storeName, id) {
-        const self = this;
-        return self.transaction(idb, storeName, 'delete', id, 'readwrite');
-    }
-    clearEntries(idb, storeName) {
-        const self = this;
-        return self.transaction(idb, storeName, 'clear', undefined, 'readwrite');
-    }
-    transaction(idb, storeName, method, param = undefined, type = 'readonly') {
-        const self = this;
-        let transaction = idb.transaction(storeName, type);
+
+    function transaction(storeName, method, param = undefined, type = 'readonly') {
+        let transaction = db.transaction(storeName, type);
         let store = transaction.objectStore(storeName);
         let req;
 
@@ -106,26 +89,63 @@ class IDB {
             req = store[method](param);
         }
 
-        return self.promisify(req).then(res => {
-            console.log(`idb ${method} ${storeName} success`);
+        return promisify(req).then(res => {
+            console.log(`:idb :${method} :store '${storeName}' :success`);
             return res;
         }).catch(err => {
-            console.error(`idb ${method} ${storeName} error: ${err}`);
+            console.error(`:idb :error :${method} :store '${storeName}'`, err);
             return [];
         });
     }
-    promisify(request) {
-        return new Promise((resolve, reject) => {
-            request.onsuccess = function(event) {
-                return resolve(request.result);
-            };
-            request.onerror = function(event) {
-                return reject(request.error);
-            };
-        });
+
+    function add(storeName, item) {
+        return transaction(storeName, 'add', item, 'readwrite');
     }
+
+    function put(storeName, item) {
+        return transaction(storeName, 'put', item, 'readwrite');
+    }
+
+    function get(storeName, key) {
+        return transaction(storeName, 'get', key, 'readonly');
+    }
+
+    function getAll(storeName) {
+        return transaction(storeName, 'getAll', undefined, 'readonly');
+    }
+
+    function remove(storeName, id) {
+        return transaction(storeName, 'delete', id, 'readwrite');
+    }
+
+    function clear(storeName) {
+        return transaction(storeName, 'clear', undefined, 'readwrite');
+    }
+
+    function setId(item, id = undefined) {
+        if(!exists(item.id)) {
+            if(!exists(id)) {
+                id = uuid();
+            };
+            Object.assign(item, {id: id});
+        }
+        return item;
+    }
+
+    return Object.freeze({
+        open,
+        createStore,
+        deleteStore,
+        add,
+        put,
+        get,
+        getAll,
+        remove,
+        clear,
+        setId,
+    });
 }
 
-const idb = new IDB();
+const idb = IDB();
 
 export { idb };
