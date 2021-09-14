@@ -1,4 +1,6 @@
-
+//
+// A collection of common functions that makes JS more functional
+//
 
 
 // Values
@@ -104,6 +106,9 @@ function map(coll, fn) {
         return Object.fromEntries(
             Object.entries(coll).map(([k, v], i) => [k, (fn(v, k, i))]));
     }
+    if(isString(coll)) {
+        return coll.split('').map(fn).join('');
+    }
     throw new Error(`map called with unkown collection `, coll);
 }
 
@@ -132,34 +137,8 @@ function getIn(...args) {
     let [collection, ...path] = args;
     return path.reduce((acc, key) => {
         if(acc[key]) return acc[key];
-        console.warn(`:getIn 'no such key' :key ${key}`);
         return undefined;
     }, collection);
-}
-
-function filterIn(coll, prop, value) {
-    return first(coll.filter(x => x[prop] === value));
-}
-
-function filterByValue(obj, value) {
-    return Object.entries(obj).filter(kv => kv[1] === value);
-}
-
-function findByValue(obj, value) {
-    return first(first(filterByValue(obj, value)));
-}
-
-function splitAt(xs, at) {
-    if(!isArray(xs)) throw new Error(`splitAt takes an array: ${xs}`);
-    let i = -1;
-    return xs.reduce((acc, x) => {
-        if((equals(x, at)) || (equals(acc.length, 0) && !equals(x, at))) {
-            acc.push([x]); i++;
-        } else {
-            acc[i].push(x);
-        }
-        return acc;
-    },[]);
 }
 
 function avg(xs, prop = false) {
@@ -212,191 +191,6 @@ function repeat(n) {
         };
     };
 };
-
-// Math
-function digits(n) {
-    return Math.log(n) * Math.LOG10E + 1 | 0;
-}
-
-function rand(min = 0, max = 10) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function gte(a, b) { return a >= b; }
-function lte(a, b) { return a <= b; }
-function gt(a, b) { return a > b; }
-function lt(a, b) { return a < b; }
-
-function inRange(min, max, value, lb=gte, ub=lte) {
-    return (lb(value, min) && ub(value, max));
-}
-
-function fixInRange(min, max, value) {
-    if(value >= max) {
-        return max;
-    } else if(value < min) {
-        return min;
-    } else {
-        return value;
-    }
-}
-
-function divisors(number) {
-    let divisors = [1];
-    for(let i=2; i < number/2; i++) {
-        if(number % i === 0) { divisors.push(i); }
-    }
-    return divisors;
-}
-
-function toDecimalPoint (x, point = 2) {
-    return Number((x).toFixed(point));
-}
-
-const bod = Math.pow(2, 31) / 180;
-const dob = 180 / Math.pow(2, 31);
-
-function degToSemicircles(degrees) {
-    return degrees * bod;
-}
-
-function semicirclesToDeg(semicircles) {
-    return semicircles * dob;
-}
-
-// Util
-function secondsToHms(elapsed, compact = false) {
-    let hour = Math.floor(elapsed / 3600);
-    let min  = Math.floor(elapsed % 3600 / 60);
-    let sec  = elapsed % 60;
-    let sD   = (sec < 10)  ? `0${sec}`  : `${sec}`;
-    let mD   = (min < 10)  ? `0${min}`  : `${min}`;
-    let hD   = (hour < 10) ? `0${hour}` : `${hour}`;
-    let hDs  = (hour < 10) ? `${hour}`  : `${hour}`;
-    let res  = ``;
-    if(compact) {
-        if(elapsed < 3600) {
-            res = `${mD}:${sD}`;
-        } else {
-            res = `${hD}:${mD}:${sD}`;
-        }
-    } else {
-        res = `${hD}:${mD}:${sD}`;
-    }
-    return res ;
-}
-
-function timeDiff(timestamp1, timestamp2) {
-    let difference = (timestamp1 / 1000) - (timestamp2 / 1000);
-    return Math.round(Math.abs(difference));
-};
-
-function dateToDashString(date) {
-    const day    = (date.getDate()).toString().padStart(2, '0');
-    const month  = (date.getMonth()+1).toString().padStart(2, '0');
-    const year   = date.getFullYear().toString();
-    const hour   = (date.getHours()).toString().padStart(2, '0');
-    const minute = (date.getMinutes()).toString().padStart(2, '0');
-    return `${day}-${month}-${year}-at-${hour}-${minute}h`;
-}
-
-function format(x, precision = 1000) {
-    return Math.round(x * precision) / precision;
-}
-
-function kphToMps(kph) {
-    return format(kph / 3.6);
-};
-
-function mpsToKph(mps) {
-    return 3.6 * mps;
-};
-
-function scale(value, max = 100) {
-    return 100 * (value/max);
-}
-
-function stringToBool(str) {
-    if(str === 'true') return true;
-    if(str === 'false') return false;
-    return false;
-}
-
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// Bits
-function dataviewToArray(dataview) {
-    return Array.from(new Uint8Array(dataview.buffer));
-}
-
-function nthBit(field, bit) {
-    return (field >> bit) & 1;
-};
-
-function bitToBool(bit) {
-    return !!(bit);
-};
-
-function nthBitToBool(field, bit) {
-    return bitToBool(nthBit(field, bit));
-}
-
-function getBitField(field, bit) {
-    return (field >> bit) & 1;
-};
-
-function getUint16(uint8array, index = 0, endianness = true) {
-    let dataview = new DataView(uint8array.buffer);
-    return dataview.getUint16(index, dataview, endianness);
-}
-
-function getUint32(uint8array, index = 0, endianness = true) {
-    let dataview = new DataView(uint8array.buffer);
-    return dataview.getUint32(index, dataview, endianness);
-}
-
-function fromUint16(n) {
-    let buffer = new ArrayBuffer(2);
-    let view = new DataView(buffer);
-    view.setUint16(0, n, true);
-    return view;
-}
-
-function fromUint32(n) {
-    let buffer = new ArrayBuffer(4);
-    let view = new DataView(buffer);
-    view.setUint32(0, n, true);
-    return view;
-}
-
-function toUint8Array(n, type) {
-    if(type === 32) return fromUint32(n);
-    if(type === 16) return fromUint16(n);
-    return n;
-}
-
-function xor(view) {
-    let cs = 0;
-    for (let i=0; i < view.byteLength; i++) {
-        cs ^= view.getUint8(i);
-    }
-    return cs;
-}
-
-function hex(n) {
-    let h = parseInt(n).toString(16).toUpperCase();
-    if(h.length === 1) {
-        h = '0'+ h;
-    }
-    return '0x' + h;
-}
-
-function dataviewToString(dataview) {
-    let utf8decoder = new TextDecoder('utf-8');
-    return utf8decoder.decode(dataview.buffer);
-}
 
 // Async
 function delay(ms) {
@@ -481,6 +275,68 @@ function XF(args = {}) {
 
 const xf = XF();
 
+// Bits
+function nthBit(field, bit) {
+    return (field >> bit) & 1;
+};
+
+function bitToBool(bit) {
+    return !!(bit);
+};
+
+function nthBitToBool(field, bit) {
+    return bitToBool(nthBit(field, bit));
+}
+
+function dataviewToArray(dataview) {
+    return Array.from(new Uint8Array(dataview.buffer));
+}
+
+function dataviewToString(dataview) {
+    let utf8decoder = new TextDecoder('utf-8');
+    return utf8decoder.decode(dataview.buffer);
+}
+
+function stringToCharCodes(str) {
+    return str.split('').map(c => c.charCodeAt(0));
+}
+
+function stringToDataview(str) {
+    let charCodes = stringToCharCodes(str);
+    let uint8 = new Uint8Array(charCodes);
+    let dataview = new DataView(uint8.buffer);
+
+    return dataview;
+}
+
+function fromUint16(n) {
+    let buffer = new ArrayBuffer(2);
+    let view = new DataView(buffer);
+    view.setUint16(0, n, true);
+    return view;
+}
+
+function fromUint32(n) {
+    let buffer = new ArrayBuffer(4);
+    let view = new DataView(buffer);
+    view.setUint32(0, n, true);
+    return view;
+}
+
+function toUint8Array(n, type) {
+    if(type === 32) return fromUint32(n);
+    if(type === 16) return fromUint16(n);
+    return n;
+}
+
+function xor(view) {
+    let cs = 0;
+    for (let i=0; i < view.byteLength; i++) {
+        cs ^= view.getUint8(i);
+    }
+    return cs;
+}
+
 export {
     // values
     equals,
@@ -501,56 +357,30 @@ export {
     empty,
     map,
     traverse,
-    getIn,
-    filterIn,
-    filterByValue,
-    findByValue,
-    splitAt,
     avg,
     max,
     sum,
+    getIn,
 
-    // math
-    digits,
-    rand,
-    gte,
-    lte,
-    gt,
-    lt,
-    inRange,
-    fixInRange,
-    toDecimalPoint,
-    divisors,
-
-    // utils
-    secondsToHms,
-    timeDiff,
-    dateToDashString,
-    format,
-    kphToMps,
-    mpsToKph,
-    scale,
-    stringToBool,
-    capitalize,
-
-    // bits
-    dataviewToArray,
-    nthBit,
-    bitToBool,
-    nthBitToBool,
-    getBitField,
-    getUint16,
-    getUint32,
-    fromUint16,
-    fromUint32,
-    toUint8Array,
-    xor,
-    hex,
-    dataviewToString,
+    // functions
+    compose,
+    pipe,
+    repeat,
 
     // async
     delay,
 
     // events
     xf,
+
+    // bits
+    nthBit,
+    bitToBool,
+    nthBitToBool,
+    dataviewToArray,
+    dataviewToString,
+    stringToCharCodes,
+    toUint8Array,
+    xor,
 };
+
