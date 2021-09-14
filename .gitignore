@@ -1,5 +1,9 @@
 /ble-spec/
+/ant-spec/
+/fit-spec/
+notes.txt
+env.js
 /dist/
 /node_modules/
 .cache
-notes.txt
+**/.DS_Store
