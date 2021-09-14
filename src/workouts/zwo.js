@@ -1,4 +1,5 @@
-import { exists, toDecimalPoint, divisors } from '../functions.js';
+import { exists } from '../functions.js';
+import { toDecimalPoint, divisors } from '../utils.js';
 
 function readWarmup(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
@@ -222,17 +223,20 @@ function parse(zwo) {
     let description = descEl.textContent || 'Custom Workout';
 
     let effort;
+
     if(exists(effortEl)) {
         effort = effortEl.textContent;
     } else {
         effort = 'Custom';
     }
 
-    return {intervals: intervals,
-            duration: duration,
-            name: name,
-            description: description,
-            effort: effort};
+    return {
+        intervals: intervals,
+        duration: duration,
+        name: name,
+        description: description,
+        effort: effort
+    };
 }
 
 function isValid(zwo) {
