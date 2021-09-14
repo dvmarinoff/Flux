@@ -3,6 +3,11 @@ import { xf } from './xf.js';
 function pista() {
     navigator.vibrate([200, 800, 200, 800, 200, 800, 1000]);
 }
+
+function keypress() {
+    navigator.vibrate([250]);
+}
+
 function interval() {
     navigator.vibrate([250]);
 }
@@ -12,7 +17,7 @@ function Vibrate(args) {
     let turnOn = args.turnOn;
 
     xf.sub('ui:vibrate', e => {
-        short();
+        keypress();
     });
 
     xf.sub(`db:vibrate`, x => {

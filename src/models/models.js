@@ -1,13 +1,17 @@
-import { xf, exists, empty, equals, first, second, last, inRange, fixInRange, dateToDashString } from '../functions.js';
+import { xf, exists, empty, equals,
+         first, second, last } from '../functions.js';
+
+import { inRange, fixInRange, dateToDashString } from '../utils.js';
+
 import { LocalStorageItem } from '../storage/local-storage.js';
-import { IDBStore } from '../storage/idb-store.js';
-import { Session as IDBSessionStore } from '../storage/session.js';
 import { idb } from '../storage/idb.js';
 import { uuid } from '../storage/uuid.js';
+
 import { workouts as workoutsFile }  from '../workouts/workouts.js';
-import { zwo } from '../workouts/parser.js';
+import { zwo } from '../workouts/zwo.js';
 import { fileHandler } from '../file.js';
-import { Encode } from '../ant/fit.js';
+import { activity } from '../fit/activity.js';
+import { fit } from '../fit/fit.js';
 
 class Model {
     constructor(args) {
@@ -40,7 +44,7 @@ class Model {
     }
     defaultStorage() {
         const self = this;
-        return {set: ((x)=>x),
+        return {add: ((x)=>x),
                 restore: ((_)=> self.default)};
     }
     backup(value) {
@@ -217,13 +221,16 @@ class FTP extends Model {
         const self = this;
         const storageModel = {
             key: self.prop,
-            default: self.defaultValue(),
+            fallback: self.defaultValue(),
+            parse: parseInt,
         };
         self.min = args.min || 0;
         self.max = args.max || 500;
-        self.storage = new args.storage(storageModel);
+        self.storage = args.storage(storageModel);
         self.zones = args.zones || self.defaultZones();
         self.percentages = args.percentages || self.defaultPercentages();
+
+        // console.log(self.defaultValue());
     }
     defaultValue() { return 200; }
     defaultIsValid(value) {
@@ -266,7 +273,8 @@ class Weight extends Model {
         const self = this;
         const storageModel = {
             key: self.prop,
-            default: self.defaultValue(),
+            fallback: self.defaultValue(),
+            parse: parseInt,
         };
         self.min = args.min || 0;
         self.max = args.max || 500;
@@ -283,7 +291,7 @@ class Theme extends Model {
         const self = this;
         const storageModel = {
             key: self.prop,
-            default: self.defaultValue(),
+            fallback: self.defaultValue(),
         };
         self.storage = new args.storage(storageModel);
         self.values = ['dark', 'light'];
@@ -303,7 +311,7 @@ class Measurement extends Model {
         const self = this;
         const storageModel = {
             key: self.prop,
-            default: self.defaultValue(),
+            fallback: self.defaultValue(),
         };
         self.storage = new args.storage(storageModel);
         self.values = ['metric', 'imperial'];
@@ -322,11 +330,6 @@ class Measurement extends Model {
 class Workout extends Model {
     postInit(args) {
         const self = this;
-        const storageModel = {
-            key: self.prop,
-            default: self.defaultValue(),
-        };
-        self.storage = new args.storage(storageModel);
     }
     defaultValue() { return this.parse((first(workoutsFile))); }
     defaultIsValid(value) {
@@ -348,9 +351,9 @@ class Workout extends Model {
         return `workout-${dateToDashString(now)}.fit`;
     }
     encode(db) {
-        const self = this;
-        let activity = Encode({data: db.records, laps: db.laps});
-        return activity;
+        const fitjsActivity = activity.encode({records: db.records, laps: db.laps});
+        console.log(fitjsActivity);
+        return fit.activity.encode(fitjsActivity);
     }
     download(activity) {
         const self = this;
@@ -369,11 +372,8 @@ class Workouts extends Model {
         self.workoutModel = args.workoutModel;
     }
     postInit(args) {
-        // const storageModel = {
-        //     key: self.prop,
-        //     default: self.defaultValue(),
-        // };
-        // self.storage = new args.storage(storageModel);
+        const self = this;
+        console.log(self.defaultValue());
     }
     defaultValue() {
         const self = this;
@@ -403,43 +403,38 @@ class Workouts extends Model {
     }
 }
 
-class Session {
-    constructor(args) {
-        this.postInit(args);
-    }
-    postInit() {
-        const me = this;
-    }
-    async start() {
-        const me = this;
-        me.store = new IDBSessionStore({idb: idb});
+function Session(args = {}) {
+    let name = 'session';
+
+    async function start() {
         await idb.open('store', 1, 'session');
     }
-    backup(db) {
-        const me = this;
-        console.log('backing up session');
-        me.store.set(idb, me.dbToSession(db));
+
+    function backup(db) {
+        idb.put('session', idb.setId(dbToSession(db), 0));
     }
-    async restore(db) {
-        const me = this;
-        const sessions = await me.store.restore();
+
+    async function restore(db) {
+        const sessions = await idb.getAll(`${name}`);
+        xf.dispatch(`${name}:restore`, sessions);
+        console.log(`:idb :restore '${name}' :length ${sessions.length}`);
+
         let session = last(sessions);
-        if(!me.store.isEmpty(sessions)) {
-          if(session.elapsed > 0) {
-              me.sessionToDb(db, session);
-          } else {
-              me.store.clear(idb);
-          }
-        }
-    }
-    sessionToDb(db, session) {
-        for(let prop in session) {
-            if (session.hasOwnProperty(prop)) {
-                db[prop] = session[prop];
+
+        if(!empty(sessions)) {
+            if(session.elapsed > 0) {
+                sessionToDb(db, session);
+            } else {
+                idb.clear(`${name}`);
             }
         }
     }
-    dbToSession(db) {
+
+    function sessionToDb(db, session) {
+        return Object.assign(db, session);
+    }
+
+    function dbToSession(db) {
         const session = {
             // Watch
             elapsed: db.elapsed,
@@ -468,10 +463,18 @@ class Session {
             resistanceTarget: db.resistanceTarget,
             slopeTarget: db.slopeTarget,
             sources: db.sources,
-
         };
+
         return session;
     }
+
+    return Object.freeze({
+        start,
+        backup,
+        restore,
+        sessionToDb,
+        dbToSession,
+    });
 }
 
 
@@ -494,10 +497,10 @@ const weight = new Weight({prop: 'weight', storage: LocalStorageItem});
 const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 
-const workout = new Workout({prop: 'workout', storage: IDBStore});
+const workout = new Workout({prop: 'workout'});
 const workouts = new Workouts({prop: 'workouts', workoutModel: workout});
 
-const session = new Session();
+const session = Session();
 
 let models = { power,
                heartRate,

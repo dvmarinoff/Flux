@@ -1,4 +1,6 @@
-import { exists, first, xf, dateToDashString } from './functions.js';
+//
+// File Handler
+//
 
 class FileHandler {
     constructor(args) {}
@@ -15,17 +17,6 @@ class FileHandler {
                 return reject(reader.error);
             };
         });
-        // reader.onload = _ => {
-        //     let res = reader.result;
-        //     console.log(res);
-        //     // xf.dispatch('file:upload:workout', res);
-        // };
-        // reader.onerror = _ => {
-        //     let err = reader.error;
-        //     console.error(`Error reading local file: `);
-        //     console.error(reader.error);
-        // };
-
     }
     async readBinaryFile() {
         self.unsupportedFormat();
