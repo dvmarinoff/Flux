@@ -244,6 +244,7 @@ function encode(args = {}) {
     const now          = existance(args.now, Date.now());
     const time_created = now;
     const timestamp    = now;
+    const num_laps     = laps.length;
     const summary      = Summary({records: records});
 
     // records and laps to FITjs
@@ -263,7 +264,7 @@ function encode(args = {}) {
                  start_time:    l.startTime,
                  message_index: i})),
         lmd.session,
-        Session(Object.assign({timestamp}, summary)),
+        Session(Object.assign({timestamp, num_laps}, summary)),
         lmd.activity,
         Activity({timestamp})
     ];
