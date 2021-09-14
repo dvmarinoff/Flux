@@ -1,4 +1,5 @@
-import { xf, exists, empty, equals, secondsToHms, scale } from '../functions.js';
+import { xf, empty, equals } from '../functions.js';
+import { secondsToHms, scale } from '../utils.js';
 import { models } from '../models/models.js';
 
 function intervalsToGraph(intervals, ftp) {

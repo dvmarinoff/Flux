@@ -1,4 +1,4 @@
-import { hex, nthBitToBool }  from '../../functions.js';
+import { nthBitToBool }  from '../../functions.js';
 
 const read =  {
     avgSpeed:            (flags) => nthBitToBool(flags,  0),

@@ -1,4 +1,4 @@
-import { xf, exists, empty, first, filterIn, equals } from '../functions.js';
+import {  xf, exists } from '../functions.js';
 import { ble } from './web-ble.js';
 
 class Device {

@@ -1,4 +1,4 @@
-import { xf, exists, equals, rand } from '../functions.js';
+import { xf, exists, equals } from '../functions.js';
 import { models } from './models/models.js';
 
 let db = {

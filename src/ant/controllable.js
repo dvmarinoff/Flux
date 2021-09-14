@@ -1,4 +1,4 @@
-import { xf, first, empty, exists, equals } from '../functions.js';
+import { xf, equals } from '../functions.js';
 import { Channel, keys } from './channel.js';
 import { FecChannel } from './fec-channel.js';
 import { message } from './message.js';

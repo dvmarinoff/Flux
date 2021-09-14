@@ -1,4 +1,4 @@
-import { equals, nthBitToBool, xor } from '../functions.js';
+import { equals, xor } from '../functions.js';
 import { page } from './page.js';
 
 const ids = {

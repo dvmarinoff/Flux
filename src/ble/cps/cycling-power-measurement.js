@@ -1,4 +1,5 @@
-import { nthBitToBool, format } from '../../functions.js';
+import { nthBitToBool } from '../../functions.js';
+import { format } from '../../utils.js';
 
 const pedalPowerBalance       = (flags) => nthBitToBool(flags,  0);
 const pedalPowerBalanceRef    = (flags) => nthBitToBool(flags,  1);

@@ -1,4 +1,5 @@
-import { exists, first, last, empty, filterIn, findByValue } from '../functions.js';
+import { exists } from '../functions.js';
+import { filterIn, findByValue } from '../utils.js';
 import { uuids } from './uuids.js';
 
 ////

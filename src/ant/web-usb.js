@@ -1,4 +1,3 @@
-import { first, last, exists } from '../functions.js';
 
 const values = {
     Dynastream_Id:      4047, // 0x0FCF

@@ -1,6 +1,6 @@
-import { xf, exists, equals, secondsToHms, scale } from '../functions.js';
+import { xf, exists, equals } from '../functions.js';
+import { secondsToHms, scale } from '../utils.js';
 import { models } from '../models/models.js';
-import { zwo } from '../workouts/parser.js';
 
 function intervalsToGraph(intervals, ftp) {
     let scaleMax = ftp * 1.6;

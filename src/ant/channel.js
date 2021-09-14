@@ -1,4 +1,4 @@
-import { xf, first, empty, xor, exists, delay } from '../functions.js';
+import { xf, exists } from '../functions.js';
 import { message } from './message.js';
 
 const ChannelTypes = {

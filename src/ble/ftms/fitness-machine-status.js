@@ -1,4 +1,5 @@
-import { exists, equals, hex } from '../../functions.js';
+import { equals } from '../../functions.js';
+import { hex } from '../../utils.js';
 
 const fitnessMachineStatusCodes = {
     '0x00': {param: false, msg: 'Reserved for Future Use'},

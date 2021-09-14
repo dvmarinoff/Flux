@@ -1,6 +1,3 @@
-import { xf, exists, equals } from '../functions.js';
-import { q } from './q.js';
-
 import './connection-switch.js';
 import './data-display.js';
 import './inputs.js';

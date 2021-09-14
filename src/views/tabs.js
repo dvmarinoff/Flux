@@ -1,4 +1,4 @@
-import { xf, exists, equals } from '../functions.js';
+import { xf } from '../functions.js';
 
 class TabBtn extends HTMLElement {
     constructor() {

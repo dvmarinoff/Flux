@@ -1,5 +1,4 @@
-import { xf, exists, empty, equals } from '../functions.js';
-import { q } from './q.js';
+import { xf } from '../functions.js';
 
 class Upload extends HTMLInputElement {
     constructor() {

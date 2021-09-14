@@ -1,4 +1,5 @@
-import { xf, exists, equals, scale } from '../functions.js';
+import { xf, exists, equals } from '../functions.js';
+import { scale } from '../utils.js';
 import { models } from '../models/models.js';
 
 class DataGraph extends HTMLElement {

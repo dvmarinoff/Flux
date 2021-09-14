@@ -1,4 +1,4 @@
-import { xf, first, last, exists, empty, splitAt } from '../functions.js';
+import { xf, first, last, exists, empty } from '../functions.js';
 import { message } from './message.js';
 import { serialPolyfill } from './polyfill.js';
 

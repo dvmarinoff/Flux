@@ -1,4 +1,4 @@
-import { xf, equals, exists, empty } from '../functions.js';
+import { xf, exists } from '../functions.js';
 import { ble } from './web-ble.js';
 import { uuids } from './uuids.js';
 import { Device } from './device.js';

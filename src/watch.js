@@ -1,6 +1,5 @@
-import { exists, first, last, xf,
-         avg, max, kphToMps, mpsToKph,
-         timeDiff, fixInRange, delay } from './functions.js';
+import { exists, first, last, xf, avg, max, delay } from './functions.js';
+import { kphToMps, mpsToKph, timeDiff, fixInRange } from './utils.js';
 
 class Watch {
     constructor(args) {

@@ -1,4 +1,4 @@
-import { xf, first, empty, exists } from '../functions.js';
+import { xf } from '../functions.js';
 import { Serial } from './web-serial.js';
 import { USB } from './web-usb.js';
 import { Channel } from './channel.js';

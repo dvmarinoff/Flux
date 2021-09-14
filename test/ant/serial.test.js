@@ -1,4 +1,3 @@
-import { values, filter, requestPort, getPorts, open } from './serial.js';
 
 describe('request ant+ stick over serial', () => {
     describe('request returns port object', () => {
@@ -8,13 +7,6 @@ describe('request ant+ stick over serial', () => {
         });
     });
 });
-
-// describe('disconnect from ant+ stick over serial', () => {
-//     describe('', () => {
-//         test('', () => {
-//         });
-//     });
-// });
 
 // describe('', () => {
 //     describe('', () => {

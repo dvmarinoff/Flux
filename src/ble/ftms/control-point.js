@@ -1,4 +1,4 @@
-import { hex, nthBitToBool }  from '../../functions.js';
+import { hex }  from '../../utils.js';
 
 // 00 - reserved for future use
 // 01 - success

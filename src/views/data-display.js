@@ -1,4 +1,5 @@
-import { xf, exists, equals, secondsToHms, stringToBool } from '../functions.js';
+import { xf, exists, equals } from '../functions.js';
+import { secondsToHms, stringToBool } from '../utils.js';
 import { models } from '../models/models.js';
 
 class DataDisplay extends HTMLElement {

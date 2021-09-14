@@ -1,4 +1,4 @@
-import { xf, exists, equals, empty, last } from '../functions.js';
+import { xf, empty, last } from '../functions.js';
 import { models } from '../models/models.js';
 import { utils } from '../ant/message.js';
 

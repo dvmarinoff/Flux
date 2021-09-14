@@ -1,4 +1,4 @@
-import { xf, first, empty, exists, delay } from '../functions.js';
+import { xf } from '../functions.js';
 import { Channel } from './channel.js';
 import { message } from './message.js';
 
