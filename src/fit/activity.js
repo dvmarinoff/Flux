@@ -29,13 +29,20 @@ function toFitSpeed(speed, unit = 'kph') {
     return speed;
 }
 
-function toFitDistance(distance, unit = 'km') {
+function toFitDistance(unit = 'm') {
     const scale = 100;
 
-    if(unit === 'km') {
-        return parseInt((distance * 1000) * scale, 10);
-    }
-    return distance;
+    return function (distance) {
+
+        if(equals(unit, 'km')) {
+            return parseInt((distance * 1000) * scale, 10);
+        }
+        if(equals(unit, 'm')) {
+            return parseInt(distance * scale, 10);
+        }
+
+        return parseInt(distance * scale, 10);
+    };
 }
 
 
@@ -116,7 +123,7 @@ function Record(args = {}) {
 
     const transforms = {
         timestamp: toFitTimestamp,
-        distance: toFitDistance,
+        distance: toFitDistance('m'),
         speed: toFitSpeed,
     };
 
@@ -174,7 +181,7 @@ function Session(args = {}) {
         total_timer_time:   toFitElapsedTime, // calculate properly in the future by excluding pauses
         avg_speed:          toFitSpeed,
         max_speed:          toFitSpeed,
-        total_distance:     toFitDistance,
+        total_distance:     toFitDistance('m'),
     };
 
     return Data({values: args, definition: lmd.session, transforms, defaults});

@@ -1,9 +1,10 @@
-import { first, last, xf, rand, } from '../src/functions.js';
+import { xf } from '../src/functions.js';
+import { rand } from '../src/utils.js';
 
 class TrainerMock {
     constructor() {
         this.powerTarget = 180;
-        this.init();
+        // this.init();
     }
     init() {
         const self = this;
@@ -35,15 +36,15 @@ class TrainerMock {
         clearInterval(self.interval);
     }
     broadcast(handler) {
-        const interval = setInterval(handler, 500);
+        const interval = setInterval(handler, 1000);
         return interval;
     }
     indoorBikeData() {
         const self = this;
         xf.dispatch('power', self.power(self.powerTarget));
-        xf.dispatch('speed', self.speed(20));
+        xf.dispatch('speed', self.speed(27));
         xf.dispatch('cadence', self.cadence(80));
-        xf.dispatch('heartRate', self.heartRate(163));
+        xf.dispatch('heartRate', self.heartRate(143));
     }
     onPowerTarget(powerTarget) {
         this.powerTarget = powerTarget;
@@ -59,13 +60,13 @@ class TrainerMock {
         return prev + rand(0, 1);
     }
     speed(prev) {
-        return prev + rand(-0.1, 0.1);
+        return prev; // + rand(-0.1, 0.1);
     }
     heartRate(prev) {
         return prev + rand(2, 2);
     }
 }
 
-const tm = new TrainerMock();
+const trainerMock = new TrainerMock();
 
-export { TrainerMock };
+export { trainerMock };

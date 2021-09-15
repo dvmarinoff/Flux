@@ -92,7 +92,7 @@ describe('constructs FITjs Message', () => {
             power: 180,
             cadence: 80,
             speed: 28.30,
-            distance: 40.10,
+            distance: 4100, // meters
         });
         let res = {
             type: 'data',
@@ -104,7 +104,7 @@ describe('constructs FITjs Message', () => {
                 power: 180,
                 cadence: 80,
                 speed: 7861,
-                distance: 4010000,
+                distance: 410000,
             },
         };
 
@@ -151,7 +151,7 @@ describe('constructs FITjs Message', () => {
             max_speed: 31, // km/h
             avg_heart_rate: 144,
             max_heart_rate: 160,
-            total_distance: 5.000, // km
+            total_distance: 5000, // meters
         });
         let res = {
             type: 'data',
@@ -210,15 +210,15 @@ describe('construct FITjs Activity', () => {
     test('', () => {
         const data = {
             records: [
-                {timestamp: 1630508400000, power: 180, speed: 27.00, cadence: 80, heart_rate: 135, distance: 0.0075},
-                {timestamp: 1630508401000, power: 183, speed: 27.00, cadence: 81, heart_rate: 135, distance: 0.0150},
-                {timestamp: 1630508402000, power: 178, speed: 27.00, cadence: 82, heart_rate: 135, distance: 0.0225},
-                {timestamp: 1630508403000, power: 179, speed: 27.00, cadence: 81, heart_rate: 135, distance: 0.0300},
+                {timestamp: 1630508400000, power: 180, speed: 27.00, cadence: 80, heart_rate: 135, distance:  7.5}, // meters
+                {timestamp: 1630508401000, power: 183, speed: 27.00, cadence: 81, heart_rate: 135, distance: 15.0},
+                {timestamp: 1630508402000, power: 178, speed: 27.00, cadence: 82, heart_rate: 135, distance: 22.5},
+                {timestamp: 1630508403000, power: 179, speed: 27.00, cadence: 81, heart_rate: 135, distance: 30.0},
 
-                {timestamp: 1630508404000, power: 179, speed: 27.00, cadence: 81, heart_rate: 135, distance: 0.0375},
-                {timestamp: 1630508405000, power: 179, speed: 27.00, cadence: 81, heart_rate: 135, distance: 0.0450},
-                {timestamp: 1630508406000, power: 180, speed: 27.00, cadence: 83, heart_rate: 135, distance: 0.0525},
-                {timestamp: 1630508407000, power: 180, speed: 27.00, cadence: 80, heart_rate: 135, distance: 0.0600},
+                {timestamp: 1630508404000, power: 179, speed: 27.00, cadence: 81, heart_rate: 135, distance: 37.5},
+                {timestamp: 1630508405000, power: 179, speed: 27.00, cadence: 81, heart_rate: 135, distance: 45.0},
+                {timestamp: 1630508406000, power: 180, speed: 27.00, cadence: 83, heart_rate: 135, distance: 52.5},
+                {timestamp: 1630508407000, power: 180, speed: 27.00, cadence: 80, heart_rate: 135, distance: 60.0},
             ],
             laps: [
                 {timestamp: 1630508403000, startTime: 1630508400000},
@@ -260,7 +260,7 @@ describe('construct FITjs Activity', () => {
             },
 
             {type: 'data', message: 'record', local_number: 3, fields: {
-                timestamp: 999442800, heart_rate: 135, power: 180, cadence: 80, speed: 7500, distance: 750,},
+                timestamp: 999442800, heart_rate: 135, power: 180, cadence: 80, speed: 7500, distance: 750,},  // meters * FIT scale (100)
             },
             {type: 'data', message: 'record', local_number: 3, fields: {
                 timestamp: 999442801, heart_rate: 135, power: 183, cadence: 81, speed: 7500, distance: 1500,},
@@ -337,7 +337,7 @@ describe('construct FITjs Activity', () => {
                 total_timer_time:   8000,
                 message_index: 0,
                 first_lap_index: 0,
-                num_laps: 1,
+                num_laps: 2,
                 sport: 2,
                 sub_sport: 58,
                 avg_power: 179, // 179.75
@@ -364,6 +364,20 @@ describe('construct FITjs Activity', () => {
         ];
 
         expect(fitjsActivity).toStrictEqual(res);
+    });
+});
+
+describe('FITjs helper functions', () => {
+
+    test('toFitDistance', () => {
+        expect(activity.toFitDistance()(1)).toBe(1*100);
+        expect(activity.toFitDistance()(1000)).toBe(1000*100);
+
+        expect(activity.toFitDistance('m')(1)).toBe(1*100);
+        expect(activity.toFitDistance('m')(1000)).toBe(1000*100);
+
+        expect(activity.toFitDistance('km')(1)).toBe(1*1000*100);
+        expect(activity.toFitDistance('km')(10)).toBe(10*1000*100);
     });
 });
 
