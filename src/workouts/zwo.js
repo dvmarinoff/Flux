@@ -19,11 +19,11 @@ function readIntervalsT(el) {
     let offPower    = parseFloat(el.getAttribute('OffPower'));
     let onSlope     = undefined;
     let offSlope    = undefined;
-    if(el.hasAttribute('OnSlopeTarget')) {
-        onSlope = parseFloat(el.getAttribute('OnSlopeTarget'));
+    if(el.hasAttribute('OnSlope')) {
+        onSlope = parseFloat(el.getAttribute('OnSlope'));
     }
-    if(el.hasAttribute('OffSlopeTarget')) {
-        offSlope = parseFloat(el.getAttribute('OffSlopeTarget'));
+    if(el.hasAttribute('OffSlope')) {
+        offSlope = parseFloat(el.getAttribute('OffSlope'));
     }
     return {tag:        'IntervalsT',
             repeat:      repeat,

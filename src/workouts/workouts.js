@@ -15,9 +15,9 @@ let workouts =
         <SteadyState Duration="60" Power="0.63"/>
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
         <SteadyState Duration="120" Power="0.5"/>
-        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44" OffSlopeTarget="0"/>
+        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44"/>
         <SteadyState Duration="300" Power="0.40"/>
-        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44" OffSlopeTarget="0"/>
+        <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44"/>
         <SteadyState Duration="300" Power="0.40"/>
         <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39"/>
     </workout>
@@ -39,9 +39,9 @@ let workouts =
         <SteadyState Duration="60" Power="0.63"/>
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
         <SteadyState Duration="120" Power="0.5"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlopeTarget="8" OffSlopeTarget="0"/>
+        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlope="8" OffSlope="0"/>
         <SteadyState Duration="300" Power="0.40"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlopeTarget="8" OffSlopeTarget="0"/>
+        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlope="8" OffSlope="0"/>
         <SteadyState Duration="300" Power="0.40"/>
         <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39" />
     </workout>
