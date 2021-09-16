@@ -1340,11 +1340,16 @@ body.dark-theme {
 }
 .connection-content {}
 
-#version {
+#about {
     text-align: center;
     margin: 10px 0 0 0;
     padding: 10px 10px;
 }
+
+#about .row {
+    margin: 5px auto;
+}
+
 #outdoor-settings {
     display: flex;
     align-items: center;
