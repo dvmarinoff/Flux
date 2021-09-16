@@ -5,14 +5,14 @@ Flux is an App for executing structured workouts on a smart trainer.
 - executing Zwift .zwo workouts
 - works with bluetooth smart trainers, power meters and heart rate monitors.
 - ERG mode and extended manual control of your trainer with Grade Simulation and Resistance mode.
-- workouts with Slope targets
+- workouts with [Slope targets](https://github.com/dvmarinoff/Flux/wiki/Slope-target-for-workout-intervals)
 - recording .FIT Activities compatible with all major platforms like Strava, Training Peaks, etc
 - build-in collection of structured workouts to get you started
 
 The web version is free to use and open source. It is developed as a static PWA, has zero dependancies and is completly independant to run.
 Everything happens in your Browser and stays in there. It uses Web Bluetooth, Web Serial, Web Components, IndexDB, Local Storage, WakeLock API.
 
-_Status_: I am working on adding automated testing while refactoring the code and moving some parts to a separate projects like [FitFile](https://github.com/dvmarinoff/FitFile), [WebANT](https://github.com/dvmarinoff/WebANT), [Functions.js](https://github.com/dvmarinoff/Functions)
+_Status_: I am working on adding automated testing while refactoring the code and moving some parts to a separate projects like [FitFile](https://github.com/dvmarinoff/FitFile), [WebANT](https://github.com/dvmarinoff/WebANT), [Functions](https://github.com/dvmarinoff/Functions)
 
 ## Screenshots
 
