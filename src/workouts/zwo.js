@@ -38,8 +38,8 @@ function readSteadyState(el) {
     let duration = parseInt(el.getAttribute('Duration'));
     let power    = parseFloat(el.getAttribute('Power'));
     let slope    = undefined;
-    if(el.hasAttribute('SlopeTarget')) {
-        slope = parseFloat(el.getAttribute('SlopeTarget'));
+    if(el.hasAttribute('Slope')) {
+        slope = parseFloat(el.getAttribute('Slope'));
     }
     return {tag:      'SteadyState',
             duration: duration,
@@ -58,8 +58,8 @@ function readCooldown(el) {
 function readFreeRide(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
     let slope    = undefined;
-    if(el.hasAttribute('SlopeTarget')) {
-        slope = parseFloat(el.getAttribute('SlopeTarget'));
+    if(el.hasAttribute('Slope')) {
+        slope = parseFloat(el.getAttribute('Slope'));
     }
     return {tag:      'FreeRide',
             duration: duration,
@@ -258,3 +258,4 @@ const zwo = {
 };
 
 export { zwo };
+
