@@ -2,8 +2,8 @@ import { xf, exists, equals } from '../functions.js';
 import { secondsToHms, scale } from '../utils.js';
 import { models } from '../models/models.js';
 
-function intervalsToGraph(intervals, ftp) {
-    let scaleMax = ftp * 1.6;
+function intervalsToGraph(intervals, ftp, graphHeight = 118) {
+    let scaleMax = ftp * 1.6 * (100 / graphHeight);
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
         let stepsCount = interval.steps.length;
@@ -56,6 +56,9 @@ class WorkoutGraph extends HTMLElement {
     getWidth() {
         return this.getBoundingClientRect().width;
     }
+    getHeight() {
+        return this.getBoundingClientRect().height;
+    }
     onMetric(value) {
         this.metricValue = value;
         if(exists(this.workout.intervals)) this.initRender();
@@ -72,7 +75,7 @@ class WorkoutGraph extends HTMLElement {
     }
     initRender() {
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
-        this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue);
+        this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue, this.getHeight());
 
         this.dom.progress  = this.querySelector('#progress');
         this.dom.active    = this.querySelector('#progress-active');

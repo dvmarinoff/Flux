@@ -39,6 +39,14 @@
                 </header>
 
                 <div class="data-tiles cf">
+
+                        <div class="data-tile--small wide">
+                            <h2 class="data-tile-small--heading">Power avg</h2>
+                            <div class="data-tile-small--value-cont">
+                                <div id=power-avg-value" class="data-tile-small--value">--</div>
+                            </div>
+                        </div>
+
                         <div class="data-tile">
                             <h2 class="data-tile--heading">Power</h2>
                             <div class="data-tile--value-cont">
@@ -62,6 +70,26 @@
                                 <data-display id="heart-rate-value"
                                               class="data-tile--value"
                                               prop="heartRate">--</data-display>
+                            </div>
+                        </div>
+
+                        <div class="data-tile--small wide">
+                            <h2 class="data-tile-small--heading">Speed</h2>
+                            <div class="data-tile-small--value-cont">
+                                <speed-display id="speed-value"
+                                               class="data-tile-small--value"
+                                               prop="speed">
+                                    <value>--</value>
+                                    <unit class="data-tile-small--unit"></unit>
+                                </speed-display>
+                            </div>
+                        </div>
+                        <div class="data-tile--small wide">
+                            <h2 class="data-tile-small--heading">Slope</h2>
+                            <div class="data-tile-small--value-cont">
+                                <data-display id=slope-target-value-display"
+                                              class="data-tile-small--value"
+                                              prop="slopeTarget">--</data-display>
                             </div>
                         </div>
 
@@ -90,9 +118,21 @@
                                               prop="cadence">--</data-display>
                             </div>
                         </div>
+
+                        <div class="data-tile--small wide">
+                            <h2 class="data-tile-small--heading">Distance</h2>
+                            <div class="data-tile-small--value-cont">
+                                <distance-display id="distance-value"
+                                                  class="data-tile-small--value"
+                                                  prop="distance">
+                                    <value>--</value>
+                                    <unit class="data-tile-small--unit"></unit>
+                                </distance-display>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="data-tiles cf">
+                    <div class="data-tiles tall cf">
                         <div class="data-tile--small">
                             <h2 class="data-tile-small--heading">Speed</h2>
                             <div class="data-tile-small--value-cont">
@@ -118,27 +158,24 @@
                     </div>
                     <div class="line"></div>
 
-                    <div class="graphs">
-
-                        <div id="graph-power" class="graph">
-                            <h4 class="graph--heading">Power</h4>
-                            <data-graph class="graph--cont cf" prop="power" metric="ftp" scale="400"></data-graph>
-                        </div>
-
-                        <div class="line"></div>
-
-                        <div id="graph-workout" class="graph">
-                            <h4 id="current-workout-name" class="graph--heading">
-                                <data-display prop="workout" path="name"></data-display>
-                            </h4>
-                            <workout-graph class="graph-workout--cont" prop="workout" metric="ftp"></workout-graph>
-                        </div>
-
+                    <div id="graph-power" class="graph">
+                        <h4 class="graph--heading">Power</h4>
+                        <data-graph class="graph--cont cf" prop="power" metric="ftp" scale="400"></data-graph>
                     </div>
 
-                    <div class="line"></div>
+
+                    <div id="graph-workout" class="graph">
+                        <div class="line"></div>
+                        <h4 id="current-workout-name" class="graph--heading">
+                            <data-display prop="workout" path="name"></data-display>
+                        </h4>
+                        <workout-graph class="graph-workout--cont" prop="workout" metric="ftp"></workout-graph>
+                        <div class="line"></div>
+                    </div>
+
 
                     <div id="targets">
+
                         <div class="tab-btn-group">
                             <div id="mode-selector" class="mode-selector">
                                 <tab-btn id="erg-mode-btn"
@@ -158,11 +195,9 @@
                                          param="slope">Slope</tab-btn>
                             </div> <!-- end mode selector -->
                         </div> <!-- tab-btn-group -->
+
                         <tab-group prop="mode">
                             <div id="erg-mode-controls" class="tab active mode-controls" tab="erg">
-                                <header>
-                                    <div id="erg-mode-params" class="t4">0 to 0 W</div>
-                                </header>
                                 <div id="power-control-btn" class="number-btn">
                                     <div class="number-btn">
                                         <button is="effect-button"
@@ -185,9 +220,6 @@
                                 </div>
                             </div> <!-- end erg mode -->
                             <div id="resistance-mode-controls" class="tab mode-controls" tab="resistance">
-                                <header>
-                                    <div id="resistance-mode-params" class="t4">0 to 100</div>
-                                </header>
                                 <div id="resistance-control-btn" class="number-btn">
                                     <div class="number-btn">
                                         <button is="effect-button"
@@ -210,9 +242,6 @@
                                 </div>
                             </div> <!-- end resistance mode -->
                             <div id="slope-mode-controls" class="tab mode-controls" tab="slope">
-                                <header>
-                                    <div id="slope-mode-params" class="t4">0 to 0%</div>
-                                </header>
                                 <div id="slope-control-btn" class="number-btn">
                                     <div class="number-btn">
                                         <button is="effect-button"
@@ -660,6 +689,7 @@
                         <div id="workout-name">
                             <data-display prop="workout" path="name">Free ride</data-display>
                         </div>
+
                         <div id="start-workout" class="control--btn">
                             <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
                                 height="24" viewBox="0 0 24 24" width="24">

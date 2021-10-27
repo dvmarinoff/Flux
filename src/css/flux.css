@@ -362,6 +362,9 @@ body.dark-theme {
     line-height: 30px;
 }
 
+.wide {
+    display: none;
+}
 
 
 
@@ -410,15 +413,11 @@ body.dark-theme {
 }
 .t4 { /* tab text, workout list, */
     font-size: 10px;
-    /* font-size: 9px; */
     line-height: 14px;
     letter-spacing: 1px;
-    /* text-transform: uppercase; */
 }
 .t5 { /* workout desc, */
     font-size: 14px;
-    /* font-weight: bold; */
-    /* letter-spacing: 1px; */
 }
 .t6 { /* workout first-row, */
     font-size: 14px;
@@ -448,27 +447,9 @@ body.dark-theme {
     background-color: var(--white-opacity-01);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+input, button {
+    font-family: var(--ssr-font-family);
+}
 
 :root {
     /* --ssb-font-family: sans-serif; */
@@ -531,6 +512,7 @@ body.dark-theme {
 
     --data-tile-small--heading-font-size: 16px;
     --data-tile-small--value-font-size: 30px;
+    /* --data-tile-small--unit-font-size: 18px; */
     --data-tile-small--unit-font-size: 18px;
 
     display: flex;
@@ -571,6 +553,7 @@ body.dark-theme {
     text-transform: uppercase;
 }
 .data-tile-small--value-cont {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -582,8 +565,11 @@ body.dark-theme {
 }
 .data-tile-small--unit {
     font-size: var(--data-tile-small--unit-font-size);
-    /* font-weight: bold; */
+    /* position: absolute; */
+    /* top: -20px; */
+    /* right: 0px; */
 }
+
 
 
 
@@ -686,16 +672,6 @@ body.dark-theme {
     z-index: 1;
 }
 
-
-
-
-
-/* Input */
-.input {
-}
-
-
-
 /* Btn */
 .btn {
     color: #fff;
@@ -730,6 +706,7 @@ body.dark-theme {
     --number-btn-line-height: 28px;
     --number-btn-font-size: 12px;
     --number-btn-value-font-size: 14px;
+    --number-btn-value-width: 105px;
 
     display: flex;
     justify-content: center;
@@ -740,7 +717,7 @@ body.dark-theme {
     line-height: var(--number-btn-line-height);
 }
 .number-btn--value {
-    width: 105px;
+    width: var(--number-btn-value-width);
     line-height: var(--number-btn-line-height);
     font-size: var(--number-btn-value-font-size);
     text-align: center;
@@ -866,35 +843,6 @@ body.dark-theme {
     display: none;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .control-point .tile {
     display: inline-block;
     vertical-align: middle;
@@ -905,7 +853,8 @@ body.dark-theme {
     justify-content: space-evenly;
     align-items: center;
     max-width: 300px;
-    margin: 10px auto 4px;
+    margin: 10px auto;
+;
 
     font-size: 10px;
     text-transform: uppercase;
@@ -1481,50 +1430,328 @@ body.dark-theme {
     }
 }
 
-/* Mobile Device Specific Queries */
 
-/* Portrait and Landscape Tablets */
 
 @media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (-webkit-min-device-pixel-ratio: 1) {
-    /* iPad 1, 2, Mini, Air */
+and (min-width: 1024px) {
+    .tall {
+        display: none;
+    }
+
+    .wide {
+        display: block;
+    }
+
+    unit {
+        display: none;
+    }
+
+    /* Data views */
+    .data-tiles {
+        --data-tile--heading-font-size: 16px; /*.h2*/
+        --data-tile--value-font-size: 65px;   /*.t1*/
+        --data-tile--unit-font-size: 18px;
+
+        --data-tile-small--heading-font-size: 14px; /* 16px */
+        --data-tile-small--value-font-size: 50px; /* 30px */
+        --data-tile-small--unit-font-size: 18px;
+
+        margin-bottom: 15;
+    }
+
+    .data-tile {
+        width: 22%;
+    }
+
+    .data-tile--small {
+        width: 17%;
+    }
+    .data-tile-small--heading {
+        margin: 15px auto 25px;
+    }
+
+    .data-tile--heading {
+        margin: 15px auto 25px;
+    }
+
+    .graph--heading {
+        font-size: 12px;
+    }
 }
 
 @media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    /* iPad Pro 3, 4, Pro 9.7 inch */
+and (min-width: 1024px)
+and (min-height: 600px) {
+    .data-tiles {
+        --data-tile--heading-font-size: 18px;
+        --data-tile--value-font-size: 50px;
+        --data-tile--height: 30px;
+        --data-tile--unit-font-size: 18px;
+
+        --data-tile-small--heading-font-size: 16px; /* 16px */
+        --data-tile-small--value-font-size: 40px; /* 30px */
+        --data-tile-small--height: 30px;
+        --data-tile-small--unit-font-size: 18px;
+    }
+
+    .data-tile--heading {
+        margin: 0px auto 15px;
+    }
+
+    .data-tile-small--heading {
+        margin: 0px auto 15px;
+    }
+
+    .graph {
+        --graph-total-height: 100px;
+        --graph-height: 76px;
+    }
 }
 
 @media only screen
-and (min-device-width: 834px)
-and (max-device-width: 1112px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    /* iPad Pro 10.5 inch */
-}
-@media only screen
-and (min-device-width: 1024px)
-and (max-device-width: 1366px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    /* iPad Pro 12.9 inch */
+and (min-width: 1024px)
+and (min-height: 628px) {
+
+    .graph {
+        --graph-total-height: 120px;
+        --graph-height: 98px;
+    }
 }
 
-/* Portrait and Landscape Phones */
 @media only screen
-and (min-device-width: 320px)
-and (max-device-width: 869px) {
+and (min-width: 1024px)
+and (min-height: 650px) {
+
+    .data-tiles {
+        --data-tile--height: 40px;
+        --data-tile-small--height: 40px;
+    }
 }
 
-/* Landscape Phones */
 @media only screen
-and (min-device-width: 360px)
-and (max-device-width: 869px)
-and (orientation: landscape) {
-    /* iPhone 5, 6, 6S, 7, 8 */
-    /* iPhone 6+, 7+, 8+ */
-    /* iPhone X */
-    /* Galaxy S6-10 */
+and (min-width: 1024px)
+and (min-height: 690px) {
+
+    .data-tiles {
+        --data-tile--height: 60px;
+        --data-tile-small--height: 60px;
+
+        --data-tile--heading-font-size: 18px; /*.h2*/
+        --data-tile--value-font-size: 65px;   /*.t1*/
+        --data-tile--unit-font-size: 18px;
+
+        --data-tile-small--heading-font-size: 16px; /* 16px */
+        --data-tile-small--value-font-size: 50px; /* 30px */
+        --data-tile-small--unit-font-size: 18px;
+    }
+
+    .data-tile--heading {
+        margin: 0px auto 20px;
+    }
+
+    .data-tile-small--heading {
+        margin: 0px auto 20px;
+    }
+}
+
+@media only screen
+and (min-width: 1280px)
+and (min-height: 690px) {
+
+    .data-tiles {
+        --data-tile--height: 60px;
+        --data-tile-small--height: 60px;
+
+        --data-tile--heading-font-size: 18px; /*.h2*/
+        --data-tile--value-font-size: 80px;   /*.t1*/
+        --data-tile--unit-font-size: 18px;
+
+        --data-tile-small--heading-font-size: 16px; /* 16px */
+        --data-tile-small--value-font-size: 60px; /* 30px */
+        --data-tile-small--unit-font-size: 18px;
+    }
+}
+
+@media only screen
+and (min-width: 1024px)
+and (min-height: 720px) {
+
+    /* Target setting */
+    .mode {
+        padding: 5px 42px;
+    }
+
+    .mode-selector {
+        font-size: 12px;
+        margin: 10px auto;
+        max-width: 380 px;
+    }
+
+    .number-btn {
+        --number-btn-height: 40px;
+        --number-btn-width: 80px;
+        --number-btn-line-height: 38px;
+        --number-btn-font-size: 16px;
+        --number-btn-value-font-size: 16px;
+        --number-btn-value-width: 140px;
+    }
+}
+
+@media only screen
+and (min-width: 1024px)
+and (min-height: 820px) {
+    .data-tiles {
+        --data-tile--height: 60px;
+        --data-tile-small--height: 60px; /* 40px */
+        margin-bottom: 15;
+    }
+
+    .graph {
+        --graph-total-height: 140px;
+        --graph-height: 118px;
+    }
+}
+
+@media only screen
+and (min-width: 1280px)
+and (min-height: 760px) {
+
+    /* Data views */
+    .data-tiles {
+        --data-tile--heading-font-size: 18px; /*.h2*/
+        --data-tile--value-font-size: 80px;   /*.t1*/
+        /* --data-tile--height: 60px; */
+        --data-tile--unit-font-size: 18px;
+
+        --data-tile-small--heading-font-size: 16px; /* 16px */
+        --data-tile-small--value-font-size: 60px; /* 30px */
+        /* --data-tile-small--height: 60px; /\* 40px *\/ */
+        --data-tile-small--unit-font-size: 18px;
+
+        margin-bottom: 15;
+    }
+
+    .data-tile {
+        width: 22%;
+    }
+
+    .data-tile--small {
+        width: 17%;
+    }
+
+    .data-tile-small--heading {
+        margin: 15px auto 25px;
+    }
+
+    .data-tile--heading {
+        margin: 15px auto 25px;
+    }
+
+    .graph--heading {
+        font-size: 12px;
+    }
+
+    /* Watch */
+    .menu--btn--label {
+        font-size: 11px;
+    }
+    .menu--btn--icon {
+        width: 24px;
+        height: 24px;
+    }
+    .menu--btn {
+        padding-bottom: 4px;
+    }
+
+    /* Settings */
+    .info-cell h3 {
+        font-size: 12px;
+    }
+}
+
+@media only screen
+and (min-width: 1920px)
+and (min-height: 1080px) {
+
+    /* Data views */
+    .data-tiles {
+        --data-tile--heading-font-size: 24px; /*.h2*/
+        --data-tile--value-font-size: 120px;   /*.t1*/
+        --data-tile--height: 120px;
+        --data-tile--unit-font-size: 18px;
+
+        --data-tile-small--heading-font-size: 22px; /* 16px */
+        --data-tile-small--value-font-size: 100px; /* 30px */
+        --data-tile-small--height: 120px; /* 40px */
+        --data-tile-small--unit-font-size: 18px;
+    }
+
+    .graph {
+        --graph-total-height: 180px;
+        --graph-height: 158px;
+    }
+
+    .fixed-bottom {
+        --controls-height: 50px;
+        --menu-height: 50px;
+        --fb-total-height: 100px;
+    }
+
+}
+
+
+@media only screen
+and (min-width: 2260px)
+and (min-height: 1240px) {
+    /* and (min-device-width: 2560px) */
+    /* and (min-device-height: 1440px) { */
+
+    /* Data views */
+    .data-tiles {
+        --data-tile--heading-font-size: 26px; /*.h2*/
+        --data-tile--value-font-size: 150px;   /*.t1*/
+        --data-tile--height: 160px;
+        --data-tile--unit-font-size: 18px;
+
+        --data-tile-small--heading-font-size: 24px; /* 16px */
+        --data-tile-small--value-font-size: 130px; /* 30px */
+        --data-tile-small--height: 160px; /* 40px */
+        --data-tile-small--unit-font-size: 18px;
+    }
+
+    .graph {
+        --graph-total-height: 240px;
+        --graph-height: 218px;
+    }
+}
+
+@media only screen
+and (min-width: 3540px)
+and (min-height: 1860px) {
+/* and (min-device-width: 3840px) */
+/* and (min-device-height: 2160px) { */
+
+    /* Data views */
+    .data-tiles {
+        --data-tile--heading-font-size: 36px; /*.h2*/
+        --data-tile--value-font-size: 240px;   /*.t1*/
+        --data-tile--height: 250px;
+        --data-tile--unit-font-size: 18px;
+
+        --data-tile-small--heading-font-size: 34px; /* 16px */
+        --data-tile-small--value-font-size: 220px; /* 30px */
+        --data-tile-small--height: 250px; /* 40px */
+        --data-tile-small--unit-font-size: 18px;
+    }
+
+    .graph {
+        --graph-total-height: 340px;
+        --graph-height: 318px;
+    }
+
+    .fixed-bottom {
+        --controls-height: 80px;
+        --menu-height: 80px;
+        --fb-total-height: 160px;
+    }
 }
