@@ -40,6 +40,7 @@ class WorkoutGraph extends HTMLElement {
         this.prop = this.getAttribute('prop');
         this.metric = this.getAttribute('metric');
         this.width = this.getWidth();
+        this.height = this.getHeight();
 
         xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
         xf.sub(`db:${this.metric}`, this.onMetric.bind(this));
@@ -48,10 +49,13 @@ class WorkoutGraph extends HTMLElement {
             this.index = index;
             this.progress(this.index);
         });
+
+        window.addEventListener('resize', this.onWindowResize.bind(this));
     }
     disconnectedCallback() {
-        document.removeEventListener(`db:${this.prop}`, this.onUpdate);
-        document.removeEventListener(`db:${this.metric}`, this.onMetric);
+        window.removeEventListener(`db:${this.prop}`, this.onUpdate);
+        window.removeEventListener(`db:${this.metric}`, this.onMetric);
+        window.removeEventListener('resize', this.onWindowResize);
     }
     getWidth() {
         return this.getBoundingClientRect().width;
@@ -62,6 +66,11 @@ class WorkoutGraph extends HTMLElement {
     onMetric(value) {
         this.metricValue = value;
         if(exists(this.workout.intervals)) this.initRender();
+    }
+    onWindowResize(e) {
+        this.width = this.getWidth();
+        this.height = this.getHeight();
+        this.initRender();
     }
     onUpdate(value) {
         this.workout = value;
@@ -75,7 +84,8 @@ class WorkoutGraph extends HTMLElement {
     }
     initRender() {
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
-        this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue, this.getHeight());
+
+        this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue, this.height);
 
         this.dom.progress  = this.querySelector('#progress');
         this.dom.active    = this.querySelector('#progress-active');
