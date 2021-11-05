@@ -45,18 +45,16 @@ const radioOn = `
         </svg>`;
 
 function workoutTemplate(workout) {
-    return `<li is="workout-item" class='workout list-item cf' id="${workout.id}" metric="ftp">
-                <div class="first-row">
-                    <div class="name t6">${workout.name}</div>
-                    <div class="type t6">${workout.effort}</div>
-                    <div class="time t6">${workout.duration} min</div>
-                    <div class="select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
+    return `<li is="workout-item" class='workout cf' id="${workout.id}" metric="ftp">
+                <div class="workout--short-info">
+                    <div class="workout--name">${workout.name}</div>
+                    <div class="workout--type">${workout.effort}</div>
+                    <div class="workout--duration">${workout.duration} min</div>
+                    <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
                 </div>
-                <div class="second-row">
-                    <div class="desc">
-                        <div class="graph-workout--cont">${workout.graph}</div>
-                        <div class="content t5">${workout.description}</div>
-                    </div>
+                <div class="workout--full-info">
+                    <div class="workout--graph-cont">${workout.graph}</div>
+                    <div class="workout--description">${workout.description}</div>
                 </div>
             </li>`;
 }
@@ -123,9 +121,9 @@ class WorkoutListItem extends HTMLLIElement {
     }
     postInit() { return; }
     connectedCallback() {
-        this.summary = this.querySelector('.first-row');
-        this.description = this.querySelector('.second-row .desc');
-        this.selectBtn = this.querySelector('.select');
+        this.summary = this.querySelector('.workout--short-info');
+        this.description = this.querySelector('.workout--full-info');
+        this.selectBtn = this.querySelector('.workout--select');
         this.indicator = this.selectBtn;
         this.id = this.getAttribute('id');
 
@@ -190,3 +188,4 @@ class WorkoutListItem extends HTMLLIElement {
 
 customElements.define('workout-list', WorkoutList, {extends: 'ul'});
 customElements.define('workout-item', WorkoutListItem, {extends: 'li'});
+

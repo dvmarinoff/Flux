@@ -3,7 +3,7 @@ import { secondsToHms, scale } from '../utils.js';
 import { models } from '../models/models.js';
 
 function intervalsToGraph(intervals, ftp, graphHeight = 118) {
-    let scaleMax = ftp * 1.6 * (100 / graphHeight);
+    let scaleMax = ftp * 1.6 * (90 / graphHeight);
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
         let stepsCount = interval.steps.length;
@@ -78,8 +78,9 @@ class WorkoutGraph extends HTMLElement {
     }
     progress() {
         const rect = this.dom.intervals[this.index].getBoundingClientRect();
-        this.dom.active.style.left  = `${rect.left}px`;
+        this.dom.active.style.left  = `${rect.left - this.getBoundingClientRect().left}px`;
         this.dom.active.style.width = `${rect.width}px`;
+        this.dom.active.style.height = `${this.getBoundingClientRect().height}px`;
 
     }
     initRender() {
