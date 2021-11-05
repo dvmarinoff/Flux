@@ -1439,21 +1439,14 @@ and (min-height: 600px) {
     }
 }
 
-/* Macbook Air, fullscreen */
+/* HD Laptop, fullscreen */
 @media only screen
 and (min-width: 1360px)
 and (min-height: 700px) {
     .data-tiles {
         font-size: 2.4rem;
-        /* --data-tile--heading-font-size: 0.8em; */
-        /* --data-tile-small--heading-font-size: 0.8em; */
-        /* --data-tile--heading-margin: 0 auto 0.5em; */
     }
 }
-
-
-
-
 
 @media only screen
 and (min-width: 1600px)
@@ -1520,16 +1513,11 @@ and (min-height: 1200px) {
     }
 }
 
-@media only screen
-and (min-width: 2500px)
-and (min-height: 1400px) {
-}
-
-/* IPhone X, landscape */
-@media only screen
-and (max-height: 414px)
-and (max-width: 900px)
-and (orientation: landscape) {
+/* IPhone Pro 12, landscape */
+@media all
+and (max-height: 428px)
+/* and (max-width: 1000px) */
+{
 
     #home-page-wrapper {
         display: grid;
@@ -1691,8 +1679,9 @@ and (orientation: landscape) {
 }
 
 /* DOCK MOCK (wide and very short) */
-@media only screen
-and (max-height: 300px) {
+@media all
+and (max-height: 300px)
+and (min-width: 1024px) {
 
     #home-page-wrapper {
         display: grid;
