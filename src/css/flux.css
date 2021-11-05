@@ -1644,6 +1644,7 @@ and (max-height: 428px)
 
     .controls {
         width: 40%;
+        border-top: none;
     }
 
     .dark-theme .controls {
