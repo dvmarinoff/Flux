@@ -666,7 +666,7 @@ body.dark-theme {
     padding: 0 1em;
     --inner-max-width: 300px;
     --mode-selector-margin: 1.4em auto;
-    --mode-selector-padding: 0 4.8em;
+    --mode-selector-padding: 0 1em;
 
     --number-input-height: 3rem;
     --number-input-total-width: 100%;
@@ -1516,7 +1516,7 @@ and (min-height: 1200px) {
 /* IPhone Pro 12, landscape */
 @media all
 and (max-height: 428px)
-/* and (max-width: 1000px) */
+and (min-width: 500px)
 {
 
     #home-page-wrapper {

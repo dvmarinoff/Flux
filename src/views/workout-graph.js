@@ -18,7 +18,7 @@ function intervalsToGraph(intervals, ftp, graphHeight = 118) {
 
             return a +
                 `<div class="graph--bar zone-${zone}" style="height: ${height}%; width: ${width}%">
-                     <div class="graph--info t5">
+                     <div class="graph--info">
                          <div class="graph--info--power">${infoPower}${infoPowerUnit}</div>
                          <div class="graph--info--time">${infoTime}<span></span></div>
                      </div>
@@ -35,6 +35,7 @@ class WorkoutGraph extends HTMLElement {
         this.metricValue = 0;
         this.dom = {};
         this.index = 0;
+        this.minHeight = 30;
     }
     connectedCallback() {
         this.prop = this.getAttribute('prop');
@@ -65,16 +66,22 @@ class WorkoutGraph extends HTMLElement {
     }
     onMetric(value) {
         this.metricValue = value;
-        if(exists(this.workout.intervals)) this.initRender();
+        if(exists(this.workout.intervals)) this.render();
     }
     onWindowResize(e) {
+        const height = this.getHeight();
+
+        if(height < this.minHeight) {
+            return;
+        }
+
         this.width = this.getWidth();
         this.height = this.getHeight();
-        this.initRender();
+        this.render();
     }
     onUpdate(value) {
         this.workout = value;
-        this.initRender();
+        this.render();
     }
     progress() {
         const rect = this.dom.intervals[this.index].getBoundingClientRect();
@@ -83,7 +90,7 @@ class WorkoutGraph extends HTMLElement {
         this.dom.active.style.height = `${this.getBoundingClientRect().height}px`;
 
     }
-    initRender() {
+    render() {
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
 
         this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue, this.height);
