@@ -249,12 +249,12 @@ xf.reg('watch:elapsed', (x, db) => {
     db.elapsed = x;
     db.distance  += 1 * kphToMps(db.speed);
 
-    let record = {timestamp: Date.now(),
-                  power:     db.power,
-                  cadence:   db.cadence,
-                  speed:     db.speed,
-                  hr:        db.heartRate,
-                  distance:  db.distance};
+    let record = {timestamp:  Date.now(),
+                  power:      db.power,
+                  cadence:    db.cadence,
+                  speed:      db.speed,
+                  heart_rate: db.heartRate,
+                  distance:   db.distance};
     db.records.push(record);
     db.lap.push(record);
 });
