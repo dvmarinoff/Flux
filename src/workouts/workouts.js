@@ -19,7 +19,7 @@ let workouts =
         <SteadyState Duration="300" Power="0.40"/>
         <IntervalsT Repeat="8" OnDuration="60" OffDuration="60" OnPower="1.21" OffPower="0.44"/>
         <SteadyState Duration="300" Power="0.40"/>
-        <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39"/>
+        <Cooldown Duration="300" PowerLow="0.39" PowerHigh="0.32"/>
     </workout>
 </workout_file>
 `,
@@ -43,7 +43,7 @@ let workouts =
         <SteadyState Duration="300" Power="0.40" Slope="1"/>
         <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlope="8" OffSlope="0"/>
         <SteadyState Duration="300" Power="0.40"/>
-        <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39" />
+        <Cooldown Duration="300" PowerLow="0.39" PowerHigh="0.32" />
     </workout>
 </workout_file>
 `,
@@ -105,7 +105,7 @@ let workouts =
         <SteadyState Duration="40" Power="1.31"/>
         <FreeRide Duration="20" />
         <SteadyState Duration="300" Power="0.39"/>
-        <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.39"/>
+        <Cooldown Duration="300" PowerLow="0.39" PowerHigh="0.32"/>
     </workout>
 </workout_file>
 `,
@@ -129,7 +129,7 @@ let workouts =
         <SteadyState Duration="600" Power="0.44"/>
         <SteadyState Duration="1200" Power="0.98"/>
         <SteadyState Duration="300" Power="0.44"/>
-        <Cooldown Duration="300" PowerLow="0.32" PowerHigh="0.44"/>
+        <Cooldown Duration="300" PowerLow="0.44" PowerHigh="0.32"/>
     </workout>
 </workout_file>`
 ,
@@ -166,7 +166,7 @@ let workouts =
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="1.08" OffPower="0.44"/>
         <SteadyState Duration="180" Power="0.44"/>
         <IntervalsT Repeat="4" OnDuration="600" OffDuration="300" OnPower="0.92" OffPower="0.44"/>
-        <Cooldown Duration="600" PowerLow="0.32" PowerHigh="0.44"/>
+        <Cooldown Duration="600" PowerLow="0.44" PowerHigh="0.32"/>
     </workout>
 </workout_file>`
 ,
@@ -181,7 +181,7 @@ let workouts =
         <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="1.08" OffPower="0.44"/>
         <SteadyState Duration="180" Power="0.44"/>
         <IntervalsT Repeat="3" OnDuration="900" OffDuration="300" OnPower="0.90" OffPower="0.44"/>
-        <Cooldown Duration="600" PowerLow="0.32" PowerHigh="0.44"/>
+        <Cooldown Duration="600" PowerLow="0.44" PowerHigh="0.32"/>
     </workout>
 </workout_file>`
 ,
@@ -204,7 +204,7 @@ let workouts =
         <SteadyState Duration="600" Power="0.71"/>
         <SteadyState Duration="300" Power="0.56"/>
         <SteadyState Duration="600" Power="0.63"/>
-        <Cooldown Duration="600" PowerLow="0.32" PowerHigh="0.63"/>
+        <Cooldown Duration="600" PowerLow="0.63" PowerHigh="0.32"/>
     </workout>
 </workout_file>`
 ,
@@ -247,7 +247,7 @@ let workouts =
         <Warmup Duration="360" PowerLow="0.32" PowerHigh="0.55"/>
         <IntervalsT Repeat="2" OnDuration="60" OffDuration="60" OnPower="0.88" OffPower="0.55"/>
         <SteadyState Duration="6000" Power="0.67"/>
-        <Cooldown Duration="600" PowerLow="0.32" PowerHigh="0.67"/>
+        <Cooldown Duration="600" PowerLow="0.67" PowerHigh="0.32"/>
     </workout>
 </workout_file>`
 ,
@@ -263,7 +263,7 @@ let workouts =
         <Warmup Duration="360" PowerLow="0.32" PowerHigh="0.55"/>
         <IntervalsT Repeat="2" OnDuration="60" OffDuration="60" OnPower="0.88" OffPower="0.55"/>
         <SteadyState Duration="4200" Power="0.67"/>
-        <Cooldown Duration="600" PowerLow="0.32" PowerHigh="0.67"/>
+        <Cooldown Duration="600" PowerLow="0.67" PowerHigh="0.32"/>
     </workout>
 </workout_file>`
 ,
@@ -277,7 +277,7 @@ let workouts =
     <workout>
         <Warmup Duration="600" PowerLow="0.30" PowerHigh="0.5"/>
         <SteadyState Duration="2400" Power="0.5"/>
-        <Cooldown Duration="600" PowerLow="0.30" PowerHigh="0.5"/>
+        <Cooldown Duration="600" PowerLow="0.5" PowerHigh="0.30"/>
     </workout>
 </workout_file>`
 
