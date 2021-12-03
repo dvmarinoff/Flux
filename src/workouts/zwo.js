@@ -52,8 +52,8 @@ function readCooldown(el) {
     let powerHigh = parseFloat(el.getAttribute('PowerHigh'));
     return {tag:       'Cooldown',
             duration:  duration,
-            powerLow:  powerLow,
-            powerHigh: powerHigh};
+            powerLow:  powerHigh,
+            powerHigh: powerLow};
 }
 function readFreeRide(el) {
     let duration  = parseInt(el.getAttribute('Duration'));
