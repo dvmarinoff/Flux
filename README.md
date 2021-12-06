@@ -38,9 +38,9 @@ A fully featured web version will be released soon, and followed with desktop ap
 The Web version is running directly in the browser and relies on some of the latest web platform technologies.
 Browser support for the web version is the following:
 
-| Chrome | Edge | Opera | Chrome Android | Samsung Internet | Opera Android | Safari | Safari iOS |
-|--------|------|-------|----------------|------------------|---------------|--------|------------|
-| yes    | yes  | yes   | yes            | yes              | no            | no     | no         |
+| Chrome | Edge | Opera | Chrome Android | Samsung Internet | Firefox | Opera Android | Safari | Safari iOS |
+|--------|------|-------|----------------|------------------|---------|---------------|--------|------------|
+| yes    | yes  | yes   | yes            | yes              | no      | no            | no     | no         |
 
 
 ### Linux
