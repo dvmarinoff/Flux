@@ -126,15 +126,26 @@ function readHeartRate(dataview) {
 }
 
 // Example:
-//    value: (0x) 44-00-18-01-14-00-06-00
-//           (10) 68-00-24-01-20-00-06-00
+//
+// Tacx Flux S:
+//(0x) 44-00-18-01-14-00-06-00
+//(10) [68, 0, 24, 1, 20, 0, 6, 0]
 //
 //    "Instantanious Speed: 2.8 km/h
 //     Instantanious Cadence: 10.0 per min
-//     Instantanious Power: 6 W" received
+//     Instantanious Power: 6 W"
 //
 //              21098 76543210
 // flags  68, 0b00000 01000100
+//
+// Schwinn 800IC:
+// (0x) 44-02-AA-05-2E-00-18-00-46
+// (10) [68, 2, 170, 5, 46, 0, 24, 0, 70]
+//
+//    "Instantanious Speed: 14.5 km/h
+//     Instantanious Cadence: 24.0 per min
+//     Instantanious Power: 24 W
+//     Heart Rate: 70 bpm"
 //
 //                               5432109876543210
 // flags,          66, 0x42,   0b0000000001000100
