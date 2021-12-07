@@ -106,13 +106,9 @@ class WebBLE {
         const characteristic = await service.getCharacteristic(uuid);
         return characteristic;
     }
-    async getCharacteristics(service, uuids) {
+    async getCharacteristics(service) {
         const self = this;
-        let characteristics = {};
-        // for await (let uuid of uuids) {
-        //     const characteristic = await self.getCharacteristic(service, uuid);
-        //     characteristics.push(characteristic);
-        // }
+        const characteristics = await service.getCharacteristics();
         return characteristics;
     }
     async getDescriptors(characteristic) {

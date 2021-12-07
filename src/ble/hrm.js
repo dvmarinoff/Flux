@@ -8,8 +8,11 @@ import { models } from '../models/models.js';
 
 function onHeartRate(value) {
     const self = this;
-    if(('hr' in value) && models.sources.isSource('heartRate', self.id)) xf.dispatch(`heartRate`, value.hr);
+    if(('heartRate' in value) && models.sources.isSource('heartRate', self.id)) {
+        xf.dispatch(`heartRate`, value.heartRate);
+    }
 }
+
 function onHrmInfo(value) {
     console.log(`Heart Rate Monitor Information: `, value);
 }

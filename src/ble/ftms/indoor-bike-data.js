@@ -37,27 +37,32 @@ const fields = {
     RemainingTime:         { type: 'Uint16', size: 2, resolution: 1,    unit: 's'       }
 };
 
-const speedPresent          = (flags) => !(nthBitToBool(flags, 0));
-const avgSpeedPresent       = (flags) =>   nthBitToBool(flags, 1);
-const cadencePresent        = (flags) =>   nthBitToBool(flags, 2);
-const avgCadencePresent     = (flags) =>   nthBitToBool(flags, 3);
-const distancePresent       = (flags) =>   nthBitToBool(flags, 4);
-const resistancePresent     = (flags) =>   nthBitToBool(flags, 5);
-const powerPresent          = (flags) =>   nthBitToBool(flags, 6);
-const avgPowerPresent       = (flags) =>   nthBitToBool(flags, 7);
-const expandedEnergyPresent = (flags) =>   nthBitToBool(flags, 8);
-const heartRatePresent      = (flags) =>   nthBitToBool(flags, 9);
+const speedPresent               = (flags) => !(nthBitToBool(flags, 0));
+const avgSpeedPresent            = (flags) =>   nthBitToBool(flags, 1);
+const cadencePresent             = (flags) =>   nthBitToBool(flags, 2);
+const avgCadencePresent          = (flags) =>   nthBitToBool(flags, 3);
+const distancePresent            = (flags) =>   nthBitToBool(flags, 4);
+const resistancePresent          = (flags) =>   nthBitToBool(flags, 5);
+const powerPresent               = (flags) =>   nthBitToBool(flags, 6);
+const avgPowerPresent            = (flags) =>   nthBitToBool(flags, 7);
+const expandedEnergyPresent      = (flags) =>   nthBitToBool(flags, 8);
+const heartRatePresent           = (flags) =>   nthBitToBool(flags, 9);
+const metabolicEquivalentPresent = (flags) =>   nthBitToBool(flags, 10);
+const elapsedTimePresent         = (flags) =>   nthBitToBool(flags, 11);
+const remainingTimePresent       = (flags) =>   nthBitToBool(flags, 12);
 
 function speedIndex(flags) {
     let i = fields.Flags.size;
     return i;
 }
+
 function cadenceIndex(flags) {
     let i = fields.Flags.size;
     if(speedPresent(flags))    i += fields.InstantaneousSpeed.size;
     if(avgSpeedPresent(flags)) i += fields.AverageSpeed.size;
     return i;
 }
+
 function distanceIndex(flags) {
     let i = fields.Flags.size;
     if(speedPresent(flags))      i += fields.InstantaneousSpeed.size;
@@ -66,6 +71,7 @@ function distanceIndex(flags) {
     if(avgCadencePresent(flags)) i += fields.AverageCandence.size;
     return i;
 }
+
 function powerIndex(flags) {
     let i = fields.Flags.size;
     if(speedPresent(flags))      i += fields.InstantaneousSpeed.size;
@@ -77,24 +83,46 @@ function powerIndex(flags) {
     return i;
 }
 
-function getSpeed(dataview) {
+function heartRateIndex(flags) {
+    let i = fields.Flags.size;
+    if(speedPresent(flags))          i += fields.InstantaneousSpeed.size;
+    if(avgSpeedPresent(flags))       i += fields.AverageSpeed.size;
+    if(cadencePresent(flags))        i += fields.InstantaneousCandence.size;
+    if(avgCadencePresent(flags))     i += fields.AverageCandence.size;
+    if(distancePresent(flags))       i += fields.TotalDistance.size;
+    if(resistancePresent(flags))     i += fields.ResistanceLevel.size;
+    if(powerPresent(flags))          i += fields.InstantaneousPower.size;
+    if(avgPowerPresent(flags))       i += fields.AvaragePower.size;
+    if(expandedEnergyPresent(flags)) i += fields.ExtendedEnergy.size;
+    return i;
+}
+
+function readSpeed(dataview) {
     const flags = dataview.getUint16(0, true);
     const speed = dataview.getUint16(speedIndex(flags), true);
     return (speed * fields.InstantaneousSpeed.resolution);
 }
-function getCadence(dataview) {
+
+function readCadence(dataview) {
     const flags = dataview.getUint16(0, true);
     const cadence = dataview.getUint16(cadenceIndex(flags), true);
     return (cadence * fields.InstantaneousCandence.resolution);
 }
-function getDistance(dataview) {
+
+function readDistance(dataview) {
     const flags = dataview.getUint16(0, true);
     const distance = dataview.getUint16(distanceIndex(flags), true);
     return (distance * fields.TotalDistance.resolution);
 }
-function getPower(dataview) {
-    const flags   = dataview.getUint16(0, true);
+
+function readPower(dataview) {
+    const flags = dataview.getUint16(0, true);
     return dataview.getUint16(powerIndex(flags), true);
+}
+
+function readHeartRate(dataview) {
+    const flags = dataview.getUint16(0, true);
+    return dataview.getUint8(heartRateIndex(flags), true);
 }
 
 // Example:
@@ -105,8 +133,8 @@ function getPower(dataview) {
 //     Instantanious Cadence: 10.0 per min
 //     Instantanious Power: 6 W" received
 //
-//              76543210
-// flags  68, 0b01000100
+//              21098 76543210
+// flags  68, 0b00000 01000100
 //
 //                               5432109876543210
 // flags,          66, 0x42,   0b0000000001000100
@@ -121,16 +149,19 @@ function indoorBikeDataDecoder(dataview) {
     let data = {};
 
     if(speedPresent(flags)) {
-        data['speed']    = getSpeed(dataview);
+        data['speed'] = readSpeed(dataview);
     }
     if(cadencePresent(flags)) {
-        data['cadence']  = getCadence(dataview);
+        data['cadence'] = readCadence(dataview);
     }
     if(distancePresent(flags)) {
-        data['distance'] = getDistance(dataview);
+        data['distance'] = readDistance(dataview);
     }
     if(speedPresent(flags)) {
-        data['power']    = getPower(dataview);
+        data['power'] = readPower(dataview);
+    }
+    if(heartRatePresent(flags)) {
+        data['heartRate'] = readHeartRate(dataview);
     }
 
     return data;

@@ -15,15 +15,21 @@ import { fitnessMachineFeatureDecoder } from './fitness-machine-feature.js';
 import { supportedPowerRange,
          supportedResistanceLevelRange } from './supported.js';
 
+import { equals, exists, first } from '../../functions.js';
+
 function eventToValue(decoder, callback) {
     return function (e) {
         return callback(decoder(e.target.value));
     };
 }
 
+function findCharacteristic(list, uuid) {
+    return first(list.filter(x => equals(x.uuid, uuid)));
+}
+
 class FitnessMachineService {
     uuid = uuids.fitnessMachine;
-    characteristics = {};
+
     constructor(args) {
         this.ble = args.ble;
         this.device = args.device;
@@ -32,61 +38,142 @@ class FitnessMachineService {
         this.onStatus = args.onStatus || ((x) => x);
         this.onControl = args.onControl || ((x) => x);
         this.onData = args.onData || ((x) => x);
-        // this.init();
+
+        this.characteristics = {
+            fitnessMachineFeature: {
+                uuid: uuids.fitnessMachineFeature,
+                supported: false,
+                characteristic: undefined,
+            },
+            supportedPowerRange: {
+                uuid: uuids.supportedPowerRange,
+                supported: false,
+                characteristic: undefined,
+            },
+            supportedResistanceLevelRange: {
+                uuid: uuids.supportedResistanceLevelRange,
+                supported: false,
+                characteristic: undefined,
+            },
+            fitnessMachineStatus: {
+                uuid: uuids.fitnessMachineStatus,
+                supported: false,
+                characteristic: undefined,
+            },
+            fitnessMachineControlPoint: {
+                uuid: uuids.fitnessMachineControlPoint,
+                supported: false,
+                characteristic: undefined,
+            },
+            indoorBikeData: {
+                uuid: uuids.indoorBikeData,
+                supported: false,
+                characteristic: undefined,
+            },
+        };
     }
+
     async init() {
         const self = this;
         self.service = await self.ble.getService(self.server, self.uuid);
-        self.characteristics = await self.getCharacteristics(self.service);
+        await self.getCharacteristics(self.service);
 
-        await self.ble.sub(self.characteristics.fitnessMachineStatus,
-                     eventToValue(fitnessMachineStatusDecoder, self.onStatus));
+        if(self.supported('fitnessMachineStatus')) {
+            await self.sub('fitnessMachineStatus', fitnessMachineStatusDecoder, self.onStatus);
+        }
 
-        await self.ble.sub(self.characteristics.indoorBikeData,
-                     eventToValue(indoorBikeDataDecoder, self.onData));
+        if(self.supported('indoorBikeData')) {
+            await self.sub('indoorBikeData', indoorBikeDataDecoder, self.onData);
+        }
 
-        await self.ble.sub(self.characteristics.fitnessMachineControlPoint,
-                     eventToValue(controlPointResponseDecoder, self.onControl));
+        if(self.supported('fitnessMachineControlPoint')) {
+            await self.sub('fitnessMachineControlPoint', controlPointResponseDecoder, self.onControl);
+        }
 
         await self.requestControl();
     }
+    characteristic(key) {
+        const self = this;
+        if(exists(self.characteristics[key])) {
+            return self.characteristics[key].characteristic;
+        }
+        return undefined;
+    }
+    supported(key) {
+        const self = this;
+        if(exists(self.characteristics[key])) {
+            return self.characteristics[key].supported;
+        }
+        return false;
+    }
     async getCharacteristics(service) {
         const self = this;
-        const fitnessMachineFeature         = await self.ble.getCharacteristic(service, uuids.fitnessMachineFeature);
-        const supportedPowerRange           = await self.ble.getCharacteristic(service, uuids.supportedPowerRange);
-        const supportedResistanceLevelRange = await self.ble.getCharacteristic(service, uuids.supportedResistanceLevelRange);
-        const fitnessMachineStatus          = await self.ble.getCharacteristic(service, uuids.fitnessMachineStatus);
-        const fitnessMachineControlPoint    = await self.ble.getCharacteristic(service, uuids.fitnessMachineControlPoint);
-        const indoorBikeData                = await self.ble.getCharacteristic(service, uuids.indoorBikeData);
+        const list = await self.ble.getCharacteristics(service);
 
-        return { fitnessMachineFeature,
-                 supportedPowerRange,
-                 supportedResistanceLevelRange,
-                 fitnessMachineStatus,
-                 fitnessMachineControlPoint,
-                 indoorBikeData };
+        Object.keys(self.characteristics).forEach((key) => {
+            const characteristic = findCharacteristic(list, self.characteristics[key].uuid);
+
+            if(exists(characteristic)) {
+                self.characteristics[key].characteristic = characteristic;
+                self.characteristics[key].supported = true;
+            }
+
+            return;
+        });
+
+        console.log(list);
+        console.log(self.characteristics);
+
+        return;
+    }
+    async sub(prop, decoder, callback) {
+        const self = this;
+        const characteristic = self.characteristic(prop);
+
+        if(exists(characteristic)) {
+            await self.ble.sub(characteristic, eventToValue(decoder, callback));
+            return true;
+        } else {
+            return false;
+        }
+    }
+    async write(characteristic, buffer) {
+        const self = this;
+
+        if(exists(characteristic)) {
+            const res = await self.ble.writeCharacteristic(characteristic, buffer);
+            return res;
+        } else {
+            return false;
+        }
     }
     async requestControl() {
         const self = this;
-        return await self.ble.writeCharacteristic(self.characteristics.fitnessMachineControlPoint, requestControl().buffer);
+        const buffer = requestControl();
+        const characteristic = self.characteristic('fitnessMachineControlPoint');
+
+        return await self.write(characteristic, buffer);
     }
     async setTargetPower(value) {
         const self = this;
         const buffer = powerTarget(value);
-        const characteristic = self.characteristics.fitnessMachineControlPoint;
-        self.ble.writeCharacteristic(characteristic, buffer);
+        const characteristic = self.characteristic('fitnessMachineControlPoint');
+
+        return await self.write(characteristic, buffer);
     }
     async setTargetResistance(value) {
         const self = this;
         const buffer = resistanceTarget(value);
-        const characteristic = self.characteristics.fitnessMachineControlPoint;
-        self.ble.writeCharacteristic(characteristic, buffer);
+        const characteristic = self.characteristic('fitnessMachineControlPoint');
+
+        return await self.write(characteristic, buffer);
     }
     async setTargetSlope(value) {
         const self = this;
         const buffer = slopeTarget(value);
-        const characteristic = self.characteristics.fitnessMachineControlPoint;
-        self.ble.writeCharacteristic(characteristic, buffer);
+        const characteristic = self.characteristic('fitnessMachineControlPoint');
+
+        return await self.write(characteristic, buffer);
     }
 }
 

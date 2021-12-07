@@ -84,6 +84,7 @@ function onIndoorBikeData(value) {
     if(exists(value.status)  && models.sources.isSource('power', self.id)) {
         xf.dispatch(`${self.id}:fec:calibration`, value.status);
     }
+    if(exists(value.heartRate) && models.sources.isSource('heartRate', self.id))  xf.dispatch(`heartRate`, value.heartRate);
 }
 function onControllableInfo(value) {
     console.log(`Fitness Machine Information: `, value);
