@@ -2,7 +2,6 @@
 // A collection of common functions that makes JS more functional
 //
 
-
 // Values
 function equals(a, b) {
     return Object.is(a, b);
@@ -27,7 +26,10 @@ function existance(value, fallback) {
     throw new Error(`existance needs a fallback value `, value);
 }
 
-// Collections
+function isFunction(x) {
+    return equals(typeof x, 'function');
+}
+
 function isArray(x) {
     return Array.isArray(x);
 }
@@ -44,6 +46,15 @@ function isString(x) {
     return equals(typeof x, 'string');
 }
 
+function isNumber(x) {
+    return equals(typeof x, 'number');
+}
+
+function isAtomic(x) {
+    return isNumber(x) || isString(x);
+}
+
+// Collections
 function empty(x) {
     if(isNull(x)) throw new Error(`empty called with null: ${x}`);
     if(!isCollection(x) && !isString(x) && !isUndefined(x)) {
@@ -136,10 +147,21 @@ function traverse(obj, fn = ((x) => x), acc = []) {
 function getIn(...args) {
     let [collection, ...path] = args;
     return path.reduce((acc, key) => {
-        if(acc[key]) return acc[key];
+        if(exists(acc[key])) return acc[key];
         return undefined;
     }, collection);
 }
+
+function set(coll, k, v) {
+    coll = (coll || {});
+    coll[k] = v;
+    return coll;
+}
+
+function setIn(coll={}, [k, ...keys], v) {
+    return keys.length ? set(coll, k, setIn(coll[k], keys, v)) : set(coll, k, v);
+}
+
 
 function avg(xs, prop = false) {
     if(prop !== false) {
@@ -164,6 +186,14 @@ function sum(xs, path = false) {
         return xs.reduce( (acc,v,i) => acc + v, 0);
     }
 };
+
+function rand(min = 0, max = 10) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function capitalize(str) {
+    return str.trim().replace(/^\w/, (c) => c.toUpperCase());
+}
 
 // Functions
 function compose2(f, g) {
@@ -192,6 +222,18 @@ function repeat(n) {
     };
 };
 
+function curry2(fn) {
+    return function (arg1, arg2) {
+        if(exists(arg2)) {
+            return fn(arg1, arg2);
+        } else {
+            return function(arg2) {
+                return fn(arg1, arg2);
+            };
+        }
+    };
+}
+
 // Async
 function delay(ms) {
     return new Promise(res => setTimeout(res, ms));
@@ -218,7 +260,7 @@ function XF(args = {}) {
     }
 
     function dispatch(eventType, value) {
-        document.dispatchEvent(evt(eventType)(value));
+        window.dispatchEvent(evt(eventType)(value));
     }
 
     function sub(eventType, handler, element = false) {
@@ -234,21 +276,21 @@ function XF(args = {}) {
                 }
             }
 
-            document.addEventListener(eventType, handlerWraper, true);
+            window.addEventListener(eventType, handlerWraper, true);
 
             return handlerWraper;
         }
     }
 
     function reg(eventType, handler) {
-        document.addEventListener(eventType, e => handler(e.detail.data, data));
+        window.addEventListener(eventType, e => handler(e.detail.data, data));
     }
 
     function unsub(eventType, handler, element = false) {
         if(element) {
             element.removeEventListener(eventType, handler, true);
         } else {
-            document.removeEventListener(eventType, handler, true);
+            window.removeEventListener(eventType, handler, true);
         }
     }
 
@@ -270,7 +312,13 @@ function XF(args = {}) {
         return first(eventType.split(':'));
     }
 
-    return Object.freeze({ create, reg, sub, dispatch, unsub });
+    return Object.freeze({
+        create,
+        reg,
+        sub,
+        dispatch,
+        unsub
+    });
 }
 
 const xf = XF();
@@ -342,14 +390,17 @@ export {
     equals,
     isNull,
     isUndefined,
+    isFunction,
     exists,
     existance,
-
-    // collections
     isArray,
     isObject,
     isString,
     isCollection,
+    isNumber,
+    isAtomic,
+
+    // collections
     first,
     second,
     third,
@@ -357,15 +408,20 @@ export {
     empty,
     map,
     traverse,
+    getIn,
+    set,
+    setIn,
     avg,
     max,
     sum,
-    getIn,
+    rand,
+    capitalize,
 
     // functions
     compose,
     pipe,
     repeat,
+    curry2,
 
     // async
     delay,

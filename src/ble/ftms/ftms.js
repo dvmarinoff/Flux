@@ -1,21 +1,14 @@
 import { uuids } from '../uuids.js';
-import { indoorBikeDataDecoder } from './indoor-bike-data.js';
-
-import { powerTarget,
-         resistanceTarget,
-         slopeTarget,
-         simulationParameters,
-         requestControl,
-         controlPointResponseDecoder } from './control-point.js';
-
-import { fitnessMachineStatusDecoder } from './fitness-machine-status.js';
+import { indoorBikeData } from './indoor-bike-data.js';
+import { control } from './control-point.js';
+import { status } from './fitness-machine-status.js';
 
 import { fitnessMachineFeatureDecoder } from './fitness-machine-feature.js';
 
 import { supportedPowerRange,
          supportedResistanceLevelRange } from './supported.js';
 
-import { equals, exists, first } from '../../functions.js';
+import { equals, exists, existance, first } from '../../functions.js';
 
 function eventToValue(decoder, callback) {
     return function (e) {
@@ -30,14 +23,13 @@ function findCharacteristic(list, uuid) {
 class FitnessMachineService {
     uuid = uuids.fitnessMachine;
 
-    constructor(args) {
-        this.ble = args.ble;
-        this.device = args.device;
-        this.server = args.server;
-        this.deviceServices = args.services;
-        this.onStatus = args.onStatus || ((x) => x);
-        this.onControl = args.onControl || ((x) => x);
-        this.onData = args.onData || ((x) => x);
+    constructor(args = {}) {
+        this.ble       = existance(args.ble);
+        this.device    = existance(args.device);
+        this.server    = existance(args.server);
+        this.onData    = existance(args.onData,    ((x) => x));
+        this.onStatus  = existance(args.onStatus,  this.defaultOnStatus);
+        this.onControl = existance(args.onControl, this.defaultOnControlPoint);
 
         this.characteristics = {
             fitnessMachineFeature: {
@@ -79,15 +71,15 @@ class FitnessMachineService {
         await self.getCharacteristics(self.service);
 
         if(self.supported('fitnessMachineStatus')) {
-            await self.sub('fitnessMachineStatus', fitnessMachineStatusDecoder, self.onStatus);
+            await self.sub('fitnessMachineStatus', status.decode, self.onStatus);
         }
 
         if(self.supported('indoorBikeData')) {
-            await self.sub('indoorBikeData', indoorBikeDataDecoder, self.onData);
+            await self.sub('indoorBikeData', indoorBikeData.decode, self.onData);
         }
 
         if(self.supported('fitnessMachineControlPoint')) {
-            await self.sub('fitnessMachineControlPoint', controlPointResponseDecoder, self.onControl);
+            await self.sub('fitnessMachineControlPoint', control.response.decode, self.onControl);
         }
 
         await self.requestControl();
@@ -121,7 +113,6 @@ class FitnessMachineService {
             return;
         });
 
-        console.log(list);
         console.log(self.characteristics);
 
         return;
@@ -149,32 +140,39 @@ class FitnessMachineService {
     }
     async requestControl() {
         const self = this;
-        const buffer = requestControl();
+        const buffer = control.requestControl.encode();
         const characteristic = self.characteristic('fitnessMachineControlPoint');
 
         return await self.write(characteristic, buffer);
     }
     async setTargetPower(value) {
         const self = this;
-        const buffer = powerTarget(value);
+        const buffer = control.powerTarget.encode({power: value});
         const characteristic = self.characteristic('fitnessMachineControlPoint');
 
         return await self.write(characteristic, buffer);
     }
     async setTargetResistance(value) {
         const self = this;
-        const buffer = resistanceTarget(value);
+        const buffer = control.resistanceTarget.encode({resistance: value});
         const characteristic = self.characteristic('fitnessMachineControlPoint');
 
         return await self.write(characteristic, buffer);
     }
     async setTargetSlope(value) {
         const self = this;
-        const buffer = slopeTarget(value);
+        const buffer = control.simulationParameters.encode({grade: value});;
         const characteristic = self.characteristic('fitnessMachineControlPoint');
 
         return await self.write(characteristic, buffer);
     }
+    defaultOnControlPoint(decoded) {
+        control.response.toString(decoded);
+    }
+    defaultOnStatus(decoded) {
+        status.toString(decoded);
+    }
+
 }
 
 export { FitnessMachineService };

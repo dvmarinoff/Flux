@@ -182,9 +182,10 @@ class PowerTarget extends Target {
 class ResistanceTarget extends Target {
     postInit(args) {
         this.min = args.min || 0;
-        this.max = args.max || 100;
-        this.step = args.step || 10;
+        this.max = args.max || 25.5; // 10
+        this.step = args.step || 1;  // 1
     }
+    parse(value) { return parseFloat(value); }
 }
 
 class SlopeTarget extends Target {

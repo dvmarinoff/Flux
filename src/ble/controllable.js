@@ -37,9 +37,11 @@ class Controllable extends Device {
     }
     async deviceInformation(device) {
         const self = this;
-        const dis = new DeviceInformationService({ble: ble,
-                                                onInfo: onControllableInfo,
-                                                ...device});
+        const dis = new DeviceInformationService({
+            ble:    ble,
+            onInfo: onControllableInfo,
+            ...device
+        });
 
         if(ble.hasService(device, uuids.deviceInformation)) {
             await dis.init();
@@ -50,19 +52,21 @@ class Controllable extends Device {
     async controlService(device) {
         const self = this;
         if(ble.hasService(device, uuids.fitnessMachine)) {
-            const ftms = new FitnessMachineService({ble: ble,
-                                                    onStatus: onFitnessMachineStatus,
-                                                    onData: onIndoorBikeData.bind(self),
-                                                    onControl: onFitnessMachineControlPoint,
-                                                    ...device});
+            const ftms = new FitnessMachineService({
+                ble:      ble,
+                onStatus: onFitnessMachineStatus,
+                onData:   onIndoorBikeData.bind(self),
+                ...device
+            });
             await ftms.init();
 
             return ftms;
         }
         if(ble.hasService(device, uuids.fec)) {
-            const fec = new FEC({ble: ble,
-                                onData: onIndoorBikeData.bind(self),
-                                ...device});
+            const fec = new FEC({
+                ble:    ble,
+                onData: onIndoorBikeData.bind(self),
+                ...device});
             await fec.init();
 
             return fec;
@@ -70,32 +74,41 @@ class Controllable extends Device {
 
         console.warn(`no FTMS or FE-C over BLE found on device ${device.device.name}`, device);
 
-        return {setTargetPower: ((x) => x),
-                setTargetResistance: ((x) => x),
-                setTargetSlope: ((x) => x)};
+        return {
+            setTargetPower:      ((x) => x),
+            setTargetResistance: ((x) => x),
+            setTargetSlope:      ((x) => x)
+        };
     }
 }
 
 function onIndoorBikeData(value) {
     const self = this;
-    if(exists(value.power)   && models.sources.isSource('power', self.id))   xf.dispatch(`power`, value.power);
-    if(exists(value.cadence) && models.sources.isSource('cadence', self.id)) xf.dispatch(`cadence`, value.cadence);
-    if(exists(value.speed)   && models.sources.isSource('speed', self.id))   xf.dispatch(`speed`, value.speed);
-    if(exists(value.status)  && models.sources.isSource('power', self.id)) {
+    if(exists(value.power) && models.sources.isSource('power', self.id)) {
+        xf.dispatch(`power`, value.power);
+    };
+    if(exists(value.cadence) && models.sources.isSource('cadence', self.id)) {
+        xf.dispatch(`cadence`, value.cadence);
+    };
+    if(exists(value.speed) && models.sources.isSource('speed', self.id)) {
+        xf.dispatch(`speed`, value.speed);
+    };
+    if(exists(value.heartRate) && models.sources.isSource('heartRate', self.id)) {
+        xf.dispatch(`heartRate`, value.heartRate);
+    };
+    if(exists(value.status) && models.sources.isSource('power', self.id)) {
         xf.dispatch(`${self.id}:fec:calibration`, value.status);
     }
-    if(exists(value.heartRate) && models.sources.isSource('heartRate', self.id))  xf.dispatch(`heartRate`, value.heartRate);
 }
+
 function onControllableInfo(value) {
     console.log(`Fitness Machine Information: `, value);
 }
-function onFitnessMachineStatus(res) {
-    let value = '';
-    if(res.value) value = ` :value ${isObject(res.value)? JSON.stringify(res.value) : res.value}`;
-    console.log(`:status '${res.msg}'${value}`);
+
+function onFitnessMachineStatus(value) {
 }
+
 function onFitnessMachineControlPoint(value) {
-    console.log(`:operation '${value.operation}' :result :${value.result}`);
 }
 
 export { Controllable };

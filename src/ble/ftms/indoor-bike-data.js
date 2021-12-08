@@ -1,3 +1,7 @@
+//
+// 4.9 Indoor Bike Data (characteristic)
+//
+
 import { nthBitToBool }  from '../../functions.js';
 
 const flags = {
@@ -83,6 +87,33 @@ function powerIndex(flags) {
     return i;
 }
 
+function energyPerHourIndex(flags) {
+    let i = fields.Flags.size;
+    if(speedPresent(flags))          i += fields.InstantaneousSpeed.size;
+    if(avgSpeedPresent(flags))       i += fields.AverageSpeed.size;
+    if(cadencePresent(flags))        i += fields.InstantaneousCandence.size;
+    if(avgCadencePresent(flags))     i += fields.AverageCandence.size;
+    if(distancePresent(flags))       i += fields.TotalDistance.size;
+    if(resistancePresent(flags))     i += fields.ResistanceLevel.size;
+    if(powerPresent(flags))          i += fields.InstantaneousPower.size;
+    if(avgPowerPresent(flags))       i += fields.AvaragePower.size;
+    return i;
+}
+
+function energyPerMinuteIndex(flags) {
+    let i = fields.Flags.size;
+    if(speedPresent(flags))          i += fields.InstantaneousSpeed.size;
+    if(avgSpeedPresent(flags))       i += fields.AverageSpeed.size;
+    if(cadencePresent(flags))        i += fields.InstantaneousCandence.size;
+    if(avgCadencePresent(flags))     i += fields.AverageCandence.size;
+    if(distancePresent(flags))       i += fields.TotalDistance.size;
+    if(resistancePresent(flags))     i += fields.ResistanceLevel.size;
+    if(powerPresent(flags))          i += fields.InstantaneousPower.size;
+    if(avgPowerPresent(flags))       i += fields.AvaragePower.size;
+    if(expandedEnergyPresent(flags)) i += fields.EnergyPerHour.size;
+    return i;
+}
+
 function heartRateIndex(flags) {
     let i = fields.Flags.size;
     if(speedPresent(flags))          i += fields.InstantaneousSpeed.size;
@@ -93,7 +124,7 @@ function heartRateIndex(flags) {
     if(resistancePresent(flags))     i += fields.ResistanceLevel.size;
     if(powerPresent(flags))          i += fields.InstantaneousPower.size;
     if(avgPowerPresent(flags))       i += fields.AvaragePower.size;
-    if(expandedEnergyPresent(flags)) i += fields.ExtendedEnergy.size;
+    if(expandedEnergyPresent(flags)) i += fields.EnergyPerHour.size + fields.EnergyPerMinute.size;
     return i;
 }
 
@@ -155,27 +186,40 @@ function readHeartRate(dataview) {
 //
 // (0x) 42-00- b8-0b- a0-00 b4-00
 
-function indoorBikeDataDecoder(dataview) {
-    const flags = dataview.getUint16(0, true);
-    let data = {};
+function IndoorBikeData(dataview) {
 
-    if(speedPresent(flags)) {
-        data['speed'] = readSpeed(dataview);
-    }
-    if(cadencePresent(flags)) {
-        data['cadence'] = readCadence(dataview);
-    }
-    if(distancePresent(flags)) {
-        data['distance'] = readDistance(dataview);
-    }
-    if(speedPresent(flags)) {
-        data['power'] = readPower(dataview);
-    }
-    if(heartRatePresent(flags)) {
-        data['heartRate'] = readHeartRate(dataview);
+    function decode(dataview) {
+        const flags = dataview.getUint16(0, true);
+        let data = {};
+
+        if(speedPresent(flags)) {
+            data['speed'] = readSpeed(dataview);
+        }
+        if(cadencePresent(flags)) {
+            data['cadence'] = readCadence(dataview);
+        }
+        if(distancePresent(flags)) {
+            data['distance'] = readDistance(dataview);
+        }
+        if(speedPresent(flags)) {
+            data['power'] = readPower(dataview);
+        }
+        if(heartRatePresent(flags)) {
+            data['heartRate'] = readHeartRate(dataview);
+        }
+
+        return data;
     }
 
-    return data;
+    function encode() {
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
 }
 
-export { indoorBikeDataDecoder };
+const indoorBikeData = IndoorBikeData();
+
+export { indoorBikeData };
