@@ -26,16 +26,30 @@ function readHeartRate(dataview) {
     }
 }
 
-function heartRateMeasurementDecoder(dataview) {
-    const flags = dataview.getUint16(0, true);
+function HeartRateMeasurement() {
 
-    let data = {};
+    function encode(args = {}) {
+    }
 
-    data['heartRate'] = readHeartRate(dataview);
+    function decode(dataview) {
+        const flags     = dataview.getUint16(0, true);
+        const heartRate = readHeartRate(dataview);
 
-    return data;
+        let data = {};
+
+        data['heartRate'] = heartRate;
+
+        return data;
+    }
+
+    return Object.freeze({
+        encode,
+        decode
+    });
 }
 
+const heartRateMeasurement = HeartRateMeasurement();
+
 export {
-    heartRateMeasurementDecoder
+    heartRateMeasurement
 };
