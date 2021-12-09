@@ -72,11 +72,11 @@ class FitnessMachineService {
         self.features = await self.getFeatures();
 
         if(self.supported('fitnessMachineStatus')) {
-            self.sub('fitnessMachineStatus', status.decode, self.onStatus);
+            await self.sub('fitnessMachineStatus', status.decode, self.onStatus);
         }
 
         if(self.supported('indoorBikeData')) {
-            self.sub('indoorBikeData', indoorBikeData.decode, self.onData);
+            await self.sub('indoorBikeData', indoorBikeData.decode, self.onData);
         }
 
         if(self.supported('fitnessMachineControlPoint')) {
