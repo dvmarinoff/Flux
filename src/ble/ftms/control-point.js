@@ -3,7 +3,7 @@
 //
 
 import { fixInRange, hex }  from '../../utils.js';
-import { exists, existance, curry2 }  from '../../functions.js';
+import {  existance, curry2 }  from '../../functions.js';
 
 const logs = true;
 
@@ -72,9 +72,7 @@ function PowerTarget(power) {
 
     function decode(dataview) {
         const opCode = dataview.getUint8(0);
-        const power  = data.decodeField('power', dataview.getUint8(1));
-
-        // log(`:rx :ftms :power ${power}`);
+        const power  = data.decodeField('power', dataview.getInt16(1, true));
 
         return {
             power,
@@ -116,9 +114,7 @@ function ResistanceTarget() {
 
     function decode(dataview) {
         const opCode     = dataview.getUint8(0);
-        const resistance = data.decodeField('resistance', dataview.getUint8(1));
-
-        // log(`:rx :ftms :resistance ${resistance}`);
+        const resistance = data.decodeField('resistance', dataview.getUint8(1, true));
 
         return {
             resistance,
@@ -169,12 +165,10 @@ function SimulationParameters(args) {
 
     function decode(dataview) {
         const opCode         = dataview.getUint8(0);
-        const windSpeed      = data.decodeField('windSpeed', dataview.getInt16(1));
-        const grade          = data.decodeField('grade', dataview.getInt16(3));
-        const crr            = data.decodeField('crr', dataview.getUint8(5));
-        const windResistance = data.decodeField('windResistance', dataview.getUint8(6));
-
-        // log(`:rx :ftms :simulation {:windSpeed ${windSpeed} :grade ${grade} :crr ${crr} :windResistance ${windResistance}}`);
+        const windSpeed      = data.decodeField('windSpeed', dataview.getUint16(1, true));
+        const grade          = data.decodeField('grade', dataview.getInt16(3, true));
+        const crr            = data.decodeField('crr', dataview.getInt8(5, true));
+        const windResistance = data.decodeField('windResistance', dataview.getUint8(6, true));
 
         return {
             windSpeed,
@@ -198,15 +192,22 @@ function WheelCircumference(args) {
     const length = 3;
 
     const definitions = {
-        circumference: {resolution: 0.1, unit: 'mm', min: 0, max: 0, default: 2105}
+        circumference: {resolution: 0.1, unit: 'mm', min: 0, max: 6553.4, default: 2105}
     };
 
-    const data = Data({definitions});
+    const values = {
+        2080: '700x19C', 2086: '700x20C', 2096: '700x23C', 2105: '700x25C', 2136: '700x28C',
+	      2146: '700x30C', 2155: '700x32C', 2168: '700x35C', 2180: '700x38C',
+        2200: '700x40C', 2242: '700x45C', 2268: '700x47C',
+        2281: `29"x2.25"`, 2326: `29"x2.3"`, 2750: '',
+    };
 
     // 700x25C -> 2105 -> [0x12, 0x3A, 0x52] -> [18, 58, 82]
     // 700x40C -> 2200 -> [0x12, 0xF0, 0x55] -> [18, 240, 85]
     // 700x47C -> 2268 -> [0x12, 0x98, 0x58] -> [18, 152, 88]
     // Max     -> 2750 -> [0x12, 0x6C, 0x6B] -> [18, 108, 107]
+
+    const data = Data({definitions});
 
     function encode(args = {}) {
         const circumference = data.encodeField('circumference', args.circumference);
@@ -228,22 +229,46 @@ function WheelCircumference(args) {
         log(`:rx :ftms :wheelCircumference ${circumference}`);
 
         return {
-            // opCode,
             circumference,
         };
     }
 
-    return {
+    return Object.freeze({
         opCode,
         length,
         definitions,
+        values,
         encode,
         decode,
-    };
+    });
+}
+
+function Reset() {
+    const opCode = 0x01;
+    const length = 1;
+
+    function encode() {
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, opCode, true);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0);
+        return { opCode };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        encode,
+        decode
+    });
 }
 
 function RequestControl() {
-    // just a control request
     const opCode = 0x00;
     const length = 1;
 
@@ -269,6 +294,7 @@ function RequestControl() {
 }
 
 function Response() {
+    const opCode = 0x80;
 
     // Format:
     // response code - request code - result code
@@ -276,9 +302,9 @@ function Response() {
     // 128-5-3
     // 128-5-1
     //
-    // 128 (0x80) - success | request control  | success
-    // 128 (0x80) - success | set target power | invalid parameter
-    // 128 (0x80) - success | set target power | success
+    // 128 (0x80) | request control  | success
+    // 128 (0x80) | set target power | invalid parameter
+    // 128 (0x80) | set target power | success
 
     const results = {
         '0x01': {definition: 'success',          msg: 'success'},
@@ -301,22 +327,22 @@ function Response() {
     }
 
     function decode(dataview) {
-        const responseCode = dataview.getUint8(0, true);
-        const requestCode  = dataview.getUint8(1, true);
-        const resultCode   = dataview.getUint8(2, true);
+        const opCode      = dataview.getUint8(0, true);
+        const requestCode = dataview.getUint8(1, true);
+        const resultCode  = dataview.getUint8(2, true);
 
         return {
-            responseCode,
+            opCode,
             requestCode,
             resultCode,
         };
     }
 
     function toString(decoded = {}) {
-        const response = hex(decoded.responseCode);
-        const request  = requests[hex(decoded.requestCode)].msg;
-        const result   = results[hex(decoded.resultCode)].msg;
-        const str = `${response} - ${request} - ${result}`;
+        const opCode  = hex(decoded.opCode);
+        const request = requests[hex(decoded.requestCode)].msg;
+        const result  = results[hex(decoded.resultCode)].msg;
+        const str = `${request} - ${result}`;
 
         log(`:rx :ftms :response '${str}'`);
 
@@ -336,9 +362,10 @@ const control = {
     powerTarget:          PowerTarget(),
     resistanceTarget:     ResistanceTarget(),
     simulationParameters: SimulationParameters(),
+    wheelCircumference:   WheelCircumference(),
     requestControl:       RequestControl(),
     response:             Response(),
-    wheelCircumference:   WheelCircumference(),
+    reset:                Reset(),
 };
 
 export {

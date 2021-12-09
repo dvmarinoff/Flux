@@ -3,10 +3,9 @@ import { indoorBikeData } from './indoor-bike-data.js';
 import { control } from './control-point.js';
 import { status } from './fitness-machine-status.js';
 
-import { fitnessMachineFeatureDecoder } from './fitness-machine-feature.js';
+import { feature } from './fitness-machine-feature.js';
 
-import { supportedPowerRange,
-         supportedResistanceLevelRange } from './supported.js';
+import { supported } from './supported-ranges.js';
 
 import { equals, exists, existance, first } from '../../functions.js';
 
@@ -68,14 +67,16 @@ class FitnessMachineService {
     async init() {
         const self = this;
         self.service = await self.ble.getService(self.server, self.uuid);
+
         await self.getCharacteristics(self.service);
+        self.features = await self.getFeatures();
 
         if(self.supported('fitnessMachineStatus')) {
-            await self.sub('fitnessMachineStatus', status.decode, self.onStatus);
+            self.sub('fitnessMachineStatus', status.decode, self.onStatus);
         }
 
         if(self.supported('indoorBikeData')) {
-            await self.sub('indoorBikeData', indoorBikeData.decode, self.onData);
+            self.sub('indoorBikeData', indoorBikeData.decode, self.onData);
         }
 
         if(self.supported('fitnessMachineControlPoint')) {
@@ -98,6 +99,16 @@ class FitnessMachineService {
         }
         return false;
     }
+    async getFeatures(service) {
+        const self = this;
+        const characteristic = self.characteristic('fitnessMachineFeature');
+        const { value }      = await self.ble.readCharacteristic(characteristic);
+        const features       = feature.decode(value);
+
+        console.log(':rx :feature ', JSON.stringify(features));
+
+        return features;
+    }
     async getCharacteristics(service) {
         const self = this;
         const list = await self.ble.getCharacteristics(service);
@@ -113,7 +124,7 @@ class FitnessMachineService {
             return;
         });
 
-        console.log(self.characteristics);
+        // console.log(':rx :characteristics ', self.characteristics);
 
         return;
     }
@@ -145,6 +156,13 @@ class FitnessMachineService {
 
         return await self.write(characteristic, buffer);
     }
+    async reset() {
+        const self = this;
+        const buffer = control.reset.encode();
+        const characteristic = self.characteristic('fitnessMachineControlPoint');
+
+        return await self.write(characteristic, buffer);
+    }
     async setTargetPower(value) {
         const self = this;
         const buffer = control.powerTarget.encode({power: value});
@@ -162,6 +180,13 @@ class FitnessMachineService {
     async setTargetSlope(value) {
         const self = this;
         const buffer = control.simulationParameters.encode({grade: value});;
+        const characteristic = self.characteristic('fitnessMachineControlPoint');
+
+        return await self.write(characteristic, buffer);
+    }
+    async setWheelCircumference(value) {
+        const self = this;
+        const buffer = control.wheelCircumference.encode({circumference: value});;
         const characteristic = self.characteristic('fitnessMachineControlPoint');
 
         return await self.write(characteristic, buffer);

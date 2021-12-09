@@ -1,6 +1,6 @@
 import { nthBitToBool }  from '../../functions.js';
 
-const read =  {
+const reading =  {
     avgSpeed:            (flags) => nthBitToBool(flags,  0),
     cadence:             (flags) => nthBitToBool(flags,  1),
     distance:            (flags) => nthBitToBool(flags,  2),
@@ -40,27 +40,43 @@ const target =  {
     cadence:              (flags) => nthBitToBool(flags, 16)
 };
 
-function fitnessMachineFeatureDecoder(dataview) {
-    const featureFlags = dataview.getUint32(0, true); // 0-31 flags
-    const targetFlags  = dataview.getUint32(4, true); // 0-31 flags
+function FitnessMachineFeature() {
 
-    let readings = [];
-    let targets  = [];
+    function decode(dataview) {
+        const featureFlags = dataview.getUint32(0, true); // 0-31 flags
+        const targetFlags  = dataview.getUint32(4, true); // 0-31 flags
 
-    if(read.avgSpeed(featureFlags)) readings.push('Speed');
-    if(read.cadence(featureFlags))  readings.push('Cadence');
-    if(read.distance(featureFlags)) readings.push('Distance');
-    if(read.power(featureFlags))    readings.push('Power');
+        let readings = [];
+        let targets  = [];
 
-    if(target.speed(targetFlags))      targets.push('Speed');
-    if(target.cadence(targetFlags))    targets.push('Cadence');
-    if(target.distance(featureFlags))  targets.push('Distance');
-    if(target.resistance(targetFlags)) targets.push('Resistance');
-    if(target.power(targetFlags))      targets.push('Power');
-    if(target.simulation(targetFlags)) targets.push('Simulation');
-    if(target.spinDown(targetFlags))   targets.push('SpinDown');
+        if(reading.avgSpeed(featureFlags)) readings.push('Speed');
+        if(reading.cadence(featureFlags))  readings.push('Cadence');
+        if(reading.distance(featureFlags)) readings.push('Distance');
+        if(reading.power(featureFlags))    readings.push('Power');
 
-    return { readings, targets };
+        if(target.speed(targetFlags))      targets.push('Speed');
+        if(target.cadence(targetFlags))    targets.push('Cadence');
+        if(target.distance(featureFlags))  targets.push('Distance');
+        if(target.resistance(targetFlags)) targets.push('Resistance');
+        if(target.power(targetFlags))      targets.push('Power');
+        if(target.simulation(targetFlags)) targets.push('Simulation');
+        if(target.spinDown(targetFlags))   targets.push('SpinDown');
+
+        return {
+            readings,
+            targets
+        };
+    }
+
+    function encode() {
+    }
+
+    return Object.freeze({
+        encode,
+        decode
+    });
 }
 
-export { fitnessMachineFeatureDecoder };
+const feature = FitnessMachineFeature();
+
+export { feature };

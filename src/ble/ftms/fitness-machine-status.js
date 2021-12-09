@@ -87,7 +87,7 @@ function FitnessMachineStatus() {
             value = decodeParam(operation, dataview);
         }
 
-        log(`:rx :ftms :status :operation '${operation.name}' :value ${existance(JSON.stringify(value), ':na')}`);
+        log(`:rx :ftms :status '${operation.name}' ${JSON.stringify(value)}`);
 
         return {
             operation: operation.name,
