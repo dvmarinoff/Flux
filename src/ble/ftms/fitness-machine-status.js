@@ -1,23 +1,54 @@
-import { equals } from '../../functions.js';
+//
+// 4.17 Fitness Machine Status (characteristic)
+//
+
+import { equals, exists, existance } from '../../functions.js';
 import { hex } from '../../utils.js';
 
-const fitnessMachineStatusCodes = {
-    '0x00': {param: false, msg: 'Reserved for Future Use'},
-    '0x01': {param: false, msg: 'Reset'},
-    '0x02': {param: false, msg: 'Fitness Machine Stopped or Paused by the User'},
-    '0x03': {param: false, msg: 'Fitness Machine Stopped by Safety Key'},
-    '0x04': {param: false, msg: 'Fitness Machine Started or Resumed by the User'},
-    '0x05': {param: true,  msg: 'Target Speed Changed'},
-    '0x06': {param: true,  msg: 'Target Incline Changed'},
-    '0x07': {param: true,  msg: 'Target Resistance Level Changed'},
-    '0x08': {param: true,  msg: 'Target Power Changed'},
-    '0x09': {param: true,  msg: 'Target Heart Rate Changed'},
-    '0x0D': {param: true,  msg: 'Target Distance Changed'},
-    '0x12': {param: true,  msg: 'Indoor Bike Simulation Parameters Changed'},
-    '0x13': {param: true,  msg: 'Wheel Circumference Changed'},
-    '0x14': {param: true,  msg: 'Spin Down Status'},
-    '0x15': {param: true,  msg: 'Targeted Cadence Changed'},
-    '0xFF': {param: false, msg: 'Control Permission Lost'},
+import { control } from './control-point.js';
+
+
+
+const logs = true;
+
+function log(msg) {
+    if(logs) {
+        console.log(msg);
+    }
+}
+
+const fitnessMachineStatusOpCodes = {
+    '0x00': {param: false, name: 'Reserved for Future Use'},
+    '0x01': {param: false, name: 'Reset'},
+    '0x02': {param: false, name: 'Fitness Machine Stopped or Paused by the User'},
+    '0x03': {param: false, name: 'Fitness Machine Stopped by Safety Key'},
+    '0x04': {param: false, name: 'Fitness Machine Started or Resumed by the User'},
+    '0x05': {param: true,  name: 'Target Speed Changed'},
+    '0x06': {param: true,  name: 'Target Incline Changed'},
+    '0x07': {param: true,
+             decoder: control.resistanceTarget.decode,
+             name: 'Target Resistance Level Changed'},
+    '0x08': {param: true,
+             decoder: control.powerTarget.decode,
+             name: 'Target Power Changed'},
+    '0x09': {param: true,  name: 'Target Heart Rate Changed'},
+    '0x0A': {param: false, name: 'Targeted Expended Energy Changed'},
+    '0x0B': {param: false, name: 'Targeted Number of Steps Changed'},
+    '0x0C': {param: false, name: 'Targeted Number of Strides Changed'},
+    '0x0D': {param: true,  name: 'Target Distance Changed'},
+    '0x0E': {param: false, name: 'Targeted Training Time Changed'},
+    '0x0F': {param: false, name: 'Targeted Time in Two Heart Rate Zones Changed'},
+    '0x0F': {param: false, name: 'Targeted Time in Three Heart Rate Zones Changed'},
+    '0x0F': {param: false, name: 'Targeted Time in Five Heart Rate Zones Changed'},
+    '0x12': {param: true,
+             decoder: control.simulationParameters.decode,
+             name: 'Indoor Bike Simulation Parameters Changed'},
+    '0x13': {param: true,
+             decoder: control.wheelCircumference.decode,
+             name: 'Wheel Circumference Changed'},
+    '0x14': {param: true,  name: 'Spin Down Status'},
+    '0x15': {param: true,  name: 'Targeted Cadence Changed'},
+    '0xFF': {param: false, name: 'Control Permission Lost'},
 };
 
 const spinDownStatusValue = {
@@ -28,113 +59,54 @@ const spinDownStatusValue = {
     '0x04': 'Stop Pedaling'
 };
 
+function FitnessMachineStatus() {
 
+    const unknownOperation = {
+        param: false,
+        decoder: undefined,
+        name: 'Unknown',
+    };
 
-function isTargetSpeed(statusCode) {
-    return equals(statusCode, '0x05');
-}
-function isTargetIncline(statusCode) {
-    return equals(statusCode, '0x06');
-}
-function isTargetResistance(statusCode) {
-    return equals(statusCode, '0x07');
-}
-function isTargetPower(statusCode) {
-    return equals(statusCode, '0x08');
-}
-function isTargetHeartRate(statusCode) {
-    return equals(statusCode, '0x09');
-}
-function isTargetDistance(statusCode) {
-    return equals(statusCode, '0x0D');
-}
-function isIndoorBikeSimulation(statusCode) {
-    return equals(statusCode, '0x12');
-}
-function isWheelCircumference(statusCode) {
-    return equals(statusCode, '0x13');
-}
-function isSpinDownStatus(statusCode) {
-    return equals(statusCode, '0x14');
-}
-function isTargetCadence(statusCode) {
-    return equals(statusCode, '0x15');
-}
-function isControlLost(statusCode) {
-    return equals(statusCode, '0xFF');
-}
+    function encode() {}
 
-
-
-function readTargetPower(dataview) {
-    return dataview.getInt16(1, dataview, true);
-}
-function readTargetResistance(dataview) {
-    const resolution = 0.1;
-    return dataview.getUint8(1, dataview, true) * resolution;
-}
-function readIndootBikeSimulation(dataview) {
-    const windResolution  = 0.001;
-    const gradeResolution = 0.01;
-    const crrResolution   = 0.0001;
-    const dragResolution  = 0.01;
-    const wind  = dataview.getInt16(1, dataview, true) * windResolution;
-    const grade = dataview.getInt16(3, dataview, true) * gradeResolution;
-    const crr   = dataview.getUint8(5, dataview, true) * crrResolution;
-    const drag  = dataview.getUint8(6, dataview, true) * dragResolution;
-    return  { wind, grade, crr, drag };
-}
-function readTargetIncline(dataview) {
-    const resolution = 0.1;
-    return dataview.getInt16(1, dataview, true) * resolution;
-}
-function readTargetSpeed(dataview) {
-    const resolution = 0.01;
-    return dataview.getUint16(1, dataview, true) * resolution;
-}
-function readTargetCadence(dataview) {
-    const resolution = 0.05;
-    return dataview.getUint16(1, dataview, true) * resolution;
-}
-function readTargetHeartRate(dataview) {
-    return dataview.getUint8(1, dataview, true);
-}
-function readTargetDistance(dataview) {
-    return dataview.getUint32(1, dataview, true);
-}
-function reedWheelCircumference(dataview) {
-    const resolution = 0.1;
-    return dataview.getUint16(1, dataview, true) * resolution;
-}
-function readSpinDownStatus(dataview) {
-    const statusCode = dataview.getUnit8(1, dataview, true);
-    return spinDownStatusValue[statusCode];
-}
-function readParam(dataview, code) {
-    if(isTargetPower(code))          return readTargetPower(dataview);
-    if(isTargetResistance(code))     return readTargetResistance(dataview);
-    if(isIndoorBikeSimulation(code)) return readIndootBikeSimulation(dataview);
-    if(isTargetSpeed(code))          return readTargetSpeed(dataview);
-    if(isTargetDistance(code))       return readTargetDistance(dataview);
-    if(isTargetCadence(code))        return readTargetCadence(dataview);
-    if(isTargetHeartRate(code))      return readTargetHeartRate(dataview);
-    if(isSpinDownStatus(code))       return readSpinDownStatus(dataview);
-    return false;
-}
-
-
-
-function fitnessMachineStatusDecoder(dataview) {
-    const statusCode = dataview.getUint8(0, dataview, true);
-    const status = fitnessMachineStatusCodes[hex(statusCode)];
-    const msg = status.msg;
-    let value = false;
-
-    if(status.param) {
-        value = readParam(dataview, hex(statusCode));
+    function decodeParam(operation, dataview) {
+        if(exists(operation.decoder)) {
+            return operation.decoder(dataview);
+        }
+        return '';
     }
 
-    return {statusCode, msg, value};
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, dataview, true);
+
+        const operation = existance(fitnessMachineStatusOpCodes[hex(opCode)],
+                                    unknownOperation);
+
+        let value;
+        if(operation.param) {
+            value = decodeParam(operation, dataview);
+        }
+
+        log(`:rx :ftms :status '${operation.name}' ${JSON.stringify(value)}`);
+
+        return {
+            operation: operation.name,
+            value
+        };
+    }
+
+    function toString(decoded) {
+        const str = `:operation '${decoded.operation}' :value ${existance(decoded.value, ':na')}`;
+
+        return str;
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
 }
 
-export { fitnessMachineStatusDecoder };
+const status = FitnessMachineStatus();
+
+export { status };

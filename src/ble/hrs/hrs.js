@@ -1,5 +1,5 @@
 import { uuids } from '../uuids.js';
-import { heartRateMeasurementDecoder } from './heartRateMeasurement.js';
+import { heartRateMeasurement } from './heartRateMeasurement.js';
 
 function eventToValue(decoder, cb) {
     return function (e) {
@@ -18,11 +18,10 @@ class HeartRateService {
     }
     async init() {
         const self = this;
-        const heartRate = await self.ble.getService(self.server, self.uuid);
-        const heartRateMeasurement = await self.ble.getCharacteristic(heartRate, uuids.heartRateMeasurement);
+        const service = await self.ble.getService(self.server, self.uuid);
+        const characteristic = await self.ble.getCharacteristic(service, uuids.heartRateMeasurement);
 
-        self.ble.sub(heartRateMeasurement,
-                     eventToValue(heartRateMeasurementDecoder, self.onHeartRate));
+        self.ble.sub(characteristic, eventToValue(heartRateMeasurement.decode, self.onHeartRate));
     }
 }
 

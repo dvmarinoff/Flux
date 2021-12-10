@@ -182,15 +182,16 @@ class PowerTarget extends Target {
 class ResistanceTarget extends Target {
     postInit(args) {
         this.min = args.min || 0;
-        this.max = args.max || 100;
-        this.step = args.step || 10;
+        this.max = args.max || 25.5;
+        this.step = args.step || 1;
     }
+    parse(value) { return parseFloat(value); }
 }
 
 class SlopeTarget extends Target {
     postInit(args) {
-        this.min = args.min || 0;
-        this.max = args.max || 45;
+        this.min = args.min || -40;
+        this.max = args.max || 40;
         this.step = args.step || 0.5;
     }
     defaultIsValid(value) {
@@ -373,7 +374,7 @@ class Workouts extends Model {
     }
     postInit(args) {
         const self = this;
-        console.log(self.defaultValue());
+        // console.log(self.defaultValue());
     }
     defaultValue() {
         const self = this;
