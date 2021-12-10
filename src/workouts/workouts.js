@@ -253,7 +253,7 @@ let workouts =
 ,
 `<workout_file>
     <author>Marinov</author>
-    <name>Butter+1</name>
+    <name>Butter</name>
     <effort-type>Base</effort-type>
     <description>The bread and butter of Endurance training, in steady Zone 2 at 67% of FTP.</description>
     <sportType>bike</sportType>
