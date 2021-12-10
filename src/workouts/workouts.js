@@ -237,22 +237,6 @@ let workouts =
 ,
 `<workout_file>
     <author>Marinov</author>
-    <name>Butter+1</name>
-    <effort-type>Base</effort-type>
-    <description>The bread and butter of Endurance training, in steady Zone 2 at 67% of FTP.</description>
-    <sportType>bike</sportType>
-    <tags>
-    </tags>
-    <workout>
-        <Warmup Duration="360" PowerLow="0.32" PowerHigh="0.55"/>
-        <IntervalsT Repeat="2" OnDuration="60" OffDuration="60" OnPower="0.88" OffPower="0.55"/>
-        <SteadyState Duration="6000" Power="0.67"/>
-        <Cooldown Duration="600" PowerLow="0.67" PowerHigh="0.32"/>
-    </workout>
-</workout_file>`
-,
-`<workout_file>
-    <author>Marinov</author>
     <name>Butter</name>
     <effort-type>Base</effort-type>
     <description>The bread and butter of Endurance training, in steady Zone 2 at 67% of FTP.</description>
@@ -263,6 +247,22 @@ let workouts =
         <Warmup Duration="360" PowerLow="0.32" PowerHigh="0.55"/>
         <IntervalsT Repeat="2" OnDuration="60" OffDuration="60" OnPower="0.88" OffPower="0.55"/>
         <SteadyState Duration="4200" Power="0.67"/>
+        <Cooldown Duration="600" PowerLow="0.67" PowerHigh="0.32"/>
+    </workout>
+</workout_file>`
+,
+`<workout_file>
+    <author>Marinov</author>
+    <name>Butter+1</name>
+    <effort-type>Base</effort-type>
+    <description>The bread and butter of Endurance training, in steady Zone 2 at 67% of FTP.</description>
+    <sportType>bike</sportType>
+    <tags>
+    </tags>
+    <workout>
+        <Warmup Duration="360" PowerLow="0.32" PowerHigh="0.55"/>
+        <IntervalsT Repeat="2" OnDuration="60" OffDuration="60" OnPower="0.88" OffPower="0.55"/>
+        <SteadyState Duration="6000" Power="0.67"/>
         <Cooldown Duration="600" PowerLow="0.67" PowerHigh="0.32"/>
     </workout>
 </workout_file>`
