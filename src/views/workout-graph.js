@@ -11,7 +11,7 @@ function intervalsToGraph(intervals, ftp, graphHeight = 118) {
         return highest;
     }, 1.6);
 
-    const scaleMax = ftp * maxInterval * (90 / graphHeight);
+    const scaleMax = ftp * maxInterval * (90 / graphHeight); //
 
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
