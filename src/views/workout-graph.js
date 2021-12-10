@@ -3,7 +3,16 @@ import { secondsToHms, scale } from '../utils.js';
 import { models } from '../models/models.js';
 
 function intervalsToGraph(intervals, ftp, graphHeight = 118) {
-    let scaleMax = ftp * 1.6 * (90 / graphHeight);
+
+    const maxInterval = intervals.reduce((highest, interval) => {
+        interval.steps.forEach((step) => {
+            if(step.power > highest)  highest = step.power;
+        });
+        return highest;
+    }, 1.6);
+
+    const scaleMax = ftp * maxInterval * (90 / graphHeight);
+
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
         let stepsCount = interval.steps.length;

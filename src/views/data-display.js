@@ -262,5 +262,22 @@ class DeviceInfoDisplay extends HTMLElement {
 
 customElements.define('device-info-display', DeviceInfoDisplay);
 
+class WorkoutName extends DataDisplay {
+    constructor() {
+        super();
+        this.state = '';
+        this.postInit();
+    }
+    postInit() { return; }
+    onUpdate(value) {
+        if(!equals(value, this.state)) {
+            this.state = value.meta.name;
+            this.render();
+        }
+    }
+}
+
+customElements.define('workout-name', WorkoutName);
+
 
 export { DataDisplay, TimeDisplay };

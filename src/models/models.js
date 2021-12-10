@@ -344,7 +344,7 @@ class Workout extends Model {
         return workout;
     }
     parse(workout) {
-        return zwo.parse(workout);
+        return zwo.readToInterval(workout);
     }
     fileName () {
         const self = this;
@@ -374,7 +374,6 @@ class Workouts extends Model {
     }
     postInit(args) {
         const self = this;
-        // console.log(self.defaultValue());
     }
     defaultValue() {
         const self = this;

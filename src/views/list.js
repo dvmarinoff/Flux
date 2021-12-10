@@ -3,9 +3,17 @@ import { secondsToHms, scale } from '../utils.js';
 import { models } from '../models/models.js';
 
 function intervalsToGraph(intervals, ftp) {
-    let scaleMax = ftp * 1.6;
 
-    return intervals.reduce( (acc, interval) => {
+    const maxInterval = intervals.reduce((highest, interval) => {
+        interval.steps.forEach((step) => {
+            if(step.power > highest)  highest = step.power;
+        });
+        return highest;
+    }, 1.6);
+
+    const scaleMax = ftp * maxInterval;
+
+    return intervals.reduce((acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
         let stepsCount = interval.steps.length;
         return acc + interval.steps.reduce((a, step) => {
@@ -47,14 +55,14 @@ const radioOn = `
 function workoutTemplate(workout) {
     return `<li is="workout-item" class='workout cf' id="${workout.id}" metric="ftp">
                 <div class="workout--short-info">
-                    <div class="workout--name">${workout.name}</div>
-                    <div class="workout--type">${workout.effort}</div>
-                    <div class="workout--duration">${workout.duration} min</div>
+                    <div class="workout--name">${workout.meta.name}</div>
+                    <div class="workout--type">${workout.meta.category}</div>
+                    <div class="workout--duration">${workout.meta.duration / 60} min</div>
                     <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
                 </div>
                 <div class="workout--full-info">
                     <div class="workout--graph-cont">${workout.graph}</div>
-                    <div class="workout--description">${workout.description}</div>
+                    <div class="workout--description">${workout.meta.description}</div>
                 </div>
             </li>`;
 }
