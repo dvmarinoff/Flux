@@ -82,6 +82,7 @@ The following table is copied from [DC Rainmaker Trainer Guide](https://www.dcra
 - Tacx:     ANT+ FE-C on all ‘Smart’ branded trainers (except Satori). FTMS on all non-NEO models. FEC over BLE on NEO.
 - Wahoo:    ANT+ FE-C on all smart trainers. FTMS on all 2020 smart trainer.
 - 4iiii:    ANT+ FE-C and Bluetooth FTMS on Fliiiight (--Ed)
+- Schwinn:  Bluetooth FTMS on the IC8 / 800IC (--Ed)
 ```
 
 ### ANT+
