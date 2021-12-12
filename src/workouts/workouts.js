@@ -2,7 +2,7 @@ let workouts =
 [`<workout_file>
     <author>Marinov</author>
     <name>Dijon</name>
-    <effort-type>VO2 Max</effort-type>
+    <category>VO2 Max</category>
     <description>60/60s or 60 sec ON at 121% of FTP followed by 60 sec OFF. In 2 groups by 8 reps each.</description>
     <sportType>bike</sportType>
     <tags>
@@ -26,7 +26,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Chili Pepper</name>
-    <effort-type>VO2 Max</effort-type>
+    <category>VO2 Max</category>
     <description> NOTE: This is mixed mode workout with Slope targets in the main interval groups. 40/20s or 40 sec ON at 121% of FTP followed by 20 sec OFF, in 2 groups by 10 reps each.</description>
     <sportType>bike</sportType>
     <tags>
@@ -50,7 +50,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Chili Pepper +1</name>
-    <effort-type>VO2 Max</effort-type>
+    <category>VO2 Max</category>
     <description>Short but tough, this is the hardest workout ever. It\'s gonna burn!</description>
     <sportType>bike</sportType>
     <tags>
@@ -112,7 +112,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Pasta</name>
-    <effort-type>Threshold</effort-type>
+    <category>Threshold</category>
     <description>A Classic 2 times 20 min at almost FTP. Make sure you had some pasta before this session. You will need it!</description>
     <sportType>bike</sportType>
     <tags>
@@ -136,7 +136,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Potato Chips</name>
-    <effort-type>Threshold</effort-type>
+    <category>Threshold</category>
     <description>5 by 5 min at 100% of FTP with 5 min recovery in between. Perfect to get you accustome to first intensite sessions after a base block, or just that new FTP value.</description>
     <sportType>bike</sportType>
     <tags>
@@ -154,7 +154,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Maple</name>
-    <effort-type>Sweet Spot</effort-type>
+    <category>Sweet Spot</category>
     <description>4 times 10 min Sweet Spot intervals with 5 min recovery in between and warm-up Ramp.</description>
     <sportType>bike</sportType>
     <tags>
@@ -173,7 +173,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Honey</name>
-    <effort-type>Sweet Spot</effort-type>
+    <category>Sweet Spot</category>
     <description>4 times 10 min Sweet Spot intervals with 5 min recovery in between.</description>
     <sportType>bike</sportType>
     <workout>
@@ -188,7 +188,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Baguette</name>
-    <effort-type>Base</effort-type>
+    <category>Base</category>
     <description>The bread and butter of Endurance training with efforts in Zone 1 and 2.</description>
     <sportType>bike</sportType>
     <tags>
@@ -211,7 +211,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Baguette +1</name>
-    <effort-type>Base</effort-type>
+    <category>Base</category>
     <description>The bread and butter of Endurance training, with efforts in Zone 2.</description>
     <sportType>bike</sportType>
     <tags>
@@ -238,7 +238,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Butter</name>
-    <effort-type>Base</effort-type>
+    <category>Base</category>
     <description>The bread and butter of Endurance training, in steady Zone 2 at 67% of FTP.</description>
     <sportType>bike</sportType>
     <tags>
@@ -254,7 +254,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Butter+1</name>
-    <effort-type>Base</effort-type>
+    <category>Base</category>
     <description>The bread and butter of Endurance training, in steady Zone 2 at 67% of FTP.</description>
     <sportType>bike</sportType>
     <tags>
@@ -270,7 +270,7 @@ let workouts =
 `<workout_file>
     <author>Marinov</author>
     <name>Blackcurrant</name>
-    <effort-type>Recovery</effort-type>
+    <category>Recovery</category>
     <description>A recovery ride in zone 1 at 50% of FTP.</description>
     <sporttype>bike</sporttype>
     <tags></tags>
@@ -279,8 +279,62 @@ let workouts =
         <SteadyState Duration="2400" Power="0.5"/>
         <Cooldown Duration="600" PowerLow="0.5" PowerHigh="0.30"/>
     </workout>
+</workout_file>`,
+`<workout_file>
+    <author>Flux</author>
+    <name>Ramp Test</name>
+    <category>Ramp Test</category>
+    <description>Ramp test proceeding in steps of 6% of previous FTP for 60 seconds. Do until exhoustion and take 75% of the power you did in the last interval you’ve reached. That's your new FTP.</description>
+    <sportType>bike</sportType>
+    <tags>
+    </tags>
+    <workout>
+        <SteadyState Duration=" 300" Power="0.46" />
+        <SteadyState Duration="60" Power="0.52" />
+        <SteadyState Duration="60" Power="0.58" />
+        <SteadyState Duration="60" Power="0.64" />
+        <SteadyState Duration="60" Power="0.70" />
+        <SteadyState Duration="60" Power="0.76" />
+        <SteadyState Duration="60" Power="0.82" />
+        <SteadyState Duration="60" Power="0.88" />
+        <SteadyState Duration="60" Power="0.94" />
+        <SteadyState Duration="60" Power="1.0" />
+        <SteadyState Duration="60" Power="1.06" />
+        <SteadyState Duration="60" Power="1.12" />
+        <SteadyState Duration="60" Power="1.18" />
+        <SteadyState Duration="60" Power="1.24" />
+        <SteadyState Duration="60" Power="1.3" />
+        <SteadyState Duration="60" Power="1.36" />
+        <SteadyState Duration="60" Power="1.42" />
+        <SteadyState Duration="60" Power="1.48" />
+        <SteadyState Duration="60" Power="1.54" />
+        <SteadyState Duration="60" Power="1.6" />
+        <SteadyState Duration="60" Power="1.66" />
+        <SteadyState Duration="60" Power="1.72" />
+        <SteadyState Duration="60" Power="1.78" />
+        <SteadyState Duration="60" Power="1.84" />
+        <SteadyState Duration="60" Power="1.9" />
+        <SteadyState Duration="60" Power="1.96" />
+        <SteadyState Duration="60" Power="2.02" />
+        <SteadyState Duration="60" Power="2.08" />
+        <SteadyState Duration="60" Power="2.14" />
+        <SteadyState Duration="60" Power="2.2" />
+        <SteadyState Duration="60" Power="2.26" />
+        <SteadyState Duration="60" Power="2.32" />
+        <SteadyState Duration="60" Power="2.38" />
+        <SteadyState Duration="60" Power="2.44" />
+        <SteadyState Duration="60" Power="2.5" />
+        <SteadyState Duration="60" Power="2.56" />
+        <SteadyState Duration="60" Power="2.62" />
+        <SteadyState Duration="60" Power="2.68" />
+        <SteadyState Duration="60" Power="2.74" />
+        <SteadyState Duration="60" Power="2.8" />
+        <SteadyState Duration="60" Power="2.86" />
+        <SteadyState Duration="60" Power="2.92" />
+        <SteadyState Duration="60" Power="2.98" />
+        <SteadyState Duration="60" Power="3.04" />
+    </workout>
 </workout_file>`
-
 ];
 
 export { workouts };
