@@ -517,7 +517,6 @@ const Elements = {
     Warmup:      Warmup(),
     SteadyState: Element({name: 'SteadyState', tagOpen: '<SteadyState', tagClose: ' />'}),
     IntervalsT:  IntervalsT(),
-    // FreeRide:    Element({name: 'FreeRide', tagOpen: '<FreeRide', tagClose: ' />'}),
     FreeRide:    FreeRide(),
     Cooldown:    Cooldown(),
     Unknown:     Unknown(),
@@ -545,17 +544,6 @@ function readToInterval(zwo) {
         meta:      Object.assign(meta, {duration}),
         intervals: intervals,
     };
-}
-
-function flatten(zwoJS) {
-
-    return zwoJS.intervals.reduce((acc, interval) => {
-        interval.steps.forEach((step) => {
-            acc.push(step);
-        });
-
-        return acc;
-    }, []);
 }
 
 function read(zwo) {
@@ -596,7 +584,6 @@ const zwo = {
     head,
     body,
     readToInterval,
-    flatten,
     read,
     write,
 };
