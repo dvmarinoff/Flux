@@ -93,7 +93,7 @@ function ResistanceTarget() {
     const length = 3; // 3
 
     const definitions = {
-        resistance: {resolution: 0.1, unit: '', size: 1, min: 0, max: 25.4, default: 0},
+        resistance: {resolution: 0.1, unit: '', size: 2, min: -100, max: 100, default: 0},
     };
 
     const data = Data({definitions});
@@ -105,7 +105,7 @@ function ResistanceTarget() {
         const view   = new DataView(buffer);
 
         view.setUint8(0, opCode, true);
-        view.setUint8(1, resistance, true);
+        view.setInt16(1, resistance, true);
 
         log(`:tx :ftms :resistance ${args.resistance} -> ${resistance}`);
 
@@ -114,7 +114,7 @@ function ResistanceTarget() {
 
     function decode(dataview) {
         const opCode     = dataview.getUint8(0);
-        const resistance = data.decodeField('resistance', dataview.getUint8(1, true));
+        const resistance = data.decodeField('resistance', dataview.getInt16(1, true));
 
         return {
             resistance,
