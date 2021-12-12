@@ -49,11 +49,10 @@ describe('Zwo', () => {
                 {duration: 10, steps: [
                     {duration: 10, power: 0.70, slope: 2.1, cadence: 90}]},
                 {duration: 15, steps: [{duration: 15, power: 0.92, cadence: 80}]},
-                {duration: 2 * 60, steps: [
-                        {duration: 40, power: 1.21, slope: 4.8},
-                        {duration: 20, power: 0.7, slope: 0.0},
-                        {duration: 40, power: 1.21, slope: 4.8},
-                        {duration: 20, power: 0.7, slope: 0.0},]},
+                {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
+                {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
+                {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
+                {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
                 {duration: 10, steps: [{duration: 10, cadence: 90}]},
             ],
         };
@@ -436,27 +435,21 @@ describe('IntervalsT', () => {
             OffPower: 0.7,
             OnSlope: 4.8,
             OffSlope: 0,
-        })).toStrictEqual({
-            duration: 2 * 60,
-            steps: [
-                {duration: 40, power: 1.21, slope: 4.8},
-                {duration: 20, power: 0.7, slope: 0.0},
-                {duration: 40, power: 1.21, slope: 4.8},
-                {duration: 20, power: 0.7, slope: 0.0},
-            ]
-        });
+        })).toStrictEqual([
+            {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
+            {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
+            {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
+            {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
+        ]);
     });
 
     test('readToInterval', () => {
-        expect(IntervalsT.readToInterval({el})).toStrictEqual({
-            duration: 2 * 60,
-            steps: [
-                {duration: 40, power: 1.21, slope: 4.8},
-                {duration: 20, power: 0.7, slope: 0.0},
-                {duration: 40, power: 1.21, slope: 4.8},
-                {duration: 20, power: 0.7, slope: 0.0},
-            ]
-        });
+        expect(IntervalsT.readToInterval({el})).toStrictEqual([
+            {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
+            {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
+            {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
+            {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
+        ]);
     });
 });
 

@@ -222,15 +222,12 @@ function IntervalsT(args = {}) {
         const onStep  = OnStep(element);
         const offStep = OffStep(element);
         const steps   = repeat(stepsCount)(function(acc) {
-            acc.push(onStep);
-            acc.push(offStep);
+            acc.push({duration: onStep.duration, steps: [onStep]});
+            acc.push({duration: offStep.duration, steps: [offStep]});
             return acc;
         })([]);
 
-        return {
-            duration: duration,
-            steps:    steps,
-        };
+        return steps;
     }
 
     return Element(spec);
@@ -463,7 +460,7 @@ function Body() {
     function readToInterval(args = {}) {
         const doc = existance(args.doc);
         const elements = queryElements(doc);
-        return elements.map((el) => apply(el, 'readToInterval'), []);
+        return elements.flatMap((el) => apply(el, 'readToInterval'), []);
     }
 
     function writeElement(args = {}) {
@@ -550,6 +547,17 @@ function readToInterval(zwo) {
     };
 }
 
+function flatten(zwoJS) {
+
+    return zwoJS.intervals.reduce((acc, interval) => {
+        interval.steps.forEach((step) => {
+            acc.push(step);
+        });
+
+        return acc;
+    }, []);
+}
+
 function read(zwo) {
     const doc          = parser.parseFromString(zwo, 'text/xml');
     const headElements = head.read({doc});
@@ -588,6 +596,7 @@ const zwo = {
     head,
     body,
     readToInterval,
+    flatten,
     read,
     write,
 };
