@@ -42,33 +42,35 @@
                             <div class="data-tile--small wide" id="data-tile--power-avg">
                                 <h2 class="data-tile-small--heading">Power avg</h2>
                                 <div class="data-tile-small--value-cont">
-                                    <div id=power-avg-value" class="data-tile-small--value">--</div>
+                                    <!-- <div id=power-avg-value" class="data-tile-small--value">--</div> -->
+                                    <power-avg id=power-avg-value"
+                                               class="data-tile-small--value">--</power-value>
                                 </div>
                             </div>
 
                             <div class="data-tile" id="data-tile--power">
                                 <h2 class="data-tile--heading">Power</h2>
                                 <div class="data-tile--value-cont">
-                                    <data-display id=power-value"
-                                                class="data-tile--value"
-                                                prop="power">--</data-display>
+                                    <!-- <data-display id=power-value"
+                                         class="data-tile--value"
+                                         prop="power">--</data-display> -->
+                                    <power-value id=power-value"
+                                                 class="data-tile--value">--</power-value>
+
                                 </div>
                             </div>
                             <div class="data-tile" id="data-tile--interval-time">
                                 <h2 class="data-tile--heading">Interval Time</h2>
                                 <div class="data-tile--value-cont">
-                                    <time-display id="interval-time"
-                                                class="data-tile--value"
-                                                form="mm:ss"
-                                                prop="lapTime">--:--</time-display>
+                                    <interval-time id="interval-time"
+                                                   class="data-tile--value">--:--</interval-time>
                                 </div>
                             </div>
                             <div class="data-tile" id="data-tile--heart-rate">
                                 <h2 class="data-tile--heading">Heart Rate</h2>
                                 <div class="data-tile--value-cont">
-                                    <data-display id="heart-rate-value"
-                                                class="data-tile--value"
-                                                prop="heartRate">--</data-display>
+                                    <heart-rate-value id="heart-rate-value"
+                                                      class="data-tile--value">--</heart-rate-value>
                                 </div>
                             </div>
 
@@ -87,36 +89,39 @@
                             <div class="data-tile--small wide" id="data-tile--slope">
                                 <h2 class="data-tile-small--heading">Slope</h2>
                                 <div class="data-tile-small--value-cont">
-                                    <data-display id=slope-target-value-display"
-                                                class="data-tile-small--value"
-                                                prop="slopeTarget">--</data-display>
+                                    <!-- <data-display id=slope-target-value-display"
+                                         class="data-tile-small--value"
+                                         prop="slopeTarget">--</data-display> -->
+                                    <slope-target id=slope-target-value"
+                                                  class="data-tile-small--value">--</slope-target>
                                 </div>
                             </div>
 
                             <div class="data-tile" id="data-tile--target">
                                 <h2 class="data-tile--heading">Target</h2>
                                 <div class="data-tile--value-cont">
-                                    <data-display id=power-target-value"
-                                                class="data-tile--value"
-                                                prop="powerTarget">--</data-display>
+                                    <!-- <data-display id=power-target-value"
+                                         class="data-tile--value"
+                                         prop="powerTarget">--</data-display> -->
+                                    <power-target id=power-target-value"
+                                                  class="data-tile--value">--</power-target>
                                 </div>
                             </div>
                             <div class="data-tile" id="data-tile--elapsed-time">
                                 <h2 class="data-tile--heading">Elapsed Time</h2>
                                 <div class="data-tile--value-cont">
-                                    <time-display id="elapsed-time"
-                                                class="data-tile--value"
-                                                form="hh:mm:ss"
-                                                prop="elapsed">--:--:--</time-display>
+                                    <timer-time id="elapsed-time"
+                                                class="data-tile--value">--:--:--</timer-time>
                                 </div>
                             </div>
                             <div class="data-tile" id="data-tile--cadence">
                                 <h2 class="data-tile--heading">Cadence</h2>
                                 <div class="data-tile--value-cont">
-                                    <data-display id=cadence-value"
-                                                class="data-tile--value"
-                                                prop="cadence">--</data-display>
+                                    <cadence-value id=cadence-value"
+                                                   class="data-tile--value">--</cadence-value>
                                 </div>
+                                <cadence-target id=cadence-target-value"
+                                                class="data-tile-target--value"></cadence-target>
                             </div>
 
                             <div class="data-tile--small wide" id="data-tile--distance">
@@ -141,7 +146,8 @@
                         <div id="graph-workout" class="graph">
                             <div class="line"></div>
                             <h4 id="current-workout-name" class="graph--heading">
-                                <workout-name prop="workout"></workout-name>
+                                <!-- <workout-name prop="workout"></workout-name> -->
+                                <workout-name></workout-name>
                             </h4>
                             <workout-graph class="workout--graph-cont" prop="workout" metric="ftp"></workout-graph>
                             <div class="line"></div>
@@ -668,7 +674,8 @@
                 <div class="controls">
                     <watch-control id="watch" class="watch cf">
                         <div id="workout-name">
-                            <workout-name prop="workout">Free ride</workout-name>
+                            <!-- <workout-name prop="workout">Free ride</workout-name> -->
+                            <workout-name>Free ride</workout-name>
                         </div>
 
                         <div id="start-workout" class="control--btn">

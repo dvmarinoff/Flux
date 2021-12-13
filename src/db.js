@@ -14,6 +14,7 @@ let db = {
     powerTarget: models.powerTarget.default,
     resistanceTarget: models.resistanceTarget.default,
     slopeTarget: models.slopeTarget.default,
+    cadenceTarget: models.cadenceTarget.default,
 
     mode: models.mode.default,
     page: models.page.default,
@@ -23,6 +24,7 @@ let db = {
     weight: models.weight.default,
     theme: models.theme.default,
     measurement: models.measurement.default,
+    powerSmoothing: 1,
 
     // Workouts
     workouts: [],
@@ -99,6 +101,10 @@ xf.reg('ui:power-target-inc', (_, db) => {
 });
 xf.reg(`ui:power-target-dec`, (_, db) => {
     db.powerTarget = models.powerTarget.dec(db.powerTarget);
+});
+xf.reg('ui:cadence-target-set', (cadenceTarget, db) => {
+    db.cadenceTarget = models.cadenceTarget.set(cadenceTarget);
+    console.log(`:zwo set target cadence ${db.cadenceTarget}`);
 });
 
 xf.reg('ui:resistance-target-set', (resistanceTarget, db) => {

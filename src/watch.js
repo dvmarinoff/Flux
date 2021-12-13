@@ -1,4 +1,4 @@
-import { exists, existance, first, last, xf, avg, max } from './functions.js';
+import { equals, exists, existance, first, last, xf, avg, max } from './functions.js';
 import { kphToMps, mpsToKph, timeDiff, fixInRange } from './utils.js';
 
 class Watch {
@@ -221,15 +221,25 @@ xf.reg('watch:lapTime',        (time, db) => db.lapTime          = time);
 xf.reg('watch:stepTime',       (time, db) => db.stepTime         = time);
 xf.reg('watch:intervalIndex', (index, db) => db.intervalIndex    = index);
 xf.reg('watch:stepIndex',     (index, db) => {
-    db.stepIndex      = index;
-    let intervalIndex = db.intervalIndex;
-    let powerTarget   = db.workout.intervals[intervalIndex].steps[index].power;
-    let slopeTarget   = db.workout.intervals[intervalIndex].steps[index].slope;
+    db.stepIndex        = index;
+    const intervalIndex = db.intervalIndex;
+    const powerTarget   = db.workout.intervals[intervalIndex].steps[index].power;
+    const slopeTarget   = db.workout.intervals[intervalIndex].steps[index].slope;
+    const cadenceTarget = db.workout.intervals[intervalIndex].steps[index].cadence;
 
     if(exists(slopeTarget)) {
         xf.dispatch('ui:slope-target-set', slopeTarget);
-    } else if(exists(powerTarget)) {
-        xf.dispatch('ui:power-target-set', parseInt(db.ftp * powerTarget)); // update just the workout defined
+        if(!equals(db.mode, 'slope')) {
+            xf.dispatch('ui:mode-set', 'slope');
+        }
+    }
+    if(exists(cadenceTarget)) {
+        xf.dispatch('ui:cadence-target-set', cadenceTarget);
+    } else {
+        xf.dispatch('ui:cadence-target-set', 0);
+    }
+    if(exists(powerTarget)) {
+        xf.dispatch('ui:power-target-set', parseInt(db.ftp * powerTarget));
     } else {
         xf.dispatch('ui:power-target-set', 0);
     }

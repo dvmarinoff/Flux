@@ -510,6 +510,7 @@ body.dark-theme {
     grid-area: 2 / 3 / 2 / 5;
 }
 #data-tile--cadence {
+    position: relative;
     grid-area: 2 / 5 / 2 / 7;
 }
 #data-tile--speed {
@@ -552,6 +553,17 @@ body.dark-theme {
 .data-tile-small--unit {
     font-size: var(--data-tile-small--unit-font-size);
     font-weight: bold;
+}
+.data-tile-target--value {
+    font-size: 1em;
+    height: 1em;
+
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: var(--red);
 }
 
 /* Graphs */
@@ -610,8 +622,8 @@ body.dark-theme {
 .graph--info {
     display: none;
     position: absolute;
-    top: -25px;
-    padding: 0px 10px;
+    bottom: 90%;
+    padding: 2px 2px;
     color: var(--black);
     background-color: var(--white);
     border-radius: 2px;
@@ -620,8 +632,15 @@ body.dark-theme {
 .graph--bar:hover .graph--info {
     display: block;
 }
-.graph--info--power {}
-.graph--info--power span {}
+.graph--info--power {
+    min-width: 48px;
+}
+.graph--info--slope {
+    min-width: 48px;
+}
+.graph--info--cadence {
+    min-width: 48px;
+}
 .graph--info--time {
     color: var(--gray);
 }

@@ -264,20 +264,45 @@ describe('Body', () => {
 
 describe('Attribute', () => {
 
-    const xml = `<SteadyState Duration="300" Power="0.88" />`;
+    const xml = `
+        <workout>
+            <SteadyState Duration="300" Power="0.88" Slope="4.8" Cadence="90"/>
+            <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63" Cadence="90" CadenceResting="80"/>
+        </workout>`;
 
     const doc = parser.parseFromString(xml, 'text/xml');
 
-    test('readAttribute', () => {
-        let el = doc.querySelector('SteadyState');
+    const elSteadyState = doc.querySelector('SteadyState');
+    const elIntervalsT = doc.querySelector('IntervalsT');
 
-        let duration = zwo.readAttribute({el, name: 'Duration'});
-        let power    = zwo.readAttribute({el, name: 'Power'});
-        let slope    = zwo.readAttribute({el, name: 'Slope'});
-
+    test('readAttribute Duration', () => {
+        const duration = zwo.readAttribute({el: elSteadyState, name: 'Duration'});
         expect(duration).toBe('300');
+    });
+
+    test('readAttribute Power', () => {
+        const power = zwo.readAttribute({el: elSteadyState, name: 'Power'});
         expect(power).toBe('0.88');
-        expect(slope).toBe(undefined);
+    });
+
+    test('readAttribute Slope', () => {
+        const slope = zwo.readAttribute({el: elSteadyState, name: 'Slope'});
+        expect(slope).toBe('4.8');
+    });
+
+    test('readAttribute Cadence', () => {
+        const cadence = zwo.readAttribute({el: elSteadyState, name: 'Cadence'});
+        expect(cadence).toBe('90');
+    });
+
+    test('readAttribute CadenceResting', () => {
+        const cadence = zwo.readAttribute({el: elIntervalsT, name: 'CadenceResting'});
+        expect(cadence).toBe('80');
+    });
+
+    test('readAttribute with undefined', () => {
+        const OnSlope = zwo.readAttribute({el: elIntervalsT, name: 'OnSlope'});
+        expect(OnSlope).toBe(undefined);
     });
 
     test('writeAttribute', () => {
@@ -290,24 +315,21 @@ describe('Attribute', () => {
         expect(slope).toBe('Slope="4.8"');
     });
 
-    let el       = doc.querySelector('SteadyState');
-    let duration = zwo.Attribute({name: 'Duration', transform: parseInt});
-    let slope    = zwo.Attribute({name: 'Slope', transform: parseFloat});
+    describe('Attribute', () => {
+        let el       = doc.querySelector('SteadyState');
+        let duration = zwo.Attribute({name: 'Duration', transform: parseInt});
 
-    test('Attribute.getName', () => {
-        expect(duration.getName()).toBe('Duration');
-    });
+        test('Attribute.getName', () => {
+            expect(duration.getName()).toBe('Duration');
+        });
 
-    test('Attribute.read', () => {
-        expect(duration.read({el})).toBe(300);
-    });
+        test('Attribute.read', () => {
+            expect(duration.read({el})).toBe(300);
+        });
 
-    test('Attribute.write', () => {
-        expect(duration.write({value: 300})).toBe('Duration="300"');
-    });
-
-    test('Attribute.read with undefined', () => {
-        expect(slope.read({el})).toBe(undefined);
+        test('Attribute.write', () => {
+            expect(duration.write({value: 300})).toBe('Duration="300"');
+        });
     });
 });
 
@@ -463,6 +485,8 @@ describe('Steps', () => {
         OffPower: 0.7,
         OnSlope: 4.8,
         OffSlope: 0,
+        Cadence: 90,
+        CadenceResting: 80,
     };
 
     const steadyStateTag = {
@@ -485,6 +509,7 @@ describe('Steps', () => {
             duration: 40,
             power: 1.21,
             slope: 4.8,
+            cadence: 90,
         });
     });
 
@@ -493,6 +518,7 @@ describe('Steps', () => {
             duration: 20,
             power: 0.7,
             slope: 0,
+            cadence: 80,
         });
     });
 });

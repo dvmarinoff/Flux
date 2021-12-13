@@ -1,5 +1,6 @@
 import './connection-switch.js';
 import './data-display.js';
+import './data-views.js';
 import './inputs.js';
 import './tabs.js';
 import './data-graph.js';

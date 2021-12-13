@@ -201,6 +201,15 @@ class SlopeTarget extends Target {
     parse(value) { return parseFloat(value); }
 }
 
+class CadenceTarget extends Target {
+    postInit(args) {
+        this.min = args.min || 0;
+        this.max = args.max || 255;
+        this.step = args.step || 5;
+    }
+    parse(value) { return parseInt(value); }
+}
+
 class Mode extends Model {
     postInit(args) {
         this.values = ['erg', 'resistance', 'slope'];
@@ -489,6 +498,7 @@ const sources = new Sources({prop: 'sources'});
 const powerTarget = new PowerTarget({prop: 'powerTarget'});
 const resistanceTarget = new ResistanceTarget({prop: 'resistanceTarget'});
 const slopeTarget = new SlopeTarget({prop: 'slopeTarget'});
+const cadenceTarget = new CadenceTarget({prop: 'cadenceTarget'});
 const mode = new Mode({prop: 'mode'});
 const page = new Page({prop: 'page'});
 
@@ -510,6 +520,7 @@ let models = { power,
                powerTarget,
                resistanceTarget,
                slopeTarget,
+               cadenceTarget,
                mode,
                page,
                ftp,

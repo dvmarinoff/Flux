@@ -1,8 +1,50 @@
-import { xf, exists, equals } from '../functions.js';
-import { secondsToHms, scale } from '../utils.js';
+import { xf, exists, existance, equals } from '../functions.js';
+import { formatTime, scale } from '../utils.js';
 import { models } from '../models/models.js';
 
-function intervalsToGraph(intervals, ftp, graphHeight = 118) {
+function powerTargetToHtml(args = {}) {
+    const name  = existance(args.name, 'power');
+    const value = existance(args.value, 0);
+    const unit  = existance(args.unit, 'W');
+
+    if(equals(value, 0)) {
+        return `<div class="graph--info--${name}">Free ride</div>`;
+    } else {
+        return `<div class="graph--info--${name}">${value} ${unit}</div>`;
+    }
+}
+
+function cadenceTargetToHtml(args = {}) {
+    const name  = existance(args.name, 'cadence');
+    const value = existance(args.value, 0);
+    const unit  = existance(args.unit, 'rpm');
+
+    if(equals(value, 0)) {
+        return '';
+    } else {
+        return `<div class="graph--info--${name}">${value} ${unit}</div>`;
+    }
+}
+
+function slopeTargetToHtml(args = {}) {
+    const name  = existance(args.name, 'slope');
+    const value = existance(args.value, 'na');
+    const unit  = existance(args.unit, '%');
+
+    if(equals(value, 'na')) {
+        return '';
+    } else {
+        return `<div class="graph--info--${name}">${value} ${unit}</div>`;
+    }
+}
+
+function targetsToHtml(args = {}) {
+    return powerTargetToHtml({value: args.power}) +
+           cadenceTargetToHtml({value: args.cadence}) +
+           slopeTargetToHtml({value: args.slope});
+}
+
+function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 118) {
 
     const maxInterval = intervals.reduce((highest, interval) => {
         interval.steps.forEach((step) => {
@@ -11,30 +53,31 @@ function intervalsToGraph(intervals, ftp, graphHeight = 118) {
         return highest;
     }, 1.6);
 
-    const scaleMax = ftp * maxInterval * (90 / graphHeight); //
+    const scaleMax = ftp * maxInterval * (useGraphHeight ? (90 / graphHeight) : 1);
 
     return intervals.reduce( (acc, interval) => {
         let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
         let stepsCount = interval.steps.length;
         return acc + interval.steps.reduce((a, step) => {
-            const power = parseInt(ftp * step.power);
-            const width = 100 / stepsCount;
-            const height = scale((power === 0) ? 80 : power, scaleMax);
-            const zone = (models.ftp.powerToZone(power, ftp)).name;
-            const infoPower = power === 0 ? 'Free ride' : power;
-            const infoPowerUnit = power === 0 ? '' : 'W';
-            const infoTime = secondsToHms(step.duration, true);
+            const power   = parseInt(ftp * step.power);
+            const cadence = step.cadence;
+            const slope   = step.slope;
+
+            const width    = 100 / stepsCount;
+            const height   = scale((power === 0) ? 80 : power, scaleMax);
+            const zone     = (models.ftp.powerToZone(power, ftp)).name;
+            const infoTime = formatTime({value: step.duration, format: 'mm:ss'});
 
             return a +
                 `<div class="graph--bar zone-${zone}" style="height: ${height}%; width: ${width}%">
                      <div class="graph--info">
-                         <div class="graph--info--power">${infoPower}${infoPowerUnit}</div>
+                         ${targetsToHtml({power, cadence, slope})}
                          <div class="graph--info--time">${infoTime}<span></span></div>
                      </div>
                 </div>`;
         }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
 
-    }, ``);
+    }, '');
 }
 
 class WorkoutGraph extends HTMLElement {
@@ -102,7 +145,7 @@ class WorkoutGraph extends HTMLElement {
     render() {
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
 
-        this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue, this.height);
+        this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue, true, this.height);
 
         this.dom.progress  = this.querySelector('#progress');
         this.dom.active    = this.querySelector('#progress-active');
@@ -115,4 +158,7 @@ class WorkoutGraph extends HTMLElement {
 
 customElements.define('workout-graph', WorkoutGraph);
 
-export { WorkoutGraph };
+export {
+    WorkoutGraph,
+    intervalsToGraph
+};
