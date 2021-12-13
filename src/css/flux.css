@@ -563,7 +563,7 @@ body.dark-theme {
     left: 0;
     width: 100%;
     text-align: center;
-    color: var(--red);
+    /* color: var(--red); */
 }
 
 /* Graphs */
