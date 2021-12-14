@@ -33,13 +33,13 @@ let workouts =
     </tags>
     <workout>
         <Warmup Duration="120" PowerLow="0.32" PowerHigh="0.39"/>
-        <SteadyState Duration="60" Power="0.39"/>
-        <SteadyState Duration="60" Power="0.47"/>
-        <SteadyState Duration="60" Power="0.55"/>
-        <SteadyState Duration="60" Power="0.63"/>
-        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63"/>
+        <SteadyState Duration="60" Power="0.39" Cadence="80"/>
+        <SteadyState Duration="60" Power="0.47" Cadence="90"/>
+        <SteadyState Duration="60" Power="0.55" Cadence="100"/>
+        <SteadyState Duration="60" Power="0.63" Cadence="90"/>
+        <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63" Cadence="100" CadenceResting="80"/>
         <SteadyState Duration="120" Power="0.5" Slope="1"/>
-        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlope="4" OffSlope="0"/>
+        <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlope="4" OffSlope="0" Cadence="90" CadenceResting="80"/>
         <SteadyState Duration="300" Power="0.40" Slope="1"/>
         <IntervalsT Repeat="10" OnDuration="40" OffDuration="20" OnPower="1.21" OffPower="0.44" OnSlope="4" OffSlope="0"/>
         <SteadyState Duration="300" Power="0.40"/>

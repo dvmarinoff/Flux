@@ -1,26 +1,63 @@
-import { first, last, equals, isArray } from './functions.js';
+import { existance, first, last, equals, isArray } from './functions.js';
 
 // Views
-function secondsToHms(elapsed, compact = false) {
-    let hour = Math.floor(elapsed / 3600);
-    let min  = Math.floor(elapsed % 3600 / 60);
-    let sec  = elapsed % 60;
-    let sD   = (sec < 10)  ? `0${sec}`  : `${sec}`;
-    let mD   = (min < 10)  ? `0${min}`  : `${min}`;
-    let hD   = (hour < 10) ? `0${hour}` : `${hour}`;
-    let hDs  = (hour < 10) ? `${hour}`  : `${hour}`;
-    let res  = ``;
-    if(compact) {
-        if(elapsed < 3600) {
-            res = `${mD}:${sD}`;
-        } else {
+function formatTime(args = {}) {
+    const defaults = {
+        unit:   'seconds',
+        format: 'hh:mm:ss',
+    };
+
+    const value  = args.value;
+    const format = existance(args.format, defaults.format);
+    const unit   = existance(args.unit, defaults.unit);
+
+    if(equals(unit, 'seconds')) {
+        let hour = Math.floor(value / 3600);
+        let min  = Math.floor(value % 3600 / 60);
+        let sec  = value % 60;
+        let sD   = (sec < 10)  ? `0${sec}`  : `${sec}`;
+        let mD   = (min < 10)  ? `0${min}`  : `${min}`;
+        let hD   = (hour < 10) ? `0${hour}` : `${hour}`;
+        let hDs  = (hour < 10) ? `${hour}`  : `${hour}`;
+        let res  = ``;
+
+        if(equals(format, 'hh:mm:ss')) {
             res = `${hD}:${mD}:${sD}`;
         }
-    } else {
-        res = `${hD}:${mD}:${sD}`;
+        if(equals(format, 'mm:ss')) {
+            if(value < 3600) {
+                res = `${mD}:${sD}`;
+            } else {
+                res = `${hD}:${mD}:${sD}`;
+            }
+        }
+
+        return res;
     }
-    return res ;
+
+    return value;
 }
+
+// function secondsToHms(elapsed, compact = false) {
+//     let hour = Math.floor(elapsed / 3600);
+//     let min  = Math.floor(elapsed % 3600 / 60);
+//     let sec  = elapsed % 60;
+//     let sD   = (sec < 10)  ? `0${sec}`  : `${sec}`;
+//     let mD   = (min < 10)  ? `0${min}`  : `${min}`;
+//     let hD   = (hour < 10) ? `0${hour}` : `${hour}`;
+//     let hDs  = (hour < 10) ? `${hour}`  : `${hour}`;
+//     let res  = ``;
+//     if(compact) {
+//         if(elapsed < 3600) {
+//             res = `${mD}:${sD}`;
+//         } else {
+//             res = `${hD}:${mD}:${sD}`;
+//         }
+//     } else {
+//         res = `${hD}:${mD}:${sD}`;
+//     }
+//     return res ;
+// }
 
 function dateToDashString(date) {
     const day    = (date.getDate()).toString().padStart(2, '0');
@@ -42,10 +79,6 @@ function kphToMps(kph) {
 function mpsToKph(mps) {
     return 3.6 * mps;
 };
-
-function scale(value, max = 100) {
-    return 100 * (value/max);
-}
 
 function stringToBool(str) {
     if(str === 'true') return true;
@@ -246,12 +279,12 @@ function getUint32(uint8array, index = 0, endianness = true) {
 
 export {
     // Views
-    secondsToHms,
+    formatTime,
+    // secondsToHms,
     dateToDashString,
     format,
     kphToMps,
     mpsToKph,
-    scale,
     stringToBool,
     capitalize,
 

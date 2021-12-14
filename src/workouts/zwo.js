@@ -86,8 +86,8 @@ function Step(element) {
 function OnStep(element) {
     const spec = {
         element:    element,
-        filter: (key) => key.startsWith('On'),
-        toName: (key) => key.substring(2).toLocaleLowerCase(),
+        filter: (key) => key.startsWith('On') || equals(key, 'Cadence'),
+        toName: (key) => key.replace(/On/g,'').toLocaleLowerCase(),
     };
 
     return attributesToStep(spec);
@@ -96,8 +96,8 @@ function OnStep(element) {
 function OffStep(element) {
     const spec = {
         element:    element,
-        filter: (key) => key.startsWith('Off'),
-        toName: (key) => key.substring(3).toLocaleLowerCase(),
+        filter: (key) => key.startsWith('Off') || key.endsWith('Resting'),
+        toName: (key) => key.replace(/On|Off|Resting/g,'').toLocaleLowerCase(),
     };
 
     return attributesToStep(spec);
@@ -499,10 +499,10 @@ const Attrs = {
     PowerLow:  Attribute({name: 'PowerLow', transform: parseFloat}),
     PowerHigh: Attribute({name: 'PowerHigh', transform: parseFloat}),
 
-    Cadence:     Attribute({name: 'Cadence', transform: parseInt}),
-    CadenceLow:  Attribute({name: 'CadenceLow', transform: parseInt}),
-    CadenceHigh: Attribute({name: 'CadenceHigh', transform: parseInt}),
-    CadenceRest: Attribute({name: 'CadenceRest', transform: parseInt}),
+    Cadence:        Attribute({name: 'Cadence', transform: parseInt}),
+    CadenceLow:     Attribute({name: 'CadenceLow', transform: parseInt}),
+    CadenceHigh:    Attribute({name: 'CadenceHigh', transform: parseInt}),
+    CadenceResting: Attribute({name: 'CadenceResting', transform: parseInt}),
 
     Slope:     Attribute({name: 'Slope', transform: parseFloat}),
     OnSlope:   Attribute({name: 'OnSlope', transform: parseFloat}),

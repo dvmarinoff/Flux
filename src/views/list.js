@@ -1,41 +1,6 @@
 import { xf, empty, equals } from '../functions.js';
-import { secondsToHms, scale } from '../utils.js';
 import { models } from '../models/models.js';
-
-function intervalsToGraph(intervals, ftp) {
-
-    const maxInterval = intervals.reduce((highest, interval) => {
-        interval.steps.forEach((step) => {
-            if(step.power > highest)  highest = step.power;
-        });
-        return highest;
-    }, 1.6);
-
-    const scaleMax = ftp * maxInterval;
-
-    return intervals.reduce((acc, interval) => {
-        let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
-        let stepsCount = interval.steps.length;
-        return acc + interval.steps.reduce((a, step) => {
-            const power = parseInt(ftp * step.power);
-            const width = 100 / stepsCount;
-            const height = scale((power === 0) ? 80 : power, scaleMax);
-            const zone = (models.ftp.powerToZone(power, ftp)).name;
-            const infoPower = power === 0 ? 'Free ride' : power;
-            const infoPowerUnit = power === 0 ? '' : 'W';
-            const infoTime = secondsToHms(step.duration, true);
-
-            return a +
-                `<div class="graph--bar zone-${zone}" style="height: ${height}%; width: ${width}%">
-                     <div class="graph--info t5">
-                         <div class="graph--info--power">${infoPower}${infoPowerUnit}</div>
-                         <div class="graph--info--time">${infoTime}<span></span></div>
-                     </div>
-                </div>`;
-        }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
-
-    }, ``);
-}
+import { intervalsToGraph } from './workout-graph.js';
 
 const radioOff = `
         <svg class="radio radio-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">

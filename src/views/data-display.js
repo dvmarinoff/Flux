@@ -1,5 +1,5 @@
 import { xf, exists, equals } from '../functions.js';
-import { secondsToHms, stringToBool } from '../utils.js';
+import { stringToBool } from '../utils.js';
 import { models } from '../models/models.js';
 
 class DataDisplay extends HTMLElement {
@@ -74,25 +74,6 @@ class EffectDisplay extends HTMLElement {
 }
 
 customElements.define('effect-display', EffectDisplay);
-
-class TimeDisplay extends DataDisplay {
-    postInit() {
-        this.state = 0;
-        this.form = this.getAttribute('form') || this.defaultForm();
-
-        this.compact = false;
-        if(this.form === 'hh:mm:ss') this.compact = false;
-        if(this.form === 'mm:ss') this.compact = true;
-    }
-    defaultForm() { return 'hh:mm:ss'; }
-    render() {
-        this.textContent = secondsToHms(this.state, this.compact);
-    }
-}
-
-customElements.define('time-display', TimeDisplay);
-
-
 
 class DistanceDisplay extends DataDisplay {
     postInit() {
@@ -262,22 +243,5 @@ class DeviceInfoDisplay extends HTMLElement {
 
 customElements.define('device-info-display', DeviceInfoDisplay);
 
-class WorkoutName extends DataDisplay {
-    constructor() {
-        super();
-        this.state = '';
-        this.postInit();
-    }
-    postInit() { return; }
-    onUpdate(value) {
-        if(!equals(value, this.state)) {
-            this.state = value.meta.name;
-            this.render();
-        }
-    }
-}
 
-customElements.define('workout-name', WorkoutName);
-
-
-export { DataDisplay, TimeDisplay };
+export { DataDisplay };

@@ -26,7 +26,9 @@ class Controllable extends Device {
         });
 
         xf.sub('db:slopeTarget', slope => {
-            if(self.isConnected(self.device)) self.control.setTargetSlope(slope);
+            if(self.isConnected(self.device) && (equals(mode, 'slope'))) {
+                if(self.isConnected(self.device)) self.control.setTargetSlope(slope);
+            }
         });
     }
     async initServices(device) {
