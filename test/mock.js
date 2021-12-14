@@ -67,6 +67,22 @@ class TrainerMock {
     }
 }
 
+function cadenceTargetMock() {
+
+    setInterval(function() {
+        xf.dispatch('cadence', 100 + rand(-4, 4));
+    }, 1000);
+
+    setInterval(function() {
+        const t = rand(0, 1);
+        if(equals(t, 0)) {
+            xf.dispatch('ui:cadence-target-set', 100);
+        } else {
+            xf.dispatch('ui:cadence-target-set', 0);
+        }
+    }, 4000);
+}
+
 const trainerMock = new TrainerMock();
 
 export { trainerMock };

@@ -80,10 +80,6 @@ function mpsToKph(mps) {
     return 3.6 * mps;
 };
 
-function scale(value, max = 100) {
-    return 100 * (value/max);
-}
-
 function stringToBool(str) {
     if(str === 'true') return true;
     if(str === 'false') return false;
@@ -289,7 +285,6 @@ export {
     format,
     kphToMps,
     mpsToKph,
-    scale,
     stringToBool,
     capitalize,
 

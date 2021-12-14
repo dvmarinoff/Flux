@@ -412,7 +412,7 @@ body.dark-theme {
 #home-page-wrapper {
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 50px 2.5fr 1fr 1fr 88px 100px;
+    grid-template-rows: 50px 2.5fr 1fr 1fr 98px 100px;
     height: 100vh;
 }
 
@@ -510,7 +510,6 @@ body.dark-theme {
     grid-area: 2 / 3 / 2 / 5;
 }
 #data-tile--cadence {
-    position: relative;
     grid-area: 2 / 5 / 2 / 7;
 }
 #data-tile--speed {
@@ -554,16 +553,27 @@ body.dark-theme {
     font-size: var(--data-tile-small--unit-font-size);
     font-weight: bold;
 }
-.data-tile-target--value {
-    font-size: 1em;
-    height: 1em;
 
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    /* color: var(--red); */
+.data-tile--value-cont.complex {
+    height: 3.2em;
+
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.data-tile--value.active {
+    font-size: 2.6em;
+    width: 2em;
+}
+
+.data-tile-target--value {
+    width: 0;
+}
+.data-tile-target--value.active {
+    font-size: 1.6em;
+    width: 1.5em;
 }
 
 /* Graphs */
@@ -578,6 +588,7 @@ body.dark-theme {
     width: 100%;
     overflow: hidden;
 }
+
 .graph--bar-group {
     display: flex;
     flex-direction: row;
@@ -589,13 +600,25 @@ body.dark-theme {
     /* min-height: 100%; */
     padding: 0;
 }
+
 .graph--heading {
+    position: relative;
     font-family: var(--ssb-font-family);
     font-size: 1em;
     font-weight: bold;
     text-align: center;
     height: var(--graph-heading-height);
+    z-index: 1;
 }
+
+.graph--msg {
+    font-size: 1em;
+    line-height: 1.4em;
+
+    position: relative;
+    z-index: 1;
+}
+
 .graph--cont {
     display: flex;
     flex-direction: row;
@@ -609,6 +632,7 @@ body.dark-theme {
     bottom: 0px;
     padding: 0;
     /* min-height: 40px; */
+    /* z-index: 0; */
 }
 .graph--bar {
     position: relative;
@@ -618,11 +642,12 @@ body.dark-theme {
     margin: 0;
     padding: 0;
     width: 1px;
+
 }
 .graph--info {
     display: none;
     position: absolute;
-    bottom: 90%;
+    bottom: 60%;
     padding: 2px 2px;
     color: var(--black);
     background-color: var(--white);
@@ -684,7 +709,7 @@ body.dark-theme {
     font-size: 1rem;
     padding: 0 1em;
     --inner-max-width: 300px;
-    --mode-selector-margin: 1.4em auto;
+    --mode-selector-margin: 1.8em auto;
     --mode-selector-padding: 0 1em;
 
     --number-input-height: 3rem;
@@ -1390,7 +1415,7 @@ and (min-width: 1024px)
 and (min-height: 768px) {
     /* Home Page MQ */
     #home-page-wrapper {
-        grid-template-rows: 50px 2fr 1fr 1fr 88px 100px;
+        grid-template-rows: 50px 2fr 1fr 1fr 98px 100px;
     }
 
     .data-tiles {

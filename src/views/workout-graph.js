@@ -1,5 +1,5 @@
 import { xf, exists, existance, equals } from '../functions.js';
-import { formatTime, scale } from '../utils.js';
+import { formatTime } from '../utils.js';
 import { models } from '../models/models.js';
 
 function powerTargetToHtml(args = {}) {
@@ -42,6 +42,10 @@ function targetsToHtml(args = {}) {
     return powerTargetToHtml({value: args.power}) +
            cadenceTargetToHtml({value: args.cadence}) +
            slopeTargetToHtml({value: args.slope});
+}
+
+function scale(value, max = 100) {
+    return 100 * (value/max);
 }
 
 function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 118) {
