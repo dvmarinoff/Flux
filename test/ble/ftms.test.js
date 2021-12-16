@@ -1,5 +1,15 @@
 import { uuids } from '../../src/ble/uuids.js';
 import { control } from '../../src/ble/ftms/control-point.js';
+import { indoorBikeData } from '../../src/ble/ftms/indoor-bike-data.js';
+import { status } from '../../src/ble/ftms/fitness-machine-status.js';
+import { supported } from '../../src/ble/ftms/supported-ranges.js';
+
+
+global.console = {
+    log: jest.fn(),
+    error: console.error,
+    warn: console.warn,
+};
 
 describe('Control Point', () => {
 
@@ -142,7 +152,7 @@ describe('Control Point', () => {
             view.setInt16(3, 810, true);
             view.setUint8(5, 40, true);
             view.setUint8(6, 49, true);
-            // []
+            // [17, 184, 11, 42, 3, 40, 49]
 
             const res = control.simulationParameters.decode(view);
             expect(res).toEqual({
@@ -178,11 +188,190 @@ describe('Control Point', () => {
             const view = new DataView((new Uint8Array(3)).buffer);
             view.setUint8(0, 18, true);
             view.setUint16(1, 21800, true);
-            // []
+            // [18, 40, 85]
 
             const res = control.wheelCircumference.decode(view);
             expect(res).toEqual({
                 circumference: 2180,
+            });
+        });
+    });
+
+    describe('Response', () => {
+        test('opCode', () => {
+            const res = control.response.opCode;
+            expect(res).toEqual(0x80);
+        });
+
+        describe('decode', () => {
+            test('request control success', () => {
+                const view = new DataView((new Uint8Array(3)).buffer);
+                view.setUint8(0, 128, true);
+                view.setUint8(1, 0, true);
+                view.setUint8(2, 1, true);
+                // []
+
+                const res = control.response.decode(view);
+                expect(res).toEqual({
+                    opCode: 128,
+                    requestCode: 0,
+                    resultCode: 1,
+                });
+            });
+
+            test('set power target fail', () => {
+                const view = new DataView((new Uint8Array(3)).buffer);
+                view.setUint8(0, 128, true);
+                view.setUint8(1, 5, true);
+                view.setUint8(2, 3, true);
+                // []
+
+                const res = control.response.decode(view);
+                expect(res).toEqual({
+                    opCode: 128,
+                    requestCode: 5,
+                    resultCode: 3,
+                });
+            });
+
+            test('set power target success', () => {
+                const view = new DataView((new Uint8Array(3)).buffer);
+                view.setUint8(0, 128, true);
+                view.setUint8(1, 5, true);
+                view.setUint8(2, 1, true);
+                // []
+
+                const res = control.response.decode(view);
+                expect(res).toEqual({
+                    opCode: 128,
+                    requestCode: 5,
+                    resultCode: 1,
+                });
+            });
+        });
+    });
+});
+
+describe('IndoorBikeData', () => {
+
+    describe('decode', () => {
+        test('speed-cadence-power', () => {
+            const view = new DataView((new Uint8Array([68, 0, 24, 1, 20, 0, 6, 0])).buffer);
+
+            const res = indoorBikeData.decode(view);
+            expect(res).toEqual({
+                speed: 280 * 0.01,
+                cadence: 10,
+                power: 6,
+            });
+        });
+
+        test('speed-cadence-power-heartRate', () => {
+            const view = new DataView((new Uint8Array([68, 2, 170, 5, 46, 0, 24, 0, 70])).buffer);
+
+            const res = indoorBikeData.decode(view);
+            expect(res).toEqual({
+                speed: 1450 * 0.01,
+                cadence: 23,
+                power: 24,
+                heartRate: 70,
+            });
+        });
+    });
+});
+
+describe('FitnessMachineStatus', () => {
+
+    describe('decode', () => {
+        test('Target Power Changed', () => {
+            const view = new DataView((new Uint8Array([8, 44, 1])).buffer);
+
+            const res = status.decode(view);
+            expect(res).toEqual({
+                operation: 'Target Power Changed',
+                value: {power: 300},
+            });
+        });
+
+        test('Target Resistance Level Changed', () => {
+            const view = new DataView((new Uint8Array([7, 100, 0])).buffer);
+
+            const res = status.decode(view);
+            expect(res).toEqual({
+                operation: 'Target Resistance Level Changed',
+                value: {resistance: 10},
+            });
+        });
+
+        test('Indoor Bike Simulation Parameters Changed', () => {
+            const view = new DataView((new Uint8Array([18, 184, 11, 42, 3, 40, 49])).buffer);
+
+            const res = status.decode(view);
+            expect(res).toEqual({
+                operation: 'Indoor Bike Simulation Parameters Changed',
+                value: {
+                    windSpeed: 3,
+                    grade: 8.1,
+                    crr: 0.004,
+                    windResistance: 0.49,
+                },
+            });
+        });
+
+        test('Wheel Circumference Changed', () => {
+            const view = new DataView((new Uint8Array([19, 40, 85])).buffer);
+
+            const res = status.decode(view);
+            expect(res).toEqual({
+                operation: 'Wheel Circumference Changed',
+                value: {circumference: 2180},
+            });
+        });
+    });
+});
+
+describe('SupportedRanges', () => {
+
+    describe('PowerRange', () => {
+        test('encode', () => {
+            const res = supported.powerRange.encode({min: 0, max: 800, inc: 1});
+            const view = new DataView(res);
+
+            expect(view.getUint16(0, true)).toBe(0);
+            expect(view.getUint16(2, true)).toBe(800);
+            expect(view.getUint16(4, true)).toBe(1);
+        });
+
+        test('decode', () => {
+            const view = new DataView((new Uint8Array([0, 0, 32, 3, 1, 0])).buffer);
+
+            const res = supported.powerRange.decode(view);
+            expect(res).toEqual({
+                min: 0,
+                max: 800,
+                inc: 1,
+            });
+        });
+    });
+
+    describe('ResistanceRange', () => {
+        test('encode', () => {
+            const res = supported.resistanceRange.encode({min: 0, max: 100, inc: 1});
+            const view = new DataView(res);
+
+            expect(view.getUint16(0, true)).toBe(0);
+            expect(view.getUint16(2, true)).toBe(100);
+            expect(view.getUint16(4, true)).toBe(1);
+        });
+
+        test('decode', () => {
+            const view = new DataView((new Uint8Array([0, 0, 232, 3, 1, 0])).buffer);
+
+            const res = supported.resistanceRange.decode(view);
+            expect(res).toEqual({
+                min: 0,
+                max: 1000,
+                inc: 1,
             });
         });
     });
