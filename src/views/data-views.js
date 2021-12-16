@@ -386,6 +386,67 @@ class InstantPowerGraph extends HTMLElement {
 
 customElements.define('instant-power-graph', InstantPowerGraph);
 
+
+
+class DataTileSwitch extends HTMLElement {
+    constructor() {
+        super();
+        this.state = 1;
+    }
+    connectedCallback() {
+        this.switchOne = this.querySelector('#data-tile--switch-one');
+        this.switchTwo = this.querySelector('#data-tile--switch-two');
+
+        this.powerAvg = document.querySelector('#data-tile--power-avg');
+        this.slope    = document.querySelector('#data-tile--slope');
+
+        this.speed    = document.querySelector('#data-tile--speed');
+        this.distance = document.querySelector('#data-tile--distance');
+
+        this.addEventListener('pointerup', this.onSwitch.bind(this));
+    }
+    disconnectedCallback() {
+        this.removeEventListener('pointerup', this.onSwitch.bind(this));
+    }
+    onSwitch(e) {
+        if(exists(e.target.attributes.id)) {
+            const id = e.target.attributes.id.value;
+
+            if(equals(id, 'data-tile--switch-one') && !equals(this.state, 1)) {
+                this.state = 1;
+                this.setSwitch(1);
+            }
+            if(equals(id, 'data-tile--switch-two') && !equals(this.state, 2)) {
+                this.state = 2;
+                this.setSwitch(2);
+            }
+        }
+    }
+    setSwitch(state) {
+        if(equals(state, 1)) {
+            this.speed.style.display = 'block';
+            this.distance.style.display = 'block';
+            this.powerAvg.style.display = 'none';
+            this.slope.style.display = 'none';
+
+            this.switchOne.classList.toggle('active');
+            this.switchTwo.classList.toggle('active');
+        }
+        if(equals(state, 2)) {
+            this.speed.style.display = 'none';
+            this.distance.style.display = 'none';
+            this.powerAvg.style.display = 'block';
+            this.slope.style.display = 'block';
+
+            this.switchOne.classList.toggle('active');
+            this.switchTwo.classList.toggle('active');
+        }
+        return;
+    }
+}
+
+customElements.define('data-tile-switch', DataTileSwitch);
+
 export {
     DataView,
 
@@ -404,4 +465,6 @@ export {
     WorkoutName,
 
     InstantPowerGraph,
+
+    DataTileSwitch,
 }
