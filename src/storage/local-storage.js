@@ -2,7 +2,7 @@
 // LocalStorageItem
 //
 
-import { xf, equals, exists, existance } from '../functions.js';
+import { equals, exists, existance } from '../functions.js';
 
 function LocalStorageItem(args = {}) {
     const defaults = {
@@ -44,7 +44,7 @@ function LocalStorageItem(args = {}) {
             window.localStorage.setItem(`${key}`, value);
             return value;
         } else {
-            console.error(`Trying to enter invalid ${key} value in Local Storage: ${typeof value}`, value);
+            console.warn(`Trying to enter invalid ${key} value in Local Storage: ${typeof value}`, value);
             window.localStorage.setItem(`${key}`, fallback);
             return fallback;
         }

@@ -2,11 +2,11 @@
  * @jest-environment jsdom
  */
 
-import { fileHandler } from '../src/file.js';
-import { uuid } from '../src/storage/uuid.js';
-import { zwo } from '../src/workouts/zwo.js';
+import { fileHandler } from '../../src/file.js';
+import { uuid } from '../../src/storage/uuid.js';
+import { zwo } from '../../src/workouts/zwo.js';
 
-import { idb } from '../src/storage/idb.js';
+import { idb } from '../../src/storage/idb.js';
 import indexedDB from 'fake-indexeddb';
 
 window.indexedDB = indexedDB;
@@ -19,7 +19,7 @@ describe('Workouts', () => {
         warn: console.warn,
     };
 
-    test('base', async () => {
+    test('placeholder', async () => {
         expect(1).toBe(1);
     });
 });

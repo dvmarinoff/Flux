@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import {
     equals,
     isNull,
@@ -415,15 +419,15 @@ describe('pipe', () => {
 describe('repeat', () => {
     const inc = (n) => n + 1;
 
-    test('0 x repeat inc', () => {
+    test('inc 0 zero times', () => {
         expect(repeat(0)(inc)(0)).toBe(0);
     });
 
-    test('1 x repeat inc', () => {
+    test('inc 0 one time', () => {
         expect(repeat(1)(inc)(0)).toBe(1);
     });
 
-    test('4 x repeat inc', () => {
+    test('inc 0 four times', () => {
         expect(repeat(4)(inc)(0)).toBe(4);
     });
 });

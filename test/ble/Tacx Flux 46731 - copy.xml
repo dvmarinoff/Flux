@@ -1,0 +1,107 @@
+<server-configuration name="Tacx Flux 46731 - copy">
+   <service uuid="0000180a-0000-1000-8000-00805f9b34fb">
+      <characteristic uuid="00002a26-0000-1000-8000-00805f9b34fb" value-string="3.3.123">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic uuid="00002a29-0000-1000-8000-00805f9b34fb" value-string="Tacx">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic uuid="00002a24-0000-1000-8000-00805f9b34fb" value-string="T1900">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+   </service>
+   <service uuid="669aa605-0c08-969e-e211-86ad5062675f">
+      <characteristic uuid="669aab01-0c08-969e-e211-86ad5062675f">
+         <descriptor uuid="00002901-0000-1000-8000-00805f9b34fb"/>
+         <permission name="WRITE"/>
+         <property name="WRITE"/>
+      </characteristic>
+      <characteristic uuid="669aab02-0c08-969e-e211-86ad5062675f">
+         <descriptor uuid="00002901-0000-1000-8000-00805f9b34fb"/>
+         <descriptor configure="CCCD"/>
+         <property name="NOTIFY"/>
+      </characteristic>
+      <characteristic uuid="669aab21-0c08-969e-e211-86ad5062675f">
+         <descriptor uuid="00002901-0000-1000-8000-00805f9b34fb"/>
+         <permission name="WRITE"/>
+         <property name="WRITE"/>
+         <property name="WRITE_WITHOUT_RESPONSE"/>
+      </characteristic>
+      <characteristic uuid="669aab22-0c08-969e-e211-86ad5062675f">
+         <descriptor uuid="00002901-0000-1000-8000-00805f9b34fb"/>
+         <descriptor configure="CCCD"/>
+         <property name="NOTIFY"/>
+      </characteristic>
+   </service>
+   <service uuid="669aa501-0c08-969e-e211-86ad5062675f">
+      <characteristic uuid="669aac01-0c08-969e-e211-86ad5062675f">
+         <descriptor uuid="00002904-0000-1000-8000-00805f9b34fb"/>
+         <permission name="READ"/>
+         <permission name="WRITE"/>
+         <property name="READ"/>
+         <property name="WRITE"/>
+      </characteristic>
+   </service>
+   <service uuid="00001818-0000-1000-8000-00805f9b34fb">
+      <characteristic uuid="00002a63-0000-1000-8000-00805f9b34fb">
+         <descriptor configure="CCCD"/>
+         <property name="NOTIFY"/>
+      </characteristic>
+      <characteristic uuid="00002a65-0000-1000-8000-00805f9b34fb">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic uuid="00002a5d-0000-1000-8000-00805f9b34fb">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic uuid="00002a66-0000-1000-8000-00805f9b34fb">
+         <descriptor configure="CCCD"/>
+         <permission name="WRITE"/>
+         <property name="WRITE"/>
+         <property name="INDICATE"/>
+      </characteristic>
+   </service>
+   <service uuid="00001826-0000-1000-8000-00805f9b34fb">
+      <characteristic uuid="00002ad2-0000-1000-8000-00805f9b34fb">
+         <descriptor configure="CCCD"/>
+         <property name="NOTIFY"/>
+      </characteristic>
+      <characteristic uuid="00002acc-0000-1000-8000-00805f9b34fb" value="824000000CA00000">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic uuid="00002ad6-0000-1000-8000-00805f9b34fb" value="0000E8030100">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic uuid="00002ad8-0000-1000-8000-00805f9b34fb" value="000020030100">
+         <permission name="READ"/>
+         <property name="READ"/>
+      </characteristic>
+      <characteristic uuid="00002ada-0000-1000-8000-00805f9b34fb" value="04">
+         <descriptor configure="CCCD"/>
+         <property name="NOTIFY"/>
+      </characteristic>
+      <characteristic uuid="00002ad9-0000-1000-8000-00805f9b34fb">
+         <descriptor configure="CCCD"/>
+         <permission name="WRITE"/>
+         <property name="WRITE"/>
+         <property name="INDICATE"/>
+      </characteristic>
+   </service>
+   <service uuid="6e40fec1-b5a3-f393-e0a9-e50e24dcca9e">
+      <characteristic uuid="6e40fec2-b5a3-f393-e0a9-e50e24dcca9e">
+         <descriptor configure="CCCD"/>
+         <property name="NOTIFY"/>
+      </characteristic>
+      <characteristic uuid="6e40fec3-b5a3-f393-e0a9-e50e24dcca9e">
+         <permission name="WRITE"/>
+         <property name="WRITE"/>
+         <property name="WRITE_WITHOUT_RESPONSE"/>
+      </characteristic>
+   </service>
+</server-configuration>
