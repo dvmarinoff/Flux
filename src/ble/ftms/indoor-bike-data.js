@@ -174,7 +174,7 @@ function readHeartRate(dataview) {
 // (10) [68, 2, 170, 5, 46, 0, 24, 0, 70]
 //
 //    "Instantanious Speed: 14.5 km/h
-//     Instantanious Cadence: 24.0 per min
+//     Instantanious Cadence: 23.0 per min
 //     Instantanious Power: 24 W
 //     Heart Rate: 70 bpm"
 //

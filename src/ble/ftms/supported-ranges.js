@@ -26,14 +26,16 @@ function PowerRange() {
         const view   = new DataView(buffer);
 
         view.setUint16(0, min, true);
-        view.setUint16(0, max, true);
-        view.setUint16(0, inc, true);
+        view.setUint16(2, max, true);
+        view.setUint16(4, inc, true);
 
         return view.buffer;
     }
 
     function decode(dataview) {
         // (0x) 00-00-20-03-01-00
+        // (10) [0, 0, 32, 3, 1, 0]
+        // 0, 800, 1
         const min = dataview.getUint16(0, dataview, true);
         const max = dataview.getUint16(2, dataview, true);
         const inc = dataview.getUint16(4, dataview, true);
@@ -60,14 +62,16 @@ function ResistanceRange() {
         const view   = new DataView(buffer);
 
         view.setUint16(0, min, true);
-        view.setUint16(0, max, true);
-        view.setUint16(0, inc, true);
+        view.setUint16(2, max, true);
+        view.setUint16(4, inc, true);
 
         return view.buffer;
     }
 
     function decode(dataview) {
         // (0x) 00-00-E8-03-01-00
+        // (10) [0, 0, 232, 3, 1, 0]
+        // 0, 1000, 1
         const min = dataview.getUint16(0, dataview, true);
         const max = dataview.getUint16(2, dataview, true);
         const inc = dataview.getUint16(4, dataview, true);
