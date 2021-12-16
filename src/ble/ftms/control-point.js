@@ -3,7 +3,7 @@
 //
 
 import { fixInRange, hex }  from '../../utils.js';
-import {  existance, curry2 }  from '../../functions.js';
+import { existance, curry2 }  from '../../functions.js';
 
 const logs = true;
 
@@ -109,7 +109,7 @@ function ResistanceTarget() {
 
         log(`:tx :ftms :resistance ${args.resistance} -> ${resistance}`);
 
-        return view;
+        return view.buffer;
     }
 
     function decode(dataview) {
@@ -196,10 +196,10 @@ function WheelCircumference(args) {
     };
 
     const values = {
-        2080: '700x19C', 2086: '700x20C', 2096: '700x23C', 2105: '700x25C', 2136: '700x28C',
-	      2146: '700x30C', 2155: '700x32C', 2168: '700x35C', 2180: '700x38C',
-        2200: '700x40C', 2242: '700x45C', 2268: '700x47C',
-        2281: `29"x2.25"`, 2326: `29"x2.3"`, 2750: '',
+        2080: '700x19C', 2086: '700x20C', 2096: '700x23C', 2105: '700x25C', 2136: '700x28C', // 20s
+	      2146: '700x30C', 2155: '700x32C', 2168: '700x35C', 2180: '700x38C',                  // 30s
+        2200: '700x40C', 2242: '700x45C', 2268: '700x47C',                                   // 40s
+        2281: `29"x2.25"`, 2326: `29"x2.3"`, 2750: 'tractor',                                // MTBs
     };
 
     // 700x25C -> 2105 -> [0x12, 0x3A, 0x52] -> [18, 58, 82]
@@ -350,6 +350,7 @@ function Response() {
     }
 
     return Object.freeze({
+        opCode,
         results,
         requests,
         encode,
