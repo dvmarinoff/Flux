@@ -468,16 +468,16 @@ class DataTileSwitchGroup extends SwitchGroup {
     }
     renderEffect(state) {
         if(equals(state, 0)) {
-            this.speed.style.display    = 'block';
-            this.distance.style.display = 'block';
-            this.powerAvg.style.display = 'none';
-            this.slope.style.display    = 'none';
+            this.speed.classList.add('active');
+            this.distance.classList.add('active');
+            this.powerAvg.classList.remove('active');
+            this.slope.classList.remove('active');
         }
         if(equals(state, 1)) {
-            this.speed.style.display    = 'none';
-            this.distance.style.display = 'none';
-            this.powerAvg.style.display = 'block';
-            this.slope.style.display    = 'block';
+            this.speed.classList.remove('active');
+            this.distance.classList.remove('active');
+            this.powerAvg.classList.add('active');
+            this.slope.classList.add('active');
         }
         return;
     }
