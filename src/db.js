@@ -24,7 +24,10 @@ let db = {
     weight: models.weight.default,
     theme: models.theme.default,
     measurement: models.measurement.default,
+
+    // UI options
     powerSmoothing: 1,
+    dataTileSwitch: 0,
 
     // Workouts
     workouts: [],
@@ -90,6 +93,11 @@ xf.reg('ui:mode-set', (mode, db) => {
     if(equals(mode, 'erg'))        xf.dispatch(`ui:power-target-set`, db.powerTarget);
     if(equals(mode, 'resistance')) xf.dispatch(`ui:resistance-target-set`, db.resistanceTarget);
     if(equals(mode, 'slope'))      xf.dispatch(`ui:slope-target-set`, db.slopeTarget);
+});
+
+// UI options
+xf.reg('ui:data-tile-switch-set', (index, db) => {
+    db.dataTileSwitch = index;
 });
 
 // Targets

@@ -472,6 +472,10 @@ function Session(args = {}) {
             resistanceTarget: db.resistanceTarget,
             slopeTarget: db.slopeTarget,
             sources: db.sources,
+
+            // UI options
+            powerSmoothing: db.powerSmoothing,
+            dataTileSwitch: db.dataTileSwitch,
         };
 
         return session;
