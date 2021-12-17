@@ -27,7 +27,7 @@ let db = {
 
     // UI options
     powerSmoothing: 1,
-    dataTileSwitch: 0,
+    dataTileSwitch: models.dataTileSwitch.default,
 
     // Workouts
     workouts: [],
@@ -98,6 +98,7 @@ xf.reg('ui:mode-set', (mode, db) => {
 // UI options
 xf.reg('ui:data-tile-switch-set', (index, db) => {
     db.dataTileSwitch = index;
+    models.dataTileSwitch.backup(db.dataTileSwitch);
 });
 
 // Targets
@@ -219,6 +220,7 @@ xf.reg('app:start', async function(_, db) {
     db.weight = models.weight.restore();
     db.theme = models.theme.restore();
     db.measurement = models.measurement.restore();
+    db.dataTileSwitch = models.dataTileSwitch.restore(),
 
     db.workouts = models.workouts.restore();
     db.workout = models.workout.restore(db);
