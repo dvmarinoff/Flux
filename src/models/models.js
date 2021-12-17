@@ -16,13 +16,14 @@ import { fit } from '../fit/fit.js';
 class Model {
     constructor(args) {
         this.init(args);
-        this.prop = args.prop;
-        this.default = args.default || this.defaultValue();
-        this.prev = args.default;
-        this.set = args.set || this.defaultSet;
-        this.isValid = args.isValid || this.defaultIsValid;
+        this.prop      = args.prop;
+        this.default   = args.default   || this.defaultValue();
+        this.prev      = args.default;
+        this.set       = args.set       || this.defaultSet;
+        this.parser    = args.parser    || this.defaultParse;
+        this.isValid   = args.isValid   || this.defaultIsValid;
         this.onInvalid = args.onInvalid || this.defaultOnInvalid;
-        this.storage = this.defaultStorage();
+        this.storage   = this.defaultStorage();
         this.postInit(args);
     }
     init() { return; }
@@ -37,6 +38,9 @@ class Model {
             self.defaultOnInvalid(value);
             return self.default;
         }
+    }
+    defaultParse(value) {
+        return value;
     }
     defaultOnInvalid(x) {
         const self = this;
@@ -53,7 +57,7 @@ class Model {
     }
     restore() {
         const self = this;
-        return self.storage.restore();
+        return self.parser(self.storage.restore());
     }
 }
 
@@ -239,8 +243,6 @@ class FTP extends Model {
         self.storage = args.storage(storageModel);
         self.zones = args.zones || self.defaultZones();
         self.percentages = args.percentages || self.defaultPercentages();
-
-        // console.log(self.defaultValue());
     }
     defaultValue() { return 200; }
     defaultIsValid(value) {
@@ -334,6 +336,23 @@ class Measurement extends Model {
         if(theme === second(self.values)) return first(self.values);
         self.onInvalid(theme);
         return self.default;
+    }
+}
+
+class DataTileSwitch extends Model {
+    postInit(args) {
+        const self = this;
+        const storageModel = {
+            key: self.prop,
+            fallback: self.defaultValue(),
+        };
+        self.storage = new args.storage(storageModel);
+        this.values = [0,1];
+    }
+    defaultValue() { return 0; }
+    defaultIsValid(value) { return this.values.includes(value); }
+    defaultParse(value) {
+        return parseInt(value);
     }
 }
 
@@ -472,6 +491,10 @@ function Session(args = {}) {
             resistanceTarget: db.resistanceTarget,
             slopeTarget: db.slopeTarget,
             sources: db.sources,
+
+            // UI options
+            powerSmoothing: db.powerSmoothing,
+            // dataTileSwitch: db.dataTileSwitch,
         };
 
         return session;
@@ -506,6 +529,7 @@ const ftp = new FTP({prop: 'ftp', storage: LocalStorageItem});
 const weight = new Weight({prop: 'weight', storage: LocalStorageItem});
 const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
+const dataTileSwitch = new DataTileSwitch({prop: 'dataTileSwitch', storage: LocalStorageItem});
 
 const workout = new Workout({prop: 'workout'});
 const workouts = new Workouts({prop: 'workouts', workoutModel: workout});
@@ -527,6 +551,7 @@ let models = { power,
                weight,
                theme,
                measurement,
+               dataTileSwitch,
                workout,
                workouts,
                session,

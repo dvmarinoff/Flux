@@ -468,6 +468,7 @@ body.dark-theme {
 
 /* Data Tiles */
 .data-tiles {
+    position: relative;
     grid-row: 2;
 
     font-size: 1rem;
@@ -490,6 +491,7 @@ body.dark-theme {
 
 #data-tile--power-avg {
     display: none;
+    grid-area: 3 / 1 / 3 / 4;
 }
 #data-tile--power {
     grid-area: 1 / 1 / 1 / 3;
@@ -502,6 +504,7 @@ body.dark-theme {
 }
 #data-tile--slope {
     display: none;
+    grid-area: 3 / 4 / 3 / 7;
 }
 #data-tile--target {
     grid-area: 2 / 1 / 2 / 3;
@@ -517,6 +520,41 @@ body.dark-theme {
 }
 #data-tile--distance {
     grid-area: 3 / 4 / 3 / 7;
+}
+
+.data-tile--switch--group {
+    position: absolute;
+    bottom: 0em;
+    left: 0;
+    width: 100%;
+    height: 2em;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.data-tile--switch {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 2em;
+    width: 4em;
+}
+
+.data-tile--switch .data-tile--switch--icon {
+    display: block;
+    width: 1em;
+    height: 1em;
+    /* margin: 0 1em; */
+    border-radius: 50%;
+    border: 1px solid #fff;
+}
+
+.data-tile--switch.active .data-tile--switch--icon {
+    background-color: #fff;
+    border: 1px solid #fff;
 }
 
 .data-tile-small--unit {
@@ -1336,6 +1374,11 @@ and (min-height: 600px) {
     .data-tile-small--unit {
         display: none;
     }
+
+    /*REMOVE*/
+    .data-tile--switch--group {
+        display: none;
+    }
 }
 
 /* IPad, Galaxy Tab S, Portrait */
@@ -1396,7 +1439,6 @@ and (orientation: portrait) {
         display: none;
     }
 
-
     .graph--heading {
         font-size: 1.2em;
         line-height: 2em;
@@ -1407,6 +1449,10 @@ and (orientation: portrait) {
         --mode-selector-margin: 1.7em auto;
     }
 
+    /*REMOVE*/
+    .data-tile--switch--group {
+        display: none;
+    }
 }
 
 /* IPad, Lanscape */
@@ -1560,8 +1606,7 @@ and (min-height: 1200px) {
 /* IPhone Pro 12, landscape */
 @media all
 and (max-height: 428px)
-and (min-width: 500px)
-{
+and (min-width: 500px) {
 
     #home-page-wrapper {
         display: grid;
@@ -1719,6 +1764,11 @@ and (min-width: 500px)
     }
 
     #workout-name {
+        display: none;
+    }
+
+    /*REMOVE*/
+    .data-tile--switch--group {
         display: none;
     }
 }

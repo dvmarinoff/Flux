@@ -24,7 +24,10 @@ let db = {
     weight: models.weight.default,
     theme: models.theme.default,
     measurement: models.measurement.default,
+
+    // UI options
     powerSmoothing: 1,
+    dataTileSwitch: models.dataTileSwitch.default,
 
     // Workouts
     workouts: [],
@@ -90,6 +93,12 @@ xf.reg('ui:mode-set', (mode, db) => {
     if(equals(mode, 'erg'))        xf.dispatch(`ui:power-target-set`, db.powerTarget);
     if(equals(mode, 'resistance')) xf.dispatch(`ui:resistance-target-set`, db.resistanceTarget);
     if(equals(mode, 'slope'))      xf.dispatch(`ui:slope-target-set`, db.slopeTarget);
+});
+
+// UI options
+xf.reg('ui:data-tile-switch-set', (index, db) => {
+    db.dataTileSwitch = index;
+    models.dataTileSwitch.backup(db.dataTileSwitch);
 });
 
 // Targets
@@ -211,6 +220,7 @@ xf.reg('app:start', async function(_, db) {
     db.weight = models.weight.restore();
     db.theme = models.theme.restore();
     db.measurement = models.measurement.restore();
+    db.dataTileSwitch = models.dataTileSwitch.restore(),
 
     db.workouts = models.workouts.restore();
     db.workout = models.workout.restore(db);

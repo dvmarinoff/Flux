@@ -386,6 +386,105 @@ class InstantPowerGraph extends HTMLElement {
 
 customElements.define('instant-power-graph', InstantPowerGraph);
 
+
+class SwitchGroup extends HTMLElement {
+    constructor() {
+        super();
+        this.state = 0;
+        this.postInit();
+    }
+    connectedCallback() {
+        this.switchList = this.querySelectorAll('.switch-item');
+        this.config();
+
+        xf.sub(`db:${this.prop}`, this.onState.bind(this));
+        this.addEventListener('pointerup', this.onSwitch.bind(this));
+    }
+    disconnectedCallback() {
+        xf.unsub(`db:${this.prop}`, this.onState.bind(this));
+        this.removeEventListener('pointerup', this.onSwitch.bind(this));
+    }
+    eventOwner(e) {
+        const pathLength = e.path.length;
+
+        for(let i = 0; i < pathLength; i++) {
+            if(exists(e.path[i].hasAttribute) &&
+               e.path[i].hasAttribute('index')) {
+                return e.path[i];
+            }
+        }
+
+        return e.path[0];
+    }
+    onSwitch(e) {
+        const element = this.eventOwner(e);
+
+        if(exists(element.attributes.index)) {
+
+            const id = parseInt(element.attributes.index.value) || 0;
+
+            if(equals(id, this.state)) {
+                return;
+            } else {
+                xf.dispatch(`${this.effect}`, id);
+            }
+        }
+    }
+    onState(state) {
+        this.state = state;
+        this.setSwitch(this.state);
+        this.renderEffect(this.state);
+    }
+    setSwitch(state) {
+        this.switchList.forEach(function(s, i) {
+            if(equals(i, state)) {
+                s.classList.add('active');
+            } else {
+                s.classList.remove('active');
+            }
+        });
+    }
+    // overwrite the rest to augment behavior
+    postInit() {
+        this.prop = '';
+    }
+    config() {
+    }
+    renderEffect(state) {
+        return state;
+    }
+}
+
+class DataTileSwitchGroup extends SwitchGroup {
+    postInit() {
+        this.prop = 'dataTileSwitch';
+        this.effect = 'ui:data-tile-switch-set';
+    }
+    config() {
+        this.speed    = document.querySelector('#data-tile--speed');     // tab 0
+        this.distance = document.querySelector('#data-tile--distance');  // tab 0
+        this.powerAvg = document.querySelector('#data-tile--power-avg'); // tab 1
+        this.slope    = document.querySelector('#data-tile--slope');     // tab 1
+    }
+    renderEffect(state) {
+        if(equals(state, 0)) {
+            this.speed.style.display    = 'block';
+            this.distance.style.display = 'block';
+            this.powerAvg.style.display = 'none';
+            this.slope.style.display    = 'none';
+        }
+        if(equals(state, 1)) {
+            this.speed.style.display    = 'none';
+            this.distance.style.display = 'none';
+            this.powerAvg.style.display = 'block';
+            this.slope.style.display    = 'block';
+        }
+        return;
+    }
+}
+
+customElements.define('data-tile-switch-group', DataTileSwitchGroup);
+
 export {
     DataView,
 
@@ -404,4 +503,7 @@ export {
     WorkoutName,
 
     InstantPowerGraph,
+
+    SwitchGroup,
+    DataTileSwitchGroup,
 }
