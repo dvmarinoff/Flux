@@ -517,9 +517,25 @@ body.dark-theme {
 }
 #data-tile--speed {
     grid-area: 3 / 1 / 3 / 4;
+    display: none;
 }
 #data-tile--distance {
     grid-area: 3 / 4 / 3 / 7;
+    display: none;
+}
+
+
+#data-tile--power-avg.active {
+    display: block;
+}
+#data-tile--slope.active {
+    display: block;
+}
+#data-tile--speed.active {
+    display: block;
+}
+#data-tile--distance.active {
+    display: block;
 }
 
 .data-tile--switch--group {
@@ -547,7 +563,6 @@ body.dark-theme {
     display: block;
     width: 1em;
     height: 1em;
-    /* margin: 0 1em; */
     border-radius: 50%;
     border: 1px solid #fff;
 }
@@ -1379,6 +1394,18 @@ and (min-height: 600px) {
     .data-tile--switch--group {
         display: none;
     }
+    #data-tile--power-avg {
+        display: block;
+    }
+    #data-tile--slope {
+        display: block;
+    }
+    #data-tile--speed {
+        display: block;
+    }
+    #data-tile--distance {
+        display: block;
+    }
 }
 
 /* IPad, Galaxy Tab S, Portrait */
@@ -1452,6 +1479,18 @@ and (orientation: portrait) {
     /*REMOVE*/
     .data-tile--switch--group {
         display: none;
+    }
+    #data-tile--power-avg {
+        display: block;
+    }
+    #data-tile--slope {
+        display: block;
+    }
+    #data-tile--speed {
+        display: block;
+    }
+    #data-tile--distance {
+        display: block;
     }
 }
 
@@ -1769,6 +1808,19 @@ and (min-width: 500px) {
 
     /*REMOVE*/
     .data-tile--switch--group {
+        display: none;
+    }
+
+    #data-tile--power-avg.active {
+        display: none;
+    }
+    #data-tile--slope.active {
+        display: none;
+    }
+    #data-tile--speed.active {
+        display: none;
+    }
+    #data-tile--distance.active {
         display: none;
     }
 }
