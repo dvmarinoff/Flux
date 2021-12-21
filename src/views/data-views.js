@@ -587,6 +587,26 @@ class MeasurementUnit extends DataView {
 
 customElements.define('measurement-unit', MeasurementUnit);
 
+class ThemeValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:theme',
+        };
+    }
+}
+
+customElements.define('theme-value', ThemeValue);
+
+class MeasurementValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:measurement',
+        };
+    }
+}
+
+customElements.define('measurement-value', MeasurementValue);
+
 export {
     DataView,
 
@@ -600,6 +620,9 @@ export {
     HeartRateValue,
     PowerAvg,
     PowerValue,
+    MeasurementUnit,
+    ThemeValue,
+    MeasurementValue,
 
     SlopeTarget,
     PowerTarget,

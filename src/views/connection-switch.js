@@ -13,12 +13,7 @@ class ConnectionSwitch extends HTMLElement {
         this.loadingClass   = existance(this.getAttribute('loadingClass'), this.defaultLoadingClass());
         this.indicatorClass = existance(this.getAttribute('indicatorClass'), this.defaultIndicatorClass());
 
-        console.log(this.onClass);
-        console.log(this.indicatorClass);
-
         this.indicator = this.querySelector(`.${this.indicatorClass}`);
-
-        console.log(this.indicator);
 
         xf.sub('pointerup',                this.onEffect.bind(this), this);
         xf.sub(`${this.for}:connected`,    this.on.bind(this));

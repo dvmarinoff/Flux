@@ -1,13 +1,11 @@
 import './connection-switch.js';
-import './data-display.js';
 import './data-views.js';
-import './inputs.js';
+import './effect-views.js';
 import './tabs.js';
+import './workout-list.js';
 import './workout-graph.js';
-import './list.js';
 import './watch.js';
-import './upload.js';
-import './request.js';
+import './ant-device-scan.js';
 import './keyboard.js';
 
 function start() {
