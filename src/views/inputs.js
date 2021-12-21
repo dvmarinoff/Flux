@@ -104,55 +104,6 @@ class EffectButton extends HTMLButtonElement {
 
 customElements.define('effect-button', EffectButton, {extends: 'button'});
 
-class SourceSwitch extends HTMLElement {
-    constructor() {
-        super();
-        this.effect = this.getAttribute('effect');
-        this.path = this.getAttribute('path');
-        this.value = this.getAttribute('value');
-
-        let dataDisplay = this.querySelector('data-display');
-        let speedDisplay = this.querySelector('speed-display');
-        if(exists(dataDisplay)) this.dataDisplay = dataDisplay;
-        if(exists(speedDisplay)) this.dataDisplay = speedDisplay;
-
-    }
-    connectedCallback() {
-        xf.sub(`db:sources`, this.onSources.bind(this));
-        this.addEventListener('pointerup', this.onEffect.bind(this));
-        this.render();
-    }
-    disconnectedCallback() {
-        this.removeEventListener('pointerup', this.onEffect);
-        this.removeEventListener(`${this.effect}`, this.onSources);
-    }
-    onSources(sources) {
-        this.render();
-    }
-    onEffect(e) {
-        let state = {};
-        state[this.path] = this.value;
-        xf.dispatch(`${this.effect}`, state);
-    }
-    disable() {
-        this.classList.add('active');
-        this.dataDisplay.removeAttribute('disabled');
-    };
-    enable() {
-        this.classList.remove('active');
-        this.dataDisplay.setAttribute('disabled', '');
-    }
-    render() {
-        if(models.sources.isSource(this.path, this.value)) {
-            this.disable();
-        } else {
-            this.enable();
-        };
-    }
-}
-
-customElements.define('source-switch', SourceSwitch);
-
 
 class InputButton extends HTMLInputElement {
 }

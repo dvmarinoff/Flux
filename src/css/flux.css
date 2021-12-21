@@ -316,7 +316,7 @@ body.dark-theme {
     color: var(--white);
     background-color: var(--dark);
 }
-.dark-theme .switch-connections {
+.dark-theme .connections-header {
     background-color: var(--chrome);
 }
 
@@ -373,7 +373,7 @@ body.dark-theme {
 .page {
     width: 100%;
     min-height: 110vh;
-    padding-bottom: 120px;
+    padding-bottom: 12em;
     -webkit-transition: all 0.2s ease-in-out 0s;
     transition: all 0.2s ease-in-out 0s;
 }
@@ -417,7 +417,9 @@ body.dark-theme {
 }
 
 /* Switch btn */
-.switch-connections {
+.connections-header {
+    font-size: 1.1rem;
+
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -427,40 +429,43 @@ body.dark-theme {
     grid-row: 1;
 }
 
-.switch {
+.connection-switch {
     display: flex;
     align-items: center;
     align-content: center;
-    font-size: 1rem;
     height: 3em;
     padding: 0 15px;
 }
 
-.switch:hover {
+.connection-switch:hover,
+.connection-icon-switch:hover {
     cursor: pointer;
 }
 
-.switch--indicator {
+.connection-switch--indicator {
     margin: 0px 1em 0px 0px;
     width: 1.3em;
     height: 1.3em;
     border-radius: 50%;
 }
 
-.switch--indicator.on {
+.connection-switch--indicator.on,
+.connection-icon-switch--indicator.on {
     background-color: var(--green);
 }
 
-.switch--indicator.loading {
+.connection-switch--indicator.loading,
+.connection-icon-switch--indicator.loading {
     background-color: var(--yellow);
 }
 
-.switch--indicator.off {
+.connection-switch--indicator.off,
+.connection-icon-switch--indicator.off {
     background-color: var(--red);
 }
 
-.switch--label {
-    font-size: 1.1em;
+.connection-switch--label {
+    font-size: 1em;
     line-height: 1em;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -842,6 +847,9 @@ body.dark-theme {
     --controls-height: 5em;
     --menu-height: 5em;
     --fb-total-height: 10em;
+    --size--icon--global: 2.4em;
+    /* --size--icon--menu--btn: 1.6em; */
+    --size--icon--menu--btn: 2em;
 
     position: fixed;
     bottom: 0px;
@@ -885,8 +893,8 @@ body.dark-theme {
 
 .menu--btn--icon {
     display: block;
-    width: 1.6em;
-    height: 1.6em;
+    width: var(--size--icon--menu--btn);
+    height: var(--size--icon--menu-btn);
     fill: var(--gray);
 }
 
@@ -911,7 +919,7 @@ body.dark-theme {
 
 .watch {
     display: block;
-    padding: 5px 0 5px;
+    padding: 0.5em 0 0.5em;
     width: 100%;
     text-align: right;
 }
@@ -922,10 +930,12 @@ body.dark-theme {
 
 .control--btn {
     display: inline-block;
-    margin: 0px 8px;
+    margin: 0px 0.8em;
 }
 
 .control--btn--icon {
+    width: var(--size--icon--global);
+    height: var(--size--icon--global);
     fill: #fff;
     cursor: pointer;
 }
@@ -967,14 +977,15 @@ body.dark-theme {
 
 
 /* Workout List */
-.workout-list {
+#workouts-page {
     font-size: 1rem;
 
     --workout--name-font-size: 1.4em;
     --workout--type-font-size: 1.4em;
     --workout--duration-font-size: 1.4em;
     --workout--description-font-size: 1.4em;
-    --inner-max-width: 470px;
+    --inner-max-width: 47em;
+    --size--icon--global: 2.4em;
 
     text-align: center;
 }
@@ -983,6 +994,7 @@ body.dark-theme {
     display: block;
     padding: 1.5em 1.5em;
 }
+
 .workout--short-info {
     display: flex;
     flex-direction: row;
@@ -1025,6 +1037,10 @@ body.dark-theme {
     line-height: 1.4em;
     padding: 1.5em 0 0.5em;
     text-align: left;
+}
+.radio {
+    width: var(--size--icon--global);
+    height: var(--size--icon--global);
 }
 
 /* Device Chooser popup */
@@ -1080,23 +1096,37 @@ body.dark-theme {
 /* Settings Page */
 #settings-page {
     font-size: 1rem;
-    --inner-max-width: 480px;
+    line-height: 1.4em;
+    --inner-max-width-fixed: 480px;
+    --inner-max-width: 48em;
+    --inner-max-wider: 60em;
+    --size--icon--global: 2.4em;
 }
 
 .settings-tiles--cont {
     display: flex;
     max-width: var(--inner-max-width);
-    margin: 0px auto;
+    margin: 0 auto;
+
+    --width--settings-tile: 12em;
+    --height--settings-tile: 12em;
+
+    --font-size--label: 1.2em;
+    --font-size--input: 3em;
+    --height--label: 3em;
+    --height--input: 1em;
 }
 
 .settings-tile {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 1fr 1fr 1fr;
 
-    width: 120px;
-    height: 120px;
+    align-items: center;
+    justify-content: center;
+
+    width: var(--width--settings-tile);
+    height: var(--height--settings-tile);
     padding: 5px 5px;
     margin: 10px auto;
 
@@ -1107,18 +1137,16 @@ body.dark-theme {
 
 .settings-tile--label {
     display: block;
-    /* margin: 9px auto 5px; */
-    font-size: 1.2em;
+    font-size: var(--font-size--label);
     font-weight: bold;
     text-transform: uppercase;
-    height: 30px;
-    line-height: 30px;
+    height: var(--height--label);
+    line-height: var(--height--label);
 }
 
 .settings-tile--input {
-    font-size: 3em;
-    height: 40px;
-    /* margin: 5px auto; */
+    font-size: var(--font-size--input);
+    height: var(--height--input);
     width: 100%;
     font-weight: bold;
     text-align: center;
@@ -1133,22 +1161,15 @@ body.dark-theme {
 }
 
 .settings-tile--btn {
-    /* margin: 5px auto; */
-    /* padding: 0 14px; */
-    font-size: 12px;
+    font-size: var(--font-size--label);
+    height: var(--height--label);
     letter-spacing: 1px;
-    line-height: 30px;
-    height: 30px;
+    padding: 0 14px;
 
     font-weight: bold;
     text-transform: uppercase;
     color: #fff;
     cursor: pointer;
-
-    /* font-family: sans-serif; */
-    /* border-radius: 3px; */
-    /* -webkit-transition: all 0.2s ease-in-out 0s; */
-    /* transition: all 0.2s ease-in-out 0s; */
 }
 
 
@@ -1157,12 +1178,13 @@ body.dark-theme {
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 480px;
+    max-width: var(--inner-max-width);
     margin: 0 auto 10px;
 }
 
 .settings-switch-btn-cont {
     margin: 10px auto;
+    font-size: 1em;
 }
 
 .settings-switch-bnt {
@@ -1170,110 +1192,147 @@ body.dark-theme {
     align-items: center;
     justify-content: center;
 
-    /* width: 70px; */
-    width: 120px;
-    height: 40px;
-    padding: 4px 10px;
-    font-size: 10px;
+    width: 12em;
+    height: 4em;
+    /* padding: 0.4em 1em; */
+
     text-transform: uppercase;
     font-weight: bold;
     letter-spacing: 1px;
-    /* border: 1px solid var(--white-opacity-01); */
     border-radius: 50%;
     cursor: pointer;
+}
+
+.protocol-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.protocol-btn--icon {
+    fill: var(--white);
+    width: var(--size--icon--global);
+    height: var(--size--icon--global);
+}
+.protocol-btn--label {
+    margin-left: 10px;
+}
+
+.protocol-btn.disabled .protocol-btn--label {
+    color: var(--gray);
+}
+
+.protocol-btn.disabled .protocol-btn--icon {
+    fill: var(--gray);
 }
 
 .row-border {
     border-top: 1px solid var(--white-opacity-01);
 }
-
-.settings-card {
+.border-top {
+    border-top: 1px solid var(--white-opacity-01);
 }
 
-.settings-card-cont {
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    flex-flow: column;
-    justify-content: center;
-    padding: 5px 5px;
-    /* max-width: 480px; */
-    margin: 10px auto;
-    text-align: center;
+.device-card {
+    --settings-row-max-width: 60em;
+    --font-size-value: 1.2em;
+    --line-height--device-card--tile: 1.2em;
+    --grid-template-columns--device-card--body--row: 5em 2fr 1fr 1.1fr 1fr 1.1fr;
+    --size--icon: 2.7em;
+    border-bottom: 1px solid var(--white-opacity-01);
 }
-.settings-card .switch {
-    /* padding-left: 0; */
+.device-card--cont {
+    max-width: var(--settings-row-max-width);
+    margin: 0 auto;
+    padding: 0.2em 0 0.8em 0;
 }
-.device-controls {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 5px;
+
+.device-card--header {
 }
-.settings-card .t2 {
-    font-size: 12px;
-    /* font-weight: bold; */
-    letter-spacing: 0px;
+
+.device-card--header--label {
+    font-size: 1.1em;
+    line-height: 3em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
-.device-info {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
+
+.device-card--body--row {
+    display: grid;
+    grid-template-columns: var(--grid-template-columns--device-card--body--row);
+}
+
+.device-card--body--row.ant-supported {
+    display: none;
+}
+
+.device-card--body--row.second {
+    margin-top: 1.5em;
+}
+
+.device-card--tile {
     text-align: left;
-    width: 480px;
-    max-width: 100%;
-    padding: 1.4em 0 0;
 }
-.protocol-switch {
-    justify-self: flex-start;
-    width: 40px;
-    height: 40px;
+
+.device-card--tile--header {
+    font-size: var(--font-size--device-card--tile--header);
+    line-height: 1em;
+    margin-bottom: 4px;
 }
-.protocol-switch .icon {
+
+.device-card--tile--value {
+    font-size: var(--font-size-value);
+    font-weight: bold;
+}
+
+.connection-icon-switch {
+}
+
+.connection-icon-switch--icon {
     fill: #fff;
+    width: var(--size--icon);
+    height: var(--size--icon);
 }
+
+.connection-icon-switch--icon.disabled {
+    fill: var(--gray);
+}
+
+.connection-icon-switch--indicator {
+    width: 1em;
+    height: 1em;
+    margin: 5px auto;
+    border-radius: 50%;
+}
+
 .source-switch {
     display: block;
     color: var(--gray);
     cursor: pointer;
 }
+
 .source-switch.active {
     color: #fff;
-}
-.info-cell {
-    padding: 0 5px;
-    min-width: 55px;
-}
-.info-cell h3 {
-    font-size: 10px;
-    line-height: 12px;
-    /* text-transform: uppercase; */
-}
-.info-cell-value{
-    font-size: 12px;
-    font-weight: bold;
 }
 
 /* APP CONNECTIONS */
 .app-connections {
-    margin: 30px auto;
+    margin: 3em auto;
 }
 
 .app-connection {
     display: flex;
-    max-width: 480px;
+    max-width: var(--inner-max-width);
     margin: 0 auto;
     align-items: center;
-    padding: 10px 10px;
+    padding: 1em 1em;
 }
 
 .app-connection--icon {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
+    width: 4em;
+    height: 4em;
+    margin-right: 1em;
 }
 
 .app-connection--heading {
@@ -1285,16 +1344,24 @@ body.dark-theme {
 .app-connection--content {
 }
 
-/* APP CONNECTIONS */
+/* ABOUT */
 #about {
     font-size: 1em;
-    text-align: center;
-    margin: 10px 0 0 0;
+    margin: 10px auto 0;
     padding: 10px 10px;
+    max-width: var(--inner-max-width);
+    text-align: center;
 }
-
-#about .row {
-    margin: 5px auto;
+.about--text {
+    font-size: 1.2em;
+    line-height: 1.4em;
+    margin-bottom: 3em;
+}
+.about--version {
+    margin: 0.5em auto;
+}
+.about--links {
+    margin: 0.5em auto;
 }
 
 .license {
@@ -1583,20 +1650,53 @@ and (min-height: 800px) {
     .data-tiles {
         font-size: 2.6rem;
     }
+
+    #settings-page {
+        font-size: 1.1rem;
+    }
 }
 
 
 @media only screen
 and (min-width: 1800px)
 and (min-height: 850px) {
+    /* FHD */
+
+    #home-page-wrapper {
+        grid-template-rows: 5em 2.5fr 1fr 1fr 14em 14em;
+    }
+
+    .connections-header {
+        font-size: 1.2rem;
+    }
+
     .data-tiles {
         font-size: 3rem;
+    }
+
+    #targets {
+        --number-input-height: 5rem;
+        --mode-selector-margin: 2em auto;
+        --inner-max-width: 50em;
+    }
+
+    .watch {
+        padding: 1em;
+    }
+
+    #settings-page {
+        font-size: 1.2rem;
+    }
+
+    .fixed-bottom {
+        font-size: 1.4rem;
     }
 }
 
 @media only screen
 and (min-width: 1900px)
 and (min-height: 900px) {
+    /* FHD */
     .data-tiles {
         font-size: 3.2rem;
     }
@@ -1605,8 +1705,13 @@ and (min-height: 900px) {
 @media only screen
 and (min-width: 2400px)
 and (min-height: 1200px) {
+    /* QHD */
     #home-page-wrapper {
-        grid-template-rows: 60px 2.5fr 1fr 1fr 138px 160px;
+        grid-template-rows: 6em 2.5fr 1fr 1fr 16em 16em;
+    }
+
+    .connections-header {
+        font-size: 1.6rem;
     }
 
     .switch--label {
@@ -1625,8 +1730,8 @@ and (min-height: 1200px) {
     #targets {
         font-size: 1.4rem;
         --number-input-height: 6rem;
-        --mode-selector-margin: 1.5em auto;
-        --inner-max-width: 500px;
+        --mode-selector-margin: 2em auto;
+        --inner-max-width: 50em;
         --mode-selector-padding: 0 1em;
     }
 
@@ -1634,11 +1739,54 @@ and (min-height: 1200px) {
         font-size: 1.6rem;
     }
 
-    .watch {
-        padding: 1em;
-    }
     #workout-name {
         line-height: 2em;
+    }
+
+    #settings-page {
+        font-size: 1.6rem;
+    }
+
+    #workouts-page {
+        font-size: 1.6rem;
+    }
+}
+
+@media only screen
+and (min-width: 3000px)
+and (min-height: 1600px) {
+    /* 4K UHD */
+
+    #home-page-wrapper {
+        grid-template-rows: 10em 2.5fr 1fr 1fr 24em 24em;
+    }
+
+    .data-tiles {
+        font-size: 6.4rem;
+    }
+
+    .connections-header {
+        font-size: 2.4rem;
+    }
+
+    #targets {
+        font-size: 2.4rem;
+        --number-input-height: 8rem;
+        --mode-selector-margin: 2em auto;
+        --inner-max-width: 44em;
+        --mode-selector-padding: 0 1em;
+    }
+
+    #settings-page {
+        font-size: 2.4rem;
+    }
+
+    #workouts-page {
+        font-size: 2.4rem;
+    }
+
+    .fixed-bottom {
+        font-size: 2.4rem;
     }
 }
 

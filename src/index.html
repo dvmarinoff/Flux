@@ -26,15 +26,15 @@
                 <div id="home-page" class="page active" page="home">
                     <div id="home-page-wrapper">
 
-                        <header class="switch-connections page-header cf">
-                            <connection-switch id="switch-controllable" class="switch-connection switch" name="ble:controllable">
-                                <div class="switch--indicator off"></div>
-                                <div class="switch--label">Controllable</div>
+                        <header class="connections-header page-header cf">
+                            <connection-switch for="ble:controllable" id="switch-controllable" class="connection-switch">
+                                <div class="connection-switch--indicator off"></div>
+                                <div class="connection-switch--label">Controllable</div>
                             </connection-switch>
 
-                            <connection-switch id="switch-hrm" class="switch-connection switch" name="ble:hrm">
-                                <div class="switch--indicator off"></div>
-                                <div class="switch--label">HRM</div>
+                            <connection-switch for="ble:hrm" id="switch-hrm" class="connection-switch">
+                                <div class="connection-switch--indicator off"></div>
+                                <div class="connection-switch--label">HRM</div>
                             </connection-switch>
                         </header>
 
@@ -71,15 +71,10 @@
                             </div>
 
                             <div class="data-tile--small wide" id="data-tile--speed">
-                                <h2 class="data-tile-small--heading">Speed
-                                </h2>
+                                <h2 class="data-tile-small--heading">Speed</h2>
                                 <div class="data-tile-small--value-cont">
-                                    <speed-display id="speed-value"
-                                                class="data-tile-small--value"
-                                                prop="speed">
-                                        <value>--</value>
-                                        <unit class="data-tile-small--unit">km/h</unit>
-                                    </speed-display>
+                                    <speed-value id="speed-value"
+                                                 class="data-tile-small--value">--</speed-value>
                                 </div>
                             </div>
                             <div class="data-tile--small wide" id="data-tile--slope">
@@ -117,12 +112,8 @@
                             <div class="data-tile--small wide" id="data-tile--distance">
                                 <h2 class="data-tile-small--heading">Distance</h2>
                                 <div class="data-tile-small--value-cont">
-                                    <distance-display id="distance-value"
-                                                    class="data-tile-small--value"
-                                                    prop="distance">
-                                        <value>--</value>
-                                        <unit class="data-tile-small--unit">km</unit>
-                                    </distance-display>
+                                    <distance-value id="distance-value"
+                                                    class="data-tile-small--value">--</distance-value>
                                 </div>
                             </div>
 
@@ -298,7 +289,7 @@
                     </div>
                     <div id="weight-settings" class="settings-tile">
                         <label id="weight-label" for="weight-value" class="settings-tile--label">
-                            <unit-display type="weight">kg</unit-display>
+                            <measurement-unit type="weight">kg</measurement-unit>
                         </label>
                         <input is="weight-input"
                                id="weight-value"
@@ -335,308 +326,262 @@
                     </button>
                 </div> <!-- end settings btn row -->
 
+                <div class="protocol-settings settings-btn-row">
+                    <div class="protocol-btn flat-btn settings-switch-btn-cont">
+                        <svg class="protocol-btn--icon icon" xmlns="http://www.w3.org/2000/svg"
+                             height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
+                        </svg>
+                        <span class="protocol-btn--label">BLE</span>
+                    </div>
+
+                    <div class="protocol-btn flat-btn settings-switch-btn-cont disabled">
+                        <svg class="protocol-btn--icon icon" xmlns="http://www.w3.org/2000/svg"
+                             height="24"
+                             viewBox="0 0 24 24"
+                             width="24">
+                            <path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6zm6-6h4v3h-4zM6 7h5v5H6zm6 4h4v6h-4z"/>
+                            <path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"/>
+                        </svg>
+                        <span class="protocol-btn--label">ANT+</span>
+                    </div>
+                </div>
+
                 <!-- controlable settings -->
-                <div class="settings-card">
-                    <div class="settings-card-cont">
-                        <connection-switch id="switch-controllable" class="switch-connection switch" name="ble:controllable">
-                            <div class="switch--indicator off"></div>
-                            <div class="switch--label">Controllable</div>
-                        </connection-switch>
-                        <div class="device-info">
-                            <div class="protocol-switch">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-                                    <path d="M0 0h24v24H0V0z" fill="none"/>
-                                    <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
-                                </svg>
+                <div class="device-card border-top">
+                    <div class="device-card--cont">
+                        <div class="device-card--header">
+                            <div class="device-card--header--label">Controllable</div>
+                        </div>
+                        <div class="device-card--body">
+                            <div class="device-card--body--row">
+                                <connection-switch for="ble:controllable"
+                                                   indicatorClass="connection-icon-switch--indicator"
+                                                   class="connection-icon-switch">
+                                    <svg class="connection-icon-switch--icon icon" xmlns="http://www.w3.org/2000/svg"
+                                        height="24" viewBox="0 0 24 24" width="24">
+                                        <path d="M0 0h24v24H0V0z" fill="none"/>
+                                        <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
+                                    </svg>
+                                    <div class="connection-icon-switch--indicator off"></div>
+                                </connection-switch>
+                                <div class="device-card--tile name">
+                                    <h3 class="device-card--tile--header">Name</h3>
+                                    <data-view class="device-card--tile--value"
+                                               prop="ble:controllable:name">Tacx Flux 12348</data-view>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="power"
+                                                   use="ble:controllable">
+                                        <h3 class="device-card--tile--header">Power</h3>
+                                        <power-value class="data-view device-card--tile--value">108</power-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="cadence"
+                                                   use="ble:controllable">
+                                        <h3 class="device-card--tile--header">Cadence</h3>
+                                        <cadence-value class="data-view device-card--tile--value">80</cadence-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="speed"
+                                                   use="ble:controllable">
+                                        <h3 class="device-card--tile--header">Speed</h3>
+                                        <speed-value class="data-view device-card--tile--value">--</speed-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="heartRate"
+                                                   use="ble:controllable">
+                                        <h3 class="device-card--tile--header">Heart Rate</h3>
+                                        <heart-rate-value class="data-view device-card--tile--value">--</heart-rate-value>
+                                    </source-switch>
+                                </div>
                             </div>
-                            <div class="info-cell">
-                                <h3 class="">Name</h3>
-                                <effect-display id="controllable-name"
-                                                class="info-cell-value"
-                                                effect="ble:controllable:name"">--</effect-display>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="power"
-                                               value="ble:controllable">
-                                    <h3 class="">Power</h3>
-                                    <data-display id="controllable-power"
-                                                  class="info-cell-value"
-                                                  prop="power">--</data-display>
-                                </source-switch>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="cadence"
-                                               value="ble:controllable">
-                                    <h3 class="">Cadence</h3>
-                                    <data-display id="controllable-cadence"
-                                                class="info-cell-value"
-                                                prop="cadence">--</data-display>
-                                </source-switch>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="speed"
-                                               value="ble:controllable">
-                                    <h3 class="">Speed</h3>
-                                    <speed-display id="controllable-speed"
-                                                   class="info-cell-value"
-                                                   prop="speed">
-                                        <value>--</value>
-                                        <unit class="data-tile-small--unit"></unit>
-                                    </speed-display>
-                                </source-switch>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="heartRate"
-                                               value="ble:controllable">
-                                    <h3 class="">Heart Rate</h3>
-                                    <data-display id="controllable-heart-rate"
-                                                  class="info-cell-value"
-                                                  prop="heartRate">--</data-display>
-                                </source-switch>
+                            <div class="device-card--body--row second ant-supported">
+                                <connection-switch for="ant:controllable"
+                                                   indicatorClass="connection-icon-switch--indicator"
+                                                   class="connection-icon-switch">
+                                    <svg class="connection-icon-switch--icon icon disabled" xmlns="http://www.w3.org/2000/svg"
+                                         height="24" viewBox="0 0 24 24" width="24">
+                                        <path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6zm6-6h4v3h-4zM6 7h5v5H6zm6 4h4v6h-4z"/>
+                                        <path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"/>
+                                    </svg>
+                                    <div class="connection-icon-switch--indicator off"></div>
+                                </connection-switch>
+                                <div class="device-card--tile name">
+                                    <h3 class="device-card--tile--header">Name</h3>
+                                    <data-view class="device-card--tile--value"
+                                               prop="ant:controllable:name">--</data-view>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="power"
+                                                   use="ant:controllable">
+                                        <h3 class="device-card--tile--header">Power</h3>
+                                        <power-value class="data-view device-card--tile--value">--</power-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="cadence"
+                                                   use="ant:controllable">
+                                        <h3 class="device-card--tile--header">Cadence</h3>
+                                        <cadence-value class="data-view device-card--tile--value">--</cadence-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="speed"
+                                                   use="ant:controllable">
+                                        <h3 class="device-card--tile--header">Speed</h3>
+                                        <speed-value class="data-view device-card--tile--value">--</speed-value>
+                                    </source-switch>
+                                </div>
+
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="heartRate"
+                                                   use="ble:controllable">
+                                        <h3 class="device-card--tile--header">Heart Rate</h3>
+                                        <heart-rate-value class="data-view device-card--tile--value">--</heart-rate-value>
+                                    </source-switch>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div> <!-- end controlable settings -->
 
                 <!-- power-meter settings -->
-                <div class="settings-card row-border">
-                    <div class="settings-card-cont">
-                        <connection-switch id="switch-power-meter" class="switch-connection switch" name="ble:power-meter">
-                            <div class="switch--indicator off"></div>
-                            <div class="switch--label">Power Meter</div>
-                        </connection-switch>
-                        <div class="device-info">
-                            <div class="protocol-switch">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-                                    <path d="M0 0h24v24H0V0z" fill="none"/>
-                                    <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
-                                </svg>
-                            </div>
-                            <div class="info-cell">
-                                <h3 class="">Name</h3>
-                                <effect-display id="controllable-name"
-                                                class="info-cell-value"
-                                                effect="ble:power-meter:name"">--</effect-display>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="power"
-                                               value="ble:power-meter">
-                                    <h3 class="">Power</h3>
-                                    <data-display id="power-meter-power"
-                                                  class="info-cell-value"
-                                                  prop="power">--</data-display>
-                                </source-switch>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="cadence"
-                                               value="ble:power-meter">
-                                    <h3 class="">Cadence</h3>
-                                    <data-display id="power-meter-cadence"
-                                                  class="info-cell-value"
-                                                  prop="cadence">--</data-display>
-                                </source-switch>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="speed"
-                                               value="ble:power-meter">
-                                    <h3 class="">Speed</h3>
-                                    <speed-display id="power-meter-speed"
-                                                   class="info-cell-value"
-                                                   prop="speed">
-                                        <value>--</value>
-                                        <unit class="data-tile-small--unit"></unit>
-                                    </speed-display>
-                                </source-switch>
+                <div class="device-card">
+                    <div class="device-card--cont">
+                        <div class="device-card--header">
+                            <div class="device-card--header--label">Power Meter</div>
+                        </div>
+                        <div class="device-card--body">
+                            <div class="device-card--body--row">
+                                <connection-switch for="ble:power-meter" id="switch-power-meter" class="connection-icon-switch">
+                                    <svg class="connection-icon-switch--icon icon" xmlns="http://www.w3.org/2000/svg"
+                                        height="24" viewBox="0 0 24 24" width="24">
+                                        <path d="M0 0h24v24H0V0z" fill="none"/>
+                                        <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
+                                    </svg>
+                                    <div class="connection-icon-switch--indicator off"></div>
+                                </connection-switch>
+                                <div class="device-card--tile">
+                                    <h3 class="device-card--tile--header">Name</h3>
+                                    <data-view class="data-view device-card--tile--value"
+                                               prop="ble:power-meter:name">--</data-view>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="power"
+                                                   use="ble:power-meter">
+                                        <h3 class="device-card--tile--header">Power</h3>
+                                        <power-value class="data-view device-card--tile--value">--</power-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="cadence"
+                                                   use="ble:power-meter">
+                                        <h3 class="device-card--tile--header">Cadence</h3>
+                                        <cadece-value class="data-view device-card--tile--value">--</cadece-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="speed"
+                                                   use="ble:power-meter">
+                                        <h3 class="device-card--tile--header">Speed</h3>
+                                        <speed-value class="data-view device-card--tile--value">--</speed-value>
+                                    </source-switch>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div> <!-- end power-meter settings -->
 
-                <!-- hrm settings -->
-                <div class="settings-card row-border">
-                    <div class="settings-card-cont">
-                        <connection-switch id="switch-hrm" class="switch-connection switch" name="ble:hrm">
-                            <div class="switch--indicator off"></div>
-                            <div class="switch--label">HRM</div>
-                        </connection-switch>
-                        <div class="device-info">
-                            <div class="protocol-switch">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-                                    <path d="M0 0h24v24H0V0z" fill="none"/>
-                                    <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
-                                </svg>
-                            </div>
-                            <div class="info-cell">
-                                <h3 class="">Name</h3>
-                                <effect-display id="controllable-name"
-                                                class="info-cell-value"
-                                                effect="ble:hrm:name"">--</effect-display>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="heartRate"
-                                               value="ble:hrm">
-                                    <h3 class="">Heart Rate</h3>
-                                    <data-display id="hrm-heartRate"
-                                                  class="info-cell-value"
-                                                  prop="heartRate">--</data-display>
-                                </source-switch>
-                            </div>
+                <!-- cycling-speed-and-cadence settings -->
+                <div class="device-card">
+                    <div class="device-card--cont">
+                        <div class="device-card--header">
+                            <div class="device-card--header--label">Speed and Cadence</div>
                         </div>
-                    </div>
-                </div> <!--end ant hrm settings -->
-
-                <div class="settings-card row-border">
-                    <div class="settings-card-cont">
-                        <connection-switch id="switch-ant" class="switch-connection switch" name="ant">
-                            <div class="switch--indicator off"></div>
-                            <div class="switch--label">ANT+</div>
-                        </connection-switch>
-
-                        <!-- device-chooser -->
-                        <request-popup  id="device-chooser">
-                            <div id="request-popup-list" class="device-chooser-list"></div>
-                            <div id="request-popup-bootom-bar" class="device-chooser-bootom-bar">
-                                <div id="request-popup-status" class="status">Searching ...</div>
-                                <div class="chooser-btns">
-                                    <button is="effect-button"
-                                            id="request-popup-cancel-btn"
-                                            class="request-btn"
-                                            effect="ant:request:cancel">Cancel</button>
-                                    <button is="effect-button"
-                                            id="request-popup-pair-btn"
-                                            class="request-btn"
-                                            effect="ant:request:pair">Pair</button>
+                        <div class="device-card--body">
+                            <div class="device-card--body--row">
+                                <connection-switch for="ble:speed-and-cadence" class="connection-icon-switch">
+                                    <svg class="connection-icon-switch--icon icon" xmlns="http://www.w3.org/2000/svg"
+                                        height="24" viewBox="0 0 24 24" width="24">
+                                        <path d="M0 0h24v24H0V0z" fill="none"/>
+                                        <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
+                                    </svg>
+                                    <div class="connection-icon-switch--indicator off"></div>
+                                </connection-switch>
+                                <div class="device-card--tile">
+                                    <h3 class="device-card--tile--header">Name</h3>
+                                    <data-view class="data-view device-card--tile--value"
+                                               prop="ble:speed-and-cadence">--</data-view>
+                                </div>
+                                <div class="device-card--tile"></div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="cadence"
+                                                   use="ble:speed-and-cadence">
+                                        <h3 class="device-card--tile--header">Cadence</h3>
+                                        <cadece-value class="data-view device-card--tile--value">--</cadece-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="speed"
+                                                   use="ble:speed-and-cadence">
+                                        <h3 class="device-card--tile--header">Speed</h3>
+                                        <speed-value class="data-view device-card--tile--value">--</speed-value>
+                                    </source-switch>
                                 </div>
                             </div>
-                        </request-popup><!-- end device-chooser -->
-
-                    </div>
-                </div>
-
-                <!-- ant controlable settings -->
-                <div class="settings-card row-border">
-                    <div class="settings-card-cont">
-                        <connection-switch id="switch-controllable" class="switch-connection switch" name="ant:controllable">
-                            <div class="switch--indicator off"></div>
-                            <div class="switch--label">Controllable</div>
-                        </connection-switch>
-                        <div class="device-info">
-                            <div class="protocol-switch">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg"
-                                     height="24"
-                                     viewBox="0 0 24 24"
-                                     width="24">
-                                    <path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6zm6-6h4v3h-4zM6 7h5v5H6zm6 4h4v6h-4z"/>
-                                    <path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"/>
-                                </svg>
-                            </div>
-                            <div class="info-cell">
-                                <h3 class="">Name</h3>
-                                <effect-display id="controllable-name"
-                                                class="info-cell-value"
-                                                effect="ant:controllable:name"">--</effect-display>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="power"
-                                               value="ant:controllable">
-                                    <h3 class="">Power</h3>
-                                    <data-display id="controllable-power"
-                                                  class="info-cell-value"
-                                                  prop="power">--</data-display>
-                                </source-switch>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="cadence"
-                                               value="ant:controllable">
-                                    <h3 class="">Cadence</h3>
-                                    <data-display id="controllable-cadence"
-                                                class="info-cell-value"
-                                                prop="cadence">--</data-display>
-                                </source-switch>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="speed"
-                                               value="ant:controllable">
-                                    <h3 class="">Speed</h3>
-                                    <speed-display id="controllable-speed"
-                                                   class="info-cell-value"
-                                                   prop="speed">
-                                        <value>--</value>
-                                        <unit class="data-tile-small--unit"></unit>
-                                    </speed-display>
-                                </source-switch>
-                            </div>
                         </div>
                     </div>
-                </div> <!-- end ant controlable settings -->
+                </div> <!-- end cycling-speed-and-cadence settings -->
 
-                <!-- ant hrm settings -->
-                <div class="settings-card row-border">
-                    <div class="settings-card-cont">
-                        <connection-switch id="switch-ant-hrm" class="switch-connection switch" name="ant:hrm">
-                            <div class="switch--indicator off"></div>
-                            <div class="switch--label">HRM</div>
-                        </connection-switch>
-                        <div class="device-info">
-                            <div class="protocol-switch">
-                                <svg class="icon" xmlns="http://www.w3.org/2000/svg"
-                                     height="24"
-                                     viewBox="0 0 24 24"
-                                     width="24">
-                                    <path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6zm6-6h4v3h-4zM6 7h5v5H6zm6 4h4v6h-4z"/>
-                                    <path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"/>
-                                </svg>
-                            </div>
-                            <div class="info-cell">
-                                <h3 class="">Name</h3>
-                                <effect-display id="controllable-name"
-                                                class="info-cell-value"
-                                                effect="ant:hrm:name">--</effect-display>
-                            </div>
-                            <div class="info-cell">
-                                <source-switch class="source-switch"
-                                               effect="sources"
-                                               path="heartRate"
-                                               value="ant:hrm">
-                                    <h3 class="">Heart Rate</h3>
-                                    <data-display id="hrm-heartRate"
-                                                  class="info-cell-value"
-                                                  prop="heartRate">--</data-display>
-                                </source-switch>
-                            </div>
-                            <div class="info-cell">
-                                <h3 class="">Battery</h3>
-                                <battery-display id="hrm-battery"
-                                                class="info-cell-value"
-                                                effect="ant:hrm:battery">--</battery-display>
-                            </div>
-                            <div class="info-cell">
-                                <h3 class="">Manufacturer</h3>
-                                <device-info-display id="hrm-info"
-                                                    class="info-cell-value"
-                                                    effect="ant:hrm:info">--</device-info-display>
+                <!-- hrm settings -->
+                <div class="device-card">
+                    <div class="device-card--cont">
+                        <div class="device-card--header--label">HRM</div>
+                        <div class="device-card--body">
+                            <div class="device-card--body--row">
+                                <connection-switch for="ble:hrm" id="switch-hrm" class="connection-icon-switch">
+                                    <svg class="connection-icon-switch--icon icon" xmlns="http://www.w3.org/2000/svg"
+                                        height="24" viewBox="0 0 24 24" width="24">
+                                        <path d="M0 0h24v24H0V0z" fill="none"/>
+                                        <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
+                                    </svg>
+                                    <div class="connection-icon-switch--indicator off"></div>
+                                </connection-switch>
+                                <div class="device-card--tile">
+                                    <h3 class="device-card--tile--header">Name</h3>
+                                    <data-view class="device-card--tile--value"
+                                            prop="ble:hrm:name">--</data-view>
+                                </div>
+                                <div class="device-card--tile"></div>
+                                <div class="device-card--tile"></div>
+                                <div class="device-card--tile"></div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                for="heartRate"
+                                                use="ble:hrm">
+                                        <h3 class="device-card--tile--header">Heart Rate</h3>
+                                        <heart-rate-value id="hrm-heartRate"
+                                                        class="data-view device-card--tile--value">--</heart-rate-value>
+                                    </source-switch>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -656,11 +601,15 @@
                 </div> <!-- end connections -->
 
                 <div id="about">
-                    <div class="row">
-                        <p class="">Version: 0.0.9</p>
+                    <h2 class="page--heading">About</h2>
+                    <div class="about--text">
+                        <p class="">This is an open-source project. For more information, please visit the <a class="a" href="https://github.com/dvmarinoff/Flux">github</a> page. There you can get support or join the discussions.</p>
                     </div>
-                    <div class="row">
-                        <p class="license">Code is on <a class="a" href="https://github.com/dvmarinoff/Flux">github</a> | License <a class="a" href="https://www.gnu.org/licenses/agpl-3.0.en.html"> AGPL-3.0</a></p>
+                    <div class="about--version">
+                        <p class="">Version: 0.1.0</p>
+                    </div>
+                    <div class="about--links">
+                        License <a class="a" href="https://www.gnu.org/licenses/agpl-3.0.en.html"> AGPL-3.0</a></p>
                     </div>
                 </div> <!-- end about -->
 
@@ -761,6 +710,11 @@
                                 <path class="menu--btn--icon--fill" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z" />
                             </svg>
                             <div class="menu--btn--label">Home</div>
+                            <!-- <svg class="menu--btn--icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px">
+                                 <rect fill="none" height="24" width="24"/>
+                                 <path class="menu--btn--icon--fill" d="M11,21H3V3h8V21z M13,21h8v-9h-8V21z M21,10V3h-8v7H21z"/>
+                                 </svg>
+                                 <div class="menu--btn--label">Dashboard</div> -->
                         </page-btn>
                         <page-btn id="workouts-tab-btn"
                                   class="menu--btn"

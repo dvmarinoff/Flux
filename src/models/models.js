@@ -121,22 +121,22 @@ class Sources extends Model {
         self.state = self.default;
         xf.sub('db:sources', value => self.state = value);
     }
-    defaultSet(target, sources) {
-        return Object.assign(target, sources);
+    defaultSet(target, source) {
+        return Object.assign(target, source);
     }
-    isSource(value, id) {
+    isSource(path, value) {
         const self = this;
-        if(exists(self.state[value])) {
-            return equals(self.state[value], id);
+        if(exists(self.state[path])) {
+            return equals(self.state[path], value);
         }
         return false;
     }
     defaultValue() {
         const sources = {
-            power: 'ble:controllable',
-            cadence: 'ble:controllable',
-            speed: 'ble:controllable',
-            control: 'ble:controllable',
+            power:     'ble:controllable',
+            cadence:   'ble:controllable',
+            speed:     'ble:controllable',
+            control:   'ble:controllable',
             heartRate: 'ble:hrm'
         };
         return sources;
