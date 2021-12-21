@@ -85,7 +85,6 @@ customElements.define('int-input', IntInput, {extends: 'input'});
 customElements.define('float-input', FloatInput, {extends: 'input'});
 customElements.define('weight-input', WeightInput, {extends: 'input'});
 
-
 class EffectButton extends HTMLButtonElement {
     constructor() {
         super();
@@ -103,13 +102,6 @@ class EffectButton extends HTMLButtonElement {
 }
 
 customElements.define('effect-button', EffectButton, {extends: 'button'});
-
-
-class InputButton extends HTMLInputElement {
-}
-
-customElements.define('input-button', InputButton);
-
 
 class SetButton extends HTMLButtonElement {
     constructor() {
@@ -134,6 +126,24 @@ class SetButton extends HTMLButtonElement {
 }
 
 customElements.define('set-button', SetButton, {extends: 'button'});
+
+class Upload extends HTMLInputElement {
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        this.addEventListener('change', this.onSubmit.bind(this));
+    }
+    disconnectedCallback() {
+        this.removeEventListener(`pointerup`, this.onSubmit);
+    }
+    onSubmit(e) {
+        const file = e.target.files[0];
+        xf.dispatch('ui:workout:upload', file);
+    }
+}
+
+customElements.define('workout-upload', Upload, {extends: 'input'});
 
 
 export { IntInput, FloatInput, EffectButton };
