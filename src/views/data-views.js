@@ -33,7 +33,7 @@ class DataView extends HTMLElement {
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if(equals(name, 'disabled')) {
-            this.disabled = exists(newValue) ? false : true;
+            this.disabled = exists(newValue) ? true : false;
         }
     }
     getDefaults() {
@@ -118,6 +118,87 @@ class IntervalTime extends DataView {
 
 customElements.define('interval-time', IntervalTime);
 
+class SpeedValue extends DataView {
+    postInit() {
+        this.measurement = this.getDefaults().measurement;
+    }
+    getDefaults() {
+        return {
+            prop: 'db:speed',
+            measurement: 'metric',
+        };
+    }
+    config() {
+        xf.sub(`db:measurement`, this.onMeasurement.bind(this));
+    }
+    unsubs() {
+        xf.unsub(`db:measurement`, this.onMeasurement.bind(this));
+    }
+    onMeasurement(measurement) {
+        this.measurement = measurement;
+    }
+    kmhToMph(kmh) {
+        return 0.621371 * kmh;
+    };
+    format(value, measurement = 'metric') {
+        if(equals(measurement, 'imperial')) {
+            value = `${this.kmhToMph(value).toFixed(1)}`;
+        } else {
+            value = `${(value).toFixed(1)}`;
+        }
+        return value;
+    }
+    transform(state) {
+        return this.format(state, this.measurement);
+    }
+}
+
+customElements.define('speed-value', SpeedValue);
+
+class DistanceValue extends DataView {
+    postInit() {
+        this.measurement = this.getDefaults().measurement;
+    }
+    getDefaults() {
+        return {
+            prop: 'db:distance',
+            measurement: 'metric',
+        };
+    }
+    config() {
+        xf.sub(`db:measurement`, this.onMeasurement.bind(this));
+    }
+    unsubs() {
+        xf.unsub(`db:measurement`, this.onMeasurement.bind(this));
+    }
+    onMeasurement(measurement) {
+        this.measurement = measurement;
+    }
+    metersToYards(meters) {
+        return 1.09361 * meters;
+    }
+    format(meters, measurement = 'metric') {
+        let value   = `0`;
+        const km    = (meters / 1000);
+        const miles = (meters / 1609.34);
+        const yards = this.metersToYards(meters);
+
+        if(equals(measurement, 'imperial')) {
+            const yardsTemplate = `${(this.metersToYards(meters)).toFixed(0)}`;
+            const milesTemplate = `${miles.toFixed(2)}`;
+            return value = (yards < 1609.34) ? yardsTemplate : milesTemplate;
+        } else {
+            const metersTemplate = `${meters.toFixed(0)}`;
+            const kmTemplate = `${km.toFixed(2)}`;
+            return value = (meters < 1000) ? metersTemplate : kmTemplate;
+        }
+    }
+    transform(state) {
+        return this.format(state, this.measurement);
+    }
+}
+
+customElements.define('distance-value', DistanceValue);
 
 class CadenceValue extends DataView {
     getDefaults() {
@@ -485,6 +566,27 @@ class DataTileSwitchGroup extends SwitchGroup {
 
 customElements.define('data-tile-switch-group', DataTileSwitchGroup);
 
+class MeasurementUnit extends DataView {
+    getDefaults() {
+        return {
+            state: models.measurement.default,
+            prop: 'db:measurement',
+        };
+    }
+    formatUnit(measurement = models.measurement.default) {
+        if(measurement === 'imperial') {
+            return `lbs`;
+        } else {
+            return `kg`;
+        }
+    }
+    transform(state) {
+        return this.formatUnit(state);
+    }
+}
+
+customElements.define('measurement-unit', MeasurementUnit);
+
 export {
     DataView,
 
@@ -493,6 +595,8 @@ export {
     CadenceValue,
     CadenceTarget,
     CadenceGroup,
+    SpeedValue,
+    DistanceValue,
     HeartRateValue,
     PowerAvg,
     PowerValue,
