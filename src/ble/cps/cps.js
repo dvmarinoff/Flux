@@ -1,65 +1,72 @@
 import { uuids } from '../uuids.js';
-import { cpsFeatureDecoder } from './cycling-power-feature.js';
-import { cyclingPowerMeasurementDecoder } from './cycling-power-measurement.js';
-import { requestControl } from './control-point.js';
+import { BLEService } from '../service.js';
+import { feature } from './cycling-power-feature.js';
+import { cyclingPowerMeasurement } from './cycling-power-measurement.js';
+import { control } from './control-point.js';
+import { equals, exists, existance, first } from '../../functions.js';
 
-
-
-function eventToValue(decoder, callback) {
-    return function (e) {
-        return callback(decoder(e.target.value));
-    };
-}
-
-class CyclingPowerService {
+class CyclingPowerService extends BLEService {
     uuid = uuids.cyclingPower;
-    characteristics = {};
-    constructor(args) {
-        this.ble = args.ble;
-        this.device = args.device;
-        this.server = args.server;
-        this.deviceServices = args.services;
-        this.onStatus = args.onStatus || ((x) => x);
-        this.onControl = args.onControl || ((x) => x);
-        this.onData = args.onData || ((x) => x);
-    }
-    async init() {
-        const self = this;
-        self.service = await self.ble.getService(self.server, self.uuid);
-        self.characteristics = await self.getCharacteristics(self.service);
 
-        const flags = await self.ble.readCharacteristic(self.characteristics.cyclingPowerFeature);
-        self.feature = cpsFeatureDecoder(flags.value);
+    postInit(args) {
+        this.onData    = existance(args.onData,    this.defaultOnData);
+        this.onControl = existance(args.onControl, this.defaultOnControlPoint);
 
-        await self.ble.sub(self.characteristics.cyclingPowerMeasurement,
-                           eventToValue(cyclingPowerMeasurementDecoder, self.onData));
-    }
-    async getCharacteristics(service, feature) {
-        const self = this;
-        const cyclingPowerFeature      = await self.ble.getCharacteristic(service, uuids.cyclingPowerFeature);
-        const cyclingPowerMeasurement  = await self.ble.getCharacteristic(service, uuids.cyclingPowerMeasurement);
-        const sensorLocation           = await self.ble.getCharacteristic(service, uuids.sensorLocation);
-
-        return {
-            cyclingPowerFeature,
-            cyclingPowerMeasurement,
-            sensorLocation,
+        this.characteristics = {
+            cyclingPowerFeature: {
+                uuid: uuids.cyclingPowerFeature,
+                supported: false,
+                characteristic: undefined,
+            },
+            cyclingPowerMeasurement: {
+                uuid: uuids.cyclingPowerMeasurement,
+                supported: false,
+                characteristic: undefined,
+            },
+            cyclingPowerControlPoint: {
+                uuid: uuids.cyclingPowerControlPoint,
+                supported: false,
+                characteristic: undefined,
+            },
         };
     }
-    async getOptionalCharacteristics(service, feature) {
+    async config() {
         const self = this;
-        const cyclingPowerVector       = await self.ble.getCharacteristic(service, uuids.fitnessMachineStatus);
-        const cyclingPowerControlPoint = await self.ble.getCharacteristic(service, uuids.fitnessMachineControlPoint);
+        self.features = await self.getFeatures();
 
-        let characteristics = {};
-        characteristics['cyclingPowerControlPoint'] = cyclingPowerControlPoint;
-        characteristics['cyclingPowerVector'] = cyclingPowerVector;
+        if(self.supported('cyclingPowerMeasurement')) {
+            await self.sub('cyclingPowerMeasurement',
+                           cyclingPowerMeasurement.decode,
+                           self.onData.bind(self));
+        }
 
-        return characteristics;
+        if(self.supported('cyclingPowerControlPoint')) {
+            await self.sub('cyclingPowerControlPoint',
+                           control.response.decode,
+                           self.onControl.bind(self));
+
+            await self.requestControl();
+        }
+    }
+    async getFeatures(service) {
+        const self = this;
+        const features = self.read('cyclingPowerFeature', feature.decode);
+
+        console.log(':rx :cyclingPowerFeature ', JSON.stringify(features));
+
+        return features;
     }
     async requestControl() {
         const self = this;
-        return await self.ble.writeCharacteristic(self.characteristics.cyclingPowerControlPoint, requestControl().buffer);
+        const buffer = control.requestControl.encode();
+
+        return await self.write('cyclingPowerControlPoint', buffer);
+    }
+    defaultOnData(decoded) {
+        console.log(':rx :cps :measurement ', JSON.stringify(decoded));
+    }
+    defaultOnControlPoint(decoded) {
+        control.response.toString(decoded);
     }
 }
 

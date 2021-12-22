@@ -32,43 +32,54 @@ const distributeSystemSupported            = (flags) => {
     return distributedSystemsValues[value];
 };
 
+function CpsFeature() {
 
+    function decode(dataview) {
+        // nRF Connect value 0x0C-07-08-00
+        //               22 1111 1111 11
+        //               10 9876 5432 1098 7654 3210
+        // 0b0000-0000-0000-1000-0000-0111-0000-1100
+        // 0x00        08        07        0C
+        //    0         8         7        12
 
-function cpsFeatureDecoder(dataview) {
-    // nRF Connect value 0x0C-07-08-00
-    //               22 1111 1111 11
-    //               10 9876 5432 1098 7654 3210
-    // 0b0000-0000-0000-1000-0000-0111-0000-1100
-    // 0x00        08        07        0C
-    //    0         8         7        12
+        const flags = dataview.getUint32(0, true);
 
-    const flags = dataview.getUint32(0, true);
+        const res = {
+            pedalPowerBalanceSupported:           pedalPowerBalanceSupported(flags),
+            accumulatedTorqueSupported:           accumulatedTorqueSupported(flags),
+            wheelRevolutionDataSupported:         wheelRevolutionDataSupported(flags),
+            crankRevolutionDataSupported:         crankRevolutionDataSupported(flags),
+            extremeMagnitudesSupported:           extremeMagnitudesSupported(flags),
+            extremeAnglesSupported:               extremeAnglesSupported(flags),
+            topBottomDeadSpotAnglesSupported:     topBottomDeadSpotAnglesSupported(flags),
+            accumulatedEnergySupported:           accumulatedEnergySupported(flags),
+            offsetCompensationIndicatorSupported: offsetCompensationIndicatorSupported(flags),
+            offsetCompensationSupported:          offsetCompensationSupported(flags),
+            cpmcContentMaskingSupported:          cpmcContentMaskingSupported(flags),
+            multipleSensorLocationsSupported:     multipleSensorLocationsSupported(flags),
+            crankLengthAdjustmentSupported:       crankLengthAdjustmentSupported(flags),
+            chainLengthAdjustmentSupported:       chainLengthAdjustmentSupported(flags),
+            chainWeightAdjustmentSupported:       chainWeightAdjustmentSupported(flags),
+            spanLengthAdjustmentSupported:        spanLengthAdjustmentSupported(flags),
+            sensorMeasurementContext:             sensorMeasurementContext(flags),
+            instMeasurementDirectionSupported:    instMeasurementDirectionSupported(flags),
+            factoryCalibrationDateSupported:      factoryCalibrationDateSupported(flags),
+            enhancedOffsetCompensationSupported:  enhancedOffsetCompensationSupported(flags),
+            distributeSystemSupported:            distributeSystemSupported(flags),
+        };
 
-    const feature = {
-        pedalPowerBalanceSupported:           pedalPowerBalanceSupported(flags),
-        accumulatedTorqueSupported:           accumulatedTorqueSupported(flags),
-        wheelRevolutionDataSupported:         wheelRevolutionDataSupported(flags),
-        crankRevolutionDataSupported:         crankRevolutionDataSupported(flags),
-        extremeMagnitudesSupported:           extremeMagnitudesSupported(flags),
-        extremeAnglesSupported:               extremeAnglesSupported(flags),
-        topBottomDeadSpotAnglesSupported:     topBottomDeadSpotAnglesSupported(flags),
-        accumulatedEnergySupported:           accumulatedEnergySupported(flags),
-        offsetCompensationIndicatorSupported: offsetCompensationIndicatorSupported(flags),
-        offsetCompensationSupported:          offsetCompensationSupported(flags),
-        cpmcContentMaskingSupported:          cpmcContentMaskingSupported(flags),
-        multipleSensorLocationsSupported:     multipleSensorLocationsSupported(flags),
-        crankLengthAdjustmentSupported:       crankLengthAdjustmentSupported(flags),
-        chainLengthAdjustmentSupported:       chainLengthAdjustmentSupported(flags),
-        chainWeightAdjustmentSupported:       chainWeightAdjustmentSupported(flags),
-        spanLengthAdjustmentSupported:        spanLengthAdjustmentSupported(flags),
-        sensorMeasurementContext:             sensorMeasurementContext(flags),
-        instMeasurementDirectionSupported:    instMeasurementDirectionSupported(flags),
-        factoryCalibrationDateSupported:      factoryCalibrationDateSupported(flags),
-        enhancedOffsetCompensationSupported:  enhancedOffsetCompensationSupported(flags),
-        distributeSystemSupported:            distributeSystemSupported(flags),
-    };
+        return res;
+    }
 
-    return feature;
+    function encode() {
+    }
+
+    return Object.freeze({
+        encode,
+        decode
+    });
 }
 
-export { cpsFeatureDecoder };
+const feature = CpsFeature();
+
+export { feature };

@@ -12,12 +12,15 @@ class Device {
         this.server   = {};
         this.services = {};
         this.postInit(args);
-        this.start();
+        this.switch();
     }
     defaultFilter() { return  ble.requestFilters.all; }
     defaultId()     { return 'ble-device'; }
     defaultName()   { return 'Unknown'; }
-    start() {
+    init()          { return; }
+    postInit(args)  { return; }
+    start(device)   { return; }
+    switch() {
         const self = this;
 
         xf.sub(`ui:${self.id}:switch`, async () => {
@@ -28,8 +31,6 @@ class Device {
             }
         });
     }
-    init(args) { return; }
-    postInit(args) { return; }
     isConnected() {
         const self = this;
         return ble.isConnected(self.device);
@@ -45,7 +46,7 @@ class Device {
             self.services = res.services;
             self.name     = self.device.name;
 
-            await self.initServices(res);
+            await self.start();
 
             xf.dispatch(`${self.id}:connected`);
             xf.dispatch(`${self.id}:name`, self.name);
@@ -69,7 +70,6 @@ class Device {
         console.log(`Disconnected ${self.id}, ${self.name}.`);
         self.device.removeEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
     }
-    async initServices(device) { return {}; }
 }
 
 export { Device };

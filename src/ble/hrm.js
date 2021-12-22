@@ -13,29 +13,24 @@ function onHeartRate(data) {
     }
 }
 
-function onHrmInfo(value) {
-    console.log(`Heart Rate Monitor Information: `, value);
-}
-
 class Hrm extends Device {
-    defaultId() { return `ble:hrm`; }
+    defaultId()     { return `ble:hrm`; }
     defaultFilter() { return ble.requestFilters.hrm; }
-    postInit() {
+    async start() {
         const self = this;
-    }
-    async initServices(device) {
-        const self = this;
-        const hrs = new HeartRateService({ble: ble, onHeartRate: onHeartRate.bind(self), ...device});
-        await hrs.init();
 
-        const dis = new DeviceInformationService({ble: ble, onInfo: onHrmInfo, ...device});
+        self.hrs = new HeartRateService({
+            onData:   onHeartRate.bind(self),
+            services: self.services,
+            server:   self.server,
+            ble,
+        });
 
-        if(ble.hasService(device, uuids.deviceInformation)) {
-            await dis.init();
-        }
-
-        return { hrs, dis };
+        await self.hrs.start();
     }
 }
 
-export { Hrm }
+export {
+    Hrm
+}
+

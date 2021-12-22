@@ -161,38 +161,53 @@ function calculateCadence(crank_revs_2, crank_time_2) {
     return cadence;
 }
 
-function cyclingPowerMeasurementDecoder(dataview) {
+function CyclingPowerMeasurement() {
 
-//               0  1  2  3  4  5  6  7  8  9 10 11 12 13
-//  value: (0x) 30-00-21-00-2A-00-00-00-C4-60-12-00-F7-04
-//
-// power    , speed                       , cadence
-// 86 0x0056, 0 0x00-00-00-00, 0    0x0000, 0    0 0x0000
-// 94 0x005E, 3 0x00-00-00-03  2838 0x0B16, 79 778 0x030A
-//
-// (0x) 30-00 -56-00 -00-00-00-00 -00-00 -00-00-F7-04
-// (0x) 30-00 -5E-00 -03-00-00-00 -16-0B -01-00-0A-03
+    function decode(dataview) {
+        //               0  1  2  3  4  5  6  7  8  9 10 11 12 13
+        //  value: (0x) 30-00-21-00-2A-00-00-00-C4-60-12-00-F7-04
+        //
+        // power    , speed                       , cadence
+        // 86 0x0056, 0 0x00-00-00-00, 0    0x0000, 0    0 0x0000
+        // 94 0x005E, 3 0x00-00-00-03  2838 0x0B16, 79 778 0x030A
+        //
+        // (0x) 30-00 -56-00 -00-00-00-00 -00-00 -00-00-F7-04
+        // (0x) 30-00 -5E-00 -03-00-00-00 -16-0B -01-00-0A-03
 
-    const flags = dataview.getUint16(0, true);
+        const flags = dataview.getUint16(0, true);
 
-    let data = {};
-    data['power'] = getPower(dataview);
-    data['offsetIndicator'] = offsetIndicator(flags);
+        const data = {};
+        data['power'] = getPower(dataview);
+        data['offsetIndicator'] = offsetIndicator(flags);
 
-    if(wheelRevolutionData(flags)) {
-        data['wheelRevolutions'] = getWheelRevolutions(dataview);
-        data['wheelEvent'] = getWheelEvent(dataview);
-        data['speed'] = calculateSpeed(data['wheelRevolutions'], data['wheelEvent']);
+        if(wheelRevolutionData(flags)) {
+            data['wheelRevolutions'] = getWheelRevolutions(dataview);
+            data['wheelEvent']       = getWheelEvent(dataview);
+            data['speed']            = calculateSpeed(data['wheelRevolutions'],
+                                                      data['wheelEvent']);
+        }
+        if(crankRevolutionData(flags)) {
+            data['crankRevolutions'] = getCrankRevolutions(dataview);
+            data['crankEvent']       = getCrankEvent(dataview);
+            data['cadence']          = calculateCadence(data['crankRevolutions'],
+                                                        data['crankEvent']);
+        }
+
+        return data;
     }
-    if(crankRevolutionData(flags)) {
-        data['crankRevolutions'] = getCrankRevolutions(dataview);
-        data['crankEvent'] = getCrankEvent(dataview);
-        data['cadence'] = calculateCadence(data['crankRevolutions'], data['crankEvent']);
+
+    function encode() {
     }
 
-    return data;
+    return Object.freeze({
+        encode,
+        decode,
+    });
 }
 
+const cyclingPowerMeasurement = CyclingPowerMeasurement();
+
 export {
-    cyclingPowerMeasurementDecoder,
+    cyclingPowerMeasurement,
 };
+
