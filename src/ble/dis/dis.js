@@ -1,58 +1,110 @@
 import { uuids } from '../uuids.js';
-import { dataviewToString } from '../../functions.js';
+import { BLEService } from '../service.js';
+import { existance, dataviewToString } from '../../functions.js';
 
-class DeviceInformationService {
+function StringCharacteristic() {
+    function encode() {}
+    function decode(dataview) {
+        return dataviewToString(dataview);
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+const stringCharacteristic = StringCharacteristic();
+
+class DeviceInformationService extends BLEService {
     uuid = uuids.deviceInformation;
-    characteristics = {};
-    constructor(args) {
-        this.ble = args.ble;
-        this.device = args.device;
-        this.server = args.server;
-        this.deviceServices = args.services;
-        this.onInfo = args.onInfo || ((x) => x);
-        this._info = this.defaultInfo();
-    }
-    get info() { return this._info; }
-    set info(x) { return this._info = x; }
-    defaultManufecturerNameString() { return 'Unknown'; }
-    defaultModelNumberString() { return ''; }
-    defaultFirmwareRevisionString() { return ''; }
-    defaultInfo() {
-        const self = this;
-        return { manufacturer: self.defaultManufecturerNameString(),
-                 model:        self.defaultModelNumberString(),
-                 firmware:     self.defaultFirmwareRevisionString() };
-    }
-    async init() {
-        const self = this;
-        try {
-            self.service         = await self.ble.getService(self.server, self.uuid);
-            self.characteristics = await self.getCharacteristics(self.service);
-            self.info            = await self.readInfo(self.characteristics);
-        } catch(err) {
-            console.error(err);
-        }
-    }
-    async getCharacteristics(service) {
-        const self = this;
-        const manufacturerNameString = await self.ble.getCharacteristic(service, uuids.manufacturerNameString);
-        const modelNumberString      = await self.ble.getCharacteristic(service, uuids.modelNumberString);
-        const firmwareRevisionString = await self.ble.getCharacteristic(service, uuids.firmwareRevisionString);
-        return { manufacturerNameString, modelNumberString, firmwareRevisionString };
-    }
-    async readInfo(characteristics) {
-        const self = this;
-        const manufacturerDataview = (await self.ble.readCharacteristic(characteristics.manufacturerNameString)).value;
-        const modelDataview        = (await self.ble.readCharacteristic(characteristics.modelNumberString)).value;
-        const firmwareDataview     = (await self.ble.readCharacteristic(characteristics.firmwareRevisionString)).value;
 
-        const manufacturer = dataviewToString(manufacturerDataview) || self.defaultManufecturerNameString();
-        const model        = dataviewToString(modelDataview)        || self.defaultModelNumberString();
-        const firmware     = dataviewToString(firmwareDataview)     || self.defaultFirmwareRevisionString();
+    postInit(args) {
+        this.onInfo = existance(args.onInfo, ((x) => x));
+        this.value  = this.defaultValue();
 
-        const info = { manufacturer, model, firmware };
+        this.characteristics = {
+            manufacturerNameString: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            },
+            modelNumberString: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            },
+            serialNumberString: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            },
+            hardwareRevisionString: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            },
+            firmwareRevisionString: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            },
+            softwareRevisionString: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            },
+            systemID: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            },
+            regulatoryCertification: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            },
+            PnPID: {
+                uuid: uuids.f,
+                supported: false,
+                characteristic: undefined,
+            }
+        };
+    }
+    defaultValue() {
+        return {
+            manufacturer: 'Unknown',
+            model:        '',
+            firmware:     '',
+        };
+    }
+    async start() {
+        const self = this;
 
+        self.service = await self.ble.getService(self.server, self.uuid);
+
+        await self.getCharacteristics(self.service);
+
+        const info = self.readInfo();
         self.onInfo(info);
+    }
+    async readInfo() {
+        const self = this;
+
+        const info = self.defaultValue();
+
+        if(self.supported('manufacturerNameString')) {
+            info['manufacturer'] = await self.read('manufacturerNameString', stringCharacteristic.decode);
+        }
+
+        if(self.supported('modelNumberString')) {
+            info['model'] = await self.read('modelNumberString', stringCharacteristic.decode);
+        }
+
+        if(self.supported('firmwareRevisionString')) {
+            info['firmware'] = await self.read('firmwareRevisionString', stringCharacteristic.decode);
+        }
+
         return info;
     }
 };

@@ -1,20 +1,15 @@
 import { uuids } from '../uuids.js';
-
+import { BLEService } from '../service.js';
+import { measurement as data } from './measurement.js';
+import { feature } from './feature.js';
 import { equals, exists, existance, first } from '../../functions.js';
 
-class SpeedCadenceService {
+class SpeedCadenceService extends BLEService {
     uuid = uuids.speedCadence;
 
-    constructor(args = {}) {
-        this.ble       = existance(args.ble);
-        this.device    = existance(args.device);
-        this.server    = existance(args.server);
-        this.onData    = existance(args.onData,    ((x) => x));
-        this.onStatus  = existance(args.onStatus,  this.defaultOnStatus);
-        this.onControl = existance(args.onControl, this.defaultOnControlPoint);
-
+    postInit(args = {}) {
         this.characteristics = {
-            measurement: {
+            data: {
                 uuid: uuids.speedCadenceMeasurement,
                 supported: false,
                 characteristic: undefined,
@@ -29,11 +24,24 @@ class SpeedCadenceService {
                 supported: false,
                 characteristic: undefined,
             },
-            speedCadenceControlPoint: {
+            controlPoint: {
                 uuid: uuids.speedCadenceControlPoint,
                 supported: false,
                 characteristic: undefined,
             },
         };
     }
+    // async start() {
+    //     const self = this;
+    //     self.service = await self.ble.getService(self.server, self.uuid);
+
+    //     await self.getCharacteristics(self.service);
+    //     self.features = await self.getFeatures();
+
+    //     if(self.supported('measurement')) {
+    //         await self.sub('measurement', measurement.decode, self.onData);
+    //     }
+    // }
 }
+
+export { SpeedCadenceService };

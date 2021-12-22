@@ -35,7 +35,7 @@ function HeartRateMeasurement() {
         const flags     = dataview.getUint16(0, true);
         const heartRate = readHeartRate(dataview);
 
-        let data = {};
+        const data = {};
 
         data['heartRate'] = heartRate;
 
@@ -53,3 +53,4 @@ const heartRateMeasurement = HeartRateMeasurement();
 export {
     heartRateMeasurement
 };
+

@@ -223,3 +223,4 @@ function IndoorBikeData(dataview) {
 const indoorBikeData = IndoorBikeData();
 
 export { indoorBikeData };
+

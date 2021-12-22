@@ -8,67 +8,66 @@ import { FEC } from './fec/fec.js';
 import { models } from '../models/models.js';
 
 class Controllable extends Device {
-    defaultId() { return `ble:controllable`; }
+    defaultId()     { return `ble:controllable`; }
     defaultFilter() { return ble.requestFilters.controllable; }
     postInit(args) {
         const self = this;
-
-        let mode = 'erg';
-        xf.sub(`db:mode`, value => mode = value);
-
-        xf.sub('db:powerTarget', power => {
-            if(self.isConnected(self.device) && (equals(mode, 'erg'))) {
-                self.control.setTargetPower(power);
-            }
-        });
-        xf.sub('db:resistanceTarget', resistance => {
-            if(self.isConnected(self.device)) self.control.setTargetResistance(resistance);
-        });
-
-        xf.sub('db:slopeTarget', slope => {
-            if(self.isConnected(self.device) && (equals(mode, 'slope'))) {
-                if(self.isConnected(self.device)) self.control.setTargetSlope(slope);
-            }
-        });
+        self.mode = 'erg';
     }
-    async initServices(device) {
+    async start(device) {
         const self = this;
 
-        self.dis = await self.deviceInformation(device);
-        self.control = await self.controlService(device, false);
-    }
-    async deviceInformation(device) {
-        const self = this;
-        const dis = new DeviceInformationService({
-            ble:    ble,
-            onInfo: onControllableInfo,
-            ...device
-        });
+        self.control = await self.controlService(device);
+        // self.deviceInformation = await self.deviceInformation(device);
 
-        if(ble.hasService(device, uuids.deviceInformation)) {
-            await dis.init();
+        xf.sub(`db:mode`,             self.onMode.bind(self));
+        xf.sub('db:powerTarget',      self.onPowerTarget.bind(self));
+        xf.sub('db:resistanceTarget', self.onResistanceTarget.bind(self));
+        xf.sub('db:slopeTarget',      self.onSlopeTarget.bind(self));
+    }
+    onMode(mode) {
+        self.mode = mode;
+    }
+    onPowerTarget(power) {
+        const self = this;
+        if(self.isConnected(self.device) && (equals(self.mode, 'erg'))) {
+            self.control.setTargetPower(power);
         }
-
-        return dis;
     }
-    async controlService(device) {
+    onResistanceTarget(resistance) {
         const self = this;
-        if(ble.hasService(device, uuids.fitnessMachine)) {
+        if(self.isConnected(self.device)) {
+            self.control.setTargetResistance(resistance);
+        }
+    }
+    onSlopeTarget(slope) {
+        const self = this;
+        if(self.isConnected(self.device) && (equals(self.mode, 'slope'))) {
+            if(self.isConnected(self.device)) self.control.setTargetSlope(slope);
+        }
+    }
+    async controlService() {
+        const self = this;
+
+        if(ble.hasService(self.services, uuids.fitnessMachine)) {
             const ftms = new FitnessMachineService({
-                ble:      ble,
                 onStatus: onFitnessMachineStatus,
                 onData:   onIndoorBikeData.bind(self),
-                ...device
+                services: self.services,
+                server:   self.server,
+                ble,
             });
-            await ftms.init();
+            await ftms.start();
 
             return ftms;
         }
-        if(ble.hasService(device, uuids.fec)) {
+        if(ble.hasService(self.services, uuids.fec)) {
             const fec = new FEC({
-                ble:    ble,
-                onData: onIndoorBikeData.bind(self),
-                ...device});
+                onData:   onIndoorBikeData.bind(self),
+                services: self.services,
+                server:   self.server,
+                ble,
+            });
             await fec.init();
 
             return fec;
@@ -81,6 +80,20 @@ class Controllable extends Device {
             setTargetResistance: ((x) => x),
             setTargetSlope:      ((x) => x)
         };
+    }
+    async deviceInformation(device) {
+        const self = this;
+        const dis = new DeviceInformationService({
+            ble:    ble,
+            onInfo: onControllableInfo,
+            ...device
+        });
+
+        if(ble.hasService(device, uuids.deviceInformation)) {
+            await dis.start();
+        }
+
+        return dis;
     }
 }
 
@@ -113,4 +126,7 @@ function onFitnessMachineStatus(value) {
 function onFitnessMachineControlPoint(value) {
 }
 
-export { Controllable };
+export {
+    Controllable
+};
+

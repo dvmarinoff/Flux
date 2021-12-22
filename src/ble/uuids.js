@@ -10,10 +10,6 @@ const services = {
 };
 
 const characteristics = {
-    // others
-    sensorLocation:                    '00002a5d-0000-1000-8000-00805f9b34fb',
-    clientCharacteristicConfiguration: '00002902 -0000-1000-8000-00805f9b34fb',
-
     // Fitness Machine
     indoorBikeData:                '00002ad2-0000-1000-8000-00805f9b34fb',
     fitnessMachineControlPoint:    '00002ad9-0000-1000-8000-00805f9b34fb',
@@ -46,6 +42,10 @@ const characteristics = {
     // FEC over BLE
     fec2:                          '6e40fec2-b5a3-f393-e0a9-e50e24dcca9e',
     fec3:                          '6e40fec3-b5a3-f393-e0a9-e50e24dcca9e',
+
+    // others
+    sensorLocation:                    '00002a5d-0000-1000-8000-00805f9b34fb',
+    clientCharacteristicConfiguration: '00002902 -0000-1000-8000-00805f9b34fb',
 };
 
 const uuids = { ...services, ...characteristics };

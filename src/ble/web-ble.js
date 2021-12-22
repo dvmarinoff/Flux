@@ -1,4 +1,4 @@
-import { exists } from '../functions.js';
+import { equals, exists } from '../functions.js';
 import { filterIn, findByValue } from '../utils.js';
 import { uuids } from './uuids.js';
 
@@ -7,15 +7,26 @@ import { uuids } from './uuids.js';
 ////
 const _type = 'web-ble';
 
-const _hrm = {filters: [{services: [uuids.heartRate]}],
-              optionalServices: [uuids.deviceInformation]};
+const _hrm = {
+    filters: [{services: [uuids.heartRate]}],
+    optionalServices: [uuids.deviceInformation]
+};
 
-const _controllable = {filters: [{services: [uuids.fitnessMachine]},
-                                 {services: [uuids.fec]}],
-                       optionalServices: [uuids.deviceInformation]};
+const _controllable = {
+    filters: [{services: [uuids.fitnessMachine]},
+              {services: [uuids.fec]}],
+    optionalServices: [uuids.deviceInformation]
+};
 
-const _power = {filters: [{services: [uuids.cyclingPower]}],
-                optionalServices: [uuids.deviceInformation]};
+const _power = {
+    filters: [{services: [uuids.cyclingPower]}],
+    optionalServices: [uuids.deviceInformation]
+};
+
+const _speedCadence = {
+    filters: [{services: [uuids.speedCadence]}],
+    optionalServices: [uuids.deviceInformation]
+};
 
 const _all = {acceptAllDevices: true};
 
@@ -24,7 +35,7 @@ function filterDevice(devices, id) {
 }
 
 function includesDevice(devices, id) {
-    return devices.map(device => device.id).includes(device => device.id === id);
+    return devices.map(device => device.id).includes(device => equals(device.id, id));
 }
 
 const _ = { filterDevice, includesDevice };
@@ -34,7 +45,13 @@ const _ = { filterDevice, includesDevice };
 ////
 
 class WebBLE {
-    requestFilters = { hrm: _hrm, controllable: _controllable, power: _power , all: _all };
+    requestFilters = {
+        hrm:          _hrm,
+        controllable: _controllable,
+        speedCadence: _speedCadence,
+        power:        _power ,
+        all:          _all
+    };
     constructor(args) {}
     get type() { return _type; }
     async connect(filter) {
@@ -84,12 +101,21 @@ class WebBLE {
         const self = this;
         return await device.gatt.disconnect();
     }
-    hasService(device, uuid) {
+    hasService(services, uuid) {
         let res = false;
-        for(let service of device.services) {
-            if(service.uuid === uuid) res = true;
+        for(let service of services) {
+            if(equals(service.uuid, uuid)) res = true;
         }
         return res;
+    }
+    findService(services, uuid) {
+        for(let service of services) {
+            if(equals(service.uuid, uuid)) {
+                return service;
+            };
+        }
+        console.warn(`service with uuid ${uuid} not found in: `, services);
+        return undefined;
     }
     async getPrimaryServices(server) {
         const self = this;
@@ -147,7 +173,7 @@ class WebBLE {
         } catch(e) {
             console.error(`characteristic.writeValue:`, e);
         }
-        return { res, characteristic };
+        return res;
     }
     async readCharacteristic(characteristic) {
         const self = this;
@@ -157,7 +183,7 @@ class WebBLE {
         } catch(e) {
             console.error(`characteristic.readValue: ${e}`);
         }
-        return { value, characteristic };
+        return value;
     }
     isSupported() {
         if(!exists(navigator)) throw new Error(`Trying to use web-bluetooth in non-browser env!`);

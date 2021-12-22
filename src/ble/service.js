@@ -1,0 +1,131 @@
+import { equals, exists, existance, first, dataviewToArray } from '../functions.js';
+
+const data = {
+    decode: function(dataview) {
+        return dataviewToArray(dataview);
+    },
+};
+
+function eventToValue(decoder, callback) {
+    return function (e) {
+        return callback(decoder(e.target.value));
+    };
+}
+
+function findCharacteristic(list, uuid) {
+    return first(list.filter(x => equals(x.uuid, uuid)));
+}
+
+class BLEService {
+    constructor(args = {}) {
+        this.ble       = existance(args.ble);
+        this.server    = existance(args.server);
+        this.services  = existance(args.services);
+        this.onData    = existance(args.onData, ((x) => x));
+        this.postInit(args);
+    }
+    postInit(args = {}) {
+        this.uuid = existance(args.uuid);
+        // this.data = data;
+
+        this.characteristics = {
+            data: {
+                uuid: '',
+                supported: false,
+                characteristic: undefined,
+            },
+        };
+    }
+    async start() {
+        const self = this;
+        self.service = await self.getTheService();
+
+        await self.getCharacteristics(self.service);
+        await self.config();
+    }
+    async config() {
+        const self = this;
+        if(self.supported('data')) {
+            await self.sub('data', data.decode, self.onData);
+        }
+    }
+    async getTheService() {
+        const self = this;
+        let service = self.ble.findService(self.services, self.uuid);
+        if(exists(service)) {
+            return service;
+        }
+        return await self.ble.getService(self.server, self.uuid);
+    }
+    characteristic(key) {
+        const self = this;
+        if(exists(self.characteristics[key])) {
+            return self.characteristics[key].characteristic;
+        }
+        return undefined;
+    }
+    supported(key) {
+        const self = this;
+        if(exists(self.characteristics[key])) {
+            return self.characteristics[key].supported;
+        }
+        return false;
+    }
+    async getCharacteristics(service) {
+        const self = this;
+        const list = await self.ble.getCharacteristics(service);
+
+        Object.keys(self.characteristics).forEach((key) => {
+            const characteristic = findCharacteristic(list, self.characteristics[key].uuid);
+
+            if(exists(characteristic)) {
+                self.characteristics[key].characteristic = characteristic;
+                self.characteristics[key].supported = true;
+            }
+
+            return;
+        });
+
+        console.log(':rx :characteristics ', self.characteristics);
+
+        return;
+    }
+    async sub(prop, decoder, callback) {
+        const self = this;
+        const characteristic = self.characteristic(prop);
+
+        if(exists(characteristic)) {
+            await self.ble.sub(characteristic, eventToValue(decoder, callback));
+            return true;
+        } else {
+            return false;
+        }
+    }
+    async write(prop, buffer) {
+        const self = this;
+        const characteristic = self.characteristic(prop);
+
+        if(exists(characteristic)) {
+            const res = await self.ble.writeCharacteristic(characteristic, buffer);
+            return res;
+        } else {
+            return false;
+        }
+    }
+    async read(prop, decoder = ((x) => x)) {
+        const self = this;
+        const characteristic = self.characteristic(prop);
+
+        if(exists(characteristic)) {
+            const res = await self.ble.readCharacteristic(characteristic);
+            return decoder(res);
+        } else {
+            return false;
+        }
+    }
+}
+
+export {
+    BLEService
+};
+
