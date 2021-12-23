@@ -1,8 +1,8 @@
 import { nthBitToBool } from '../../functions.js';
 
-const wheelRevolutionDataPresent = (flags) => nthBitToBool(flags, 0);
-const crankRevolutionDataPresent = (flags) => nthBitToBool(flags, 1);
-const cumulativeWheelRevolutions = (flags) => nthBitToBool(flags, 2);
+const wheelRevolutionDataPresent        = (flags) => nthBitToBool(flags, 0);
+const crankRevolutionDataPresent        = (flags) => nthBitToBool(flags, 1);
+const cumulativeWheelRevolutionsPresent = (flags) => nthBitToBool(flags, 2);
 
 const definitions = {
     flags: {
@@ -97,8 +97,8 @@ let crank_time_1 = -1;
 
 function calculateCadence(crank_revs_2, crank_time_2) {
     const resolution = 1024;
-    const rollover = 1024 * 64;
-    const toRpm =  60;
+    const rollover   = 1024 * 64;
+    const toRpm      = 60;
     if(crank_revs_1 < 0) crank_revs_1 = crank_revs_2; // set initial value
     if(crank_time_1 < 0) crank_time_1 = crank_time_2; // set initial value
 
@@ -124,6 +124,19 @@ function calculateCadence(crank_revs_2, crank_time_2) {
 // Crank rev: 2,
 // Last crank event time: 7577 ms” received
 //
+//      flags  wheel revs   wheel time  crank revs  crank time
+// (0x) 03    -0c-00-00-00 -44-1A      -02-00      -99-1D
+//
+// Example data stream:
+//
+// flags  wheel revs   wheel time  crank revs  crank time
+// 03    -00-00-00-00 -00-00      -00-00      -00-00
+// 03    -00-00-00-00 -00-00      -3C-00      -00-F0
+//                                 60          61440
+// 03    -00-00-00-00 -00-00      -3C-00      -00-F0
+//                                 60          61440       -> 60 rpm
+// 03    -00-00-00-00 -00-00      -3E-00      -00-F4
+//                                 62          62464       -> 120 rpm
 
 function Measurement() {
 
@@ -141,10 +154,11 @@ function Measurement() {
         if(crankRevolutionDataPresent(flags)) {
             data['cumulativeCrankRevolutions'] = readCumulativeCrankRevolutions(dataview);
             data['lastCrankEventTime'] = readLastCrankEventTime(dataview);
-            data['cadence'] = calculateCadence(data['crankRevolutions'], data['crankEvent']);
+            data['cadence'] = calculateCadence(data['cumulativeCrankRevolutions'],
+                                               data['lastCrankEventTime']);
         }
 
-        // console.log(data);
+        console.log(data);
 
         return data;
     }
@@ -157,6 +171,5 @@ function Measurement() {
 
 const measurement = Measurement();
 
-export {
-    measurement,
-}
+export { measurement };
+
