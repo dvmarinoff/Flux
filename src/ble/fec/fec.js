@@ -21,7 +21,7 @@ function slopeTarget(value, channel = 5) {
 
 class FEC extends BLEService {
     uuid = uuids.fec;
-    characteristics = {};
+
     postInit(args = {}) {
         // this.ble = args.ble;
         // this.device = args.device;
@@ -47,31 +47,23 @@ class FEC extends BLEService {
             },
         };
     }
-    async start() {
+    async config() {
         const self = this;
-        // await self.ble.sub(self.characteristics.fec2, eventToValue(fec2Decoder, self.onData));
-
         await self.sub('fec2', fec2Decoder, self.onData);
     }
     async setTargetPower(value) {
         const self = this;
         const buffer = powerTarget(value);
-        // const characteristic = self.characteristics.fec3;
-        // self.ble.writeCharacteristic(characteristic, buffer);
         return await self.write('fec3', buffer);
     }
     async setTargetResistance(value) {
         const self = this;
         const buffer = resistanceTarget(value);
-        // const characteristic = self.characteristics.fec3;
-        // self.ble.writeCharacteristic(characteristic, buffer);
         return await self.write('fec3', buffer);
     }
     async setTargetSlope(value) {
         const self = this;
         const buffer = slopeTarget(value);
-        // const characteristic = self.characteristics.fec3;
-        // self.ble.writeCharacteristic(characteristic, buffer);
         return await self.write('fec3', buffer);
     }
 }
