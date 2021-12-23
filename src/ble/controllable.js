@@ -8,8 +8,12 @@ import { FEC } from './fec/fec.js';
 import { models } from '../models/models.js';
 
 class Controllable extends Device {
-    defaultId()     { return `ble:controllable`; }
-    defaultFilter() { return ble.requestFilters.controllable; }
+    defaultId() {
+        return `ble:controllable`;
+    }
+    defaultFilter() {
+        return ble.requestFilters.controllable;
+    }
     postInit(args) {
         const self = this;
         self.mode = 'erg';
@@ -18,7 +22,6 @@ class Controllable extends Device {
         const self = this;
 
         self.control = await self.controlService(device);
-        // self.deviceInformation = await self.deviceInformation(device);
 
         xf.sub(`db:mode`,             self.onMode.bind(self));
         xf.sub('db:powerTarget',      self.onPowerTarget.bind(self));
@@ -26,6 +29,7 @@ class Controllable extends Device {
         xf.sub('db:slopeTarget',      self.onSlopeTarget.bind(self));
     }
     onMode(mode) {
+        const self = this;
         self.mode = mode;
     }
     onPowerTarget(power) {
@@ -36,6 +40,7 @@ class Controllable extends Device {
     }
     onResistanceTarget(resistance) {
         const self = this;
+        console.log(`resistance: ${resistance}, self.mode: ${self.mode}`);
         if(self.isConnected(self.device)) {
             self.control.setTargetResistance(resistance);
         }
@@ -43,29 +48,29 @@ class Controllable extends Device {
     onSlopeTarget(slope) {
         const self = this;
         if(self.isConnected(self.device) && (equals(self.mode, 'slope'))) {
-            if(self.isConnected(self.device)) self.control.setTargetSlope(slope);
+            self.control.setTargetSlope(slope);
         }
     }
     async controlService() {
         const self = this;
 
-        if(ble.hasService(self.services, uuids.fitnessMachine)) {
+        if(self.hasService(self.services, uuids.fitnessMachine)) {
+            const service = await self.getService(uuids.fitnessMachine);
             const ftms = new FitnessMachineService({
                 onStatus: onFitnessMachineStatus,
                 onData:   onIndoorBikeData.bind(self),
-                services: self.services,
-                server:   self.server,
+                service,
                 ble,
             });
             await ftms.start();
 
             return ftms;
         }
-        if(ble.hasService(self.services, uuids.fec)) {
+        if(self.hasService(self.services, uuids.fec)) {
+            const service = await self.getService(uuids.fec);
             const fec = new FEC({
-                onData:   onIndoorBikeData.bind(self),
-                services: self.services,
-                server:   self.server,
+                onData: onIndoorBikeData.bind(self),
+                service,
                 ble,
             });
             await fec.init();
@@ -73,7 +78,7 @@ class Controllable extends Device {
             return fec;
         }
 
-        console.warn(`no FTMS or FE-C over BLE found on device ${device.device.name}`, device);
+        console.warn(`no FTMS or FE-C over BLE found on device ${self.device.name}`, self.device);
 
         return {
             setTargetPower:      ((x) => x),
@@ -86,7 +91,6 @@ class Controllable extends Device {
         const dis = new DeviceInformationService({
             ble:    ble,
             onInfo: onControllableInfo,
-            ...device
         });
 
         if(ble.hasService(device, uuids.deviceInformation)) {
@@ -121,12 +125,12 @@ function onControllableInfo(value) {
 }
 
 function onFitnessMachineStatus(value) {
+    return value;
 }
 
 function onFitnessMachineControlPoint(value) {
+    return value;
 }
 
-export {
-    Controllable
-};
+export { Controllable };
 

@@ -1,4 +1,4 @@
-import {  xf, exists } from '../functions.js';
+import { xf, equals, exists } from '../functions.js';
 import { ble } from './web-ble.js';
 
 class Device {
@@ -12,7 +12,7 @@ class Device {
         this.server   = {};
         this.services = {};
         this.postInit(args);
-        this.switch();
+        this.sub();
     }
     defaultFilter() { return  ble.requestFilters.all; }
     defaultId()     { return 'ble-device'; }
@@ -20,7 +20,7 @@ class Device {
     init()          { return; }
     postInit(args)  { return; }
     start(device)   { return; }
-    switch() {
+    sub() {
         const self = this;
 
         xf.sub(`ui:${self.id}:switch`, async () => {
@@ -44,7 +44,7 @@ class Device {
             self.device   = res.device;
             self.server   = res.server;
             self.services = res.services;
-            self.name     = self.device.name;
+            self.name     = res.device.name;
 
             await self.start();
 
@@ -70,6 +70,31 @@ class Device {
         console.log(`Disconnected ${self.id}, ${self.name}.`);
         self.device.removeEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
     }
+    hasService(services, uuid) {
+        let res = false;
+        for(let service of services) {
+            if(equals(service.uuid, uuid)) res = true;
+        }
+        return res;
+    }
+    findService(services, uuid) {
+        for(let service of services) {
+            if(equals(service.uuid, uuid)) {
+                return service;
+            };
+        }
+        console.warn(`service with uuid ${uuid} not found in: `, services);
+        return undefined;
+    }
+    async getService(uuid) {
+        const self = this;
+        let service = self.findService(self.services, uuid);
+        if(exists(service)) {
+            return service;
+        }
+        return await self.ble.getService(self.server, uuid);
+    }
 }
 
 export { Device };
+

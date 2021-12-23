@@ -18,15 +18,13 @@ function findCharacteristic(list, uuid) {
 
 class BLEService {
     constructor(args = {}) {
-        this.ble       = existance(args.ble);
-        this.server    = existance(args.server);
-        this.services  = existance(args.services);
-        this.onData    = existance(args.onData, ((x) => x));
+        this.ble     = existance(args.ble);
+        this.service = existance(args.service);
+        this.onData  = existance(args.onData, ((x) => x));
         this.postInit(args);
     }
     postInit(args = {}) {
         this.uuid = existance(args.uuid);
-        // this.data = data;
 
         this.characteristics = {
             data: {
@@ -38,8 +36,6 @@ class BLEService {
     }
     async start() {
         const self = this;
-        self.service = await self.getTheService();
-
         await self.getCharacteristics(self.service);
         await self.config();
     }
@@ -48,14 +44,6 @@ class BLEService {
         if(self.supported('data')) {
             await self.sub('data', data.decode, self.onData);
         }
-    }
-    async getTheService() {
-        const self = this;
-        let service = self.ble.findService(self.services, self.uuid);
-        if(exists(service)) {
-            return service;
-        }
-        return await self.ble.getService(self.server, self.uuid);
     }
     characteristic(key) {
         const self = this;

@@ -1,4 +1,4 @@
-import { equals, exists, existance, nthBitToBool } from '../../functions.js';
+import { nthBitToBool } from '../../functions.js';
 
 const wheelRevolutionDataPresent = (flags) => nthBitToBool(flags, 0);
 const crankRevolutionDataPresent = (flags) => nthBitToBool(flags, 1);
@@ -33,7 +33,7 @@ function cumulativeWheelRevolutionsIndex(flags) {
 }
 
 function lastWheelEventTimeIndex(flags) {
-    const i = definitions.flags.size;
+    let i = definitions.flags.size;
     if(wheelRevolutionDataPresent(flags)) {
         i+= definitions.cumulativeWheelRevolutions.size;
     }
@@ -41,7 +41,7 @@ function lastWheelEventTimeIndex(flags) {
 }
 
 function cumulativeCrankRevolutionsIndex(flags) {
-    const i = definitions.flags.size;
+    let i = definitions.flags.size;
     if(wheelRevolutionDataPresent(flags)) {
         i+= definitions.cumulativeWheelRevolutions.size;
         i+= definitions.lastWheelEventTime.size;
@@ -50,7 +50,7 @@ function cumulativeCrankRevolutionsIndex(flags) {
 }
 
 function lastCrankEventTimeIndex(flags) {
-    const i = definitions.flags.size;
+    let i = definitions.flags.size;
     if(wheelRevolutionDataPresent(flags)) {
         i+= definitions.cumulativeWheelRevolutions.size;
         i+= definitions.lastWheelEventTime.size;
@@ -144,7 +144,7 @@ function Measurement() {
             data['cadence'] = calculateCadence(data['crankRevolutions'], data['crankEvent']);
         }
 
-        console.log(data);
+        // console.log(data);
 
         return data;
     }

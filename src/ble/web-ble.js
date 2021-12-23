@@ -59,7 +59,11 @@ class WebBLE {
         const device = await self.request(filter);
         const server = await self.gattConnect(device);
         const services = await self.getPrimaryServices(server);
-        return { device, server, services };
+        return {
+            device,
+            server,
+            services
+        };
     }
     async disconnect(device) {
         const self = this;
@@ -100,22 +104,6 @@ class WebBLE {
     async gattDisconnect(device) {
         const self = this;
         return await device.gatt.disconnect();
-    }
-    hasService(services, uuid) {
-        let res = false;
-        for(let service of services) {
-            if(equals(service.uuid, uuid)) res = true;
-        }
-        return res;
-    }
-    findService(services, uuid) {
-        for(let service of services) {
-            if(equals(service.uuid, uuid)) {
-                return service;
-            };
-        }
-        console.warn(`service with uuid ${uuid} not found in: `, services);
-        return undefined;
     }
     async getPrimaryServices(server) {
         const self = this;

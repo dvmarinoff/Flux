@@ -7,8 +7,12 @@ import { CyclingPowerService } from './cps/cps.js';
 import { models } from '../models/models.js';
 
 class PowerMeter extends Device {
-    defaultId()     { return 'ble:power-meter'; }
-    defaultFilter() { return ble.requestFilters.power; }
+    defaultId() {
+        return 'ble:power-meter';
+    }
+    defaultFilter() {
+        return ble.requestFilters.power;
+    }
     postInit(args) {
         return;
     }
@@ -16,34 +20,20 @@ class PowerMeter extends Device {
         const self = this;
 
         self.cps = await self.cyclingPower();
-        // self.dis = await self.deviceInformation();
 
         xf.dispatch('sources', {power: self.id});
         xf.dispatch(`${self.id}:feature`, self.cps.feature);
         console.log(self.cps.feature);
     }
-    async deviceInformation() {
-        const self = this;
-        const dis = new DeviceInformationService({
-            onInfo:   onCyclingPowerInfo.bind(self),
-            services: self.services,
-            server:   self.server,
-            ble,
-        });
-
-        if(ble.hasService(self.services, uuids.deviceInformation)) {
-            await dis.init();
-        }
-
-        return dis;
-    }
     async cyclingPower() {
         const self = this;
+
+        const service = await self.getService(uuids.cyclingPower);
+
         const cps = new CyclingPowerService({
             onData:    onPowerData.bind(self),
             onControl: onCyclingPowerControlPoint.bind(self),
-            services:  self.services,
-            server:    self.server,
+            service,
             ble,
         });
         await cps.start();
@@ -67,13 +57,13 @@ function onPowerData(data) {
     };
 }
 
-function onCyclingPowerInfo() {
+function onCyclingPowerInfo(value) {
+    return value;
 }
 
-function onCyclingPowerControlPoint() {
+function onCyclingPowerControlPoint(value) {
+    return value;
 }
 
-export {
-    PowerMeter
-};
+export { PowerMeter };
 

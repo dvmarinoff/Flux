@@ -1,4 +1,4 @@
-import { equals, exists, existance } from '../../functions.js';
+import { equals } from '../../functions.js';
 
 function Feature() {
     function encode() {}
