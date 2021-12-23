@@ -253,7 +253,7 @@ class FTP extends Model {
         return ['one', 'two', 'three', 'four', 'five', 'six', 'seven'];
     }
     defaultPercentages() {
-        return {'one': 0.55, 'two': 0.76, 'three': 0.88, 'four': 0.95, 'five': 1.06, 'six': 1.20};
+        return {'one': 0.54, 'two': 0.75, 'three': 0.87, 'four': 0.94, 'five': 1.05, 'six': 1.20};
     }
     powerToZone(value, ftp, zones) {
         const self = this;
