@@ -316,25 +316,8 @@ let workouts =
         <SteadyState Duration="60" Power="1.9" />
         <SteadyState Duration="60" Power="1.96" />
         <SteadyState Duration="60" Power="2.02" />
-        <SteadyState Duration="60" Power="2.08" />
-        <SteadyState Duration="60" Power="2.14" />
-        <SteadyState Duration="60" Power="2.2" />
-        <SteadyState Duration="60" Power="2.26" />
-        <SteadyState Duration="60" Power="2.32" />
-        <SteadyState Duration="60" Power="2.38" />
-        <SteadyState Duration="60" Power="2.44" />
-        <SteadyState Duration="60" Power="2.5" />
-        <SteadyState Duration="60" Power="2.56" />
-        <SteadyState Duration="60" Power="2.62" />
-        <SteadyState Duration="60" Power="2.68" />
-        <SteadyState Duration="60" Power="2.74" />
-        <SteadyState Duration="60" Power="2.8" />
-        <SteadyState Duration="60" Power="2.86" />
-        <SteadyState Duration="60" Power="2.92" />
-        <SteadyState Duration="60" Power="2.98" />
-        <SteadyState Duration="60" Power="3.04" />
     </workout>
-</workout_file>`
+</workout_file>`,
 ];
 
 export { workouts };

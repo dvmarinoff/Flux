@@ -202,7 +202,7 @@ body {
     --zone-orange: #FF663A;
     --zone-yellow: #F8C73A;
     --zone-green:  #57C057;
-    --zone-teal:   #bffff9;
+    --zone-teal:   #44A5AB;
     --zone-blue:   #328AFF;
     --zone-gray:   #636468;
 
@@ -224,7 +224,7 @@ body {
     background-color: var(--zone-blue);
 }
 .zone-three {
-    background-color: var(--zone-gray);
+    background-color: var(--zone-teal);
 }
 .zone-four {
     background-color: var(--zone-green);
