@@ -1,6 +1,6 @@
 import { uuids } from '../uuids.js';
 import { BLEService } from '../service.js';
-import { measurement as data } from './measurement.js';
+import { measurement } from './measurement.js';
 import { feature } from './feature.js';
 import { equals, exists, existance, first } from '../../functions.js';
 
@@ -9,7 +9,7 @@ class SpeedCadenceService extends BLEService {
 
     postInit(args = {}) {
         this.characteristics = {
-            data: {
+            measurement: {
                 uuid: uuids.speedCadenceMeasurement,
                 supported: false,
                 characteristic: undefined,
@@ -31,17 +31,13 @@ class SpeedCadenceService extends BLEService {
             },
         };
     }
-    // async start() {
-    //     const self = this;
-    //     self.service = await self.ble.getService(self.server, self.uuid);
+    async config() {
+        const self = this;
 
-    //     await self.getCharacteristics(self.service);
-    //     self.features = await self.getFeatures();
-
-    //     if(self.supported('measurement')) {
-    //         await self.sub('measurement', measurement.decode, self.onData);
-    //     }
-    // }
+        if(self.supported('measurement')) {
+            await self.sub('measurement', measurement.decode, self.onData);
+        }
+    }
 }
 
 export { SpeedCadenceService };

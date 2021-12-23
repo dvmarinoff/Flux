@@ -6,15 +6,20 @@ import { SpeedCadenceService } from './cscs/cscs.js';
 import { models } from '../models/models.js';
 
 class SpeedCadence extends Device {
-    defaultId()     { return `ble:speed-and-cadence`; }
-    defaultFilter() { return ble.requestFilters.speedCadence; }
+    defaultId() {
+        return `ble:speed-and-cadence`;
+    }
+    defaultFilter() {
+        return ble.requestFilters.speedCadence;
+    }
     async start() {
         const self = this;
 
+        const service = await self.getService(uuids.speedCadence);
+
         self.speedCadence = new SpeedCadenceService({
-            onData:   onData.bind(self),
-            services: self.services,
-            server:   self.server,
+            onData: onData.bind(self),
+            service,
             ble,
         });
 
@@ -22,17 +27,16 @@ class SpeedCadence extends Device {
     }
 }
 
-function onData(value) {
+function onData(data) {
     const self = this;
-    if(exists(value.cadence) && models.sources.isSource('cadence', self.id)) {
-        xf.dispatch(`cadence`, value.cadence);
+
+    if(exists(data.cadence) && models.sources.isSource('cadence', self.id)) {
+        xf.dispatch('cadence', data.cadence);
     };
-    if(exists(value.speed) && models.sources.isSource('speed', self.id)) {
-        xf.dispatch(`speed`, value.speed);
+    if(exists(data.speed) && models.sources.isSource('speed', self.id)) {
+        xf.dispatch(`speed`, data.speed);
     };
 }
 
-export {
-    SpeedCadence
-};
+export { SpeedCadence };
 

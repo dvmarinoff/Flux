@@ -19,10 +19,11 @@ class Hrm extends Device {
     async start() {
         const self = this;
 
+        const service = await self.getService(uuids.heartRate);
+
         self.hrs = new HeartRateService({
-            onData:   onHeartRate.bind(self),
-            services: self.services,
-            server:   self.server,
+            onData: onHeartRate.bind(self),
+            service,
             ble,
         });
 
@@ -30,7 +31,5 @@ class Hrm extends Device {
     }
 }
 
-export {
-    Hrm
-}
+export { Hrm }
 

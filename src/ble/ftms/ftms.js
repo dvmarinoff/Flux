@@ -20,8 +20,6 @@ class FitnessMachineService extends BLEService {
                 uuid: uuids.fitnessMachineFeature,
                 supported: false,
                 characteristic: undefined
-
-,
             },
             supportedPowerRange: {
                 uuid: uuids.supportedPowerRange,
@@ -127,3 +125,4 @@ class FitnessMachineService extends BLEService {
 }
 
 export { FitnessMachineService };
+
