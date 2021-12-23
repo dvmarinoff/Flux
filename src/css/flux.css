@@ -1238,7 +1238,7 @@ body.dark-theme {
     --settings-row-max-width: 60em;
     --font-size-value: 1.2em;
     --line-height--device-card--tile: 1.2em;
-    --grid-template-columns--device-card--body--row: 5em 2fr 1fr 1.1fr 1fr 1.1fr;
+    --grid-template-columns--device-card--body--row: 5em 2fr 1fr 1.1fr 1fr 1fr;
     --size--icon: 2.7em;
     border-bottom: 1px solid var(--white-opacity-01);
 }
@@ -1261,6 +1261,7 @@ body.dark-theme {
 .device-card--body--row {
     display: grid;
     grid-template-columns: var(--grid-template-columns--device-card--body--row);
+    padding: 0 5px 0 0;
 }
 
 .device-card--body--row.ant-supported {
@@ -1472,6 +1473,10 @@ and (min-height: 600px) {
     }
     #data-tile--distance {
         display: block;
+    }
+
+    .device-card {
+        --grid-template-columns--device-card--body--row: 1fr 1fr 1fr 1fr 1fr 1fr;
     }
 }
 
