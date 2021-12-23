@@ -158,7 +158,7 @@ function Measurement() {
                                                data['lastCrankEventTime']);
         }
 
-        console.log(data);
+        // console.log(data);
 
         return data;
     }
