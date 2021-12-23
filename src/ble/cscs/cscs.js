@@ -41,3 +41,4 @@ class SpeedCadenceService extends BLEService {
 }
 
 export { SpeedCadenceService };
+

@@ -40,7 +40,6 @@ class Controllable extends Device {
     }
     onResistanceTarget(resistance) {
         const self = this;
-        console.log(`resistance: ${resistance}, self.mode: ${self.mode}`);
         if(self.isConnected(self.device)) {
             self.control.setTargetResistance(resistance);
         }
@@ -73,7 +72,7 @@ class Controllable extends Device {
                 service,
                 ble,
             });
-            await fec.init();
+            await fec.start();
 
             return fec;
         }
@@ -85,19 +84,6 @@ class Controllable extends Device {
             setTargetResistance: ((x) => x),
             setTargetSlope:      ((x) => x)
         };
-    }
-    async deviceInformation(device) {
-        const self = this;
-        const dis = new DeviceInformationService({
-            ble:    ble,
-            onInfo: onControllableInfo,
-        });
-
-        if(ble.hasService(device, uuids.deviceInformation)) {
-            await dis.start();
-        }
-
-        return dis;
     }
 }
 
