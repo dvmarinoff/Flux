@@ -112,7 +112,7 @@ function getCrankEvent(dataview) {
 }
 
 
-
+// In two successive measurements:
 // Instantaneous Speed = (Difference in two successive Cumulative Wheel Revolution values * Wheel Circumference) /
 //                       (Difference in two successive Last Wheel Event Time values)
 
@@ -139,6 +139,7 @@ function calculateSpeed(wheel_rev_2, wheel_time_2) {
     return speed;
 }
 
+// In two successive measurements:
 // Instantaneous Cadence = (Difference in two successive Cumulative Crank Revolutions values) /
 //                         (Difference in two successive Last Crank Event Time values)
 let crank_revs_1 = -1;
@@ -146,8 +147,8 @@ let crank_time_1 = -1;
 
 function calculateCadence(crank_revs_2, crank_time_2) {
     const resolution = 1024;
-    const rollover = 1024 * 64;
-    const toRpm =  60;
+    const rollover = 1024 * 60;
+    const toRpm = 60;
     if(crank_revs_1 < 0) crank_revs_1 = crank_revs_2; // set initial value
     if(crank_time_1 < 0) crank_time_1 = crank_time_2; // set initial value
 

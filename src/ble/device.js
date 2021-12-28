@@ -1,13 +1,28 @@
-import { xf, equals, exists } from '../functions.js';
+import { xf, existance , equals, exists } from '../functions.js';
 import { ble } from './web-ble.js';
+
+// Device
+//
+// id     -> the device id for the event system,
+// name   -> the ble name of the device like 'Wahoo Kickr'
+// filter -> ble scan filter
+// device   -> returned from navigator.bluetooth.requestDevice
+// server   -> returned from device.gatt.connect()
+// services -> a list of the primary services of the device
+//             device, server and services are populated by connect
+// init()     -> augments the costructor before its properties are initiated
+// postInit() -> augments the costructor after its properties are initiated
+// start()    -> is called after succesful connection
+// connect()  -> scan for and connect to a device with this.filter and dispatch events
+//               for this.id
 
 class Device {
     constructor(args) {
         this.init(args);
         if(!exists(args)) args = {};
-        this.id       = args.id     || this.defaultId();
-        this.name     = args.name   || this.defaultName();
-        this.filter   = args.filter || this.defaultFilter();
+        this.id       = existance(args.id, this.defaultId());
+        this.name     = existance(args.name, this.defaultName());
+        this.filter   = existance(args.filter, this.defaultFilter());
         this.device   = {};
         this.server   = {};
         this.services = {};
