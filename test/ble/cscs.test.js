@@ -1,6 +1,12 @@
 import { uuids } from '../../src/ble/uuids.js';
 import { measurement, _ } from '../../src/ble/cscs/measurement.js';
 
+global.console = {
+    log: jest.fn(),
+    error: console.error,
+    warn: console.warn,
+};
+
 describe('index', () => {
 
     test('flagsIndex', () => {
@@ -256,29 +262,29 @@ describe('Measurement', () => {
         ].map((i) => new DataView(new Uint8Array(i).buffer));
 
         expect(measurement.decode(input[0])).toEqual({
-            cumulativeWheelRevolutions: 0,
-            lastWheelEventTime: 0,
+            wheelRevolutions: 0,
+            wheelEvent: 0,
             speed: 0,
-            cumulativeCrankRevolutions: 0,
-            lastCrankEventTime: 0,
+            crankRevolutions: 0,
+            crankEvent: 0,
             cadence: 0
         });
 
         expect(measurement.decode(input[1])).toEqual({
-            cumulativeWheelRevolutions: 40,
-            lastWheelEventTime: 10*2048,
+            wheelRevolutions: 40,
+            wheelEvent: 10*2048,
             speed: 30.31,
-            cumulativeCrankRevolutions: 10,
-            lastCrankEventTime: 10*1024,
+            crankRevolutions: 10,
+            crankEvent: 10*1024,
             cadence: 60
         });
 
         expect(measurement.decode(input[2])).toEqual({
-            cumulativeWheelRevolutions: 80,
-            lastWheelEventTime: 20*2048,
+            wheelRevolutions: 80,
+            wheelEvent: 20*2048,
             speed: 30.31,
-            cumulativeCrankRevolutions: 20,
-            lastCrankEventTime: 20*1024,
+            crankRevolutions: 20,
+            crankEvent: 20*1024,
             cadence: 60
         });
     });

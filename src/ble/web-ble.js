@@ -13,9 +13,12 @@ const _hrm = {
 };
 
 const _controllable = {
-    filters: [{services: [uuids.fitnessMachine]},
-              {services: [uuids.fec]}],
-    optionalServices: [uuids.deviceInformation]
+    filters: [
+        {services: [uuids.fitnessMachine]},
+        {services: [uuids.fec]},
+        {services: [uuids.wahooFitnessMachine]},
+    ],
+    optionalServices: [uuids.deviceInformation, uuids.cyclingPower]
 };
 
 const _power = {

@@ -1,4 +1,5 @@
-import { equals, exists, existance, nthBitToBool } from '../../functions.js';
+import { State } from '../common.js';
+import { equals, exists, existance, nthBitToBool, dataviewToArray } from '../../functions.js';
 import { format } from '../../utils.js';
 
 const wheelRevolutionDataPresent        = (flags) => nthBitToBool(flags, 0);
@@ -21,7 +22,6 @@ const definitions = {
     lastCrankEventTime: {
         size: 2, resolution: (1/1024), unit: 's',
     },
-
 };
 
 function flagsIndex() {
@@ -118,122 +118,6 @@ function readLastCrankEventTime(dataview) {
     return undefined;
 }
 
-function StateValue(args = {}) {
-
-    const defaults = {
-        revs: -1,
-        time: -1,
-        resolution: 1024,
-        rolloverRevs: 2**16,
-        rolloverTime: 2**16,
-        transform: ((x) => x),
-    };
-
-    const resolution   = existance(args.resolution, defaults.resolution);
-    const transform    = existance(args.transform, defaults.transform);
-    const rolloverRevs = existance(args.rolloverRevs, defaults.rolloverRevs);
-    const rolloverTime = existance(args.rolloverTime, defaults.rolloverTime);
-    const calculate    = existance(args.calculate, defaultCalculate);
-
-    let revs_1 = defaults.revs;
-    let time_1 = defaults.time;
-
-    function setRevs(value) {
-        revs_1 = value;
-        return revs_1;
-    }
-
-    function setTime(value) {
-        time_1 = value;
-        return time_1;
-    }
-
-    function getRevs(value) {
-        return revs_1;
-    }
-
-    function getTime(value) {
-        return time_1;
-    }
-
-    function reset() {
-        setRevs(defaults.revs);
-        setTime(defaults.time);
-        return { revs: revs_1, time: time_1 };
-    }
-
-    function isRolloverTime(time_2) {
-        return time_2 < getTime();
-    }
-
-    function isRolloverRevs(revs_2) {
-        return revs_2 < getRevs();
-    }
-
-    function isStill(revs_2) {
-        // coasting or not moving
-        return equals(getRevs(), revs_2);
-    }
-
-    function defaultCalculate(revs_2, time_2) {
-        if(getRevs() < 0) setRevs(revs_2); // set initial value
-        if(getTime() < 0) setTime(time_2); // set initial value
-
-        if(isRolloverTime(time_2)) {
-            setTime(getTime() - rolloverTime);
-        }
-        if(isRolloverRevs(revs_2)) {
-            setRevs(getRevs() - rolloverRevs);
-        }
-        if(isStill(revs_2)) {
-            setTime(time_2);
-            return 0;
-        }
-
-        const cadence = transform(
-            (getRevs() - revs_2) / ((getTime() - time_2) / resolution)
-        );
-
-        setRevs(revs_2);
-        setTime(time_2);
-        return cadence;
-    }
-
-    return {
-        setRevs,
-        setTime,
-        getRevs,
-        getTime,
-        reset,
-        calculate,
-    };
-}
-
-// Example input:
-// by Wahoo Sensor
-//
-// (0x) 03-0c-00-00-00-44-1A-02-00-99-1D
-// (0x) [0x03, 0x0c, 0x00, 0x00, 0x00, 0x44, 0x1A, 0x02, 0x00, 0x99, 0x1D]
-// (10) [3, 12, 0, 0, 0, 68, 26, 2, 0, 153, 29]
-//
-// “Wheel rev: 12,
-//  Last wheel event time: 6724 ms,
-//  Crank rev: 2,
-//  Last crank event time: 7577 ms” received
-//
-//      flags  wheel revs   wheel time  crank revs  crank time
-// (0x) 03    -0c-00-00-00 -44-1A      -02-00      -99-1D
-//
-// Example data stream:
-//
-// flags  wheel revs   wheel time  crank revs  crank time
-// 03    -00-00-00-00 -00-00      -00-00      -00-00
-//                                 00          0             -> 0 rpm
-// 03    -00-00-00-00 -00-00      -3C-00      -00-F0
-//                                 60          (60 * 1024)   -> 60 rpm
-// 03    -00-00-00-00 -00-00      -3E-00      -00-F4
-//                                 62          (61 * 1024)   -> 120 rpm
-
 function Cadence(args = {}) {
     // In two successive measurements:
     // Instantaneous Cadence =
@@ -245,7 +129,7 @@ function Cadence(args = {}) {
         return Math.round(x * 60);
     }
 
-    const stateValue = StateValue({
+    const stateValue = State({
         resolution:   1024,
         rolloverRevs: 2**16,
         rolloverTime: 2**16,
@@ -284,7 +168,7 @@ function Speed() {
         return format(x * wheelCircumference * 3.6 , 100);
     }
 
-    const stateValue = StateValue({
+    const stateValue = State({
         resolution:   2048,
         rolloverRevs: 2**32,
         rolloverTime: 2**16,
@@ -297,6 +181,31 @@ function Speed() {
         setWheelCircumference,
     });
 }
+
+// Example input:
+// by Wahoo Sensor
+//
+// (0x) 03-0c-00-00-00-44-1A-02-00-99-1D
+// (0x) [0x03, 0x0c, 0x00, 0x00, 0x00, 0x44, 0x1A, 0x02, 0x00, 0x99, 0x1D]
+// (10) [3, 12, 0, 0, 0, 68, 26, 2, 0, 153, 29]
+//
+// “Wheel rev: 12,
+//  Last wheel event time: 6724 ms,
+//  Crank rev: 2,
+//  Last crank event time: 7577 ms” received
+//
+//      flags  wheel revs   wheel time  crank revs  crank time
+// (0x) 03    -0c-00-00-00 -44-1A      -02-00      -99-1D
+//
+// Example data stream:
+//
+// flags  wheel revs   wheel time  crank revs  crank time
+// 03    -00-00-00-00 -00-00      -00-00      -00-00
+//                                 00          0             -> 0 rpm
+// 03    -00-00-00-00 -00-00      -3C-00      -00-F0
+//                                 60          (60 * 1024)   -> 60 rpm
+// 03    -00-00-00-00 -00-00      -3E-00      -00-F4
+//                                 62          (61 * 1024)   -> 120 rpm
 
 function Measurement() {
     const speed   = Speed();
@@ -323,20 +232,27 @@ function Measurement() {
         let data = {};
 
         if(wheelRevolutionDataPresent(flags)) {
-            data['cumulativeWheelRevolutions'] = readCumulativeWheelRevolutions(dataview);
-            data['lastWheelEventTime'] = readLastWheelEventTime(dataview);
-            data['speed'] = speed.calculate(data['cumulativeWheelRevolutions'],
-                                            data['lastWheelEventTime']);
+            data['wheelRevolutions'] = readCumulativeWheelRevolutions(dataview);
+            data['wheelEvent'] = readLastWheelEventTime(dataview);
+            data['speed'] = speed.calculate(data['wheelRevolutions'],
+                                            data['wheelEvent']);
         }
 
         if(crankRevolutionDataPresent(flags)) {
-            data['cumulativeCrankRevolutions'] = readCumulativeCrankRevolutions(dataview);
-            data['lastCrankEventTime'] = readLastCrankEventTime(dataview);
-            data['cadence'] = cadence.calculate(data['cumulativeCrankRevolutions'],
-                                                data['lastCrankEventTime']);
+            data['crankRevolutions'] = readCumulativeCrankRevolutions(dataview);
+            data['crankEvent'] = readLastCrankEventTime(dataview);
+            data['cadence'] = cadence.calculate(data['crankRevolutions'],
+                                                data['crankEvent']);
         }
 
-        // console.log(data);
+        const dataLog = {
+            revs: data.crankRevolutions,
+            time: data.crankEvent,
+            cad:  data.cadence
+        };
+
+        console.log(dataviewToArray(dataview));
+        console.log(dataLog);
 
         return data;
     }
@@ -357,11 +273,13 @@ const _ = {
     wheelRevolutionDataPresent,
     crankRevolutionDataPresent,
     cumulativeWheelRevolutionsPresent,
+
     flagsIndex,
     cumulativeWheelRevolutionsIndex,
     lastWheelEventTimeIndex,
     cumulativeCrankRevolutionsIndex,
     lastCrankEventTimeIndex,
+
     readFlags,
     readCumulativeWheelRevolutions,
     readLastWheelEventTime,
@@ -369,5 +287,10 @@ const _ = {
     readLastCrankEventTime,
 };
 
-export { measurement, _ };
+export {
+    measurement,
+    Speed,
+    Cadence,
+    _
+};
 
