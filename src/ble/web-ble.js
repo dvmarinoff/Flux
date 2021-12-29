@@ -17,8 +17,9 @@ const _controllable = {
         {services: [uuids.fitnessMachine]},
         {services: [uuids.fec]},
         {services: [uuids.wahooFitnessMachine]},
+        {services: [uuids.cyclingPower]},
     ],
-    optionalServices: [uuids.deviceInformation, uuids.cyclingPower]
+    optionalServices: [uuids.deviceInformation, ]
 };
 
 const _power = {
