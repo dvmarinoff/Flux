@@ -73,6 +73,5 @@ const control = {
     response:       Response(),
 };
 
-export {
-    control,
-};
+export { control };
+

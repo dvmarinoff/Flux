@@ -4,6 +4,7 @@ import { uuids } from './uuids.js';
 import { Device } from './device.js';
 import { DeviceInformationService } from './dis/dis.js';
 import { FitnessMachineService } from './ftms/ftms.js';
+import { WahooCyclingPower } from './wcps/wcps.js';
 import { FEC } from './fec/fec.js';
 import { models } from '../models/models.js';
 
@@ -76,8 +77,19 @@ class Controllable extends Device {
 
             return fec;
         }
+        if(self.hasService(self.services, uuids.cyclingPower)) {
+            const service = await self.getService(uuids.cyclingPower);
+            const wcps = new WahooCyclingPower({
+                onData: onIndoorBikeData.bind(self),
+                service,
+                ble,
+            });
+            await wcps.start();
 
-        console.warn(`no FTMS or FE-C over BLE found on device ${self.device.name}`, self.device);
+            return wcps;
+        }
+
+        console.warn(`no FTMS, FE-C over BLE, or Wahoo CPS found on device ${self.device.name}`, self.device);
 
         return {
             setTargetPower:      ((x) => x),

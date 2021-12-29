@@ -2,8 +2,8 @@
 // 4.16 Fitness Machine Control Point (characteristic)
 //
 
-import { fixInRange, hex }  from '../../utils.js';
-import { existance, curry2 }  from '../../functions.js';
+import { hex }  from '../../utils.js';
+import { Spec } from '../common.js';
 
 const logs = true;
 
@@ -13,40 +13,7 @@ function log(msg) {
     }
 }
 
-function Data(args = {}) {
-    const definitions = existance(args.definitions);
-
-    const applyResolution = curry2((prop, value) => {
-        return value / definitions[prop].resolution;
-    });
-
-    const removeResolution = curry2((prop, value) => {
-        return value * definitions[prop].resolution;
-    });
-
-    function encodeField(prop, input, transform = applyResolution(prop)) {
-        const fallback = definitions[prop].default;
-        const min      = applyResolution(definitions[prop].min);
-        const max      = applyResolution(prop, definitions[prop].max);
-        const value    = existance(input, fallback);
-
-        return Math.floor(fixInRange(min, max, transform(value)));
-    }
-
-    function decodeField(prop, input, transform = removeResolution) {
-        return transform(prop, input);
-    }
-
-    return {
-        definitions,
-        applyResolution,
-        removeResolution,
-        encodeField,
-        decodeField,
-    };
-}
-
-function PowerTarget(power) {
+function PowerTarget() {
     const opCode = 0x05;
     const length = 3;
 
@@ -54,10 +21,10 @@ function PowerTarget(power) {
         power: {resolution: 1, unit: 'W', size: 2, min: 0, max: 65534, default: 0},
     };
 
-    const data = Data({definitions});
+    const spec = Spec({definitions});
 
     function encode(args = {}) {
-        const power = data.encodeField('power', args.power);
+        const power = spec.encodeField('power', args.power);
 
         const buffer = new ArrayBuffer(length);
         const view   = new DataView(buffer);
@@ -72,7 +39,7 @@ function PowerTarget(power) {
 
     function decode(dataview) {
         const opCode = dataview.getUint8(0);
-        const power  = data.decodeField('power', dataview.getInt16(1, true));
+        const power  = spec.decodeField('power', dataview.getInt16(1, true));
 
         return {
             power,
@@ -96,10 +63,10 @@ function ResistanceTarget() {
         resistance: {resolution: 0.1, unit: '', size: 2, min: -100, max: 100, default: 0},
     };
 
-    const data = Data({definitions});
+    const spec = Spec({definitions});
 
     function encode(args = {}) {
-        const resistance = data.encodeField('resistance', args.resistance);
+        const resistance = spec.encodeField('resistance', args.resistance);
 
         const buffer = new ArrayBuffer(length);
         const view   = new DataView(buffer);
@@ -114,7 +81,7 @@ function ResistanceTarget() {
 
     function decode(dataview) {
         const opCode     = dataview.getUint8(0);
-        const resistance = data.decodeField('resistance', dataview.getInt16(1, true));
+        const resistance = spec.decodeField('resistance', dataview.getInt16(1, true));
 
         return {
             resistance,
@@ -142,13 +109,13 @@ function SimulationParameters(args) {
         windResistance: {resolution: 0.01,   unit: 'kg/m', size: 1, min: 0,      max: 1.86,   default: 0.51},
     };
 
-    const data = Data({definitions});
+    const spec = Spec({definitions});
 
     function encode(args = {}) {
-        const windSpeed      = data.encodeField('windSpeed', args.windSpeed);
-        const grade          = data.encodeField('grade', args.grade);
-        const crr            = data.encodeField('crr', args.crr);
-        const windResistance = data.encodeField('windResistance', args.windResistance);
+        const windSpeed      = spec.encodeField('windSpeed', args.windSpeed);
+        const grade          = spec.encodeField('grade', args.grade);
+        const crr            = spec.encodeField('crr', args.crr);
+        const windResistance = spec.encodeField('windResistance', args.windResistance);
 
         const buffer = new ArrayBuffer(length);
         const view   = new DataView(buffer);
@@ -165,10 +132,10 @@ function SimulationParameters(args) {
 
     function decode(dataview) {
         const opCode         = dataview.getUint8(0);
-        const windSpeed      = data.decodeField('windSpeed', dataview.getUint16(1, true));
-        const grade          = data.decodeField('grade', dataview.getInt16(3, true));
-        const crr            = data.decodeField('crr', dataview.getInt8(5, true));
-        const windResistance = data.decodeField('windResistance', dataview.getUint8(6, true));
+        const windSpeed      = spec.decodeField('windSpeed', dataview.getUint16(1, true));
+        const grade          = spec.decodeField('grade', dataview.getInt16(3, true));
+        const crr            = spec.decodeField('crr', dataview.getInt8(5, true));
+        const windResistance = spec.decodeField('windResistance', dataview.getUint8(6, true));
 
         return {
             windSpeed,
@@ -207,10 +174,10 @@ function WheelCircumference(args) {
     // 700x47C -> 2268 -> [0x12, 0x98, 0x58] -> [18, 152, 88]
     // Max     -> 2750 -> [0x12, 0x6C, 0x6B] -> [18, 108, 107]
 
-    const data = Data({definitions});
+    const spec = Spec({definitions});
 
     function encode(args = {}) {
-        const circumference = data.encodeField('circumference', args.circumference);
+        const circumference = spec.encodeField('circumference', args.circumference);
 
         const buffer = new ArrayBuffer(length);
         const view   = new DataView(buffer);
@@ -224,7 +191,7 @@ function WheelCircumference(args) {
 
     function decode(dataview) {
         const opCode        = dataview.getUint8(0);
-        const circumference = data.decodeField('circumference', dataview.getUint16(1, true));
+        const circumference = spec.decodeField('circumference', dataview.getUint16(1, true));
 
         log(`:rx :ftms :wheelCircumference ${circumference}`);
 
