@@ -39,6 +39,7 @@ function State(args = {}) {
     const defaults = {
         revs: -1,
         time: -1,
+        value: 0,
         resolution: 1024,
         rolloverRevs: 2**16,
         rolloverTime: 2**16,
@@ -53,28 +54,31 @@ function State(args = {}) {
 
     let revs_1 = defaults.revs;
     let time_1 = defaults.time;
+    let value  = defaults.value;
 
-    function setRevs(value) {
-        revs_1 = value;
+    function setRevs(revs) {
+        revs_1 = revs;
         return revs_1;
     }
 
-    function setTime(value) {
-        time_1 = value;
+    function setTime(time) {
+        time_1 = time;
         return time_1;
     }
 
-    function getRevs(value) {
+    function getRevs() {
         return revs_1;
     }
 
-    function getTime(value) {
+    function getTime() {
         return time_1;
     }
 
     function reset() {
         setRevs(defaults.revs);
         setTime(defaults.time);
+        value = defaults.value;
+        rateCount = 0;
         return { revs: revs_1, time: time_1 };
     }
 
@@ -86,33 +90,63 @@ function State(args = {}) {
         return revs_2 < getRevs();
     }
 
-    function isStill(revs_2) {
+    function stillRevs(revs_2) {
         // coasting or not moving
         return equals(getRevs(), revs_2);
     }
 
-    function defaultCalculate(revs_2, time_2) {
-        if(getRevs() < 0) setRevs(revs_2); // set initial value
-        if(getTime() < 0) setTime(time_2); // set initial value
+    function stillTime(time) {
+        // multiple transmissions of the same time
+        return equals(getTime(), time);
+    }
 
+    const rate         = 1024/2; // 0.5 second
+    const rateCountMax = 4;
+    let rateCount      = 0;
+
+    function underRate(time) {
+        if(equals(rateCount, rateCountMax)) {
+            rateCount = 0;
+            return false;
+        }
+        if(equals(getTime(), time)){
+            rateCount += 1;
+            return true;
+        }
+        if((time - getTime()) < rate){
+            rateCount += 1;
+            return true;
+        }
+        return false;
+    }
+
+    function defaultCalculate(revs_2, time_2) {
+        if(getRevs() < 0) setRevs(revs_2); // set initial revs
+        if(getTime() < 0) setTime(time_2); // set initial time
+
+        if(underRate(time_2)) {
+            return value;
+        }
+
+        if(stillRevs(revs_2)) {
+            setTime(time_2);
+            value = 0;
+            return value;
+        }
         if(isRolloverTime(time_2)) {
             setTime(getTime() - rolloverTime);
         }
         if(isRolloverRevs(revs_2)) {
             setRevs(getRevs() - rolloverRevs);
         }
-        if(isStill(revs_2)) {
-            setTime(time_2);
-            return 0;
-        }
 
-        const cadence = transform(
+        value = transform(
             (getRevs() - revs_2) / ((getTime() - time_2) / resolution)
         );
 
         setRevs(revs_2);
         setTime(time_2);
-        return cadence;
+        return value;
     }
 
     return {

@@ -245,14 +245,13 @@ function Measurement() {
                                                 data['crankEvent']);
         }
 
-        const dataLog = {
-            revs: data.crankRevolutions,
-            time: data.crankEvent,
-            cad:  data.cadence
-        };
-
-        console.log(dataviewToArray(dataview));
-        console.log(dataLog);
+        // const dataLog = {
+        //     revs: data.crankRevolutions,
+        //     time: data.crankEvent,
+        //     cad:  data.cadence
+        // };
+        // console.log(dataviewToArray(dataview));
+        // console.log(dataLog);
 
         return data;
     }

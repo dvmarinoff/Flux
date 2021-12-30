@@ -128,6 +128,46 @@ describe('cadence', () => {
         expect(measurement.cadence.calculate(41, 1024 * 61)).toEqual(60);
     });
 
+    test('calculate multple updates', () => {
+
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
+        expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
+        expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
+        expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
+        expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+    });
+
+    test('calculate quick updates', () => {
+
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1,  1024 *  1       )).toEqual(0);
+        expect(measurement.cadence.calculate(40,  1024 * 40       )).toEqual(60);
+        expect(measurement.cadence.calculate(40, (1024 * 40) + 1  )).toEqual(60);
+        expect(measurement.cadence.calculate(40, (1024 * 40) + 511)).toEqual(60);
+        expect(measurement.cadence.calculate(41,  1024 * 41       )).toEqual(60);
+    });
+
+    test('calculate decelerates to 0', () => {
+
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1, 1024 *  1        )).toEqual(0);
+        expect(measurement.cadence.calculate(40, 1024 * 40        )).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41        )).toEqual(60);
+        expect(measurement.cadence.calculate(42, 1024 * 42        )).toEqual(60);
+        expect(measurement.cadence.calculate(43, 1024 * 44        )).toEqual(30);
+        expect(measurement.cadence.calculate(44, 1024 * 48        )).toEqual(15);
+        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(8);
+        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(8);
+        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(8);
+        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(8);
+        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(0);
+    });
+
     test('calculate data series', () => {
         // [flags, cumulative revs, last time event]
         //
