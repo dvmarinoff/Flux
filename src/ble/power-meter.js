@@ -22,8 +22,7 @@ class PowerMeter extends Device {
         self.cps = await self.cyclingPower();
 
         xf.dispatch('sources', {power: self.id});
-        xf.dispatch(`${self.id}:feature`, self.cps.feature);
-        console.log(self.cps.feature);
+        // xf.dispatch(`${self.id}:feature`, self.cps.feature);
     }
     async cyclingPower() {
         const self = this;
