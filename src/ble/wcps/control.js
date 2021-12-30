@@ -1,6 +1,6 @@
 import { uuids } from '../uuids.js';
 import { Spec } from '../common.js';
-import { existance } from '../../functions.js';
+import { existance, dataviewToArray } from '../../functions.js';
 
 function PowerTarget() {
     // set ERG mode
@@ -164,12 +164,45 @@ function RequestControl() {
     });
 }
 
+function Response() {
+    const opCode = 0x80;
+
+    // Format:
+    // ?
+
+    const results = {
+        '0x01': {definition: '', msg: ''},
+    };
+
+    const requests = {
+        '0x00': {definition: '', msg: ''},
+    };
+
+    function encode(value) {
+    }
+
+    function decode(dataview) {
+        const res = dataviewToArray(dataview);
+        console.log(`:rx :wcps :response ${res}`);
+        return res;
+    }
+
+    return Object.freeze({
+        opCode,
+        results,
+        requests,
+        encode,
+        decode,
+    });
+}
+
 
 const control = {
     powerTarget:    PowerTarget(),
     slopeTarget:    SlopeTarget(),
     sim:            SIM(),
     requestControl: RequestControl(),
+    response:       Response(),
 };
 
 export { control };
