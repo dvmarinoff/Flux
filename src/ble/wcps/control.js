@@ -169,6 +169,7 @@ function Response() {
 
     // Format:
     // ?
+    //
 
     const results = {
         '0x01': {definition: '', msg: ''},
