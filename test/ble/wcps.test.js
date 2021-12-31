@@ -61,4 +61,39 @@ describe('Control Point', () => {
             expect(res).toEqual({power: 200});
         });
     });
+
+    describe('Response', () => {
+
+        test('decode setPowerTarget success', () => {
+            const view = new DataView((new Uint8Array([1, 66, 1, 0, 50, 0])).buffer);
+
+            const res = control.response.decode(view);
+            expect(res).toEqual({
+                status:  ':success',
+                request: 'setPowerTarget',
+                value:   50,
+            });
+        });
+
+        test('decode setPowerTarget fail', () => {
+            const view = new DataView((new Uint8Array([0, 66, 1, 0, 50, 0])).buffer);
+
+            const res = control.response.decode(view);
+            expect(res).toEqual({
+                status:  ':fail',
+                request: 'setPowerTarget',
+                value:   50,
+            });
+        });
+
+        test('decode success unlock', () => {
+            const view = new DataView((new Uint8Array([1, 32, 2])).buffer);
+
+            const res = control.response.decode(view);
+            expect(res).toEqual({
+                status:  ':success',
+                request: 'unlock',
+            });
+        });
+    });
 });

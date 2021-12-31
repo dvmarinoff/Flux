@@ -1,6 +1,7 @@
 import { uuids } from '../uuids.js';
 import { Spec } from '../common.js';
-import { existance, dataviewToArray } from '../../functions.js';
+import { equals, exists, existance, dataviewToArray } from '../../functions.js';
+import { hex, format } from '../../utils.js';
 
 function PowerTarget() {
     // set ERG mode
@@ -42,8 +43,9 @@ function SlopeTarget() {
     const length = 3;
 
 
-    // ????
+    // Format ????
     // let norm = UInt16((min(1, max(-1, grade)) + 1.0) * 65535 / 2.0)
+    // int value = (gradient / 100.0 + 1.0) * 32768;
 
     const definitions = {
         grade: {resolution: 0.01, unit: '%', size: 2, min: -40, max: 40, default: 0},
@@ -51,9 +53,16 @@ function SlopeTarget() {
 
     const spec = Spec({definitions});
 
+    function applyOffset(value) {
+        return (value / 100 + 1) * 32768;
+    }
+
+    function removeOffset(value) {
+        return format((((value / 32768) - 1) * 100), 10);
+    }
+
     function encode(args = {}) {
-        // [0x]
-        const grade = spec.encodeField('grade', args.grade);
+        const grade = spec.encodeField('grade', args.grade, applyOffset);
 
         const buffer = new ArrayBuffer(length);
         const view   = new DataView(buffer);
@@ -85,20 +94,19 @@ function SIM() {
 
     const definitions = {
         weight: {
-            resolution: 1, unit: 'kg', size: 2, min: 0, max: 65535, default: 75
+            resolution: 0.01, unit: 'kg', size: 2, min: 0, max: 65535, default: 75
         },
         crr: {
             resolution: 0.0001, unit: '', size: 2, min: 0, max: 65535, default: 0.004
         },
         windResistance: {
-            resolution: 0.01, unit: 'kg/m', size: 2, min: 0, max: 1.86, default: 0.51
+            resolution: 0.001, unit: 'kg/m', size: 2, min: 0, max: 65535, default: 0.51
         },
     };
 
     const spec = Spec({definitions});
 
     function encode(args = {}) {
-        // [0x]
         const weight         = spec.encodeField('weight', args.weight);
         const crr            = spec.encodeField('crr', args.crr);
         const windResistance = spec.encodeField('windResistance', args.windResistance);
@@ -165,38 +173,81 @@ function RequestControl() {
 }
 
 function Response() {
-    const opCode = 0x80;
-
     // Format:
-    // ?
     //
+    // Example 1:
+    // msg:      [66, 50, 0],
+    // response: [1, 66, 1, 0, 50, 0]
+    //
+    // status - op code - ? - value
+    // 1        66        1   50
+    //
+    // 0b01 status === success
+    //
+    // Example 2:
+    // msg:      [32],
+    // response: [1, 32, 2]
+    //
+    // status - op code - ?
+    // 1        32        2
 
     const results = {
-        '0x01': {definition: '', msg: ''},
+        '1': {definition: 'success', msg: 'success'},
+        '0': {definition: 'fail',    msg: 'fail'},    // maybe just a guess
     };
 
     const requests = {
-        '0x00': {definition: '', msg: ''},
+        '0x20': {definition: 'unlock', msg: 'unlock'},                           // 32
+        '0x40': {definition: 'setResistanceTarget', msg: 'setResistanceTarget'}, // 64
+        '0x41': {definition: 'setStandardMode', msg: 'setStandardMode'},         // 65
+        '0x42': {definition: 'setPowerTarget', msg: 'setPowerTarget'},           // 66
+        '0x43': {definition: 'setSimMode', msg: 'setSimMode'},                   // 67
+        '0x44': {definition: 'setCrr', msg: 'setCrr'},                           // 68
+        '0x45': {definition: 'setWindResistance', msg: 'setWindResistance'},     // 69
+        '0x46': {definition: 'setSlopeTarget', msg: 'setSlopeTarget'},           // 70
+        '0x47': {definition: 'setWindSpeed', msg: 'setWindSpeed'},               // 71
+        '0x47': {definition: 'setWheelCircumference', msg: 'setWheelCircumference'}, // 72
     };
+
+    function decodeStatus(value) {
+        if(equals(value, 0)) return ':fail';
+        if(equals(value, 1)) return ':success';
+        return ':unknown';
+    }
+    function decodeRequest(value) {
+        const hexValue = hex(value);
+        if(exists(requests[hexValue])) {
+            return requests[hexValue].msg;
+        }
+        return ':unknown';
+    }
 
     function encode(value) {
     }
 
     function decode(dataview) {
-        const res = dataviewToArray(dataview);
-        console.log(`:rx :wcps :response ${res}`);
+        const raw = dataviewToArray(dataview);
+        const res = {};
+
+        res.status  = decodeStatus(dataview.getUint8(0, true));
+        res.request = decodeRequest(dataview.getUint8(1, true));
+
+        if(dataview.byteLength > 5) {
+            res.value = dataview.getUint16(4, true);
+        }
+
+        console.log(`:rx :wcps :response ${res} :raw ${raw}`);
+
         return res;
     }
 
     return Object.freeze({
-        opCode,
         results,
         requests,
         encode,
         decode,
     });
 }
-
 
 const control = {
     powerTarget:    PowerTarget(),
