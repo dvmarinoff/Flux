@@ -118,7 +118,7 @@ function readLastCrankEventTime(dataview) {
     return undefined;
 }
 
-function Cadence(args = {}) {
+function Cadence() {
     // In two successive measurements:
     // Instantaneous Cadence =
     //    (Difference in two successive Cumulative Crank Revolutions values) /
@@ -141,7 +141,7 @@ function Cadence(args = {}) {
     );
 }
 
-function Speed() {
+function Speed(args = {}) {
     // In two successive measurements:
     // Instantaneous Speed =
     //    (Difference in two successive Cumulative Wheel Revolution values
@@ -152,7 +152,9 @@ function Speed() {
         wheelCircumference: 2.105, // meters or 700x25
     };
 
-    let wheelCircumference = defaults.wheelCircumference;
+    let wheelCircumference = existance(
+        args.wheelCircumference, defaults.wheelCircumference
+    );
 
     function getWheelCircumference() {
         return wheelCircumference;
@@ -207,7 +209,8 @@ function Speed() {
 // 03    -00-00-00-00 -00-00      -3E-00      -00-F4
 //                                 62          (61 * 1024)   -> 120 rpm
 
-function Measurement() {
+function Measurement(args = {}) {
+
     const speed   = Speed();
     const cadence = Cadence();
 
@@ -286,6 +289,7 @@ const _ = {
 };
 
 export {
+    Measurement,
     measurement,
     Speed,
     Cadence,

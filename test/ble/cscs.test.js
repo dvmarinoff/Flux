@@ -1,11 +1,14 @@
 import { uuids } from '../../src/ble/uuids.js';
-import { measurement, _ } from '../../src/ble/cscs/measurement.js';
+import { Measurement, _ } from '../../src/ble/cscs/measurement.js';
 
 global.console = {
     log: jest.fn(),
     error: console.error,
     warn: console.warn,
 };
+
+const measurement = Measurement();
+measurement.cadence.setMaxRateCount(3);
 
 describe('index', () => {
 
@@ -110,7 +113,6 @@ describe('cadence', () => {
     });
 
     test('calculate time rollover', () => {
-
         measurement.cadence.reset();
         expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
         expect(measurement.cadence.calculate(63, 1024 * 63)).toEqual(60);
@@ -119,7 +121,6 @@ describe('cadence', () => {
     });
 
     test('calculate coasting', () => {
-
         measurement.cadence.reset();
         expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
         expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
@@ -128,8 +129,46 @@ describe('cadence', () => {
         expect(measurement.cadence.calculate(41, 1024 * 61)).toEqual(60);
     });
 
-    test('calculate multple updates', () => {
+    test('calculate 0 after no rev change over moving clock', () => {
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
 
+        expect(measurement.cadence.calculate(42, 1024 * 42  )).toEqual(60);
+        expect(measurement.cadence.calculate(43, 1024 * 43  )).toEqual(60);
+        expect(measurement.cadence.calculate(43, 1024 * 43.5)).toEqual(0);
+    });
+
+    test('calculate 0 after no rev change and still clock for 4 messages', () => {
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
+
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(0);
+    });
+
+    test('calculate start stop', () => {
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
+
+        expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
+
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(0);
+
+        expect(measurement.cadence.calculate(42, 1024 * 42)).toEqual(60);
+        expect(measurement.cadence.calculate(43, 1024 * 43)).toEqual(60);
+        expect(measurement.cadence.calculate(43, 1024 * 44)).toEqual(0);
+
+        expect(measurement.cadence.calculate(44, 1024 * 45)).toEqual(60);
+    });
+
+    test('calculate multple updates', () => {
         measurement.cadence.reset();
         expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
         expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
@@ -142,13 +181,113 @@ describe('cadence', () => {
         expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
     });
 
+    test('calculate variable multple updates', () => {
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
+
+        // 2 in a row
+        expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(0);
+        expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(1);
+
+        // 4 in a row
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(0);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(1);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(2);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(3);
+
+        // 3 in a row
+        expect(measurement.cadence.calculate(42, 1024 * 42)).toEqual(60);
+        expect(measurement.cadence.calculate(42, 1024 * 42)).toEqual(60);
+        expect(measurement.cadence.calculate(42, 1024 * 42)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(2);
+
+        // 2 in a row
+        expect(measurement.cadence.calculate(43, 1024 * 43)).toEqual(60);
+        expect(measurement.cadence.calculate(43, 1024 * 43)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(1);
+
+        // 5 in a row
+        expect(measurement.cadence.calculate(44, 1024 * 44)).toEqual(60);
+        expect(measurement.cadence.calculate(44, 1024 * 44)).toEqual(60);
+        expect(measurement.cadence.calculate(44, 1024 * 44)).toEqual(60);
+        expect(measurement.cadence.calculate(44, 1024 * 44)).toEqual(60);
+        expect(measurement.cadence.calculate(44, 1024 * 44)).toEqual(0);
+        expect(measurement.cadence.getRateCount()).toEqual(0);
+    });
+
+    test('calculate asc multple updates', () => {
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
+
+        // 1 in a row
+        expect(measurement.cadence.calculate(45, 1024 * 45)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(0);
+
+        // 2 in a row
+        expect(measurement.cadence.calculate(46, 1024 * 46)).toEqual(60);
+        expect(measurement.cadence.calculate(46, 1024 * 46)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(1);
+
+        // 3 in a row
+        expect(measurement.cadence.calculate(47, 1024 * 47)).toEqual(60);
+        expect(measurement.cadence.calculate(47, 1024 * 47)).toEqual(60);
+        expect(measurement.cadence.calculate(47, 1024 * 47)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(2);
+
+        // 4 in a row
+        expect(measurement.cadence.calculate(48, 1024 * 48)).toEqual(60);
+        expect(measurement.cadence.calculate(48, 1024 * 48)).toEqual(60);
+        expect(measurement.cadence.calculate(48, 1024 * 48)).toEqual(60);
+        expect(measurement.cadence.calculate(48, 1024 * 48)).toEqual(60);
+        expect(measurement.cadence.getRateCount()).toEqual(3);
+
+        // 5 in a row
+        expect(measurement.cadence.calculate(49, 1024 * 49)).toEqual(60);
+        expect(measurement.cadence.calculate(49, 1024 * 49)).toEqual(60);
+        expect(measurement.cadence.calculate(49, 1024 * 49)).toEqual(60);
+        expect(measurement.cadence.calculate(49, 1024 * 49)).toEqual(60);
+        expect(measurement.cadence.calculate(49, 1024 * 49)).toEqual(0);
+        expect(measurement.cadence.getRateCount()).toEqual(0);
+    });
+
+    test('calculate multple updates on time rollover', () => {
+        measurement.cadence.reset();
+        expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
+
+        // 3 in a row
+        expect(measurement.cadence.calculate(63, 1024 * 63)).toEqual(60);
+        expect(measurement.cadence.calculate(63, 1024 * 63)).toEqual(60);
+        expect(measurement.cadence.calculate(63, 1024 * 63)).toEqual(60);
+
+        // 2 in a row
+        expect(measurement.cadence.calculate(64, 1024 * 64)).toEqual(60);
+        expect(measurement.cadence.calculate(64, 1024 * 64)).toEqual(60);
+
+        // Time rollover
+        // 3 in a row
+        expect(measurement.cadence.calculate(65, 1024 * 1)).toEqual(60);
+        expect(measurement.cadence.calculate(65, 1024 * 1)).toEqual(60);
+        expect(measurement.cadence.calculate(65, 1024 * 1)).toEqual(60);
+
+        // 2 in a row
+        expect(measurement.cadence.calculate(66, 1024 * 2)).toEqual(60);
+        expect(measurement.cadence.calculate(66, 1024 * 2)).toEqual(60);
+    });
+
     test('calculate quick updates', () => {
 
         measurement.cadence.reset();
         expect(measurement.cadence.calculate( 1,  1024 *  1       )).toEqual(0);
-        expect(measurement.cadence.calculate(40,  1024 * 40       )).toEqual(60);
-        expect(measurement.cadence.calculate(40, (1024 * 40) + 1  )).toEqual(60);
-        expect(measurement.cadence.calculate(40, (1024 * 40) + 511)).toEqual(60);
+        expect(measurement.cadence.calculate(40,  1024 * 40       )).toEqual(60); // 1
+        expect(measurement.cadence.calculate(40, (1024 * 40) + 1  )).toEqual(60); // 2
+        expect(measurement.cadence.calculate(40, (1024 * 40) + 2  )).toEqual(60); // 3
+        expect(measurement.cadence.calculate(40, (1024 * 40) + 511)).toEqual(60); // 4
         expect(measurement.cadence.calculate(41,  1024 * 41       )).toEqual(60);
     });
 
@@ -233,11 +372,6 @@ describe('cadence', () => {
         measurement.cadence.reset();
 
         const d = cadenceLog;
-
-        // expect(measurement.cadence.calculate(
-        //     d[0].revs, d[0].time
-        // )).toEqual(d[0].cad);
-
 
         cadenceLog.forEach(function(item) {
             expect(measurement.cadence.calculate(
