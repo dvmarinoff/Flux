@@ -155,17 +155,17 @@ describe('cadence', () => {
     test('calculate decelerates to 0', () => {
 
         measurement.cadence.reset();
-        expect(measurement.cadence.calculate( 1, 1024 *  1        )).toEqual(0);
-        expect(measurement.cadence.calculate(40, 1024 * 40        )).toEqual(60);
-        expect(measurement.cadence.calculate(41, 1024 * 41        )).toEqual(60);
-        expect(measurement.cadence.calculate(42, 1024 * 42        )).toEqual(60);
-        expect(measurement.cadence.calculate(43, 1024 * 44        )).toEqual(30);
-        expect(measurement.cadence.calculate(44, 1024 * 48        )).toEqual(15);
-        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(8);
-        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(8);
-        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(8);
-        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(8);
-        expect(measurement.cadence.calculate(45, 1024 * 56        )).toEqual(0);
+        expect(measurement.cadence.calculate( 1, 1024 *  1)).toEqual(0);
+        expect(measurement.cadence.calculate(40, 1024 * 40)).toEqual(60);
+        expect(measurement.cadence.calculate(41, 1024 * 41)).toEqual(60);
+        expect(measurement.cadence.calculate(42, 1024 * 42)).toEqual(60);
+        expect(measurement.cadence.calculate(43, 1024 * 44)).toEqual(30);
+        expect(measurement.cadence.calculate(44, 1024 * 48)).toEqual(15);
+        expect(measurement.cadence.calculate(45, 1024 * 56)).toEqual(8);
+        expect(measurement.cadence.calculate(45, 1024 * 56)).toEqual(8);
+        expect(measurement.cadence.calculate(45, 1024 * 56)).toEqual(8);
+        expect(measurement.cadence.calculate(45, 1024 * 56)).toEqual(8);
+        expect(measurement.cadence.calculate(45, 1024 * 56)).toEqual(0);
     });
 
     test('calculate data series', () => {
@@ -225,6 +225,25 @@ describe('cadence', () => {
         expect(measurement.cadence.calculate(
             data[7][0]+47, data[7][1] + (1024 * 47)
         )).toEqual(60);
+    });
+
+    test('calculate from log', () => {
+        // {revs: 41736, time: 41991, cad: 35},
+
+        measurement.cadence.reset();
+
+        const d = cadenceLog;
+
+        // expect(measurement.cadence.calculate(
+        //     d[0].revs, d[0].time
+        // )).toEqual(d[0].cad);
+
+
+        cadenceLog.forEach(function(item) {
+            expect(measurement.cadence.calculate(
+                item.revs, item.time
+            )).toEqual(item.cad);
+        });
     });
 });
 
@@ -330,3 +349,140 @@ describe('Measurement', () => {
     });
 });
 
+const cadenceLog = [
+    // Magene Gemini 200
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41735, time: 40250, cad: 0},
+    {revs: 41736, time: 41991, cad: 35},
+    {revs: 41736, time: 41991, cad: 35},
+    {revs: 41736, time: 41991, cad: 35},
+    {revs: 41736, time: 41991, cad: 35},
+    {revs: 41737, time: 43388, cad: 44},
+    {revs: 41737, time: 43388, cad: 44},
+    {revs: 41737, time: 43388, cad: 44},
+    {revs: 41737, time: 43388, cad: 44},
+    {revs: 41738, time: 44422, cad: 59},
+    {revs: 41738, time: 44422, cad: 59},
+    {revs: 41738, time: 44422, cad: 59},
+    {revs: 41739, time: 45377, cad: 64},
+    {revs: 41739, time: 45377, cad: 64},
+    {revs: 41739, time: 45377, cad: 64},
+    {revs: 41739, time: 45377, cad: 64},
+    {revs: 41740, time: 46281, cad: 68},
+    {revs: 41740, time: 46281, cad: 68},
+    {revs: 41740, time: 46281, cad: 68},
+    {revs: 41741, time: 47185, cad: 68},
+    {revs: 41741, time: 47185, cad: 68},
+    {revs: 41741, time: 47185, cad: 68},
+    {revs: 41742, time: 48090, cad: 68},
+    {revs: 41742, time: 48090, cad: 68},
+    {revs: 41742, time: 48090, cad: 68},
+    {revs: 41742, time: 48090, cad: 68},
+    {revs: 41743, time: 48963, cad: 70},
+    {revs: 41743, time: 48963, cad: 70},
+    {revs: 41743, time: 48963, cad: 70},
+    {revs: 41744, time: 49822, cad: 72},
+    {revs: 41744, time: 49822, cad: 72},
+    {revs: 41744, time: 49822, cad: 72},
+    {revs: 41745, time: 50669, cad: 73},
+    {revs: 41745, time: 50669, cad: 73},
+    {revs: 41745, time: 50669, cad: 73},
+    {revs: 41746, time: 51528, cad: 72},
+    {revs: 41746, time: 51528, cad: 72},
+    {revs: 41746, time: 51528, cad: 72},
+    {revs: 41747, time: 52375, cad: 73},
+    {revs: 41747, time: 52375, cad: 73},
+    {revs: 41747, time: 52375, cad: 73},
+    {revs: 41748, time: 53172, cad: 77},
+    {revs: 41748, time: 53172, cad: 77},
+    {revs: 41748, time: 53172, cad: 77},
+    {revs: 41749, time: 53982, cad: 76},
+    {revs: 41749, time: 53982, cad: 76},
+    {revs: 41749, time: 53982, cad: 76},
+    {revs: 41750, time: 54778, cad: 77},
+    {revs: 41750, time: 54778, cad: 77},
+    {revs: 41750, time: 54778, cad: 77},
+    {revs: 41751, time: 55561, cad: 78},
+    {revs: 41751, time: 55561, cad: 78},
+    {revs: 41751, time: 55561, cad: 78},
+    {revs: 41752, time: 56331, cad: 80},
+    {revs: 41752, time: 56331, cad: 80},
+    {revs: 41753, time: 57085, cad: 81},
+    {revs: 41753, time: 57085, cad: 81},
+    {revs: 41753, time: 57085, cad: 81},
+    {revs: 41754, time: 57826, cad: 83},
+    {revs: 41754, time: 57826, cad: 83},
+    {revs: 41754, time: 57826, cad: 83},
+    {revs: 41755, time: 58557, cad: 84},
+    {revs: 41755, time: 58557, cad: 84},
+    {revs: 41756, time: 59277, cad: 85},
+    {revs: 41756, time: 59277, cad: 85},
+    {revs: 41756, time: 59277, cad: 85},
+    {revs: 41757, time: 59986, cad: 87},
+    {revs: 41757, time: 59986, cad: 87},
+    {revs: 41758, time: 60678, cad: 89},
+    {revs: 41758, time: 60678, cad: 89},
+    {revs: 41758, time: 60678, cad: 89},
+    {revs: 41759, time: 61348, cad: 92},
+    {revs: 41759, time: 61348, cad: 92},
+    {revs: 41760, time: 62004, cad: 94},
+    {revs: 41760, time: 62004, cad: 94},
+    {revs: 41760, time: 62004, cad: 94},
+    {revs: 41761, time: 62651, cad: 95},
+    {revs: 41761, time: 62651, cad: 95},
+    {revs: 41762, time: 63295, cad: 95},
+    {revs: 41762, time: 63295, cad: 95},
+    {revs: 41762, time: 63295, cad: 95},
+    {revs: 41763, time: 63935, cad: 96},
+    {revs: 41763, time: 63935, cad: 96},
+    {revs: 41764, time: 64580, cad: 95},
+    {revs: 41764, time: 64580, cad: 95},
+    {revs: 41764, time: 64580, cad: 95},
+    {revs: 41765, time: 65228, cad: 95},
+    {revs: 41765, time: 65228, cad: 95},
+    {revs: 41766, time: 347, cad: 95},
+    {revs: 41766, time: 347, cad: 95},
+    {revs: 41766, time: 347, cad: 94}, // should be 95
+    {revs: 41767, time: 1005, cad: 93},
+    {revs: 41767, time: 1005, cad: 93},
+    {revs: 41767, time: 1005, cad: 93},
+    {revs: 41768, time: 1673, cad: 92},
+    {revs: 41768, time: 1673, cad: 92},
+    {revs: 41769, time: 2347, cad: 91},
+    {revs: 41769, time: 2347, cad: 91},
+    {revs: 41769, time: 2347, cad: 91},
+    {revs: 41770, time: 3023, cad: 91},
+    {revs: 41770, time: 3023, cad: 91},
+    {revs: 41770, time: 3023, cad: 91},
+    {revs: 41771, time: 3705, cad: 90},
+    {revs: 41771, time: 3705, cad: 90},
+    {revs: 41771, time: 3705, cad: 90},
+    {revs: 41771, time: 3705, cad: 90},
+    {revs: 41772, time: 4391, cad: 90},
+    {revs: 41773, time: 5085, cad: 89},
+    {revs: 41773, time: 5085, cad: 89},
+    {revs: 41773, time: 5085, cad: 89},
+    {revs: 41774, time: 5783, cad: 88},
+    {revs: 41774, time: 5783, cad: 88},
+    {revs: 41774, time: 5783, cad: 88},
+    {revs: 41775, time: 6491, cad: 87},
+    {revs: 41775, time: 6491, cad: 87},
+    {revs: 41775, time: 6491, cad: 87},
+    {revs: 41776, time: 7205, cad: 86},
+    {revs: 41776, time: 7205, cad: 86},
+    {revs: 41776, time: 7205, cad: 86},
+    {revs: 41777, time: 7928, cad: 85},
+    // first real zero should be the next message
+    {revs: 41777, time: 7928, cad: 85},
+    {revs: 41777, time: 7928, cad: 85},
+    {revs: 41777, time: 7928, cad: 85},
+    {revs: 41777, time: 7928, cad: 0},
+];

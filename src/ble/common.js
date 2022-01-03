@@ -101,7 +101,7 @@ function State(args = {}) {
     }
 
     const rate         = 1024/2; // 0.5 second
-    const rateCountMax = 4;
+    const rateCountMax = 3;
     let rateCount      = 0;
 
     function underRate(time) {
@@ -109,14 +109,15 @@ function State(args = {}) {
             rateCount = 0;
             return false;
         }
-        if(equals(getTime(), time)){
+        if(equals(getTime(), time)) {
             rateCount += 1;
             return true;
         }
-        if((time - getTime()) < rate){
+        if((time - getTime()) < rate) {
             rateCount += 1;
             return true;
         }
+        rateCount = 0;
         return false;
     }
 
