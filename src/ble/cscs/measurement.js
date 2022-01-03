@@ -250,7 +250,6 @@ function Measurement() {
         //     time: data.crankEvent,
         //     cad:  data.cadence
         // };
-        // console.log(dataviewToArray(dataview));
         // console.log(dataLog);
 
         return data;
