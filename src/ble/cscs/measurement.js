@@ -131,8 +131,8 @@ function Cadence(args = {}) {
 
     const stateValue = State({
         resolution:   1024,
-        rolloverRevs: 2**16,
-        rolloverTime: 2**16,
+        maxRevs:      2**16,
+        maxTime:      2**16,
         transform,
     });
 
@@ -141,7 +141,7 @@ function Cadence(args = {}) {
     );
 }
 
-function Speed() {
+function Speed(args = {}) {
     // In two successive measurements:
     // Instantaneous Speed =
     //    (Difference in two successive Cumulative Wheel Revolution values
@@ -152,7 +152,9 @@ function Speed() {
         wheelCircumference: 2.105, // meters or 700x25
     };
 
-    let wheelCircumference = defaults.wheelCircumference;
+    let wheelCircumference = existance(
+        args.wheelCircumference, defaults.wheelCircumference
+    );
 
     function getWheelCircumference() {
         return wheelCircumference;
@@ -169,9 +171,9 @@ function Speed() {
     }
 
     const stateValue = State({
-        resolution:   2048,
-        rolloverRevs: 2**32,
-        rolloverTime: 2**16,
+        resolution: 2048,
+        maxRevs:    2**32,
+        maxTime:    2**16,
         transform,
     });
 
@@ -208,6 +210,7 @@ function Speed() {
 //                                 62          (61 * 1024)   -> 120 rpm
 
 function Measurement() {
+
     const speed   = Speed();
     const cadence = Cadence();
 
@@ -245,12 +248,13 @@ function Measurement() {
                                                 data['crankEvent']);
         }
 
-        // const dataLog = {
-        //     revs: data.crankRevolutions,
-        //     time: data.crankEvent,
-        //     cad:  data.cadence
-        // };
-        // console.log(dataLog);
+        const dataLog = {
+            ts: Date.now(),
+            r: data.crankRevolutions,
+            t: data.crankEvent,
+            c:  data.cadence
+        };
+        console.log(dataLog);
 
         return data;
     }
@@ -264,8 +268,6 @@ function Measurement() {
         cadence,
     });
 }
-
-const measurement = Measurement();
 
 const _ = {
     wheelRevolutionDataPresent,
@@ -286,7 +288,7 @@ const _ = {
 };
 
 export {
-    measurement,
+    Measurement,
     Speed,
     Cadence,
     _

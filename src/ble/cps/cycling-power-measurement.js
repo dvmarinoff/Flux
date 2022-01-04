@@ -136,6 +136,7 @@ function readCrankEvent(dataview) {
 //
 
 function Measurement() {
+
     const speed   = Speed();
     const cadence = Cadence();
 
@@ -174,6 +175,14 @@ function Measurement() {
                                                          data['crankEvent']);
         }
 
+        // const dataLog = {
+        //     ts: Date.now(),
+        //     r:  data.crankRevolutions,
+        //     t:  data.crankEvent,
+        //     c:  data.cadence
+        // };
+        // console.log(dataLog);
+
         return data;
     }
 
@@ -189,8 +198,6 @@ function Measurement() {
         cadence,
     });
 }
-
-const measurement = Measurement();
 
 const _ = {
     pedalPowerBalancePresent,
@@ -222,5 +229,5 @@ const _ = {
     readCrankEvent,
 };
 
-export { measurement, _ };
+export { Measurement, _ };
 

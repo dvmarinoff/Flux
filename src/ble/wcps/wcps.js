@@ -1,6 +1,6 @@
 import { uuids } from '../uuids.js';
 import { BLEService } from '../service.js';
-import { measurement } from '../cps/cycling-power-measurement.js';
+import { Measurement } from '../cps/cycling-power-measurement.js';
 import { existance } from '../../functions.js';
 import { control } from './control.js';
 
@@ -26,6 +26,8 @@ class WahooCyclingPower extends BLEService {
     }
     async config() {
         const self = this;
+
+        const measurement = Measurement();
 
         if(self.supported('cyclingPowerMeasurement')) {
             await self.sub('cyclingPowerMeasurement',
