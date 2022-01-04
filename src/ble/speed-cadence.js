@@ -17,8 +17,11 @@ class SpeedCadence extends Device {
 
         const service = await self.getService(uuids.speedCadence);
 
+        const maxRateCount = (/magene|gemini/.test(self.name.toLowerCase())) ? 10 : 3;
+
         self.speedCadence = new SpeedCadenceService({
             onData: onData.bind(self),
+            options: {maxRateCount},
             service,
             ble,
         });

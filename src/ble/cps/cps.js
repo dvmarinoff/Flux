@@ -1,7 +1,7 @@
 import { uuids } from '../uuids.js';
 import { BLEService } from '../service.js';
 import { feature } from './cycling-power-feature.js';
-import { measurement } from './cycling-power-measurement.js';
+import { Measurement } from './cycling-power-measurement.js';
 import { control } from './control-point.js';
 import { equals, exists, existance, first } from '../../functions.js';
 
@@ -33,6 +33,8 @@ class CyclingPowerService extends BLEService {
     async config() {
         const self = this;
         self.features = await self.getFeatures();
+
+        const measurement = Measurement();
 
         if(self.supported('cyclingPowerMeasurement')) {
             await self.sub('cyclingPowerMeasurement',

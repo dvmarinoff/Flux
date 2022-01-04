@@ -21,6 +21,7 @@ class BLEService {
         this.ble     = existance(args.ble);
         this.service = existance(args.service);
         this.onData  = existance(args.onData, ((x) => x));
+        this.options = existance(args.options, {});
         this.postInit(args);
     }
     postInit(args = {}) {

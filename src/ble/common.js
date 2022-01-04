@@ -41,8 +41,8 @@ function State(args = {}) {
         time: -1,
         value: 0,
         resolution: 1024,
-        rolloverRevs: 2**16,
-        rolloverTime: 2**16,
+        maxRevs: 2**16,
+        maxTime: 2**16,
         transform: ((x) => x),
 
         rate:         1024/2, // 0.5 second,
@@ -50,11 +50,11 @@ function State(args = {}) {
         rateCount:    0,
     };
 
-    const resolution   = existance(args.resolution, defaults.resolution);
-    const transform    = existance(args.transform, defaults.transform);
-    const rolloverRevs = existance(args.rolloverRevs, defaults.rolloverRevs);
-    const rolloverTime = existance(args.rolloverTime, defaults.rolloverTime);
-    const calculate    = existance(args.calculate, defaultCalculate);
+    const resolution = existance(args.resolution, defaults.resolution);
+    const transform  = existance(args.transform, defaults.transform);
+    const maxRevs    = existance(args.maxRevs, defaults.maxRevs);
+    const maxTime    = existance(args.maxTime, defaults.maxTime);
+    const calculate  = existance(args.calculate, defaultCalculate);
 
     const rate       = existance(args.rate, defaults.rate);
     let maxRateCount = existance(args.maxRateCount, defaults.maxRateCount);
@@ -80,7 +80,8 @@ function State(args = {}) {
     }
 
     function setMaxRateCount(maxCount) {
-        maxRateCount = maxCount;
+        maxRateCount = existance(maxCount, defaults.maxRateCount);
+        console.log(`maxRateCount: ${maxRateCount}`);
         return maxRateCount;
     }
 
@@ -114,6 +115,14 @@ function State(args = {}) {
 
     function isRolloverRevs(revs_2) {
         return revs_2 < getRevs();
+    }
+
+    function rollOverTime() {
+        return getTime() - maxTime;
+    }
+
+    function rollOverRevs() {
+        return getRevs() - maxRevs;
     }
 
     function stillRevs(revs_2) {
@@ -156,15 +165,17 @@ function State(args = {}) {
             value = 0;
             return value;
         }
+
         if(isRolloverTime(time_2)) {
-            setTime(getTime() - rolloverTime);
+            setTime(rollOverTime());
         }
+
         if(isRolloverRevs(revs_2)) {
-            setRevs(getRevs() - rolloverRevs);
+            setRevs(rollOverRevs());
         }
 
         value = transform(
-            (getRevs() - revs_2) / ((getTime() - time_2) / resolution)
+            (revs_2 - getRevs()) / ((time_2 - getTime()) / resolution)
         );
 
         setRevs(revs_2);
@@ -183,6 +194,8 @@ function State(args = {}) {
         getMaxRateCount,
         reset,
         calculate,
+        rollOverTime,
+        rollOverRevs,
     };
 }
 

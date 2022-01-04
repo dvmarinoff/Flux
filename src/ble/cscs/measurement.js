@@ -118,7 +118,7 @@ function readLastCrankEventTime(dataview) {
     return undefined;
 }
 
-function Cadence() {
+function Cadence(args = {}) {
     // In two successive measurements:
     // Instantaneous Cadence =
     //    (Difference in two successive Cumulative Crank Revolutions values) /
@@ -131,8 +131,8 @@ function Cadence() {
 
     const stateValue = State({
         resolution:   1024,
-        rolloverRevs: 2**16,
-        rolloverTime: 2**16,
+        maxRevs:      2**16,
+        maxTime:      2**16,
         transform,
     });
 
@@ -171,9 +171,9 @@ function Speed(args = {}) {
     }
 
     const stateValue = State({
-        resolution:   2048,
-        rolloverRevs: 2**32,
-        rolloverTime: 2**16,
+        resolution: 2048,
+        maxRevs:    2**32,
+        maxTime:    2**16,
         transform,
     });
 
@@ -209,7 +209,7 @@ function Speed(args = {}) {
 // 03    -00-00-00-00 -00-00      -3E-00      -00-F4
 //                                 62          (61 * 1024)   -> 120 rpm
 
-function Measurement(args = {}) {
+function Measurement() {
 
     const speed   = Speed();
     const cadence = Cadence();
@@ -248,12 +248,13 @@ function Measurement(args = {}) {
                                                 data['crankEvent']);
         }
 
-        // const dataLog = {
-        //     revs: data.crankRevolutions,
-        //     time: data.crankEvent,
-        //     cad:  data.cadence
-        // };
-        // console.log(dataLog);
+        const dataLog = {
+            ts: Date.now(),
+            r: data.crankRevolutions,
+            t: data.crankEvent,
+            c:  data.cadence
+        };
+        console.log(dataLog);
 
         return data;
     }
@@ -267,8 +268,6 @@ function Measurement(args = {}) {
         cadence,
     });
 }
-
-const measurement = Measurement();
 
 const _ = {
     wheelRevolutionDataPresent,
@@ -290,7 +289,6 @@ const _ = {
 
 export {
     Measurement,
-    measurement,
     Speed,
     Cadence,
     _
