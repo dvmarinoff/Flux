@@ -37,18 +37,132 @@ function PowerTarget() {
     });
 }
 
-function SlopeTarget() {
-    // set Sim Grade
-    const opCode = 0x42; // 66
+function LoadIntensity() {
+    // set Load Intensity
+    const opCode = 0x40; // 64
     const length = 3;
 
+    // Format ????
+    // input value is between 0 and 1
+    // let norm = UInt16((1 - resistance) * 16383)
+    // int value = (1.0 - load) * 16383.0;
+
+    const definitions = {
+        intensity: {
+            resolution: 1,
+            unit: '',
+            size: 2,
+            min: applyOffset(1), // it flips the value
+            max: applyOffset(0),
+            default: applyOffset(0)
+        },
+    };
+
+    const spec = Spec({definitions});
+
+    function applyOffset(value) {
+        return Math.round((1 - value) * 16383);
+    }
+
+    function removeOffset(prop, value) {
+        return format((1 - (value / 16383)), 100);
+    }
+
+    function encode(args = {}) {
+        const intensity = spec.encodeField('intensity', args.intensity, applyOffset);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        view.setUint8( 0, opCode, true);
+        view.setUint16(1, intensity, true);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, true);
+        const intensity = spec.decodeField('intensity', dataview.getUint16(1, true), removeOffset);
+
+        return { intensity };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        encode,
+        decode
+    });
+}
+
+function LoadLevel() {
+    // set Load Level
+    const opCode = 0x41; // 65
+    const length = 2;
+
+    // Format ????
+    // input value is between 0 and 9
+
+    const definitions = {
+        level: {
+            resolution: 1,
+            unit: '',
+            size: 1,
+            min: 0,
+            max: 9,
+            default: 0,
+        },
+    };
+
+    const spec = Spec({definitions});
+
+    function encode(args = {}) {
+        const level = spec.encodeField('level', args.level);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        view.setUint8( 0, opCode, true);
+        view.setUint8(1, level, true);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, true);
+        const level = spec.decodeField('level', dataview.getUint8(1, true));
+
+        return { level };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        encode,
+        decode
+    });
+}
+
+function SlopeTarget() {
+    // set Sim Grade
+    const opCode = 0x46; // 70
+    const length = 3;
 
     // Format ????
     // let norm = UInt16((min(1, max(-1, grade)) + 1.0) * 65535 / 2.0)
     // int value = (gradient / 100.0 + 1.0) * 32768;
 
     const definitions = {
-        grade: {resolution: 0.01, unit: '%', size: 2, min: -40, max: 40, default: 0},
+        grade: {
+            resolution: 1,
+            unit: '%',
+            size: 2,
+            min: applyOffset(-40),
+            max: applyOffset(40),
+            default: applyOffset(0)
+        },
     };
 
     const spec = Spec({definitions});
@@ -57,7 +171,7 @@ function SlopeTarget() {
         return (value / 100 + 1) * 32768;
     }
 
-    function removeOffset(value) {
+    function removeOffset(prop, value) {
         return format((((value / 32768) - 1) * 100), 10);
     }
 
@@ -75,14 +189,121 @@ function SlopeTarget() {
 
     function decode(dataview) {
         const opCode = dataview.getUint8(0, true);
-        const grade  = dataview.getUint16(1, true);
+        const grade  = spec.decodeField('grade', dataview.getUint16(1, true), removeOffset);
 
-        return { opCode, grade };
+        return { grade };
     }
 
     return Object.freeze({
         opCode,
         length,
+        definitions,
+        encode,
+        decode
+    });
+}
+
+function WheelCircumference() {
+    // set Wind Speed
+    const opCode = 0x48; // 72
+    const length = 3;
+
+    // Format ????
+    // int value = (int)(wheelSize * 10.0);
+
+    const definitions = {
+        circumference: {
+            resolution: 0.1,
+            unit: 'm',
+            size: 2,
+            min: 0,
+            max: 6553.4,
+            default: 2105,
+        },
+    };
+
+    const spec = Spec({definitions});
+
+    function encode(args = {}) {
+        const circumference = spec.encodeField('circumference', args.circumference);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        view.setUint8( 0, opCode, true);
+        view.setUint16(1, circumference, true);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, true);
+        const circumference = spec.decodeField('circumference', dataview.getUint16(1, true));
+
+        return { circumference };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        encode,
+        decode
+    });
+}
+
+function WindSpeed() {
+    // set Wind Speed
+    const opCode = 0x47; // 71
+    const length = 3;
+
+    // Format ????
+    // int value = (int)((windSpeed + 32.768) * 1000.0);
+
+    const definitions = {
+        windSpeed: {
+            resolution: 1,
+            unit: 'mps',
+            size: 2,
+            min: applyOffset(-35.56),
+            max: applyOffset(35.56),
+            default: applyOffset(0)
+        },
+    };
+
+    const spec = Spec({definitions});
+
+    function applyOffset(value) {
+        return (value + 32.768) * 1000;
+    }
+
+    function removeOffset(prop, value) {
+        return format(((value / 1000) - 32.768), 100);
+    }
+
+    function encode(args = {}) {
+        const windSpeed = spec.encodeField('windSpeed', args.windSpeed, applyOffset);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        view.setUint8( 0, opCode, true);
+        view.setUint16(1, windSpeed, true);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, true);
+        const windSpeed = spec.decodeField('windSpeed', dataview.getUint16(1, true), removeOffset);
+
+        return { windSpeed };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
         encode,
         decode
     });
@@ -125,10 +346,10 @@ function SIM() {
     function decode(dataview) {
         const opCode         = dataview.getUint8(0, true);
         const weight         = spec.decodeField('weight', dataview.getUint16(1, true));
-        const crr            = spec.decodeField('crr', dataview.getUint16(1, true));
-        const windResistance = spec.decodeField('windResistance', dataview.getUint16(1, true));
+        const crr            = spec.decodeField('crr', dataview.getUint16(3, true));
+        const windResistance = spec.decodeField('windResistance', dataview.getUint16(5, true));
 
-        return { opCode, weight, crr, windResistance };
+        return { weight, crr, windResistance };
     }
 
     return Object.freeze({
@@ -206,7 +427,7 @@ function Response() {
         '0x45': {definition: 'setWindResistance', msg: 'setWindResistance'},     // 69
         '0x46': {definition: 'setSlopeTarget', msg: 'setSlopeTarget'},           // 70
         '0x47': {definition: 'setWindSpeed', msg: 'setWindSpeed'},               // 71
-        '0x47': {definition: 'setWheelCircumference', msg: 'setWheelCircumference'}, // 72
+        '0x48': {definition: 'setWheelCircumference', msg: 'setWheelCircumference'}, // 72
     };
 
     function decodeStatus(value) {
@@ -250,11 +471,15 @@ function Response() {
 }
 
 const control = {
-    powerTarget:    PowerTarget(),
-    slopeTarget:    SlopeTarget(),
-    sim:            SIM(),
-    requestControl: RequestControl(),
-    response:       Response(),
+    powerTarget:        PowerTarget(),
+    slopeTarget:        SlopeTarget(),
+    loadIntensity:      LoadIntensity(),
+    loadLevel:          LoadLevel(),
+    windSpeed:          WindSpeed(),
+    sim:                SIM(),
+    wheelCircumference: WheelCircumference(),
+    requestControl:     RequestControl(),
+    response:           Response(),
 };
 
 export { control };

@@ -1,7 +1,7 @@
 import { uuids } from '../uuids.js';
 import { BLEService } from '../service.js';
 import { Measurement } from '../cps/cycling-power-measurement.js';
-import { existance } from '../../functions.js';
+import { existance, delay } from '../../functions.js';
 import { control } from './control.js';
 
 class WahooCyclingPower extends BLEService {
@@ -41,6 +41,7 @@ class WahooCyclingPower extends BLEService {
                            self.onControl.bind(self));
 
             await self.requestControl();
+            await self.setParameters();
         }
     }
     async requestControl() {
@@ -58,19 +59,49 @@ class WahooCyclingPower extends BLEService {
     async setTargetResistance(value) {
         const self = this;
 
-        // const buffer = control.resistanceTarget.encode({resistance: value});
-        // return await self.write('wahooTrainer', buffer);
-
-        return;
+        const buffer = control.loadIntensity.encode({intensity: (value / 100)});
+        return await self.write('wahooTrainer', buffer);
     }
     async setTargetSlope(value) {
         const self = this;
 
-        // const buffer = control.slopeTarget.encode({grade: value});;
-        // return await self.write('wahooTrainer', buffer);
-
-        return;
+        const buffer = control.slopeTarget.encode({grade: value});;
+        return await self.write('wahooTrainer', buffer);
     }
+    async setParameters(args) {
+        const params = {
+            circumference: 2105,
+            windSpeed: 0,
+            weight: 75,
+            crr: 0.004,
+            windResistance: 0.51,
+        };
+        await delay(1000);
+        await self.setWheelCircumference(params);
+        await delay(1000);
+        await self.setSIM(params);
+        await delay(1000);
+        await self.setWindSpeed(params);
+    }
+    async setSIM(args) {
+        const self = this;
+
+        const buffer = control.sim.encode(args);
+        return await self.write('wahooTrainer', buffer);
+    }
+    async setWindSpeed(value) {
+        const self = this;
+
+        const buffer = control.windSpeed.encode({windSpeed: value});
+        return await self.write('wahooTrainer', buffer);
+    }
+    async setWheelCircumference(value) {
+        const self = this;
+
+        const buffer = control.windSpeed.encode({circumference: value});
+        return await self.write('wahooTrainer', buffer);
+    }
+
     defaultOnData(decoded) {
         console.log(':rx :wcps :measurement ', JSON.stringify(decoded));
     }
