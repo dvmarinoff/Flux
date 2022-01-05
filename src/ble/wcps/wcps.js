@@ -69,6 +69,8 @@ class WahooCyclingPower extends BLEService {
         return await self.write('wahooTrainer', buffer);
     }
     async setParameters(args) {
+        const self = this;
+
         const params = {
             circumference: 2105,
             windSpeed: 0,
@@ -76,6 +78,7 @@ class WahooCyclingPower extends BLEService {
             crr: 0.004,
             windResistance: 0.51,
         };
+
         await delay(1000);
         await self.setWheelCircumference(params);
         await delay(1000);
@@ -98,10 +101,9 @@ class WahooCyclingPower extends BLEService {
     async setWheelCircumference(value) {
         const self = this;
 
-        const buffer = control.windSpeed.encode({circumference: value});
+        const buffer = control.wheelCircumference.encode({circumference: value});
         return await self.write('wahooTrainer', buffer);
     }
-
     defaultOnData(decoded) {
         console.log(':rx :wcps :measurement ', JSON.stringify(decoded));
     }
