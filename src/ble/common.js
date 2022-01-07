@@ -15,7 +15,7 @@ function Spec(args = {}) {
     function encodeField(prop, input, transform = applyResolution(prop)) {
         const fallback = definitions[prop].default;
         const min      = applyResolution(definitions[prop].min);
-        const max      = applyResolution(prop, definitions[prop].max);
+        const max      = applyResolution(definitions[prop].max);
         const value    = existance(input, fallback);
 
         return Math.floor(fixInRange(min, max, transform(value)));
