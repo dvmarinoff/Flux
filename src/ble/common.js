@@ -1,4 +1,4 @@
-import { equals, existance, curry2 } from '../functions.js';
+import { equals, existance, curry2, avg } from '../functions.js';
 import { fixInRange, hex } from '../utils.js';
 
 function Spec(args = {}) {
@@ -199,8 +199,106 @@ function State(args = {}) {
     };
 }
 
+function RateAdjuster(args = {}) {
+    const defaults = {
+        sample: [],
+        sampleSize: 0,
+        rate: 30, // [0,1,2,3]
+        cutoff: 20,
+        maxStillTime: 3000, // ms
+        status: 'reading',
+        statusList: ['reading', 'done'],
+        sensor: 'cscs',
+        onDone: ((x) => x),
+    };
+
+    let _sample = defaults.sample;
+    let _sampleSize = defaults.sampleSize;
+    let _rate = defaults.rate;
+    let _maxStillTime = defaults.maxStillTime;
+
+    let _cutoff = defaults.cutoff;
+    let _status = defaults.status;
+
+    const onDone = existance(args.onDone, defaults.onDone);
+    const sensor = existance(args.sensor, defaults.sensor);
+
+    function getSampleSize() { return _sampleSize; }
+    function getSample() { return _sample; }
+    function getRate() { return _rate; }
+    function getStatus() { return _status; }
+    function getCutoff() { return _cutoff; }
+    function getMaxStillTime(ms) { return _maxStillTime; }
+
+    function setCutoff(count) { _cutoff = count; }
+    function setMaxStillTime(ms) { _maxStillTime = ms; }
+
+    function reset() {
+        _sample = defaults.sample;
+        _sampleSize = defaults.sampleSize;
+        _rate = defaults.rate;
+        _status = defaults.status;
+    }
+
+    function isDone() {
+        return equals(_status, 'done');
+    }
+
+    function timestampAvgDiff(sample) {
+        return sample.reduce(function(acc, x, i, xs) {
+            let tsd = 1000;
+            if(i > 0) {
+                tsd = xs[i].ts - xs[i-1].ts;
+            }
+            acc += (tsd-acc)/(i+1);
+            return acc;
+        }, 0);
+    }
+
+    function calculate(sample) {
+        const tsAvgDiff = timestampAvgDiff(sample);
+
+        const maxRateCount = fixInRange(2, 15, Math.round(_maxStillTime / tsAvgDiff) - 1);
+
+        console.log(`rateAdjuster :on ${sensor} :tsAvgDiff ${tsAvgDiff} :result ${maxRateCount}`);
+
+        return maxRateCount;
+    }
+
+    function update(value) {
+        if(isDone()) return;
+
+        _sample.push(value);
+        _sampleSize += 1;
+
+        if(_sampleSize >= _cutoff) {
+            _status = 'done';
+            _rate = calculate(_sample);
+            onDone(_rate);
+        }
+    };
+
+    return Object.freeze({
+        getSampleSize,
+        getSample,
+        getRate,
+        getStatus,
+        getCutoff,
+        getMaxStillTime,
+        setCutoff,
+        setMaxStillTime,
+
+        reset,
+        isDone,
+        timestampAvgDiff,
+        calculate,
+        update,
+    });
+}
+
 export {
     Spec,
     State,
+    RateAdjuster,
 }
 

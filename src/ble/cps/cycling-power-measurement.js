@@ -1,4 +1,5 @@
 import { Speed, Cadence } from '../cscs/measurement.js';
+import { RateAdjuster } from '../common.js';
 import { nthBitToBool, dataviewToArray } from '../../functions.js';
 
 const pedalPowerBalancePresent       = (flags) => nthBitToBool(flags,  0);
@@ -140,6 +141,14 @@ function Measurement() {
     const speed   = Speed();
     const cadence = Cadence();
 
+    const rateAdjuster = RateAdjuster({
+        sensor: 'pm',
+        onDone: function(maxRateCount) {
+            speed.setMaxRateCount(maxRateCount);
+            cadence.setMaxRateCount(maxRateCount);
+        }
+    });
+
     function reset() {
         const crank = cadence.reset();
         const wheel = speed.reset();
@@ -173,6 +182,10 @@ function Measurement() {
             data['crankEvent']       = readCrankEvent(dataview);
             data['cadence']          = cadence.calculate(data['crankRevolutions'],
                                                          data['crankEvent']);
+        }
+
+        if(!rateAdjuster.isDone()) {
+            rateAdjuster.update({ts: Date.now()});
         }
 
         const dataLog = {

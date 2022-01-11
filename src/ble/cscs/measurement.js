@@ -1,4 +1,4 @@
-import { State } from '../common.js';
+import { State, RateAdjuster } from '../common.js';
 import { equals, exists, existance, nthBitToBool, dataviewToArray } from '../../functions.js';
 import { format } from '../../utils.js';
 
@@ -214,6 +214,14 @@ function Measurement() {
     const speed   = Speed();
     const cadence = Cadence();
 
+    const rateAdjuster = RateAdjuster({
+        sensor: 'cscs',
+        onDone: function(maxRateCount) {
+            speed.setMaxRateCount(maxRateCount);
+            cadence.setMaxRateCount(maxRateCount);
+        }
+    });
+
     function reset() {
         const crank = cadence.reset();
         const wheel = speed.reset();
@@ -246,6 +254,10 @@ function Measurement() {
             data['crankEvent'] = readLastCrankEventTime(dataview);
             data['cadence'] = cadence.calculate(data['crankRevolutions'],
                                                 data['crankEvent']);
+        }
+
+        if(!rateAdjuster.isDone()) {
+            rateAdjuster.update({ts: Date.now()});
         }
 
         const dataLog = {
