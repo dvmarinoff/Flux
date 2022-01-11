@@ -118,7 +118,6 @@ describe('RateAdjuster', () => {
         expect(rateAdjuster.timestampAvgDiff(log_4hz.slice(0, 10))).toBeCloseTo(322.0);
         expect(rateAdjuster.timestampAvgDiff(log_4hz.slice(0, 20))).toBeCloseTo(284.75);
         // expect(rateAdjuster.timestampAvgDiff(log_4hz.slice(0, 30))).toBeCloseTo(277.33);
-        // expect(rateAdjuster.timestampAvgDiff(log_4hz.slice(0, 30))).toBeCloseTo(277.33);
         // expect(rateAdjuster.timestampAvgDiff(log_4hz.slice(0, 40))).toBeCloseTo(268.00);
         // expect(rateAdjuster.timestampAvgDiff(log_4hz.slice(0, 50))).toBeCloseTo(262.42);
         // expect(rateAdjuster.timestampAvgDiff(log_4hz.slice(0, 60))).toBeCloseTo(263.666);
@@ -143,6 +142,27 @@ describe('RateAdjuster', () => {
 
         expect(rateAdjuster.getSampleSize()).toBe(20);
         expect(rateAdjuster.getRate()).toBe(2);
+        expect(rateAdjuster.isDone()).toBe(true);
+    });
+
+    test('reset', () => {
+        rateAdjuster.reset();
+        expect(rateAdjuster.isDone()).toBe(false);
+        expect(rateAdjuster.getSampleSize()).toBe(0);
+        expect(rateAdjuster.getSample()).toEqual([]);
+        expect(rateAdjuster.getRate()).toBe(3);
+    });
+
+    test('update 4 Hz', () => {
+        rateAdjuster.reset();
+        expect(rateAdjuster.isDone()).toBe(false);
+
+        for(let i=0; i < 20; i++) {
+            rateAdjuster.update(log_4hz[i]);
+        }
+
+        expect(rateAdjuster.getSampleSize()).toBe(20);
+        expect(rateAdjuster.getRate()).toBe(10);
         expect(rateAdjuster.isDone()).toBe(true);
     });
 });

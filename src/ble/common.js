@@ -201,9 +201,8 @@ function State(args = {}) {
 
 function RateAdjuster(args = {}) {
     const defaults = {
-        sample: [],
         sampleSize: 0,
-        rate: 30, // [0,1,2,3]
+        rate: 3, // [0,1,2,3]
         cutoff: 20,
         maxStillTime: 3000, // ms
         status: 'reading',
@@ -212,7 +211,7 @@ function RateAdjuster(args = {}) {
         onDone: ((x) => x),
     };
 
-    let _sample = defaults.sample;
+    let _sample = [];
     let _sampleSize = defaults.sampleSize;
     let _rate = defaults.rate;
     let _maxStillTime = defaults.maxStillTime;
@@ -234,7 +233,7 @@ function RateAdjuster(args = {}) {
     function setMaxStillTime(ms) { _maxStillTime = ms; }
 
     function reset() {
-        _sample = defaults.sample;
+        _sample = [];
         _sampleSize = defaults.sampleSize;
         _rate = defaults.rate;
         _status = defaults.status;
