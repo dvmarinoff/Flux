@@ -12,7 +12,7 @@ Flux is an App for executing structured workouts on a smart trainer.
 The web version is free to use and open source. It is developed as a static PWA, has zero dependancies and is completly independant to run.
 Everything happens in your Browser and stays in there. It uses Web Bluetooth, Web Serial, Web Components, IndexDB, Local Storage, WakeLock API.
 
-_Status_: I am working on adding automated testing while refactoring the code and moving some parts to a separate projects like [FitFile](https://github.com/dvmarinoff/FitFile), [WebANT](https://github.com/dvmarinoff/WebANT), [Functions](https://github.com/dvmarinoff/Functions)
+_Status_: I am working on ANT+ support, the latest code is moved to a separate project [WebANT](https://github.com/dvmarinoff/WebANT).
 
 ## Screenshots
 
