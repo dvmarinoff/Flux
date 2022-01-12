@@ -99,3 +99,7 @@ You can check a pre-release demo of the web version at
 [Latest Version on master](https://flux-three.vercel.app/), or [Latest development vesion](https://flux-devel.vercel.app/)
 
 Keep in mind it is in active development and will change and break on daily bases, that's until the first stable version is released.
+
+## Manual
+
+- [How to use the connection settings](https://github.com/dvmarinoff/Flux/discussions/91)
