@@ -1,4 +1,7 @@
 import { xf, first, last, exists, empty } from '../functions.js';
+
+
+
 import { message } from './message.js';
 import { serialPolyfill } from './polyfill.js';
 
@@ -35,7 +38,8 @@ function getAntStick(ports) {
     return first(ports.filter(p => isAntStick(p.getInfo())));
 }
 
-const sync = message.values.sync;
+const sync = 164;
+
 function toANTMsg(chunk, msgs = [], i = 0, leftover = false) {
     if(i >= chunk.length) return msgs;
     if(chunk[i] === sync) {

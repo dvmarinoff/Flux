@@ -1,7 +1,7 @@
 import { xf } from '../functions.js';
 import { Channel, keys } from './channel.js';
 import { message } from './message.js';
-import { page } from './page.js';
+// import { page } from './page.js';
 
 class HrmChannel extends Channel {
     postInit(args) {
@@ -15,8 +15,8 @@ class HrmChannel extends Channel {
     defaultKey()        { return keys.antPlus; }
     onBroadcast(msg) {
         const self = this;
-        const data = page.HRPage(msg);
-        self.dispatchBroadcast(data);
+        // const data = page.HRPage(msg);
+        // self.dispatchBroadcast(data);
     }
     async connect() {
         const self = this;

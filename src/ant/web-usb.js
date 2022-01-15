@@ -6,25 +6,23 @@ const values = {
     Baud_Rate:          115200,
 };
 
-function filter() {
-    return [{vendorId: values.Dynastream_Id}];
-}
+function USB() {
 
-function isSupported() {
-    return 'usb' in navigator;
-}
+    const filters = {
+        dynastream: [{vendorId: values.Dynastream_Id}],
+    };
 
-async function request(filter = filter()) {
-    let device;
-    try {
-        device = await navigator.usb.requestDevice();
-    } catch(err) {
-        console.log(`:usb :no-device-selected`);
+    async function request(args = {}) {
+        let device = {};
+        try {
+            device = await navigator.usb.requestDevice();
+        } catch(err) {
+            console.log({usb: {error: 'requesting device'}});
+        }
+        return device;
     }
-    return device;
 }
 
-class USB {
-};
+const usb = USB();
 
-export { USB };
+export { usb };

@@ -1,632 +1,1475 @@
-import { equals, xor } from '../functions.js';
-import { page } from './page.js';
+import { equals, exists, existance, isUndefined,
+         dataviewToArray, bitToBool, nthBitToBool,
+         boolToNumber, xor } from '../functions.js';
+import { ids, events, channelTypes, values, keys } from './constants.js';
 
-const ids = {
-    // config
-    setNetworkKey:     70, // 0x46
-    unassignChannel:   65, // 0x41
-    assignChannel:     66, // 0x42
-    assignChannelExt:  66, // 0x42
-    channelPeriod:     67, // 0x43
-    channelFrequency:  69, // 0x45
-    setChannelId:      81, // 0x51
-    serialNumberSet:  101, // 0x65
-    searchTimeout:     68, // 0x44
-    searchLowTimeout:  99, // 0x63
-    enableExtRx:      102, // 0x66
+function Message(args = {}) {
+    const sync        = values.sync;
+    const id          = ids[existance(args.id)];
+    const fixedLength = 4;
+    let _contentLength;
+    let _totalLength;
 
-    // control
-    resetSystem:       74, // 0x4A
-    openChannel:       75, // 0x4B
-    closeChannel:      76, // 0x4C
-    requestMessage:    77, // 0x4D
-    sleepMessage:     197, // 0xC5
+    setLengths(existance(args.contentLength, 0));
 
-    // notification
-    startUp:          111, // 0x6F
-    serialError:      174, // 0xAE
-
-    // data
-    broascastData:     78, // 0x4E
-    acknowledgedData:  79, // 0x4F
-    broascastExtData:  93, // 0x5D
-    burstData:         80, // 0x50
-    burstAdvData:     114, // 0x72
-
-    // channel
-    // channelEvent:     64, // 0x40
-    channelEvent:      1, // 0x01
-    channelResponse:  64, // 0x40
-
-    // requested response
-    channelStatus:    82, // 0x52
-    channelId:        81, // 0x51 response
-    ANTVersion:       62, // 0x3E
-    capabilities:     84, // 0x54
-    serialNumber:     97  // 0x61
-};
-
-const events = {
-    response_no_error:                0,
-    event_rx_search_timeout:          1,
-    event_rx_fail:                    2,
-    event_tx:                         3,
-    event_transfer_rx_failed:         4,
-    event_transfer_tx_completed:      5,
-    event_transfer_tx_failed:         6,
-    event_channel_closed:             7,
-    event_rx_fail_go_to_search:       8,
-    event_channel_collision:          9,
-    event_transfer_tx_start:         10,
-    event_transfer_next_data_block:  11,
-    channel_in_wrong_state:          21,
-    channel_not_opened:              22,
-    channel_id_not_set:              24,
-    close_all_channels:              25,
-    transfer_in_progress:            31,
-    transfer_sequence_number_error:  32,
-    transfer_in_error:               33,
-    message_size_exceeds_limit:      34,
-    invalid_message:                 40,
-    invalid_network_number:          41,
-    invalid_list_id:                 48,
-    invalid_scan_tx_channel:         49,
-    invalid_parameter_provided:      51,
-    event_serial_que_overflow:       52,
-    event_que_overflow:              53,
-    encrypt_negotiation_success:     56,
-    encrypt_negotiation_fail:        57,
-    nvm_full_error:                  64,
-    nvm_write_error:                 65,
-    usb_string_write_fail:          112,
-    mesg_serial_error_id:           174
-};
-
-const values = {
-    sync: 164,
-};
-
-function SetNetworkKey(args) {
-    let buffer   = new ArrayBuffer(13);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 9;
-    const id     = 70;  // 0x46
-    const key    = args.key || keys.public;
-    const networkNumber = args.networkNumber || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, networkNumber, true);
-
-
-    let j = 4;
-    for(let i=0; i<9; i++) {
-        view.setUint8(j, key[i], true);
-        j++;
+    function getLength() {
+        return _totalLength;
+    }
+    function setLength(length) {
+        _totalLength = length;
+        return _totalLength;
     }
 
-    view.setUint8(12, xor(view), true);
-
-    return view;
-}
-
-function AssignChannel(args) {
-    const sync     = 164; // 0xA4
-    const length   = 3;
-    const id       = 66;  // 0x42
-    const channelNumber = args.channelNumber || 0;
-    const channelType   = args.channelType   || 0;
-    const networkNumber = 0;
-
-    let buffer   = new ArrayBuffer(7);
-    let view     = new DataView(buffer);
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, channelType,   true);
-    view.setUint8(5, networkNumber, true);
-    view.setUint8(6, xor(view),     true);
-
-    return view;
-}
-
-function AssignChannelExt(args) {
-    const sync     = 164; // 0xA4
-    const length   = 4;
-    const id       = 66;  // 0x42
-    const channelNumber = args.channelNumber || 0;
-    const channelType   = args.channelType   || 0;
-    const networkNumber = 0;
-    const extended      = args.extended      || 0x01;
-
-    let buffer   = new ArrayBuffer(8);
-    let view     = new DataView(buffer);
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, channelType,   true);
-    view.setUint8(5, networkNumber, true);
-    view.setUint8(6, extended,      true);
-    view.setUint8(7, xor(view),     true);
-
-    return view;
-}
-
-function ChannelId(args) {
-    let buffer   = new ArrayBuffer(9);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 5;
-    const id     = 81; // 0x51
-    const channelNumber   = args.channelNumber || 0;
-    const deviceNumber    = args.deviceNumber  || 0;
-    const deviceType      = args.deviceType    || 0;
-    const transmitionType = args.transType     || 0;
-
-    view.setUint8( 0, sync,            true);
-    view.setUint8( 1, length,          true);
-    view.setUint8( 2, id,              true);
-    view.setUint8( 3, channelNumber,   true);
-    view.setUint16(4, deviceNumber,    true);
-    view.setUint8( 6, deviceType,      true);
-    view.setUint8( 7, transmitionType, true);
-    view.setUint8( 8, xor(view),       true);
-
-    return view;
-}
-
-function ChannelFrequency(args) {
-    let buffer   = new ArrayBuffer(6);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 2;
-    const id     = 69;  // 0x45
-    const channelNumber = args.channelNumber || 0;
-    const rfFrequency   = args.rfFrequency   || 66;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, rfFrequency,   true);
-    view.setUint8(5, xor(view),     true);
-
-    return view;
-}
-
-function ChannelPeriod(args) {
-    let buffer   = new ArrayBuffer(7);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 3;
-    const id     = 67;  // 0x43
-    const channelNumber = args.channelNumber || 0;
-    const period        = args.channelPeriod || 8192;
-
-    view.setUint8( 0, sync,          true);
-    view.setUint8( 1, length,        true);
-    view.setUint8( 2, id,            true);
-    view.setUint8( 3, channelNumber, true);
-    view.setUint16(4, period,        true);
-    view.setUint8( 6, xor(view),     true);
-
-    return view;
-}
-
-function OpenChannel(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 75;  // 0x4B
-    const channelNumber = args.channelNumber || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, xor(view),     true);
-
-    return view;
-}
-
-function UnassignChannel(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 65;  // 0x41
-    const channelNumber = args.channelNumber || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, xor(view),     true);
-
-    return view;
-}
-
-function CloseChannel(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 76;  //0x4C
-    const channelNumber = args.channelNumber || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, xor(view),     true);
-
-    return view;
-}
-
-function ResetSystem(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 74;  //0x4A
-
-    view.setUint8(0, sync,      true);
-    view.setUint8(1, length,    true);
-    view.setUint8(2, id,        true);
-    view.setUint8(3, 0,         true);
-    view.setUint8(4, xor(view), true);
-
-    return view;
-}
-
-function SearchTimeout(args) {
-    let buffer   = new ArrayBuffer(6);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 2;
-    const id     = 68;  // 0x44
-    const channelNumber = args.channelNumber || 0;
-    const timeout       = args.timeout; // 12 * 2.5 = 30s, 255 is infinite
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, timeout,       true);
-    view.setUint8(5, xor(view),     true);
-
-    return view;
-}
-
-function LowPrioritySearchTimeout(args) {
-    let buffer   = new ArrayBuffer(6);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 2;
-    const id     = 99;  // 0x63
-    const channelNumber = args.channelNumber || 0;
-    const timeout       = args.timeoutLow    || 2; // 2 * 2.5 = 5s, 255 is infinite
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, timeout,       true);
-    view.setUint8(5, xor(view),     true);
-
-    return view;
-}
-
-function EnableExtRxMessages(args) {
-    let buffer   = new ArrayBuffer(6);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 2;
-    const id     = 102; // 0x66
-
-    view.setUint8(0, sync,        true);
-    view.setUint8(1, length,      true);
-    view.setUint8(2, id,          true);
-    view.setUint8(3, 0,           true);
-    view.setUint8(4, args.enable, true);
-    view.setUint8(5, xor(view),   true);
-
-    return view;
-}
-
-function Sleep(args) {
-    let buffer   = new ArrayBuffer(5);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 1;
-    const id     = 197; // 0xC5
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, 0,             true);
-    view.setUint8(4, xor(view),     true);
-
-    return view;
-}
-
-function Request(args) {
-    let buffer   = new ArrayBuffer(6);
-    let view     = new DataView(buffer);
-    const sync   = 164; // 0xA4
-    const length = 2;
-    const id     = 77;  // 0x4D
-    const channelNumber = args.channelNumber || 0;
-    const request       = args.request       || 0;
-
-    view.setUint8(0, sync,          true);
-    view.setUint8(1, length,        true);
-    view.setUint8(2, id,            true);
-    view.setUint8(3, channelNumber, true);
-    view.setUint8(4, request,       true);
-    view.setUint8(5, xor(view),     true);
-
-    return view;
-}
-
-function CommonPage70(pageNumber) {
-    let buffer          = new ArrayBuffer(8);
-    let view            = new DataView(buffer);
-    const commandId     = 70; // 0x46, Data Page Request
-    const transResponse = 2;  // 0b00000010
-    const commandType   = 1;
-
-    view.setUint8(0, commandId,     true);
-    view.setUint8(1, 255,           true);
-    view.setUint8(2, 255,           true);
-    view.setUint8(3, 255,           true);
-    view.setUint8(4, 255,           true);
-    view.setUint8(5, transResponse, true);
-    view.setUint8(6, pageNumber,    true);
-    view.setUint8(7, commandType,   true);
-
-    return view;
-}
-
-function RequestDataPage(pageNumber, channel) {
-    return Control(CommonPage70(pageNumber), channel);
-}
-function targetPower(power, channel = 5) {
-    return Control(page.dataPage49(power), channel);
-}
-function targetResistance(level, channel = 5) {
-    return Control(page.dataPage48(level), channel);
-}
-function targetSlope(slope, channel = 5) {
-    return Control(page.dataPage51(slope), channel);
-}
-
-function Control(content, channel = 5) {
-    const sync   = 164;
-    const length = 9;
-    const type   = 79; // Acknowledged 0x4F
-    let buffer   = new ArrayBuffer(13);
-    let view     = new DataView(buffer);
-    view.setUint8(0, sync,    true);
-    view.setUint8(1, length,  true);
-    view.setUint8(2, type,    true);
-    view.setUint8(3, channel, true);
-
-    let j = 4;
-    for(let i = 0; i < 8; i++) {
-        view.setUint8(j, content.getUint8(i), true);
-        j++;
+    function getContentLength() {
+        return _contentLength;
+    }
+    function setContentLength(length) {
+        _contentLength = length;
+        return _contentLength;
     }
 
-    const crc = xor(view);
-    view.setUint8(12, crc, true);
-
-    return view;
-}
-function Data(dataview) {
-    const sync     = dataview.getUint8(0);
-    const length   = dataview.getUint8(1);
-    const type     = dataview.getUint8(2);
-    const channel  = dataview.getUint8(3);
-    const dataPage = dataview.getUint8(4);
-
-    if(dataPage === 25) {
-        return page.dataPage25(dataview);
+    function calcLength(contentLength) {
+        return fixedLength + contentLength;
     }
-    if(dataPage === 16) {
-        return page.dataPage16(dataview);
+
+    function setLengths(contentLength) {
+        const length = calcLength(contentLength);
+        setContentLength(contentLength);
+        setLength(length);
+        return { length, contentLength };
     }
-    return { page: 0 };
-}
 
-// Decode
-function readExtendedData(data) {
-    const length        = data[1];
-    const id            = data[2];
-    const channelNumber = data[3];
-    const flag          = data[12];
-    const deviceNumber  = (data[14] << 8) + (data[13]);
-    const deviceType    = data[15];
-    const transType     = data[16];
-    return { deviceNumber, deviceType, transType };
-}
-
-function readChannelStatus(data) {
-    const id             = 82; // 0x52
-    const channelNumber  = data[3];
-    const status         = data[4] & 0b00000011; // just bits 0 and 1
-    let res              = 'unknown';
-    if(status === 0) res = 'unassigned';
-    if(status === 1) res = 'assigned';
-    if(status === 2) res = 'searching';
-    if(status === 3) res = 'tracking';
-    return res;
-}
-
-function readChannelId(data) {
-    const id            = 81; // 0x51
-    const channelNumber = data[3];
-    const deviceNumber  = (data[5] << 8) + data[4];
-    const deviceType    = data[6];
-    const transType     = data[7];
-    return { channelNumber, deviceNumber, deviceType, transType };
-}
-
-function readANTVersion(data) {
-    const id      = 62; // 0x3E
-    const version = arrayToString(data.slice(3));
-    return { version };
-}
-
-function readSerialNumber(data) {
-    const id = 97; // 0x61
-    const sn = data.slice(3);
-    return { sn };
-}
-
-function readCapabilities(data) {
-    const id               = 84; // 0x54
-    const maxAntChannels   = data[3];
-    const maxNetworks      = data[4];
-    const standardOptions  = data[5];
-    const advancedOptions  = data[6];
-    const advancedOptions2 = data[7];
-    const maxSensRcore     = data[8];
-    const advancedOptions3 = data[9];
-    const advancedOptions4 = data[10];
-    return { maxAntChannels,
-             maxNetworks,
-             standardOptions,
-             advancedOptions,
-             advancedOptions2,
-             maxSensRcore,
-             advancedOptions3,
-             advancedOptions4};
-}
-
-function readSync(msg) {
-    return msg[0];
-}
-function readLength(msg) {
-    return msg[1];
-}
-function readId(msg) {
-    return msg[2];
-}
-function readChannel(msg) {
-    return msg[3];
-}
-
-function isValidEventCode(code) {
-    return Object.values(events).includes(code);
-}
-function eventCodeToString(code) {
-    if(!isValidEventCode(code)) {
-        return `invalid event code`;
+    function validate(dataview, check) {
+        return equals(xor(dataview, 0, -1), check);
     }
-    const prop = Object.entries(events)
-          .filter(e => e[1] === code)[0][0];
-    const str  = prop.split('_').join(' ');
-    return `${str}`;
+
+    return {
+        sync,
+        id,
+        fixedLength,
+
+        getContentLength,
+        setContentLength,
+        getLength,
+        calcLength,
+        setLengths,
+        validate,
+        xor: xor,
+    };
 }
 
-function isValidId(id) {
-    return Object.values(ids).includes(id);
-}
-function idToString(id) {
-    if(!isValidId(id)) {
-        return `invalid message id`;
+// Config messages
+function AssignChannel() {
+    const extendedAssignment = {
+        backgroundScanningEnable:       0x01,
+        frequencyAgilityEnable:         0x04,
+        fastChannelInitiationEnable:    0x10,
+        asynchronousTransmissionEnable: 0x20
+    };
+
+    const defaults = {
+        channelNumber: 0,
+        channelType:   channelTypes.slave.bidirectional,
+        networkNumber: 0,
+        extended:      extendedAssignment.backgroundScanningEnable
+    };
+
+    const msg = Message({
+        id: 'assignChannel', // 66, 0x42
+    });
+
+    function contentLength(isExtended) {
+        if(isExtended) return 4;
+        return 3;
     }
-    const prop = Object.entries(ids).filter(e => e[1] === id)[0][0];
-    const str  = prop.split('_').join(' ');
-    return `${str}`;
-}
 
-function readResponse(msg) {
-    // response to write
-    const channel = readChannel(msg);
-    const id      = readId(msg);
-    const toId    = msg[4];
-    const code    = msg[5];
-    return { channel, id, toId, code };
-}
-function readEvent(msg) {
-    const channel = readChannel(msg);
-    const code    = msg[5];
-    return { channel, code };
-}
+    function encode(args = {}) {
+        const { length } = msg.setLengths(contentLength(exists(args.extended)));
+        const xorIndex   = length - 1;
 
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+        const channelType   = existance(args.channelType, defaults.channelType);
+        const networkNumber = existance(args.networkNumber, defaults.networkNumber);
 
-function isResponse(msg) {
-    return readId(msg) === ids.channelResponse;
-}
-function isRequestedResponse(msg) {
-    return [ids.channelId,
-            ids.channelStatus,
-            ids.ANTVersion,
-            ids.capabilities,
-            ids.serialNumber
-           ].includes(readId(msg));
-}
-function isBroadcast(msg) {
-    return readId(msg) === ids.broascastData;
-}
-function isBroadcastExt(msg) {
-    return readId(msg) === ids.broascastExtData;
-}
-function isAcknowledged(msg) {
-    return readId(msg) === ids.acknowledgedData;
-}
-function isBurst(msg) {
-    return readId(msg) === ids.burstData;
-}
-function isBurstAdv(msg) {
-    return readId(msg) === ids.burstAdvData;
-}
-function isEvent(msg) {
-    return readId(msg) === ids.channelEvent;
-}
-function isSerialError(msg) {
-    return readId(msg) === ids.serialError;
-}
-function isChannelId(msg) {
-    return ids.channelId === readId(msg);
-}
-function isChannelStatus(msg) {
-    return ids.channelStatus === readId(msg);
-}
-function isANTVersion(msg) {
-    return ids.ANTVersion === readId(msg);
-}
-function isCapabilities(msg) {
-    return ids.capabilities === readId(msg);
-}
-function isSerialNumber(msg) {
-    return ids.serialNumber === readId(msg);
-}
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, channelType, true);
+        view.setUint8(5, networkNumber, true);
 
-function startsWithSync(msg) {
-    return readSync(msg) === 0xA4;
-}
-function isFullMsg(msg) {
-    if(msg === undefined) return false;
-    if(msg.length > 1) {
-        return msg.length === (readLength(msg) + 4);
+        if(exists(args.extended)) {
+            view.setUint8(6, args.extended, true);
+        }
+
+        view.setUint8(xorIndex, msg.xor(view), true);
+
+        return view;
     }
-    return false;
+
+    function decode(dataview) {
+        const contentLength = dataview.getUint8(1, true);
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const channeType    = dataview.getUint8(4, true);
+        const networkNumber = dataview.getUint8(5, true);
+        const xorIndex      = dataview.byteLength - 1;
+        const check         = dataview.getUint8(xorIndex, true);
+        const valid         = msg.validate(dataview, check);
+
+        const res = {
+            id,
+            channelNumber,
+            channeType,
+            networkNumber,
+            valid,
+        };
+
+        let extended;
+        if(equals(contentLength, 4)) {
+            extended = dataview.getUint8(6, true);
+            res.extended = extended;
+        }
+
+        return res;
+    }
+
+    return Object.freeze({
+        extendedAssignment,
+        contentLength,
+        encode,
+        decode,
+    });
 }
 
-function isValid(data) {
-    if(!startsWithSync(data)) return false;
-    if(!isFullMsg(data))      return false;
-    return true;
+function UnassignChannel() {
+    const defaults = {
+        channelNumber: 0,
+    };
+
+    const msg = Message({
+        contentLength: 1,
+        id: 'unassignChannel', // 65, 0x41
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const check         = dataview.getUint8(4, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function SetChannelId() {
+    const defaults = {
+        channelNumber:   0,
+        deviceNumber:    0,
+        deviceType:      0,
+        transmissionType: 0
+    };
+
+    const msg = Message({
+        contentLength: 5,
+        id: 'setChannelId',
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const channelNumber    = existance(args.channelNumber, defaults.channelNumber);
+        const deviceNumber     = existance(args.deviceNumber, defaults.deviceNumber);
+        const deviceType       = existance(args.deviceType, defaults.deviceType);
+        const transmissionType = existance(args.transmissionType, defaults.transmissionType);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8( 0, msg.sync, true);
+        view.setUint8( 1, msg.getContentLength(), true);
+        view.setUint8( 2, msg.id, true);
+        view.setUint8( 3, channelNumber, true);
+        view.setUint16(4, deviceNumber, true);
+        view.setUint8( 6, deviceType, true);
+        view.setUint8( 7, transmissionType, true);
+        view.setUint8( 8, msg.xor(view),  true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id               = dataview.getUint8( 2, true);
+        const channelNumber    = dataview.getUint8( 3, true);
+        const deviceNumber     = dataview.getUint16(4, true);
+        const deviceType       = dataview.getUint8( 6, true);
+        const transmissionType = dataview.getUint8( 7, true);
+        const check            = dataview.getUint8( 8, true);
+        const valid            = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            deviceNumber,
+            deviceType,
+            transmissionType,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function SetChannelPeriod() {
+    const defaults = {
+        channelNumber: 0,
+        channelPeriod: 8192, // (4Hz)
+    };
+
+    const msg = Message({
+        contentLength: 3,
+        id: 'channelPeriod', // 67, 0x43
+    });
+    const length = msg.getLength();
+
+    // The channel messaging period in seconds * 32768.
+    // Maximum messaging period is ~2 seconds.
+
+    function encode(args = {}) {
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+        const channelPeriod = existance(args.channelPeriod, defaults.channelPeriod);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8( 0, msg.sync, true);
+        view.setUint8( 1, msg.getContentLength(), true);
+        view.setUint8( 2, msg.id, true);
+        view.setUint8( 3, channelNumber, true);
+        view.setUint16(4, channelPeriod, true);
+        view.setUint8( 6, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8( 2, true);
+        const channelNumber = dataview.getUint8( 3, true);
+        const channelPeriod = dataview.getUint16(4, true);
+        const check         = dataview.getUint8( 6, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            channelPeriod,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function SetChannelFrequency() {
+    const defaults = {
+        channelNumber: 0,
+        rfFrequency:   66,
+    };
+
+    const msg = Message({
+        contentLength: 2,
+        id: 'channelFrequency', // 69, 0x45
+    });
+    const length = msg.getLength();
+
+    // ChannelFrequency = 2400 MHz + ChannelRFFrequencyNumber * 1.0 MHz
+    // most ANT devices ara between 2450 MHz and 2457 MHz
+
+    function encode(args = {}) {
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+        const rfFrequency   = existance(args.rfFrequency, defaults.rfFrequency);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, rfFrequency, true);
+        view.setUint8(5, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const rfFrequency   = dataview.getUint8(4, true);
+        const check         = dataview.getUint8(5, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            rfFrequency,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function SetNetworkKey() {
+    const defaults = {
+        networkKey:    keys.public,
+        networkNumber: 0,
+    };
+
+    const networkKeyIndex    = 4;
+    const networkKeyLength   = 8;
+    const networkKeyIndexEnd = networkKeyIndex + networkKeyLength;
+    const xorIndex           = 12;
+
+    const msg = Message({
+        contentLength: 9,
+        id: 'setNetworkKey', // 70, 0x46
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const networkKey    = existance(args.networkKey, defaults.networkKey);
+        const networkNumber = existance(args.networkNumber, defaults.networkNumber);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        const uint8  = new Uint8Array(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, networkNumber, true);
+
+        uint8.set(new Uint8Array(networkKey), networkKeyIndex);
+
+        view.setUint8(xorIndex, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const networkNumber = dataview.getUint8(3, true);
+        const array         = dataviewToArray(dataview);
+        const networkKey    = array.slice(networkKeyIndex, networkKeyIndexEnd);
+        const check         = dataview.getUint8(xorIndex, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            networkNumber,
+            networkKey,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+// Control Messages
+function ResetSystem() {
+    const msg = Message({
+        contentLength: 1,
+        id: 'resetSystem',  // 74, 0x4A
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, 0, true);
+        view.setUint8(4, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id    = dataview.getUint8(2, true);
+        const check = dataview.getUint8(4, true);
+        const valid = msg.validate(dataview, check);
+
+        return {
+            id,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function OpenChannel() {
+    const defaults = {
+        channelNumber: 0,
+    };
+
+    const msg = Message({
+        contentLength: 1,
+        id: 'openChannel', // 75, 0x4B
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const check         = dataview.getUint8(4, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function CloseChannel() {
+    const defaults = {
+        channelNumber: 0,
+    };
+
+    const msg = Message({
+        contentLength: 1,
+        id: 'closeChannel', // 76, 0x4C
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const check         = dataview.getUint8(4, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function RequestMessage() {
+    const defaults = {
+        channelNumber:      0,
+        subMessageId:       false,
+        requestedMessageId: 82, // channel status message id
+    };
+
+    const msg = Message({
+        contentLength: 2,
+        id: 'requestMessage', // 77, 0x4D
+    });
+    const length = msg.getLength();
+
+    function encode(args = {subMessageId: false}) {
+        const channelNumber      = existance(args.channelNumber, defaults.channelNumber);
+        const subMessageId       = existance(args.subMessageId, defaults.subMessageId);
+        const requestedMessageId = existance(args.requestedMessageId, defaults.requestedMessageId);
+
+        // it sends channelNumber or subMessageId if command is applicable for the whole system,
+        // Example:
+        // if requesting Advanced Burst Capabilities/Configuration,
+        // instead of channel number, set to:
+        // 0x00 – Request Advanced Burst Capabilities
+        // 0x01 – Request Advanced Burst Current Configuration
+
+        const param = channelNumber;
+        if(subMessageId) param = subMessageId;
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, param, true);
+        view.setUint8(4, requestedMessageId, true);
+        view.setUint8(5, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id                 = dataview.getUint8(2, true);
+        const param              = dataview.getUint8(3, true);
+        const requestedMessageId = dataview.getUint8(4, true);
+        const check              = dataview.getUint8(5, true);
+        const valid              = msg.validate(dataview, check);
+
+        const res = {
+            id,
+            param,
+            requestedMessageId,
+            valid,
+        };
+
+        return res;
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function OpenRxScanMode() {
+    const msg = Message({
+        id: 'openRxScanMode', // 91, 0x5B
+    });
+
+    function contentLength(args) {
+        if(exists(args.syncPackets)) return  2;
+        return 1;
+    }
+
+    // syncPackets:
+    // 0 – Default configuration.
+    // 1 – Allow synchronous channel packets only.
+
+    function encode(args = {}) {
+        const syncPackets = args.syncPackets;
+        const { length }  = msg.setLengths(contentLength(args));
+        const xorIndex    = length - 1;
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, 0, true);
+
+        if(exists(syncPackets)) {
+            view.setUint8(4, syncPackets, true);
+        }
+
+        view.setUint8(xorIndex, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const contentLength = dataview.getUint8(1, true);
+        const id            = dataview.getUint8(2, true);
+        const xorIndex      = dataview.byteLength - 1;
+        const check         = dataview.getUint8(xorIndex, true);
+        const valid         = msg.validate(dataview, check);
+
+        let syncPackets;
+
+        const res = {
+            id,
+            valid,
+        };
+
+        if(equals(contentLength, 2)) {
+            syncPackets = dataview.getUint8(4, true);
+            res.syncPackets = syncPackets;
+        }
+
+        return res;
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function Sleep() {
+    const msg = Message({
+        contentLength: 1,
+        id: 'sleepMessage', // 197, 0xC5
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, 0, true);
+        view.setUint8(4, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const check         = dataview.getUint8(4, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function SearchTimeout() {
+    const defaults = {
+        channelNumber: 0,
+        searchTimeout: 10, // 10 * 2.5 seconds = 25 seconds
+    };
+
+    const msg = Message({
+        contentLength: 2,
+        id: 'searchTimeout', // 68, 0x44
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+        const searchTimeout = existance(args.searchTimeout, defaults.searchTimeout);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, searchTimeout, true);
+        view.setUint8(5, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const searchTimeout = dataview.getUint8(4, true);
+        const check         = dataview.getUint8(5, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            searchTimeout,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function LowPrioritySearchTimeout() {
+    const defaults = {
+        channelNumber: 0,
+        searchTimeout: 2, // 2 * 2.5 seconds = 5 seconds, 255 is infinite
+    };
+
+    const msg = Message({
+        contentLength: 2,
+        id: 'searchLowTimeout', // 99, 0x63
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+        const searchTimeout = existance(args.searchTimeout, defaults.searchTimeout);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, searchTimeout, true);
+        view.setUint8(5, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const searchTimeout = dataview.getUint8(4, true);
+        const check         = dataview.getUint8(5, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            searchTimeout,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function EnableExtRxMessages() {
+    const defaults = {
+        enable: 1, // 0 disable, 1 enable
+    };
+
+    const msg = Message({
+        contentLength: 2,
+        id: 'enableExtRx', // 102, 0x66
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const enable = existance(args.enable, defaults.enable);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, 0, true);
+        view.setUint8(4, enable, true);
+        view.setUint8(5, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const enable        = dataview.getUint8(4, true);
+        const check         = dataview.getUint8(5, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            enable,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function LibConfig() {
+    const defaults = {
+        config: values.libConfig.disabled
+    };
+
+    const msg = Message({
+        contentLength: 2,
+        id: 'libConfig', // 110, 0x6E
+    });
+    const length = msg.getLength();
+
+    function encode(args = {}) {
+        const config = existance(args.config, defaults.config);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, 0, true);
+        view.setUint8(4, config, true);
+        view.setUint8(5, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id            = dataview.getUint8(2, true);
+        const config        = dataview.getUint8(4, true);
+        const check         = dataview.getUint8(5, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            config,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        values,
+        encode,
+        decode,
+    });
+}
+
+function Data(args = {}) {
+    const defaults = {
+        channelNumber: 0,
+        payload: (length) => new Uint8Array(new ArrayBuffer(length)),
+    };
+
+    const payloadIndex      = 4;
+    const payloadLength     = 8;
+    const extendedDataIndex = payloadIndex + payloadLength;
+    const flagIndex         = 12;
+
+    const typeId = existance(args.typeId);
+
+    function contentLength(args = {}) {
+        if(exists(args.extended)) return 9 + args.extended.byteLength;
+        return 9;
+    }
+
+    const msg = Message({
+        id: typeId,
+    });
+
+    // Configuring extended data with:
+    // - EnableExtendedMessages, sends ChannelId (Device number, Device Type, Transmission Type)
+    // - LibConfig, sends ChannelId, RSSI and timestamp
+
+
+    function encode(args = {}) {
+        const { length } = msg.setLengths(contentLength(args));
+        const xorIndex   = length - 1;
+
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+        const payload       = existance(args.payload,       defaults.payload(0));
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        const uint8  = new Uint8Array(buffer);
+
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+
+        uint8.set(new Uint8Array(payload.buffer), payloadIndex);
+
+        if(exists(args.extended)) {
+            uint8.set(new Uint8Array((args.extended).buffer), extendedDataIndex);
+        }
+
+        view.setUint8(xorIndex, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview, payloadDecoder = undefined) {
+        const contentLength = dataview.getUint8(1, true);
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const xorIndex      = dataview.byteLength - 1;
+        const check         = dataview.getUint8(xorIndex, true);
+        const valid         = msg.validate(dataview, check);
+
+        let payload = new DataView(new ArrayBuffer(contentLength - 1)); // must be dataview
+
+        for(let i = 0; i < contentLength-1; i++) {
+            payload.setUint8(i, dataview.getUint8(payloadIndex + i, true), true);
+        }
+
+        if(exists(payloadDecoder)) {
+            payload = payloadDecoder(payload);
+        }
+
+        return {
+            id,
+            channelNumber,
+            payload,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function BroadcastData() {
+    return Data({typeId: 'broadcastData'}); // 78, 0x4E
+}
+
+function AcknowledgedData() {
+    return Data({typeId: 'acknowledgedData'}); // 79, 0x4F
+}
+
+function BurstTransferData() {
+
+    function encode() {
+        throw new Error('not implemented');
+    }
+
+    function decode() {
+        throw new Error('not implemented');
+    }
+
+    return Object.freeze({
+        encode,
+        decode
+    });
+}
+
+function AdvancedBurstData() {
+
+    function encode() {
+        throw new Error('not implemented');
+    }
+
+    return Object.freeze({ encode });
+}
+
+function ChannelEvent() {
+    const defaults = {
+        channelNumber: 0,
+    };
+
+    const msg = Message({
+        id: 'channelEvent',
+    });
+
+    const encryptionIdLength   = 4;
+    const userInfoStringLength = 19;
+
+    function calcContentLength(args) {
+        let length = 3;
+
+        if(exists(args.encryptionId)) {
+            length += encryptionIdLength;
+        }
+        if(exists(args.userInfoString)) {
+            length += userInfoStringLength;
+        }
+
+        return length;
+    }
+
+    function encode(args) {
+        const contentLength = calcContentLength(args);
+        const { length }    = msg.setLengths(contentLength);
+        const xorIndex      = length - 1;
+        const buffer        = new ArrayBuffer(length);
+        const view          = new DataView(buffer);
+        const uint8         = new Uint8Array(buffer);
+
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+        const eventCode     = existance(args.eventCode);
+
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, 1, true);
+        view.setUint8(5, eventCode, true);
+
+        if(exists(args.encryptionId)) {
+            view.setUint32(6, args.encryptionId, true);
+
+            if(exists(args.userInfoString)) {
+                uint8.set(args.userInfoString, 10);
+            }
+        }
+
+        view.setUint8(xorIndex, xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const sync          = dataview.getUint8(0, true);
+        const contentLength = dataview.getUint8(1, true);
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const eventCode     = dataview.getUint8(5, true);
+
+        const { length }    = msg.setLengths(contentLength);
+        const xorIndex      = length - 1;
+        const uint8         = new Uint8Array(dataview.buffer);
+
+        const check         = dataview.getUint8(xorIndex, true);
+        const valid         = msg.validate(dataview, check);
+
+        let encryptionId;
+        let userInfoString;
+
+        const res = {
+            id,
+            channelNumber,
+            eventCode,
+            valid,
+        };
+
+        if(length > 7) {
+            encryptionId = dataview.getUint32(6, true);
+            res.encryptionId = encryptionId;
+
+            if(length > (7 + encryptionIdLength)) {
+                userInfoString = uint8.subarray(10, 10+userInfoStringLength);
+                res.userInfoString = userInfoString;
+            }
+        }
+
+        return res;
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function ChannelResponse() {
+    const defaults = {
+        channelNumber: 0,
+    };
+
+    const msg = Message({
+        contentLength: 3,
+        id: 'channelResponse',
+    });
+
+    function encode(args) {
+        const buffer = new ArrayBuffer(msg.getLength());
+        const view   = new DataView(buffer);
+
+        const channelNumber = existance(args.channelNumber, defaults.channelNumber);
+        const initMsgId     = existance(args.initMsgId);
+        const responseCode  = existance(args.responseCode);
+
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, initMsgId, true);
+        view.setUint8(5, responseCode, true);
+        view.setUint8(6, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const sync          = dataview.getUint8(0, true);
+        const contentLength = dataview.getUint8(1, true);
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const initMsgId     = dataview.getUint8(4, true);
+        const responseCode  = dataview.getUint8(5, true);
+        const check         = dataview.getUint8(6, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            initMsgId,
+            responseCode,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function ChannelStatus() {
+    const defaults = {
+        channelNumber: 0,
+        channelState:  0,
+        networkNumber: 0,
+        channelType:   0,
+    };
+
+    const msg = Message({
+        contentLength: 2,
+        id: 'channelStatus',
+    });
+
+    const channelStates = {
+        unassigned: 0,
+        assigned:   1,
+        searching:  2,
+        tracking:   3,
+    };
+
+    function encodeChannelStatus(args) {
+        let status = 0b00000000;
+
+        status |= existance(args.channelState, defaults.channelState);
+        status |= existance(args.networkNumber, defaults.networkNumber) << 2;
+        status |= existance(args.channelType, defaults.channelType) << 4;
+
+        return status;
+    }
+
+    function encode(args = {}) {
+        const buffer = new ArrayBuffer(msg.getLength());
+        const view   = new DataView(buffer);
+
+        const channelNumber = args.channelNumber || defaults.channelNumber;
+        const status        = encodeChannelStatus(args);
+
+        view.setUint8(0, msg.sync, true);
+        view.setUint8(1, msg.getContentLength(), true);
+        view.setUint8(2, msg.id, true);
+        view.setUint8(3, channelNumber, true);
+        view.setUint8(4, status, true);
+        view.setUint8(5, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const sync          = dataview.getUint8(0, true);
+        const contentLength = dataview.getUint8(1, true);
+        const id            = dataview.getUint8(2, true);
+        const channelNumber = dataview.getUint8(3, true);
+        const status        = dataview.getUint8(4, true);
+        const check         = dataview.getUint8(5, true);
+        const valid         = msg.validate(dataview, check);
+
+        return {
+            id,
+            channelNumber,
+            status,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
+}
+
+function ChannelId() {
+    return SetChannelId();
+}
+
+function Capabilities() {
+    const defaults = {
+        maxChannels:  0,
+        maxNetworks:  0,
+        maxSensRcore: 0,
+    };
+
+    const msg = Message({
+        contentLength: 8,
+        id: 'capabilities',
+    });
+    const length = msg.getLength();
+
+    function encodeStandardOptions(args) {
+        let options = 0b00000000;
+
+        if(args.no_receive_channels)  options |= 0b00000001;
+        if(args.no_transmit_channels) options |= 0b00000010;
+        if(args.no_receive_messages)  options |= 0b00000100;
+        if(args.no_transmit_messages) options |= 0b00001000;
+        if(args.no_ackd_messages)     options |= 0b00010000;
+        if(args.no_burst_messages)    options |= 0b00100000;
+
+        return options;
+    }
+
+    function decodeStandardOptions(bitField) {
+        return {
+            no_receive_channels:  nthBitToBool(bitField, 0),
+            no_transmit_channels: nthBitToBool(bitField, 1),
+            no_receive_messages:  nthBitToBool(bitField, 2),
+            no_transmit_messages: nthBitToBool(bitField, 3),
+            no_ackd_messages:     nthBitToBool(bitField, 4),
+            no_burst_messages:    nthBitToBool(bitField, 5),
+        };
+    }
+
+    function encodeAdvancedOptions(args) {
+        let options = 0b00000000;
+
+        if(args.network_enabled)              options |= 0b00000010;
+        if(args.serial_number_enabled)        options |= 0b00001000;
+        if(args.per_channel_tx_power_enabled) options |= 0b00010000;
+        if(args.low_priority_search_enabled)  options |= 0b00100000;
+        if(args.script_enabled)               options |= 0b01000000;
+        if(args.search_list_enabled)          options |= 0b10000000;
+
+        return options;
+    }
+
+    function decodeAdvancedOptions(bitField) {
+        return {
+            network_enabled:              nthBitToBool(bitField, 1),
+            serial_number_enabled:        nthBitToBool(bitField, 3),
+            per_channel_tx_power_enabled: nthBitToBool(bitField, 4),
+            low_priority_search_enabled:  nthBitToBool(bitField, 5),
+            script_enabled:               nthBitToBool(bitField, 6),
+            search_list_enabled:          nthBitToBool(bitField, 7),
+        };
+    }
+
+    function encodeAdvancedOptions2(args) {
+        let options = 0b00000000;
+
+        if(args.led_enabled)         options |= 0b00000001;
+        if(args.ext_message_enabled) options |= 0b00000010;
+        if(args.scan_mode_enabled)   options |= 0b00000100;
+        if(args.prox_search_enabled) options |= 0b00010000;
+        if(args.ext_assign_enabled)  options |= 0b00100000;
+        if(args.fs_antfs_enabled)    options |= 0b01000000;
+        if(args.fit1_enabled)        options |= 0b10000000;
+
+        return options;
+    }
+
+    function decodeAdvancedOptions2(bitField) {
+        return {
+            led_enabled:         nthBitToBool(bitField, 0),
+            ext_message_enabled: nthBitToBool(bitField, 1),
+            scan_mode_enabled:   nthBitToBool(bitField, 2),
+            prox_search_enabled: nthBitToBool(bitField, 4),
+            ext_assign_enabled:  nthBitToBool(bitField, 5),
+            fs_antfs_enabled:    nthBitToBool(bitField, 6),
+            fit1_enabled:        nthBitToBool(bitField, 7),
+        };
+    }
+
+    function encodeAdvancedOptions3(args) {
+        let options = 0b00000000;
+
+        if(args.advanced_burst_enabled)         options |= 0b00000001;
+        if(args.event_buffering_enabled)        options |= 0b00000010;
+        if(args.event_filtering_enabled)        options |= 0b00000100;
+        if(args.high_duty_search_enabled)       options |= 0b00001000;
+        if(args.search_sharing_enabled)         options |= 0b00010000;
+        if(args.selective_data_updates_enabled) options |= 0b01000000;
+        if(args.encrypted_channel_enabled)      options |= 0b10000000;
+
+        return options;
+    }
+
+    function decodeAdvancedOptions3(bitField) {
+        return {
+            advanced_burst_enabled:         nthBitToBool(bitField, 0),
+            event_buffering_enabled:        nthBitToBool(bitField, 1),
+            event_filtering_enabled:        nthBitToBool(bitField, 2),
+            high_duty_search_enabled:       nthBitToBool(bitField, 3),
+            search_sharing_enabled:         nthBitToBool(bitField, 4),
+            selective_data_updates_enabled: nthBitToBool(bitField, 6),
+            encrypted_channel_enabled:      nthBitToBool(bitField, 7),
+        };
+    }
+
+    function encodeAdvancedOptions4(args) {
+        let options = 0b00000000;
+
+        if(args.capabilities_rfactive_notification_enabled) options |= 0b00000001;
+
+        return options;
+    }
+
+    function decodeAdvancedOptions4(bitField) {
+        return {
+            capabilities_rfactive_notification_enabled: nthBitToBool(bitField, 0),
+        };
+    }
+
+    function encode(args = {}) {
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        const maxChannels  = existance(args.maxChannels, defaults.maxChannels);
+        const maxNetworks  = existance(args.maxNetworks, defaults.maxNetworks);
+        const standard     = encodeStandardOptions(args);
+        const advanced     = encodeAdvancedOptions(args);
+        const advanced2    = encodeAdvancedOptions2(args);
+        const maxSensRcore = existance(args.maxSensRcore, defaults.maxSensRcore);
+        const advanced3    = encodeAdvancedOptions3(args);
+        const advanced4    = encodeAdvancedOptions4(args);
+
+        view.setUint8( 0, msg.sync, true);
+        view.setUint8( 1, msg.getContentLength(), true);
+        view.setUint8( 2, msg.id, true);
+        view.setUint8( 3, maxChannels, true);
+        view.setUint8( 4, maxNetworks, true);
+        view.setUint8( 5, standard, true);
+        view.setUint8( 6, advanced, true);
+        view.setUint8( 7, advanced2, true);
+        view.setUint8( 8, maxSensRcore, true);
+        view.setUint8( 9, advanced3, true);
+        view.setUint8(10, advanced4, true);
+        view.setUint8(11, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id           = dataview.getUint8(2, true);
+        const maxChannels  = dataview.getUint8(3, true);
+        const maxNetworks  = dataview.getUint8(4, true);
+        const standard     = decodeStandardOptions(dataview.getUint8(5, true));
+        const advanced     = decodeAdvancedOptions(dataview.getUint8(6, true));
+        const advanced2    = decodeAdvancedOptions2(dataview.getUint8(7, true));
+        const maxSensRcore = dataview.getUint8(8, true);
+        const advanced3    = decodeAdvancedOptions3(dataview.getUint8(9, true));
+        const advanced4    = decodeAdvancedOptions4(dataview.getUint8(10, true));
+        const check        = dataview.getUint8(11, true);
+        const valid        = msg.validate(dataview, check);
+
+        return {
+            id,
+            maxChannels,
+            maxNetworks,
+            ...standard,
+            ...advanced,
+            ...advanced2,
+            maxSensRcore,
+            ...advanced3,
+            ...advanced4,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        encodeStandardOptions,
+        encodeAdvancedOptions,
+        encodeAdvancedOptions2,
+        encodeAdvancedOptions3,
+        encodeAdvancedOptions4,
+
+        decode,
+    });
+}
+
+function SerialNumber() {
+    const defaults = {
+        serialNumber: 0,
+    };
+
+    const msg = Message({
+        contentLength: 4,
+        id: 'serialNumber', // 97, 0x61
+    });
+    const length = msg.getLength();
+
+    function encode(args) {
+        const serialNumber = existance(args.serialNumber, defaults.serialNumber);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8( 0, msg.sync, true);
+        view.setUint8( 1, msg.getContentLength(), true);
+        view.setUint8( 2, msg.id, true);
+        view.setUint32(3, serialNumber, true);
+        view.setUint8( 7, msg.xor(view), true);
+
+        return view;
+    }
+
+    function decode(dataview) {
+        const id           = dataview.getUint8( 2, true);
+        const serialNumber = dataview.getUint32(3, true);
+        const check        = dataview.getUint8( 7, true);
+        const valid        = msg.validate(dataview, check);
+
+        return {
+            id,
+            serialNumber,
+            valid,
+        };
+    }
+
+    return Object.freeze({
+        encode,
+        decode,
+    });
 }
 
 function deviceTypeToString(deviceType) {
@@ -637,70 +1480,51 @@ function deviceTypeToString(deviceType) {
     return 'unsupported';
 }
 
-
 const message = {
-    SetNetworkKey,
-    AssignChannel,
-    AssignChannelExt,
-    ChannelId,
-    ChannelFrequency,
-    ChannelPeriod,
-    OpenChannel,
-    UnassignChannel,
-    CloseChannel,
-    ResetSystem,
-    SearchTimeout,
-    LowPrioritySearchTimeout,
-    EnableExtRxMessages,
-    Sleep,
+    // config
+    assignChannel:            AssignChannel(),
+    unassignChannel:          UnassignChannel(),
+    setChannelId:             SetChannelId(),
+    setChannelPeriod:         SetChannelPeriod(),
+    setChannelFrequency:      SetChannelFrequency(),
+    setNetworkKey:            SetNetworkKey(),
+    searchTimeout:            SearchTimeout(),
+    lowPrioritySearchTimeout: LowPrioritySearchTimeout(),
+    enableExtRxMessages:      EnableExtRxMessages(),
+    libConfig:                LibConfig(),
 
-    targetPower,
-    targetResistance,
-    targetSlope,
-    RequestDataPage,
+    // control
+    resetSystem:         ResetSystem(),
+    openChannel:         OpenChannel(),
+    closeChannel:        CloseChannel(),
+    requestMessage:      RequestMessage(),
+    openRxScanMode:      OpenRxScanMode(),
+    sleep:               Sleep(),
 
-    Request,
-    Control,
-    Data,
+    // data
+    broadcastData:       BroadcastData(),
+    acknowledgedData:    AcknowledgedData(),
+    burstTransferData:   BurstTransferData(),
+    advancedBurstData:   AdvancedBurstData(),
 
-    ids,
-    events,
-    values,
+    // channel messages
+    channelEvent:    ChannelEvent(),
+    channelResponse: ChannelResponse(),
 
-    isResponse,
-    isRequestedResponse,
-    isBroadcast,
-    isAcknowledged,
-    isBurst,
-    isBurstAdv,
-    isBroadcastExt,
-    isEvent,
-    isSerialError,
-    isValid,
-    isFullMsg,
-    isChannelId,
-    isChannelStatus,
-    isANTVersion,
-    isCapabilities,
-    isSerialNumber,
-    readSync,
-    readLength,
-    readId,
-    readChannel,
-    readResponse,
-    readEvent,
-    readExtendedData,
-    readChannelId,
-    readChannelStatus,
-    readANTVersion,
-    readCapabilities,
-    readSerialNumber,
-    eventCodeToString,
-    idToString,
+    // requested response messages
+    channelStatus: ChannelStatus(),
+    channelId:     ChannelId(),
+    capabilities:  Capabilities(),
+    serialNumber:  SerialNumber(),
 };
 
 const utils = {
     deviceTypeToString,
 };
 
-export { message, utils };
+export {
+    message,
+    Message,
+    utils,
+};
+

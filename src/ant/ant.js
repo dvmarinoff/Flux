@@ -1,6 +1,6 @@
 import { xf } from '../functions.js';
 import { Serial } from './web-serial.js';
-import { USB } from './web-usb.js';
+import { usb } from './web-usb.js';
 import { Channel } from './channel.js';
 import { SearchChannel } from './search-channel.js';
 import { message } from './message.js';

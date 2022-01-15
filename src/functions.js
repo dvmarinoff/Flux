@@ -336,6 +336,10 @@ function nthBitToBool(field, bit) {
     return bitToBool(nthBit(field, bit));
 }
 
+function boolToNumber(bool) {
+    return +bool;
+}
+
 function dataviewToArray(dataview) {
     return Array.from(new Uint8Array(dataview.buffer));
 }
@@ -377,9 +381,10 @@ function toUint8Array(n, type) {
     return n;
 }
 
-function xor(view) {
+function xor(view, start = 0, end = view.byteLength) {
     let cs = 0;
-    for (let i=0; i < view.byteLength; i++) {
+    const length = (end < 0) ? (view.byteLength + end) : end;
+    for (let i=start; i < length; i++) {
         cs ^= view.getUint8(i);
     }
     return cs;
@@ -433,6 +438,7 @@ export {
     nthBit,
     bitToBool,
     nthBitToBool,
+    boolToNumber,
     dataviewToArray,
     dataviewToString,
     stringToCharCodes,

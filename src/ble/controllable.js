@@ -101,6 +101,7 @@ class Controllable extends Device {
 
 function onIndoorBikeData(value) {
     const self = this;
+
     if(exists(value.power) && models.sources.isSource('power', self.id)) {
         xf.dispatch(`power`, value.power);
     };
@@ -110,7 +111,8 @@ function onIndoorBikeData(value) {
     if(exists(value.speed) && models.sources.isSource('speed', self.id)) {
         xf.dispatch(`speed`, value.speed);
     };
-    if(exists(value.heartRate) && models.sources.isSource('heartRate', self.id)) {
+    if(exists(value.heartRate) && models.sources.isSource('heartRate', self.id)
+       && !equals(value.heartRate, 255)) {
         xf.dispatch(`heartRate`, value.heartRate);
     };
     if(exists(value.status) && models.sources.isSource('power', self.id)) {
