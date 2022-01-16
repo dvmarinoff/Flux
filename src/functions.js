@@ -263,8 +263,8 @@ function XF(args = {}) {
         window.dispatchEvent(evt(eventType)(value));
     }
 
-    function sub(eventType, handler, element = false) {
-        if(element) {
+    function sub(eventType, handler, element = undefined) {
+        if(exists(element)) {
             element.addEventListener(eventType, handler, true);
             return handler;
         } else {
@@ -286,8 +286,8 @@ function XF(args = {}) {
         window.addEventListener(eventType, e => handler(e.detail.data, data));
     }
 
-    function unsub(eventType, handler, element = false) {
-        if(element) {
+    function unsub(eventType, handler, element = undefined) {
+        if(exists(element)) {
             element.removeEventListener(eventType, handler, true);
         } else {
             window.removeEventListener(eventType, handler, true);

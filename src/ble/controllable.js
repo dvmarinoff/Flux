@@ -18,16 +18,19 @@ class Controllable extends Device {
     postInit(args) {
         const self = this;
         self.mode = 'erg';
-    }
-    async start(device) {
-        const self = this;
 
-        self.control = await self.controlService(device);
-
-        xf.sub(`db:mode`,             self.onMode.bind(self));
+        xf.sub('db:mode',             self.onMode.bind(self));
         xf.sub('db:powerTarget',      self.onPowerTarget.bind(self));
         xf.sub('db:resistanceTarget', self.onResistanceTarget.bind(self));
         xf.sub('db:slopeTarget',      self.onSlopeTarget.bind(self));
+    }
+    async start(device) {
+        const self = this;
+        self.control = await self.controlService(device);
+    }
+    stop() {
+        const self = this;
+        self.control = {};
     }
     onMode(mode) {
         const self = this;

@@ -83,6 +83,11 @@ class WebBLE {
         await self.startNotifications(characteristic, handler);
         return characteristic;
     }
+    async unsub(characteristic, handler) {
+        const self = this;
+        await self.stopNotifications(characteristic, handler);
+        return characteristic;
+    }
     async request(filter) {
         return await navigator.bluetooth.requestDevice(filter);
     }

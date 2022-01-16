@@ -90,6 +90,17 @@ class BLEService {
             return false;
         }
     }
+    async unsub(prop, decoder, callback) {
+        const self = this;
+        const characteristic = self.characteristic(prop);
+
+        if(exists(characteristic)) {
+            await self.ble.unsub(characteristic, eventToValue(decoder, callback));
+            return true;
+        } else {
+            return false;
+        }
+    }
     async write(prop, buffer) {
         const self = this;
         const characteristic = self.characteristic(prop);

@@ -29,8 +29,6 @@ function FEC2() {
     function decode(dataview) {
         const msg = message.acknowledgedData.decode(dataview, dataPageDecoder);
 
-        console.log(msg.payload);
-
         if(isObject(msg.payload)) {
             return msg.payload;
         }
