@@ -1,5 +1,6 @@
 import { equals, exists, existance, first, last, xf, avg, max } from './functions.js';
 import { kphToMps, mpsToKph, timeDiff, fixInRange } from './utils.js';
+import { models } from './models/models.js';
 
 class Watch {
     constructor(args) {
@@ -267,6 +268,11 @@ xf.reg('watch:elapsed', (x, db) => {
                   distance:   db.distance};
     db.records.push(record);
     db.lap.push(record);
+
+    if(equals(db.elapsed % 60, 0)) {
+        models.session.backup(db);
+        console.log(`backing up of ${db.records.length} records ...`);
+    }
 });
 xf.reg('watch:lap', (x, db) => {
     let timeEnd   = Date.now();

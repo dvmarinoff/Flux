@@ -260,13 +260,13 @@ function Measurement() {
             rateAdjuster.update({ts: Date.now()});
         }
 
-        const dataLog = {
-            ts: Date.now(),
-            r: data.crankRevolutions,
-            t: data.crankEvent,
-            c:  data.cadence
-        };
-        console.log(dataLog);
+        // const dataLog = {
+        //     ts: Date.now(),
+        //     r: data.crankRevolutions,
+        //     t: data.crankEvent,
+        //     c:  data.cadence
+        // };
+        // console.log(dataLog);
 
         return data;
     }
