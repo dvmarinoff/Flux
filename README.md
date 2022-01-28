@@ -87,12 +87,11 @@ The following table is copied from [DC Rainmaker Trainer Guide](https://www.dcra
 
 ### ANT+
 
-Support for ANT+ is experimental at the moment. Works only on Linux desktop in combination with ANT+ stick.
-Follow these [instructions](https://github.com/dvmarinoff/Flux/wiki/How-to:-ANT----stick-on-Ubuntu) to give permissions to the ANT+ USB stick.
-Support for Android and Windows 10 is coming soon.
+Support for ANT+ is experimental at the moment. It is being rewritten right now and the code is moved to [WebANT](https://github.com/dvmarinoff/WebANT), which has a separate demo. When it becomes stable enough will be merged here. It currently has support for MacOS, Linux and Android, Windows 10 is a possibility.
+
 
 The current development setup is using Suunto movestick mini, Garmin Fenix 5 watch broadcasting heart rate,
-Tacx Heart Rate monitor, and Tacx Flux S trainer, with an Ubuntu 20.04.2 LTS laptop and M1 Mac.
+Tacx Heart Rate monitor, Tacx Flux S trainer, and X240 laptop with Ubuntu 20.04.2 LTS, M1 Mac, and Samsung S9 Android phone.
 
 ## The Demo
 You can check a pre-release demo of the web version at
