@@ -278,12 +278,12 @@ function Warmup(args = {}) {
 
     const timeDx = existance(args.timeDx, defaults.timeDx);
 
-    const spec = {
+    const spec = Object.assign({
         name:       'Warmup',
         tagOpen:    '<Warmup',
         tagClose:   ' />',
         toInterval: toInterval,
-    };
+    }, args.spec);
 
     function toInterval(element) {
         const duration  = element.Duration;
@@ -357,6 +357,16 @@ function Cooldown(args = {}) {
     }
 
     return Element(spec);
+}
+
+function Ramp(args = {}) {
+    const spec = {
+        name:       'Ramp',
+        tagOpen:    '<Ramp',
+        tagClose:   ' />',
+    };
+
+    return Warmup(spec);
 }
 
 function readContent(el) {
@@ -518,6 +528,7 @@ const Elements = {
     SteadyState: Element({name: 'SteadyState', tagOpen: '<SteadyState', tagClose: ' />'}),
     IntervalsT:  IntervalsT(),
     FreeRide:    FreeRide(),
+    Ramp:        Ramp(),
     Cooldown:    Cooldown(),
     Unknown:     Unknown(),
     Author:      Element({name: 'author', tagOpen: '<author>', tagClose: '</author>'}),
