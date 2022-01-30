@@ -241,6 +241,9 @@ xf.reg('watch:stepIndex',     (index, db) => {
     }
     if(exists(powerTarget)) {
         xf.dispatch('ui:power-target-set', parseInt(db.ftp * powerTarget));
+        if(!exists(slopeTarget) && !equals(db.mode, 'erg')) {
+            xf.dispatch('ui:mode-set', 'erg');
+        }
     } else {
         xf.dispatch('ui:power-target-set', 0);
     }

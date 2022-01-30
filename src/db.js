@@ -90,9 +90,15 @@ xf.reg('ui:page-set', (page, db) => {
 xf.reg('ui:mode-set', (mode, db) => {
     db.mode = models.mode.set(mode);
 
-    if(equals(mode, 'erg'))        xf.dispatch(`ui:power-target-set`, db.powerTarget);
-    if(equals(mode, 'resistance')) xf.dispatch(`ui:resistance-target-set`, db.resistanceTarget);
-    if(equals(mode, 'slope'))      xf.dispatch(`ui:slope-target-set`, db.slopeTarget);
+    if(equals(mode, 'erg')) {
+        xf.dispatch(`ui:power-target-set`, db.powerTarget);
+    }
+    if(equals(mode, 'resistance')) {
+        xf.dispatch(`ui:resistance-target-set`, db.resistanceTarget);
+    }
+    if(equals(mode, 'slope')) {
+        xf.dispatch(`ui:slope-target-set`, db.slopeTarget);
+    }
 });
 
 // UI options

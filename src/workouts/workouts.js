@@ -1,5 +1,29 @@
 let workouts =
-[`<workout_file>
+    [
+
+`<workout_file>
+    <author>Marinov</author>
+    <name>Baguette +1</name>
+    <category>Base</category>
+    <description>The bread and butter of Endurance training, with efforts in Zone 2.</description>
+    <sportType>bike</sportType>
+    <tags>
+    </tags>
+    <workout>
+        <FreeRide Duration="10"/>
+        <SteadyState Duration="10" Power="0.60"/>
+        <FreeRide Duration="10"/>
+        <SteadyState Duration="10" Power="0.60"/>
+        <FreeRide Duration="10"/>
+        <SteadyState Duration="10" Power="0.60"/>
+        <FreeRide Duration="10"/>
+        <SteadyState Duration="10" Power="0.60"/>
+        <FreeRide Duration="10"/>
+        <SteadyState Duration="10" Power="0.60"/>
+        <FreeRide Duration="10"/>
+    </workout>
+</workout_file>`,
+        `<workout_file>
     <author>Marinov</author>
     <name>Dijon</name>
     <category>VO2 Max</category>
