@@ -49,10 +49,12 @@ function scale(value, max = 100) {
 }
 
 function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 118) {
+    const minAbsPower = 9;
 
     const maxInterval = intervals.reduce((highest, interval) => {
         interval.steps.forEach((step) => {
-            if(step.power > highest)  highest = step.power;
+            const power = models.ftp.toRelative(step.power, ftp);
+            if(power > highest) highest = power;
         });
         return highest;
     }, 1.6);
@@ -60,15 +62,15 @@ function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 
     const scaleMax = ftp * maxInterval * (useGraphHeight ? (90 / graphHeight) : 1);
 
     return intervals.reduce( (acc, interval) => {
-        let width = (interval.duration) < 1 ? 1 : parseInt(Math.round(interval.duration)); // ?
-        let stepsCount = interval.steps.length;
+        const width = (interval.duration < 1) ? 1 : parseInt(Math.round(interval.duration)); // ?
+        const stepsCount = interval.steps.length;
         return acc + interval.steps.reduce((a, step) => {
-            const power   = parseInt(ftp * step.power);
+            const power   = existance(models.ftp.toAbsolute(step.power, ftp), 0);
             const cadence = step.cadence;
             const slope   = step.slope;
 
             const width    = 100 / stepsCount;
-            const height   = scale((power === 0) ? 80 : power, scaleMax);
+            const height   = scale(equals(power, 0) ? 80 : power, scaleMax);
             const zone     = (models.ftp.powerToZone(power, ftp)).name;
             const infoTime = formatTime({value: step.duration, format: 'mm:ss'});
 

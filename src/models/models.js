@@ -1,7 +1,7 @@
-import { xf, exists, empty, equals,
+import { xf, exists, existance, empty, equals,
          first, second, last } from '../functions.js';
 
-import { inRange, fixInRange, dateToDashString } from '../utils.js';
+import { inRange, fixInRange, format, dateToDashString } from '../utils.js';
 
 import { LocalStorageItem } from '../storage/local-storage.js';
 import { idb } from '../storage/idb.js';
@@ -14,15 +14,15 @@ import { activity } from '../fit/activity.js';
 import { fit } from '../fit/fit.js';
 
 class Model {
-    constructor(args) {
+    constructor(args = {}) {
         this.init(args);
         this.prop      = args.prop;
-        this.default   = args.default   || this.defaultValue();
+        this.default   = existance(args.default, this.defaultValue());
         this.prev      = args.default;
-        this.set       = args.set       || this.defaultSet;
-        this.parser    = args.parser    || this.defaultParse;
-        this.isValid   = args.isValid   || this.defaultIsValid;
-        this.onInvalid = args.onInvalid || this.defaultOnInvalid;
+        this.set       = existance(args.set, this.defaultSet);
+        this.parser    = existance(args.parser, this.defaultParse);
+        this.isValid   = existance(args.isValid, this.defaultIsValid);
+        this.onInvalid = existance(args.onInvalid, this.defaultOnInvalid);
         this.storage   = this.defaultStorage();
         this.postInit(args);
     }
@@ -62,9 +62,9 @@ class Model {
 }
 
 class Power extends Model {
-    postInit(args) {
-        this.min = args.min || 0;
-        this.max = args.max || 2500;
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 2500);
     }
     defaultValue() { return 0; }
     defaultIsValid(value) {
@@ -73,9 +73,9 @@ class Power extends Model {
 }
 
 class HeartRate extends Model {
-    postInit(args) {
-        this.min = args.min || 0;
-        this.max = args.max || 255;
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 255);
     }
     defaultValue() { return 0; }
     defaultIsValid(value) {
@@ -85,9 +85,9 @@ class HeartRate extends Model {
 }
 
 class Cadence extends Model {
-    postInit(args) {
-        this.min = args.min || 0;
-        this.max = args.max || 255;
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 255);
     }
     defaultValue() { return 0; }
     defaultIsValid(value) {
@@ -96,19 +96,18 @@ class Cadence extends Model {
 }
 
 class Speed extends Model {
-    postInit(args) {
-        this.min = args.min || 0;
-        this.max = args.max || 120;
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 120);
     }
     defaultValue() { return 0; }
     defaultIsValid(value) {
         return (Number.isInteger(value) || Number.isFloat(value)) &&
-            inRange(self.min, self.max, value);
+                inRange(self.min, self.max, value);
     }
 }
 
 class Distance extends Model {
-    postInit(args) {}
     defaultValue() { return 0; }
     defaultIsValid(value) {
         return Number.isInteger(value) || Number.isFloat(value);
@@ -116,7 +115,7 @@ class Distance extends Model {
 }
 
 class Sources extends Model {
-    postInit(args) {
+    postInit(args = {}) {
         const self = this;
         self.state = self.default;
         xf.sub('db:sources', value => self.state = value);
@@ -144,10 +143,10 @@ class Sources extends Model {
 }
 
 class Target extends Model {
-    postInit(args) {
-        this.min = args.min || 0;
-        this.max = args.max || 100;
-        this.step = args.step || 1;
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 100);
+        this.step = existance(args.step, 1);
     }
     defaultValue() { return 0; }
     defaultIsValid(value) {
@@ -176,27 +175,27 @@ class Target extends Model {
 }
 
 class PowerTarget extends Target {
-    postInit(args) {
-        this.min = args.min || 0;
-        this.max = args.max || 800;
-        this.step = args.step || 10;
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 800);
+        this.step = existance(args.step, 10);
     }
 }
 
 class ResistanceTarget extends Target {
-    postInit(args) {
-        this.min = args.min || -100;
-        this.max = args.max || 100;
-        this.step = args.step || 10;
+    postInit(args = {}) {
+        this.min = existance(args.min, -100);
+        this.max = existance(args.max, 100);
+        this.step = existance(args.step, 10);
     }
     parse(value) { return parseInt(value); }
 }
 
 class SlopeTarget extends Target {
-    postInit(args) {
-        this.min = args.min || -40;
-        this.max = args.max || 40;
-        this.step = args.step || 0.5;
+    postInit(args = {}) {
+        this.min = existance(args.min, -40);
+        this.max = existance(args.max, 40);
+        this.step = existance(args.step, 0.5);
     }
     defaultIsValid(value) {
         const self = this;
@@ -206,10 +205,10 @@ class SlopeTarget extends Target {
 }
 
 class CadenceTarget extends Target {
-    postInit(args) {
-        this.min = args.min || 0;
-        this.max = args.max || 255;
-        this.step = args.step || 5;
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 255);
+        this.step = existance(args.step, 5);
     }
     parse(value) { return parseInt(value); }
 }
@@ -231,18 +230,19 @@ class Page extends Model {
 }
 
 class FTP extends Model {
-    postInit(args) {
+    postInit(args = {}) {
         const self = this;
         const storageModel = {
             key: self.prop,
             fallback: self.defaultValue(),
             parse: parseInt,
         };
-        self.min = args.min || 0;
-        self.max = args.max || 500;
-        self.storage = args.storage(storageModel);
-        self.zones = args.zones || self.defaultZones();
-        self.percentages = args.percentages || self.defaultPercentages();
+        self.min         = existance(args.min, 0);
+        self.max         = existance(args.max, 500);
+        self.storage     = args.storage(storageModel);
+        self.zones       = existance(args.zones, self.defaultZones());
+        self.percentages = existance(args.percentages, self.defaultPercentages());
+        self.minAbsValue = 9;
     }
     defaultValue() { return 200; }
     defaultIsValid(value) {
@@ -254,6 +254,16 @@ class FTP extends Model {
     }
     defaultPercentages() {
         return {'one': 0.54, 'two': 0.75, 'three': 0.87, 'four': 0.94, 'five': 1.05, 'six': 1.20};
+    }
+    toRelative(value, ftp) {
+        const self = this;
+        if(value > self.minAbsValue) return format(value / ftp, 2);
+        return value;
+    }
+    toAbsolute(value, ftp) {
+        const self = this;
+        if(value < self.minAbsValue) return parseInt(value * ftp);
+        return value;
     }
     powerToZone(value, ftp, zones) {
         const self = this;
@@ -281,15 +291,15 @@ class FTP extends Model {
 }
 
 class Weight extends Model {
-    postInit(args) {
+    postInit(args = {}) {
         const self = this;
         const storageModel = {
             key: self.prop,
             fallback: self.defaultValue(),
             parse: parseInt,
         };
-        self.min = args.min || 0;
-        self.max = args.max || 500;
+        self.min = existance(args.min, 0);
+        self.max = existance(args.max, 500);
         self.storage = new args.storage(storageModel);
     }
     defaultValue() { return 75; }
@@ -299,7 +309,7 @@ class Weight extends Model {
     }
 }
 class Theme extends Model {
-    postInit(args) {
+    postInit(args = {}) {
         const self = this;
         const storageModel = {
             key: self.prop,
@@ -312,14 +322,14 @@ class Theme extends Model {
     defaultIsValid(value) { return this.values.includes(value); }
     switch(theme) {
         const self = this;
-        if(theme === first(self.values)) return second(self.values);
-        if(theme === second(self.values)) return first(self.values);
+        if(equals(theme, first(self.values))) return second(self.values);
+        if(equals(theme, second(self.values))) return first(self.values);
         self.onInvalid(theme);
         return self.default;
     }
 }
 class Measurement extends Model {
-    postInit(args) {
+    postInit(args = {}) {
         const self = this;
         const storageModel = {
             key: self.prop,
@@ -332,15 +342,15 @@ class Measurement extends Model {
     defaultIsValid(value) { return this.values.includes(value); }
     switch(theme) {
         const self = this;
-        if(theme === first(self.values)) return second(self.values);
-        if(theme === second(self.values)) return first(self.values);
+        if(equals(theme, first(self.values))) return second(self.values);
+        if(equals(theme, second(self.values))) return first(self.values);
         self.onInvalid(theme);
         return self.default;
     }
 }
 
 class DataTileSwitch extends Model {
-    postInit(args) {
+    postInit(args = {}) {
         const self = this;
         const storageModel = {
             key: self.prop,
