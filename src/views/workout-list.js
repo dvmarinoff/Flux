@@ -22,7 +22,7 @@ function workoutTemplate(workout) {
                 <div class="workout--short-info">
                     <div class="workout--name">${workout.meta.name}</div>
                     <div class="workout--type">${workout.meta.category}</div>
-                    <div class="workout--duration">${workout.meta.duration / 60} min</div>
+                    <div class="workout--duration">${Math.round(workout.meta.duration / 60)} min</div>
                     <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
                 </div>
                 <div class="workout--full-info">
