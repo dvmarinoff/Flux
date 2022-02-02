@@ -272,52 +272,40 @@ describe('Attribute', () => {
 
     const doc = parser.parseFromString(xml, 'text/xml');
 
-    const elSteadyState = doc.querySelector('SteadyState');
-    const elIntervalsT = doc.querySelector('IntervalsT');
+    const steadyStates  = doc.querySelectorAll('SteadyState');
+    const elSteadyState = steadyStates[0];
+    const elIntervalsT  = doc.querySelector('IntervalsT');
 
-    test('readAttribute Duration', () => {
-        const duration = zwo.readAttribute({el: elSteadyState, name: 'Duration'});
-        expect(duration).toBe('300');
+    test('readAttribute Int', () => {
+        const duration = zwo.readAttribute({el: elSteadyState, name: 'Duration',  decode: parseInt});
+        expect(duration).toBe(300);
     });
 
-    test('readAttribute Power', () => {
-        const power = zwo.readAttribute({el: elSteadyState, name: 'Power'});
-        expect(power).toBe('0.88');
+    test('readAttribute Float', () => {
+        const power = zwo.readAttribute({el: elSteadyState, name: 'Power', decode: parseFloat});
+        expect(power).toBe(0.88);
     });
 
-    test('readAttribute Slope', () => {
-        const slope = zwo.readAttribute({el: elSteadyState, name: 'Slope'});
-        expect(slope).toBe('4.8');
-    });
-
-    test('readAttribute Cadence', () => {
-        const cadence = zwo.readAttribute({el: elSteadyState, name: 'Cadence'});
-        expect(cadence).toBe('90');
-    });
-
-    test('readAttribute CadenceResting', () => {
-        const cadence = zwo.readAttribute({el: elIntervalsT, name: 'CadenceResting'});
-        expect(cadence).toBe('80');
-    });
-
-    test('readAttribute with undefined', () => {
+    test('readAttribute Undefined', () => {
         const OnSlope = zwo.readAttribute({el: elIntervalsT, name: 'OnSlope'});
         expect(OnSlope).toBe(undefined);
     });
 
     test('writeAttribute', () => {
         let duration = zwo.writeAttribute({name: 'Duration', value: 300});
-        let power    = zwo.writeAttribute({name: 'Power', value: '0.88'});
+        let power    = zwo.writeAttribute({name: 'Power', value: 0.88});
+        let powerAbs = zwo.writeAttribute({name: 'Power', value: 240});
         let slope    = zwo.writeAttribute({name: 'Slope', value: 4.8});
 
         expect(duration).toBe('Duration="300"');
         expect(power).toBe('Power="0.88"');
+        expect(powerAbs).toBe('Power="240"');
         expect(slope).toBe('Slope="4.8"');
     });
 
     describe('Attribute', () => {
         let el       = doc.querySelector('SteadyState');
-        let duration = zwo.Attribute({name: 'Duration', transform: parseInt});
+        let duration = zwo.Attribute({name: 'Duration', decode: parseInt});
 
         test('Attribute.getName', () => {
             expect(duration.getName()).toBe('Duration');
@@ -333,14 +321,78 @@ describe('Attribute', () => {
     });
 });
 
-describe('SteadyState', () => {
-    const SteadyState = zwo.Elements.SteadyState;
+describe('Attrs', () => {
 
-    const xml = `<SteadyState Duration="300" Power="0.88" Cadence="90" Slope="4.8" />`;
+    const xml = `
+        <workout>
+            <SteadyState Duration="300" Power="0.88" Slope="4.8" Cadence="90"/>
+            <SteadyState Duration="300" Power="240"/>
+            <FreeRide Duration="100" Sim="-1,4, 0,4, 1,4, 3.5,4"/>
+            <IntervalsT Repeat="2" OnDuration="30" OffDuration="30" OnPower="0.98" OffPower="0.63" Cadence="90" CadenceResting="80"/>
+        </workout>`;
 
     const doc = parser.parseFromString(xml, 'text/xml');
 
-    let el = doc.querySelector('SteadyState');
+    const steadyStates  = doc.querySelectorAll('SteadyState');
+    const elSteadyState = steadyStates[0];
+    const elPowerAbs    = steadyStates[1];
+    const elFreeRide    = doc.querySelector('FreeRide');
+    const elIntervalsT  = doc.querySelector('IntervalsT');
+
+    test('Duration.read', () => {
+        const duration = zwo.Attrs.Duration.read({el: elSteadyState});
+        expect(duration).toBe(300);
+    });
+
+    test('Power.read', () => {
+        const power = zwo.Attrs.Power.read({el: elSteadyState});
+        expect(power).toBe(0.88);
+    });
+
+    test('Power.read (absolute)', () => {
+        const power = zwo.Attrs.Power.read({el: elPowerAbs});
+        expect(power).toBe(240);
+    });
+
+    test('Slope.read', () => {
+        const slope = zwo.Attrs.Slope.read({el: elSteadyState});
+        expect(slope).toBe(4.8);
+    });
+
+    test('Cadence.read', () => {
+        const cadence = zwo.Attrs.Cadence.read({el: elSteadyState});
+        expect(cadence).toBe(90);
+    });
+
+    test('CadenceResting.read', () => {
+        const cadence = zwo.Attrs.CadenceResting.read({el: elIntervalsT});
+        expect(cadence).toBe(80);
+    });
+
+    test('Sim.read', () => {
+        const sim = zwo.Attrs.Sim.read({el: elFreeRide});
+        expect(sim).toEqual([-1,4, 0,4, 1,4, 3.5,4]);
+    });
+
+    test('Sim.write', () => {
+        const attr = zwo.Attrs.Sim.write({value: [-1,4, 0,4, 1,4, 3.5,4]});
+        expect(attr).toEqual(`Sim="-1,4,0,4,1,4,3.5,4"`);
+    });
+});
+
+describe('SteadyState', () => {
+    const SteadyState = zwo.Elements.SteadyState;
+
+    const xml =
+          `<workout>
+               <SteadyState Duration="300" Power="0.88" Cadence="90" Slope="4.8" />
+               <SteadyState Duration="300" Power="240" />
+           </workout>`;
+
+    const doc   = parser.parseFromString(xml, 'text/xml');
+    const els   = doc.querySelectorAll('SteadyState');
+    const el    = els[0];
+    const elAbs = els[1];
 
     test('getName', () => {
         expect(SteadyState.getName()).toBe('SteadyState');
@@ -354,15 +406,23 @@ describe('SteadyState', () => {
             Cadence: 90,
             Slope: 4.8
         });
+
+        expect(SteadyState.read({el: elAbs})).toStrictEqual({
+            element: 'SteadyState',
+            Duration: 300,
+            Power: 240,
+        });
     });
 
     test('write', () => {
+        const res = `<SteadyState Duration="300" Power="0.88" Cadence="90" Slope="4.8" />`;
+
         expect(SteadyState.write({
             Duration: 300,
             Power: 0.88,
             Cadence: 90,
             Slope: 4.8
-        })).toBe(xml);
+        })).toBe(res);
     });
 
     test('toInterval', () => {
@@ -526,11 +586,15 @@ describe('Steps', () => {
 describe('FreeRide', () => {
     const FreeRide = zwo.Elements.FreeRide;
 
-    const xml = `<FreeRide Duration="300" />`;
+    const xml = `<workout>
+                     <FreeRide Duration="300" />
+                     <FreeRide Duration="16" Sim="-1,4,0,4,1,4,3.5,4" />
+                 </workout>`;
 
-    const doc = parser.parseFromString(xml, 'text/xml');
-
-    let el = doc.querySelector('FreeRide');
+    const doc   = parser.parseFromString(xml, 'text/xml');
+    const els   = doc.querySelectorAll('FreeRide');
+    const el    = els[0];
+    const elSim = els[1];
 
     test('getName', () => {
         expect(FreeRide.getName()).toBe('FreeRide');
@@ -541,12 +605,19 @@ describe('FreeRide', () => {
             element: 'FreeRide',
             Duration: 300,
         });
+        expect(FreeRide.read({el: elSim})).toStrictEqual({
+            element: 'FreeRide',
+            Duration: 16,
+            Sim: [-1,4, 0,4, 1,4, 3.5,4],
+        });
     });
 
     test('write', () => {
+        const res = `<FreeRide Duration="16" Sim="-1,4,0,4,1,4,3.5,4" />`;
         expect(FreeRide.write({
-            Duration: 300,
-        })).toBe(xml);
+            Duration: 16,
+            Sim: [-1,4, 0,4, 1,4, 3.5,4],
+        })).toEqual(res);
     });
 
     test('toInterval', () => {
@@ -560,16 +631,51 @@ describe('FreeRide', () => {
                 slope: 0
             }]
         });
+
+        expect(FreeRide.toInterval({
+            Duration: 16,
+            Sim: [-1,4, 0,4, 1,4, 3.5,4],
+        })).toStrictEqual({
+            duration: 16,
+            steps: [
+                {duration: 4, power: 0, slope: -1},
+                {duration: 4, power: 0, slope: 0},
+                {duration: 4, power: 0, slope: 1},
+                {duration: 4, power: 0, slope: 3.5},
+            ]
+        });
+
+        expect(FreeRide.toInterval({
+            Duration: 60,
+            Sim: [-1,4, 0,4, 1,4, 3.5,4],
+        })).toStrictEqual({
+            duration: 60,
+            steps: [
+                {duration: 4, power: 0, slope: -1},
+                {duration: 4, power: 0, slope: 0},
+                {duration: 4, power: 0, slope: 1},
+                {duration: 4, power: 0, slope: 3.5},
+                {duration: 44, power: 0, slope: 0},
+            ]
+        });
     });
 
     test('readToInterval', () => {
         expect(FreeRide.readToInterval({el})).toStrictEqual({
             duration: 300,
-            steps: [{
-                duration: 300,
-                power: 0,
-                slope: 0
-            }]
+            steps: [
+                {duration: 300, power: 0, slope: 0},
+            ]
+        });
+
+        expect(FreeRide.readToInterval({el: elSim})).toStrictEqual({
+            duration: 16,
+            steps: [
+                {duration: 4, power: 0, slope: -1},
+                {duration: 4, power: 0, slope: 0},
+                {duration: 4, power: 0, slope: 1},
+                {duration: 4, power: 0, slope: 3.5},
+            ]
         });
     });
 });
