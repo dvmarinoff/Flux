@@ -10,6 +10,7 @@ class WahooCyclingPower extends BLEService {
     postInit(args = {}) {
         this.onData    = existance(args.onData,    this.defaultOnData);
         this.onControl = existance(args.onControl, this.defaultOnControlPoint);
+        this.controllable = args.controllable;
 
         this.characteristics = {
             wahooTrainer: {
@@ -64,6 +65,18 @@ class WahooCyclingPower extends BLEService {
     }
     async setTargetSlope(value) {
         const self = this;
+
+        console.log(self.controllable.mode);
+
+        const params = {
+            windSpeed: 0,
+            weight: 75,
+            crr: 0.004,
+            windResistance: 0.51,
+        };
+
+        await self.setSIM(params);
+        await delay(1000); // test if this is really needed
 
         const buffer = control.slopeTarget.encode({grade: value});;
         return await self.write('wahooTrainer', buffer);

@@ -86,6 +86,7 @@ class Controllable extends Device {
                 onData: onIndoorBikeData.bind(self),
                 service,
                 ble,
+                controllable: self,
             });
             await wcps.start();
 

@@ -19,6 +19,8 @@ function PowerTarget() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, power,  true);
 
+        console.log(`${Date.now()} :tx :wcps :power ${args.power}`);
+
         return view.buffer;
     }
 
@@ -77,6 +79,8 @@ function LoadIntensity() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, intensity, true);
 
+        console.log(`${Date.now()} :tx :wcps :loadIntensity ${args.intensity}`);
+
         return view.buffer;
     }
 
@@ -125,6 +129,8 @@ function LoadLevel() {
 
         view.setUint8( 0, opCode, true);
         view.setUint8(1, level, true);
+
+        console.log(`${Date.now()} :tx :wcps :loadLevel ${args.level}`);
 
         return view.buffer;
     }
@@ -184,6 +190,8 @@ function SlopeTarget() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, grade,  true);
 
+        console.log(`${Date.now()} :tx :wcps :slope ${args.grade}`);
+
         return view.buffer;
     }
 
@@ -232,6 +240,8 @@ function WheelCircumference() {
 
         view.setUint8( 0, opCode, true);
         view.setUint16(1, circumference, true);
+
+        console.log(`${Date.now()} :tx :wcps :circumference ${args.circumference}`);
 
         return view.buffer;
     }
@@ -290,6 +300,8 @@ function WindSpeed() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, windSpeed, true);
 
+        console.log(`${Date.now()} :tx :wcps :windSpeed ${args.windSpeed}`);
+
         return view.buffer;
     }
 
@@ -339,6 +351,8 @@ function SIM() {
         view.setUint16(1, weight,         true);
         view.setUint16(3, crr,            true);
         view.setUint16(5, windResistance, true);
+
+        console.log(`${Date.now()} :tx :wcps :sim ${args.weight}, ${args.crr}, ${args.windResistance}`);
 
         return view.buffer;
     }
@@ -457,7 +471,7 @@ function Response() {
             res.value = dataview.getUint16(4, true);
         }
 
-        console.log(`:rx :wcps :response ${res} :raw ${raw}`);
+        console.log(`${Date.now()} :rx :wcps :response ${raw}`);
 
         return res;
     }
