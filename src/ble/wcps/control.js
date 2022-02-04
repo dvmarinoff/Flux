@@ -159,14 +159,15 @@ function SlopeTarget() {
     // Format ????
     // let norm = UInt16((min(1, max(-1, grade)) + 1.0) * 65535 / 2.0)
     // int value = (gradient / 100.0 + 1.0) * 32768;
+    // Math.min(1, Math.max(-1, grade) + 1) * 32768
 
     const definitions = {
         grade: {
             resolution: 1,
             unit: '%',
             size: 2,
-            min: applyOffset(-40),
-            max: applyOffset(40),
+            min: applyOffset(-100),
+            max: applyOffset(100),
             default: applyOffset(0)
         },
     };
