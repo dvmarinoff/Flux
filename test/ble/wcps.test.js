@@ -162,8 +162,8 @@ describe('Control Point', () => {
                     resolution: 1,
                     unit: '%',
                     size: 2,
-                    min: 19660.8,
-                    max: 45875.2,
+                    min: 0,
+                    max: 65536,
                     default: 32768
                 },
             });
@@ -176,6 +176,26 @@ describe('Control Point', () => {
             expect(view.getUint16(1, true)).toBe(34340);
         });
 
+        test('encode -1', () => {
+            const view = new DataView(control.slopeTarget.encode({grade: -1}));
+            expect(view.getUint16(1, true)).toBe(32440);
+        });
+
+        test('encode 0', () => {
+            const view = new DataView(control.slopeTarget.encode({grade: 0}));
+            expect(view.getUint16(1, true)).toBe(32768);
+        });
+
+        test('encode 1', () => {
+            const view = new DataView(control.slopeTarget.encode({grade: 1}));
+            expect(view.getUint16(1, true)).toBe(33095);
+        });
+
+        test('encode 10', () => {
+            const view = new DataView(control.slopeTarget.encode({grade: 10}));
+            expect(view.getUint16(1, true)).toBe(36044);
+        });
+
         test('decode', () => {
             const view = new DataView((new Uint8Array(3)).buffer);
             view.setUint8( 0, 0x46, true);
@@ -183,6 +203,26 @@ describe('Control Point', () => {
 
             const res = control.slopeTarget.decode(view);
             expect(res).toEqual({grade: 4.8});
+        });
+
+        test('decode -1', () => {
+            const view = new DataView(control.slopeTarget.encode({grade: -1}));
+            expect(control.slopeTarget.decode(view).grade).toBe(-1);
+        });
+
+        test('decode 0', () => {
+            const view = new DataView(control.slopeTarget.encode({grade: 0}));
+            expect(control.slopeTarget.decode(view).grade).toBe(0);
+        });
+
+        test('decode 1', () => {
+            const view = new DataView(control.slopeTarget.encode({grade: 1}));
+            expect(control.slopeTarget.decode(view).grade).toBe(1);
+        });
+
+        test('decode 10', () => {
+            const view = new DataView(control.slopeTarget.encode({grade: 10}));
+            expect(control.slopeTarget.decode(view).grade).toBe(10);
         });
 
         test('encode -> decode', () => {
