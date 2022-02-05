@@ -242,7 +242,7 @@ function WheelCircumference() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, circumference, true);
 
-        console.log(`${Date.now()} :tx :wcps :circumference ${args.circumference}`);
+        console.log(`${Date.now()} :tx :wcps :circumference ${circumference}`);
 
         return view.buffer;
     }
@@ -301,7 +301,7 @@ function WindSpeed() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, windSpeed, true);
 
-        console.log(`${Date.now()} :tx :wcps :windSpeed ${args.windSpeed}`);
+        console.log(`${Date.now()} :tx :wcps :windSpeed ${windSpeed}`);
 
         return view.buffer;
     }
