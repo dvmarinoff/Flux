@@ -1,4 +1,4 @@
-import { xf, isObject, equals, exists } from '../functions.js';
+import { xf, isObject, equals, exists, existance, debounce } from '../functions.js';
 import { ble } from './web-ble.js';
 import { uuids } from './uuids.js';
 import { Device } from './device.js';
@@ -15,26 +15,62 @@ class Controllable extends Device {
     defaultFilter() {
         return ble.requestFilters.controllable;
     }
-    postInit(args) {
-        const self = this;
-        self.mode = 'erg';
-
-        xf.sub('db:mode',             self.onMode.bind(self));
-        xf.sub('db:powerTarget',      self.onPowerTarget.bind(self));
-        xf.sub('db:resistanceTarget', self.onResistanceTarget.bind(self));
-        xf.sub('db:slopeTarget',      self.onSlopeTarget.bind(self));
-    }
     async start(device) {
         const self = this;
+        self.mode = models.mode.state;
+        self.userWeight = models.weight.state;
+
         self.control = await self.controlService(device);
+        self.user    = await self.userService(device);
+        self.postStart({delay: self.control.delay});
+
+        self.onMode(self.mode);
+        self.onUserWeight(self.userWeight);
+    }
+    postStart(args = {}) {
+        const self = this;
+        const delay = existance(args.delay, 500);
+
+        self.debounced = {
+            onPowerTarget: debounce(
+                self.onPowerTarget.bind(self), delay, {trailing: true, leading: true}
+            ),
+            onResistanceTarget: debounce(
+                self.onResistanceTarget.bind(self), delay, {trailing: true, leading: true}
+            ),
+            onSlopeTarget: debounce(
+                self.onSlopeTarget.bind(self), delay, {trailing: true, leading: true}
+            ),
+        };
+
+        xf.sub('db:mode',             self.onMode.bind(self));
+        xf.sub('db:weight',           self.onUserWeight.bind(self));
+        xf.sub('db:powerTarget',      self.debounced.onPowerTarget.bind(self));
+        xf.sub('db:resistanceTarget', self.debounced.onResistanceTarget.bind(self));
+        xf.sub('db:slopeTarget',      self.debounced.onSlopeTarget.bind(self));
+
+        // xf.sub('db:powerTarget',      self.onPowerTarget.bind(self));
+        // xf.sub('db:resistanceTarget', self.onResistanceTarget.bind(self));
+        // xf.sub('db:slopeTarget',      self.onSlopeTarget.bind(self));
     }
     stop() {
         const self = this;
         self.control = {};
+        self.user  = {};
     }
     onMode(mode) {
         const self = this;
         self.mode = mode;
+        self.control.setMode(self.mode);
+    }
+    onUserWeight(weight) {
+        const self = this;
+        self.userWeight = weight;
+        console.log(`controllable userWeight ${self.userWeight}`);
+
+        if(exists(self.user.setUserWeight)) {
+            self.user.setUserWeight(self.userWeight);
+        }
     }
     onPowerTarget(power) {
         const self = this;
@@ -86,19 +122,60 @@ class Controllable extends Device {
                 onData: onIndoorBikeData.bind(self),
                 service,
                 ble,
-                controllable: self,
             });
             await wcps.start();
 
             return wcps;
         }
 
-        console.warn(`no FTMS, FE-C over BLE, or Wahoo CPS found on device ${self.device.name}`, self.device);
+        console.warn(`:controlService 'no FTMS, FE-C over BLE, or Wahoo CPS found on device ${self.device.name}'`);
 
         return {
             setTargetPower:      ((x) => x),
             setTargetResistance: ((x) => x),
             setTargetSlope:      ((x) => x)
+        };
+    }
+    async userService() {
+        const self = this;
+
+        if(equals(self.control.protocol, 'ftms')) {
+            if(self.hasService(self.services, uuids.fec)) {
+                const service = await self.getService(uuids.fec);
+                const fec = new FEC({
+                    flags: {read: false},
+                    service,
+                    ble,
+                });
+                await fec.start();
+
+                return fec;
+            }
+            if(self.hasService(self.services, uuids.cyclingPower)) {
+                const service = await self.getService(uuids.cyclingPower);
+                const wcps = new WahooCyclingPower({
+                    flags: {read: false},
+                    service,
+                    ble,
+                });
+                await wcps.start();
+
+                return wcps;
+            }
+        }
+        if(equals(self.control.protocol, 'fec')) {
+            // use fec
+            return self.control;
+        }
+        if(equals(self.control.protocol, 'wcps')) {
+            // use wcps
+            return self.control;
+        }
+
+        console.warn(`:userService 'no FE-C over BLE, or Wahoo CPS found on device ${self.device.name}'`);
+
+        return {
+            setUserWeight: ((x) => x),
         };
     }
 }

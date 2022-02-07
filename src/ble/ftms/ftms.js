@@ -11,6 +11,8 @@ class FitnessMachineService extends BLEService {
     uuid = uuids.fitnessMachine;
 
     postInit(args = {}) {
+        this.protocol  = 'ftms';
+        this.delay     = 500;
         this.onData    = existance(args.onData,    this.defaultOnData);
         this.onStatus  = existance(args.onStatus,  this.defaultOnStatus);
         this.onControl = existance(args.onControl, this.defaultOnControlPoint);
@@ -48,7 +50,7 @@ class FitnessMachineService extends BLEService {
             },
         };
     }
-    async config() {
+    async postStart() {
         const self = this;
 
         self.features = await self.getFeatures();

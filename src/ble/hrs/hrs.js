@@ -17,7 +17,7 @@ class HeartRateService extends BLEService {
             },
         };
     }
-    async config() {
+    async postStart() {
         const self = this;
         if(self.supported('heartRateMeasurement')) {
             await self.sub('heartRateMeasurement',

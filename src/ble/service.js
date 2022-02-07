@@ -38,7 +38,7 @@ class BLEService {
     async start() {
         const self = this;
         await self.getCharacteristics(self.service);
-        await self.config();
+        await self.postStart();
     }
     async config() {
         const self = this;

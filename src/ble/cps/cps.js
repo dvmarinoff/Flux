@@ -30,7 +30,7 @@ class CyclingPowerService extends BLEService {
             },
         };
     }
-    async config() {
+    async postStart() {
         const self = this;
         self.features = await self.getFeatures();
 

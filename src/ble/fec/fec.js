@@ -2,7 +2,7 @@ import { uuids } from '../uuids.js';
 import { BLEService } from '../service.js';
 import { message } from '../../ant/message.js';
 import { fec } from '../../ant/fec.js';
-import { equals, isObject, exists, existance, dataviewToArray } from '../../functions.js';
+import { equals, isObject, exists, existance, delay, dataviewToArray } from '../../functions.js';
 
 function FEC2() {
 
@@ -72,27 +72,36 @@ function slopeTarget(grade, channel = 5) {
 function userConfig(args = {}) {
     const defaults = {
         channel: 5,
-        user: {
-            userWeight: 75,
-            bikeWeight: 9,
-        },
+        userWeight: 75,
+        bikeWeight: 9,
     };
 
-    const user    = existance(args.user, defaults.user);
-    const channel = existance(args.channel, defaults.channel);
+    const userWeight = existance(args.userWeight, defaults.userWeight);
+    const bikeWeight = existance(args.bikeWeight, defaults.bikeWeight);
+    const channel    = existance(args.channel, defaults.channel);
+
+    console.log(userWeight);
 
     return message.acknowledgedData.encode({
         channelNumber: channel,
-        payload: fec.dataPage55.encode(user),
+        payload: fec.dataPage55.encode({userWeight, bikeWeight}),
     }).buffer;
 }
 
 class FEC extends BLEService {
     uuid = uuids.fec;
 
-    postInit(args = {}) {
+    postInit(args = {flags: {}}) {
+        console.log(args);
+        this.protocol  = 'fec';
+        this.delay     = 500;
         this.onData    = existance(args.onData,    ((x) => x));
         this.onControl = existance(args.onControl, ((x) => x));
+        this.flags     = {
+            read: existance(args.flags.read, true),
+            write: existance(args.flags.write, true)
+        };
+        this.controllable = args.controllable;
 
         this.characteristics = {
             fec2: {
@@ -107,13 +116,15 @@ class FEC extends BLEService {
             },
         };
     }
-    async config() {
+    async postStart() {
         const self = this;
-        await self.sub('fec2', fec2.decode, self.onData);
 
-        setTimeout(function() {
-            self.userConfig();
-        }, 4000);
+        if(self.flags.read) {
+            await self.sub('fec2', fec2.decode, self.onData);
+        }
+
+        await delay(4000);
+        self.userConfig({userWeight: models.weight.state});
     }
     async setTargetPower(value) {
         const self = this;
@@ -132,8 +143,13 @@ class FEC extends BLEService {
     }
     async userConfig(value) {
         const self = this;
+        console.log(value);
         const buffer = userConfig(value);
         return await self.write('fec3', buffer);
+    }
+    async setUserWeight(kg = 75) {
+        const self = this;
+        await self.userConfig({userWeight: kg});
     }
 }
 

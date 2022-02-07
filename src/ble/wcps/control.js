@@ -223,7 +223,7 @@ function WheelCircumference() {
     const definitions = {
         circumference: {
             resolution: 0.1,
-            unit: 'm',
+            unit: 'mm',
             size: 2,
             min: 0,
             max: 6553.4,
@@ -328,13 +328,13 @@ function SIM() {
 
     const definitions = {
         weight: {
-            resolution: 0.01, unit: 'kg', size: 2, min: 0, max: 65535, default: 75
+            resolution: 0.01, unit: 'kg', size: 2, min: 0, max: 655.35, default: 75
         },
         crr: {
-            resolution: 0.0001, unit: '', size: 2, min: 0, max: 65535, default: 0.004
+            resolution: 0.0001, unit: '', size: 2, min: 0, max: 6.5535, default: 0.004
         },
         windResistance: {
-            resolution: 0.001, unit: 'kg/m', size: 2, min: 0, max: 65535, default: 0.51
+            resolution: 0.001, unit: 'kg/m', size: 2, min: 0, max: 65.535, default: 0.51
         },
     };
 

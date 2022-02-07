@@ -17,9 +17,8 @@ import { ble } from './web-ble.js';
 //               for this.id
 
 class Device {
-    constructor(args) {
+    constructor(args = {}) {
         this.init(args);
-        if(!exists(args)) args = {};
         this.id       = existance(args.id, this.defaultId());
         this.name     = existance(args.name, this.defaultName());
         this.filter   = existance(args.filter, this.defaultFilter());

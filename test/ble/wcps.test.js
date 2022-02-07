@@ -345,6 +345,20 @@ describe('Control Point', () => {
             expect(view.getUint16(5, true)).toBe(480);
         });
 
+        test('encode max', () => {
+            const value = {
+                weight: 655.35,
+                crr: 6.5535,
+                windResistance: 65.535,
+            };
+            const res = control.sim.encode(value);
+            const view = new DataView(res);
+            expect(view.getUint8( 0, true)).toBe(0x43);
+            expect(view.getUint16(1, true)).toBe(65535);
+            expect(view.getUint16(3, true)).toBe(65535);
+            expect(view.getUint16(5, true)).toBe(65535);
+        });
+
         test('decode', () => {
             const view = new DataView((new Uint8Array(7)).buffer);
             view.setUint8( 0, 0x43, true);

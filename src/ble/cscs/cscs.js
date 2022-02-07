@@ -31,7 +31,7 @@ class SpeedCadenceService extends BLEService {
             },
         };
     }
-    async config() {
+    async postStart() {
         const self = this;
 
         const measurement = Measurement();
