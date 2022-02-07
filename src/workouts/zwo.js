@@ -1,5 +1,4 @@
-import { equals, existance, exists, empty, repeat, capitalize } from '../functions.js';
-import { toDecimalPoint, divisors } from '../utils.js';
+import { equals, existance, exists, empty, repeat, capitalize, toFixed } from '../functions.js';
 
 function readAttribute(args = {}) {
     const el       = args.el;
@@ -311,7 +310,7 @@ function Warmup(args = {}) {
         }
 
         const fixedSteps = steps.map((step) => {
-            step.power = toDecimalPoint(step.power, 2);
+            step.power = toFixed(step.power, 2);
             return step;
         });
 
@@ -355,7 +354,7 @@ function Cooldown(args = {}) {
         }
 
         const fixedSteps = steps.map((step) => {
-            step.power = toDecimalPoint(step.power, 2);
+            step.power = toFixed(step.power, 2);
             return step;
         });
 

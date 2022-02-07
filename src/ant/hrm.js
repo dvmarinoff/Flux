@@ -1,5 +1,4 @@
-import { xf, equals } from '../functions.js';
-import { capitalize } from '../utils.js';
+import { xf, equals, capitalize } from '../functions.js';
 import { Channel, keys } from './channel.js';
 import { HrmChannel } from './hrm-channel.js';
 import { message } from './message.js';

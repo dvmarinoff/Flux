@@ -1,7 +1,6 @@
 import { exists, empty, isUndefined,
          map, first, last, traverse,
-         nthBitToBool, toUint8Array,
-          } from '../functions.js';
+         nthBitToBool } from '../functions.js';
 import { calculateCRC, typeToAccessor } from '../utils.js';
 import { messages, basetypes, appTypes } from './profiles.js';
 import { localMessageDefinitions as lmd } from './local-message-definitions.js';

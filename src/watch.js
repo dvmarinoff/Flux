@@ -1,5 +1,5 @@
 import { equals, exists, existance, first, last, xf, avg, max } from './functions.js';
-import { kphToMps, mpsToKph, timeDiff, fixInRange } from './utils.js';
+import { kphToMps, mpsToKph, timeDiff } from './utils.js';
 import { models } from './models/models.js';
 
 class Watch {
@@ -288,10 +288,6 @@ xf.reg('watch:lap', (x, db) => {
                       totalElapsedTime: elapsed,
                       avgPower:         Math.round(avg(db.lap, 'power')),
                       maxPower:         max(db.lap, 'power')});
-        // console.log(`lap: `,
-        //             {timestamp:        new Date(timeEnd),
-        //              startTime:        new Date(timeStart),
-        //              totalElapsedTime: elapsed});
     }
     db.lap = [];
     db.lapStartTime = timeEnd + 0;

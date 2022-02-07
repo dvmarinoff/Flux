@@ -1,5 +1,4 @@
-import { equals, existance, curry2 } from '../functions.js';
-import { fixInRange } from '../utils.js';
+import { equals, existance, curry2, clamp } from '../functions.js';
 
 function DataPage(args = {}) {
     const defaults = {
@@ -35,7 +34,7 @@ function DataPage(args = {}) {
         if(equals(value, invalid)) {
             return value;
         } else {
-            return Math.floor(fixInRange(min, max, transform(prop, value)));
+            return Math.floor(clamp(min, max, transform(prop, value)));
         }
     }
 

@@ -1,6 +1,6 @@
-import { existance, first, last, equals, isArray } from './functions.js';
+import { exists, existance, first, last, equals, isObject, isFunction, isArray } from './functions.js';
 
-// Views
+// format
 function formatTime(args = {}) {
     const defaults = {
         unit:   'seconds',
@@ -38,27 +38,6 @@ function formatTime(args = {}) {
     return value;
 }
 
-// function secondsToHms(elapsed, compact = false) {
-//     let hour = Math.floor(elapsed / 3600);
-//     let min  = Math.floor(elapsed % 3600 / 60);
-//     let sec  = elapsed % 60;
-//     let sD   = (sec < 10)  ? `0${sec}`  : `${sec}`;
-//     let mD   = (min < 10)  ? `0${min}`  : `${min}`;
-//     let hD   = (hour < 10) ? `0${hour}` : `${hour}`;
-//     let hDs  = (hour < 10) ? `${hour}`  : `${hour}`;
-//     let res  = ``;
-//     if(compact) {
-//         if(elapsed < 3600) {
-//             res = `${mD}:${sD}`;
-//         } else {
-//             res = `${hD}:${mD}:${sD}`;
-//         }
-//     } else {
-//         res = `${hD}:${mD}:${sD}`;
-//     }
-//     return res ;
-// }
-
 function dateToDashString(date) {
     const day    = (date.getDate()).toString().padStart(2, '0');
     const month  = (date.getMonth()+1).toString().padStart(2, '0');
@@ -80,16 +59,7 @@ function mpsToKph(mps) {
     return 3.6 * mps;
 };
 
-function stringToBool(str) {
-    if(str === 'true') return true;
-    if(str === 'false') return false;
-    return false;
-}
-
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
+// Math
 const bod = Math.pow(2, 31) / 180;
 const dob = 180 / Math.pow(2, 31);
 
@@ -101,9 +71,6 @@ function semicirclesToDeg(semicircles) {
     return semicircles * dob;
 }
 
-//
-// Other
-//
 function digits(n) {
     return Math.log(n) * Math.LOG10E + 1 | 0;
 }
@@ -121,16 +88,6 @@ function inRange(min, max, value, lb=gte, ub=lte) {
     return (lb(value, min) && ub(value, max));
 }
 
-function fixInRange(min, max, value) {
-    if(value >= max) {
-        return max;
-    } else if(value < min) {
-        return min;
-    } else {
-        return value;
-    }
-}
-
 function divisors(number) {
     let divisors = [1];
     for(let i=2; i < number/2; i++) {
@@ -139,25 +96,9 @@ function divisors(number) {
     return divisors;
 }
 
-function toDecimalPoint (x, point = 2) {
-    return Number((x).toFixed(point));
-}
-
 //
 // WebBLE
 //
-function filterIn(coll, prop, value) {
-    return first(coll.filter(x => x[prop] === value));
-}
-
-function filterByValue(obj, value) {
-    return Object.entries(obj).filter(kv => kv[1] === value);
-}
-
-function findByValue(obj, value) {
-    return first(first(filterByValue(obj, value)));
-}
-
 function hex(n) {
     let h = parseInt(n).toString(16).toUpperCase();
     if(h.length === 1) {
@@ -267,28 +208,15 @@ function typeToAccessor(basetype, method = 'set') {
     return `${method}Uint8`;
 }
 
-function getUint16(uint8array, index = 0, endianness = true) {
-    let dataview = new DataView(uint8array.buffer);
-    return dataview.getUint16(index, dataview, endianness);
-}
-
-function getUint32(uint8array, index = 0, endianness = true) {
-    let dataview = new DataView(uint8array.buffer);
-    return dataview.getUint32(index, dataview, endianness);
-}
-
 export {
-    // Views
+    // format
     formatTime,
-    // secondsToHms,
     dateToDashString,
     format,
     kphToMps,
     mpsToKph,
-    stringToBool,
-    capitalize,
 
-    // Other
+    // math
     digits,
     rand,
     gte,
@@ -296,14 +224,9 @@ export {
     gt,
     lt,
     inRange,
-    fixInRange,
-    toDecimalPoint,
     divisors,
 
     // WebBLE
-    filterIn,
-    filterByValue,
-    findByValue,
     hex,
 
     // ANT+ and .FIT
@@ -316,6 +239,4 @@ export {
     splitAt,
     calculateCRC,
     typeToAccessor,
-    getUint16,
-    getUint32,
 };

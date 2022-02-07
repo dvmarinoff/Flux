@@ -1,5 +1,4 @@
-import { equals, existance, curry2, avg } from '../functions.js';
-import { fixInRange, hex } from '../utils.js';
+import { equals, existance, curry2, avg, clamp } from '../functions.js';
 
 function Spec(args = {}) {
     const definitions = existance(args.definitions);
@@ -18,7 +17,7 @@ function Spec(args = {}) {
         const max      = applyResolution(definitions[prop].max);
         const value    = existance(input, fallback);
 
-        return Math.floor(fixInRange(min, max, transform(value)));
+        return Math.floor(clamp(min, max, transform(value)));
     }
 
     function decodeField(prop, input, transform = removeResolution) {
@@ -257,7 +256,7 @@ function RateAdjuster(args = {}) {
     function calculate(sample) {
         const tsAvgDiff = timestampAvgDiff(sample);
 
-        const maxRateCount = fixInRange(2, 15, Math.round(_maxStillTime / tsAvgDiff) - 1);
+        const maxRateCount = clamp(2, 15, Math.round(_maxStillTime / tsAvgDiff) - 1);
 
         console.log(`rateAdjuster :on ${sensor} :tsAvgDiff ${tsAvgDiff} :result ${maxRateCount}`);
 

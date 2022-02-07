@@ -54,6 +54,12 @@ function isAtomic(x) {
     return isNumber(x) || isString(x);
 }
 
+function validate(predicates = [], value, fallback = undefined) {
+    if(predicates.reduce((acc, p) => acc && p(value), true)) return value;
+    if(exists(fallback)) return fallback;
+    throw new Error(`validate needs a fallback value with `, value);
+}
+
 // Collections
 function empty(x) {
     if(isNull(x)) throw new Error(`empty called with null: ${x}`);
@@ -195,6 +201,16 @@ function capitalize(str) {
     return str.trim().replace(/^\w/, (c) => c.toUpperCase());
 }
 
+function clamp(lower, upper, value) {
+    if(value >= upper) {
+        return upper;
+    } else if(value < lower) {
+        return lower;
+    } else {
+        return value;
+    }
+}
+
 // Functions
 function compose2(f, g) {
     return function(...args) {
@@ -233,6 +249,163 @@ function curry2(fn) {
         }
     };
 }
+
+//
+// Copied from lodash.js
+//
+function debounce(func, wait, options = {}) {
+    const root = window;
+    let lastArgs,
+        lastThis,
+        maxWait,
+        result,
+        timerId,
+        lastCallTime;
+
+    let lastInvokeTime = 0;
+    let leading = false;
+    let maxing = false;
+    let trailing = true;
+
+    // Bypass `requestAnimationFrame` by explicitly setting `wait=0`.
+    const useRAF = (!wait && wait !== 0 && typeof root.requestAnimationFrame === 'function');
+
+    if(!isFunction(func)) { // edit
+        throw new TypeError('debounce expectes a function');
+    }
+
+    wait = existance(toNumber(wait), 0); // edit
+
+    // if (isObject(options)) {
+    leading = toBool(options.leading);
+    maxing = exists(options.maxWait);
+    maxWait = maxing ? Math.max(existance(toNumber(options.maxWait), 0), wait) : maxWait;
+    trailing = exists(options.trailing) ? toBool(options.trailing) : trailing;
+    // }
+
+    function invokeFunc(time) {
+        const args = lastArgs;
+        const thisArg = lastThis;
+
+        lastArgs = lastThis = undefined;
+        lastInvokeTime = time;
+        result = func.apply(thisArg, args);
+        return result;
+    }
+
+    function startTimer(pendingFunc, wait) {
+        if (useRAF) {
+            root.cancelAnimationFrame(timerId);
+            return root.requestAnimationFrame(pendingFunc);
+        }
+        return setTimeout(pendingFunc, wait);
+    }
+
+    function cancelTimer(id) {
+        if (useRAF) {
+            return root.cancelAnimationFrame(id);
+        }
+        return clearTimeout(id); // edit
+    }
+
+    function leadingEdge(time) {
+        // Reset any `maxWait` timer.
+        lastInvokeTime = time;
+        // Start the timer for the trailing edge.
+        timerId = startTimer(timerExpired, wait);
+        // Invoke the leading edge.
+        return leading ? invokeFunc(time) : result;
+    }
+
+    function remainingWait(time) {
+        const timeSinceLastCall = time - lastCallTime;
+        const timeSinceLastInvoke = time - lastInvokeTime;
+        const timeWaiting = wait - timeSinceLastCall;
+
+        return maxing
+            ? Math.min(timeWaiting, maxWait - timeSinceLastInvoke)
+            : timeWaiting;
+    }
+
+    function shouldInvoke(time) {
+        const timeSinceLastCall = time - lastCallTime;
+        const timeSinceLastInvoke = time - lastInvokeTime;
+
+        // Either this is the first call, activity has stopped and we're at the
+        // trailing edge, the system time has gone backwards and we're treating
+        // it as the trailing edge, or we've hit the `maxWait` limit.
+        return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+               (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+    }
+
+    function timerExpired() {
+        const time = Date.now();
+        if (shouldInvoke(time)) {
+            return trailingEdge(time);
+        }
+        // Restart the timer.
+        timerId = startTimer(timerExpired, remainingWait(time));
+        return timerId; // edit
+    }
+
+    function trailingEdge(time) {
+        timerId = undefined;
+
+        // Only invoke if we have `lastArgs` which means `func` has been
+        // debounced at least once.
+        if (trailing && lastArgs) {
+            return invokeFunc(time);
+        }
+        lastArgs = lastThis = undefined;
+        return result;
+    }
+
+    function cancel() {
+        if (timerId !== undefined) {
+            cancelTimer(timerId);
+        }
+        lastInvokeTime = 0;
+        lastArgs = lastCallTime = lastThis = timerId = undefined;
+    }
+
+    function flush() {
+        return isUndefined(timerId) ? result : trailingEdge(Date.now());
+    }
+
+    function pending() {
+        return !isUndefined(timerId);
+    }
+
+    function debounced(...args) {
+        const time = Date.now();
+        const isInvoking = shouldInvoke(time);
+
+        lastArgs = args;
+        lastThis = this;
+        lastCallTime = time;
+
+        if(isInvoking) {
+            if(isUndefined(timerId)) {
+                return leadingEdge(lastCallTime);
+            }
+            if(maxing) {
+                // Handle invocations in a tight loop.
+                timerId = startTimer(timerExpired, wait);
+                return invokeFunc(lastCallTime);
+            }
+        }
+        if(isUndefined(timerId)) {
+            timerId = startTimer(timerExpired, wait);
+        }
+        return result;
+    }
+
+    debounced.cancel = cancel;
+    debounced.flush = flush;
+    debounced.pending = pending;
+    return debounced;
+}
+// end copied from lodash.js
 
 // Async
 function delay(ms) {
@@ -323,21 +496,18 @@ function XF(args = {}) {
 
 const xf = XF();
 
-// Bits
-function nthBit(field, bit) {
-    return (field >> bit) & 1;
-};
-
-function bitToBool(bit) {
-    return !!(bit);
-};
-
-function nthBitToBool(field, bit) {
-    return bitToBool(nthBit(field, bit));
+// format
+function toNumber(value) {
+    return +value;
 }
 
-function boolToNumber(bool) {
-    return +bool;
+function toBool(value) {
+    return !!(value);
+};
+
+function toFixed(x, points = 2) {
+    const precision = 10**points;
+    return Math.round(x * precision) / precision;
 }
 
 function dataviewToArray(dataview) {
@@ -361,24 +531,13 @@ function stringToDataview(str) {
     return dataview;
 }
 
-function fromUint16(n) {
-    let buffer = new ArrayBuffer(2);
-    let view = new DataView(buffer);
-    view.setUint16(0, n, true);
-    return view;
-}
+// Bits
+function nthBit(field, bit) {
+    return (field >> bit) & 1;
+};
 
-function fromUint32(n) {
-    let buffer = new ArrayBuffer(4);
-    let view = new DataView(buffer);
-    view.setUint32(0, n, true);
-    return view;
-}
-
-function toUint8Array(n, type) {
-    if(type === 32) return fromUint32(n);
-    if(type === 16) return fromUint16(n);
-    return n;
+function nthBitToBool(field, bit) {
+    return toBool(nthBit(field, bit));
 }
 
 function xor(view, start = 0, end = view.byteLength) {
@@ -404,6 +563,7 @@ export {
     isCollection,
     isNumber,
     isAtomic,
+    validate,
 
     // collections
     first,
@@ -421,12 +581,14 @@ export {
     sum,
     rand,
     capitalize,
+    clamp,
 
     // functions
     compose,
     pipe,
     repeat,
     curry2,
+    debounce,
 
     // async
     delay,
@@ -434,15 +596,17 @@ export {
     // events
     xf,
 
-    // bits
-    nthBit,
-    bitToBool,
-    nthBitToBool,
-    boolToNumber,
+    // format
+    toNumber,
+    toFixed,
+    toBool,
     dataviewToArray,
     dataviewToString,
     stringToCharCodes,
-    toUint8Array,
+
+    // bits
+    nthBit,
+    nthBitToBool,
     xor,
 };
 

@@ -1,5 +1,5 @@
 import { equals, existance, curry2, xor,
-         nthBit, nthBitToBool, boolToNumber } from '../functions.js';
+         nthBit, nthBitToBool, toNumber } from '../functions.js';
 import { format } from '../utils.js';
 import { DataPage } from './common.js';
 
@@ -403,8 +403,8 @@ function Capabilities() {
         const virtualSpeed = existance(args.virtualSpeed, defaults.virtualSpeed);
 
         return hrDataSourceToNumber(hrDataSource) +
-               (boolToNumber(distance) << 2) +
-               (boolToNumber(virtualSpeed) << 3);
+               (toNumber(distance) << 2) +
+               (toNumber(virtualSpeed) << 3);
     }
 
     function decode(bitField) {

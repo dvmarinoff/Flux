@@ -1,6 +1,5 @@
-import { equals, exists, existance, isUndefined,
-         dataviewToArray, bitToBool, nthBitToBool,
-         boolToNumber, xor } from '../functions.js';
+import { equals, exists, existance,
+         dataviewToArray, nthBitToBool, xor } from '../functions.js';
 import { ids, events, channelTypes, values, keys } from './constants.js';
 
 function Message(args = {}) {
