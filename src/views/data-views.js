@@ -1,7 +1,6 @@
-import { xf, exists, existance, equals, avg, rand } from '../functions.js';
-import { formatTime, stringToBool } from '../utils.js';
+import { xf, exists, existance, equals, avg, toFixed } from '../functions.js';
+import { formatTime } from '../utils.js';
 import { models } from '../models/models.js';
-// import { scale } from '../utils.js';
 
 //
 // DataView
@@ -83,6 +82,103 @@ class DataView extends HTMLElement {
 }
 
 customElements.define('data-view', DataView);
+
+
+class PowerTargetControl extends DataView {
+    postInit() {
+        const self = this;
+        this.state = 0;
+        this.setDefaults();
+    }
+    setDefaults() {
+        this.selectors = {
+            input: '#power-target-input',
+            inc:   '#power-target-inc',
+            dec:   '#power-target-dec',
+        };
+        this.prop = 'db:powerTarget';
+        this.effects = {
+            inc: 'power-target-inc',
+            dec: 'power-target-dec',
+            set: 'power-target-set',
+        };
+        this.parse = parseInt;
+    }
+    connectedCallback() {
+        this.$input = document.querySelector(this.selectors.input);
+        this.$inc   = document.querySelector(this.selectors.inc);
+        this.$dec   = document.querySelector(this.selectors.dec);
+
+        this.$input.addEventListener('change', this.onChange.bind(this));
+        this.$inc.addEventListener('pointerup', this.onInc.bind(this));
+        this.$dec.addEventListener('pointerup', this.onDec.bind(this));
+
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this));
+    }
+    disconnectedCallback() {
+        this.$input.removeEventListener('change', this.onChange);
+        xf.unsub(`db:${this.prop}`, this.onUpdate);
+    }
+    onInc(e) {
+        xf.dispatch(`ui:${this.effects.inc}`);
+    }
+    onDec(e) {
+        xf.dispatch(`ui:${this.effects.dec}`);
+    }
+    onChange(e) {
+        this.state = this.parse(e.target.value);
+        xf.dispatch(`ui:${this.effects.set}`, this.state);
+    }
+    render() {
+        this.$input.value = this.transform(this.state);
+    }
+}
+
+customElements.define('power-target-control', PowerTargetControl);
+
+
+class ResistanceTargetControl extends PowerTargetControl {
+    setDefaults() {
+        this.selectors = {
+            input: '#resistance-target-input',
+            inc:   '#resistance-target-inc',
+            dec:   '#resistance-target-dec',
+        };
+        this.prop = 'db:resistanceTarget';
+        this.effects = {
+            inc: 'resistance-target-inc',
+            dec: 'resistance-target-dec',
+            set: 'resistance-target-set',
+        };
+        this.parse = parseInt;
+    }
+}
+
+customElements.define('resistance-target-control', ResistanceTargetControl);
+
+
+class SlopeTargetControl extends PowerTargetControl {
+    setDefaults() {
+        this.selectors = {
+            input: '#slope-target-input',
+            inc:   '#slope-target-inc',
+            dec:   '#slope-target-dec',
+        };
+        this.prop = 'db:slopeTarget';
+        this.effects = {
+            inc: 'slope-target-inc',
+            dec: 'slope-target-dec',
+            set: 'slope-target-set',
+        };
+        this.parse = parseFloat;
+    }
+    transform(state) {
+        return (state).toFixed(1);
+    }
+}
+
+customElements.define('slope-target-control', SlopeTargetControl);
+
 
 class TimerTime extends DataView {
     getDefaults() {

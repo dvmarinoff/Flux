@@ -166,71 +166,49 @@
 
                                 <tab-group prop="mode">
                                     <div id="erg-mode-controls" class="tab active mode-controls" tab="erg">
-                                        <div id="power-control-btn" class="number-btn">
+                                        <power-target-control id="power-control-btn" class="number-btn">
                                             <div class="number-input">
-                                                <button is="effect-button"
-                                                        id="power-target-dec"
-                                                        class="number-input--dec number-input--btn btn"
-                                                        effect="power-target-dec">-</button>
-                                                <input is="int-input"
-                                                    id="power-target-input"
-                                                    class="number-input--value"
-                                                    type="number"
-                                                    value="0"
-                                                    autocomplete="off"
-                                                    prop="powerTarget"
-                                                    effect="power-target-set" />
-                                                <button is="effect-button"
-                                                        id="power-target-inc"
-                                                        class="number-input--inc number-input--btn btn"
-                                                        effect="power-target-inc">+</button>
+                                                <button id="power-target-dec"
+                                                        class="number-input--dec number-input--btn btn">-</button>
+                                                <input id="power-target-input"
+                                                       class="number-input--value"
+                                                       type="number"
+                                                       value="0"
+                                                       autocomplete="off"/>
+                                                <button id="power-target-inc"
+                                                        class="number-input--inc number-input--btn btn">+</button>
                                             </div>
-                                        </div>
+                                        </power-target-control>
                                     </div> <!-- end erg mode -->
                                     <div id="resistance-mode-controls" class="tab mode-controls" tab="resistance">
-                                        <div id="resistance-control-btn" class="number-btn">
+                                        <resistance-target-control id="resistance-control-btn" class="number-btn">
                                             <div class="number-input">
-                                                <button is="effect-button"
-                                                        id="resistance-target-dec"
-                                                        class="number-input--dec number-input--btn btn"
-                                                        effect="resistance-target-dec">-</button>
-                                                <input is="int-input"
-                                                    id="resistance-target-input"
-                                                    class="number-input--value input"
-                                                    type="number"
-                                                    value="0"
-                                                    autocomplete="off"
-                                                    prop="resistanceTarget"
-                                                    effect="resistance-target-set" />
-                                                <button is="effect-button"
-                                                        id="resistance-target-inc"
-                                                        class="number-input--inc number-input--btn btn"
-                                                        effect="resistance-target-inc">+</button>
+                                                <button id="resistance-target-dec"
+                                                        class="number-input--dec number-input--btn btn">-</button>
+                                                <input id="resistance-target-input"
+                                                       class="number-input--value input"
+                                                       type="number"
+                                                       value="0"
+                                                       autocomplete="off" />
+                                                <button id="resistance-target-inc"
+                                                        class="number-input--inc number-input--btn btn">+</button>
                                             </div>
-                                        </div>
+                                        </resistance-target-control>
                                     </div> <!-- end resistance mode -->
                                     <div id="slope-mode-controls" class="tab mode-controls" tab="slope">
-                                        <div id="slope-control-btn" class="number-btn">
+                                        <slope-target-control id="slope-control-btn" class="number-btn">
                                             <div class="number-input">
-                                                <button is="effect-button"
-                                                        id="slope-target-dec"
-                                                        class="number-input--dec number-input--btn btn"
-                                                        effect="slope-target-dec">-</button>
-                                                <input is="float-input"
-                                                    id="slope-target-input"
-                                                    class="number-input--value input"
-                                                    type="number"
-                                                    value="0"
-                                                    autocomplete="off"
-                                                    points="1"
-                                                    prop="slopeTarget"
-                                                    effect="slope-target-set" />
-                                                <button is="effect-button"
-                                                        id="slope-target-inc"
-                                                        class="number-input--inc number-input--btn btn"
-                                                        effect="slope-target-inc">+</button>
+                                                <button id="slope-target-dec"
+                                                        class="number-input--dec number-input--btn btn">-</button>
+                                                <input id="slope-target-input"
+                                                       class="number-input--value input"
+                                                       type="number"
+                                                       value="0"
+                                                       autocomplete="off" />
+                                                <button id="slope-target-inc"
+                                                        class="number-input--inc number-input--btn btn">+</button>
                                             </div>
-                                        </div>
+                                        </slope-target-control>
                                     </div> <!-- end slope mode -->
                                 </tab-group>
                             </div> <!-- end targets--cont -->
