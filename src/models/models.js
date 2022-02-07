@@ -1,7 +1,7 @@
 import { xf, exists, existance, empty, equals,
-         first, second, last } from '../functions.js';
+         first, second, last, clamp, toFixed } from '../functions.js';
 
-import { inRange, fixInRange, format, dateToDashString } from '../utils.js';
+import { inRange, dateToDashString } from '../utils.js';
 
 import { LocalStorageItem } from '../storage/local-storage.js';
 import { idb } from '../storage/idb.js';
@@ -33,6 +33,9 @@ class Model {
     defaultSet(value) {
         const self = this;
         if(self.isValid(value)) {
+            if(exists(self.state)) {
+                self.state = value;
+            }
             return value;
         } else {
             self.defaultOnInvalid(value);
@@ -105,7 +108,7 @@ class Speed extends Model {
         return (Number.isInteger(value) || Number.isFloat(value)) &&
                 inRange(self.min, self.max, value);
     }
-}
+
 
 class Distance extends Model {
     defaultValue() { return 0; }
@@ -159,7 +162,7 @@ class Target extends Model {
             self.onInvalid();
             return self.default;
         }
-        return fixInRange(self.min, self.max, self.parse(value));
+        return clamp(self.min, self.max, self.parse(value));
     }
     parse(value) { return parseInt(value); }
     inc(value) {
@@ -215,6 +218,7 @@ class CadenceTarget extends Target {
 
 class Mode extends Model {
     postInit(args) {
+        this.state = self.defaultValue();
         this.values = ['erg', 'resistance', 'slope'];
     }
     defaultValue() { return 'erg'; }
@@ -257,7 +261,7 @@ class FTP extends Model {
     }
     toRelative(value, ftp) {
         const self = this;
-        if(value > self.minAbsValue) return format(value / ftp, 2);
+        if(value > self.minAbsValue) return toFixed(value / ftp, 2);
         return value;
     }
     toAbsolute(value, ftp) {
@@ -298,6 +302,7 @@ class Weight extends Model {
             fallback: self.defaultValue(),
             parse: parseInt,
         };
+        self.state = self.defaultValue();
         self.min = existance(args.min, 0);
         self.max = existance(args.max, 500);
         self.storage = new args.storage(storageModel);
@@ -308,6 +313,7 @@ class Weight extends Model {
         return Number.isInteger(value) && inRange(self.min, self.max, value);
     }
 }
+
 class Theme extends Model {
     postInit(args = {}) {
         const self = this;
