@@ -1,5 +1,4 @@
-import { equals, exists } from '../functions.js';
-import { filterIn, findByValue } from '../utils.js';
+import { first, equals, exists } from '../functions.js';
 import { uuids } from './uuids.js';
 
 ////
@@ -34,6 +33,18 @@ const _speedCadence = {
 
 const _all = {acceptAllDevices: true};
 
+function filterIn(coll, prop, value) {
+    return first(coll.filter(x => x[prop] === value));
+}
+
+function filterByValue(obj, value) {
+    return Object.entries(obj).filter(kv => kv[1] === value);
+}
+
+function findByValue(obj, value) {
+    return first(first(filterByValue(obj, value)));
+}
+
 function filterDevice(devices, id) {
     return filterIn(devices, id);
 }
@@ -41,6 +52,7 @@ function filterDevice(devices, id) {
 function includesDevice(devices, id) {
     return devices.map(device => device.id).includes(device => equals(device.id, id));
 }
+
 
 const _ = { filterDevice, includesDevice };
 
@@ -162,7 +174,7 @@ class WebBLE {
         const self = this;
         let res = undefined;
         try{
-            if('writeValueWithResponse' in characteristic) {
+            if(exists(characteristic.writeValueWithResponse)) {
                 res = await characteristic.writeValueWithResponse(value);
             } else {
                 res = await characteristic.writeValue(value);
