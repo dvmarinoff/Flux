@@ -1732,6 +1732,10 @@ and (min-height: 1200px) {
         line-height: 2.5em;
     }
 
+    .workout--short-info {
+        line-height: 1.5em;
+    }
+
     #targets {
         font-size: 1.4rem;
         --number-input-height: 6rem;
@@ -1821,11 +1825,11 @@ and (min-width: 500px) {
         flex-direction: column;
     }
 
-    .switch--indicator {
+    .connection-switch--indicator {
         margin: 0;
     }
 
-    .switch--label {
+    .connection-switch--label {
         display: none;
     }
 
