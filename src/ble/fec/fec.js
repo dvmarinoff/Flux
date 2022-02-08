@@ -1,5 +1,6 @@
 import { uuids } from '../uuids.js';
 import { BLEService } from '../service.js';
+
 import { message } from '../../ant/message.js';
 import { fec } from '../../ant/fec.js';
 import { equals, isObject, exists, existance, delay, dataviewToArray } from '../../functions.js';
@@ -80,7 +81,7 @@ function userConfig(args = {}) {
     const bikeWeight = existance(args.bikeWeight, defaults.bikeWeight);
     const channel    = existance(args.channel, defaults.channel);
 
-    console.log(userWeight);
+    console.log(`:tx :fec :userConfig ${userWeight} ${bikeWeight}`);
 
     return message.acknowledgedData.encode({
         channelNumber: channel,
@@ -91,17 +92,13 @@ function userConfig(args = {}) {
 class FEC extends BLEService {
     uuid = uuids.fec;
 
-    postInit(args = {flags: {}}) {
-        console.log(args);
+    postInit(args = {}) {
         this.protocol  = 'fec';
         this.delay     = 500;
         this.onData    = existance(args.onData,    ((x) => x));
         this.onControl = existance(args.onControl, ((x) => x));
-        this.flags     = {
-            read: existance(args.flags.read, true),
-            write: existance(args.flags.write, true)
-        };
         this.controllable = args.controllable;
+        this.userWeight = args.controllable.userWeight;
 
         this.characteristics = {
             fec2: {
@@ -119,31 +116,31 @@ class FEC extends BLEService {
     async postStart() {
         const self = this;
 
-        if(self.flags.read) {
-            await self.sub('fec2', fec2.decode, self.onData);
-        }
+        await self.sub('fec2', fec2.decode, self.onData);
 
         await delay(4000);
-        self.userConfig({userWeight: models.weight.state});
+        self.userConfig({userWeight: self.userWeight});
     }
     async setTargetPower(value) {
         const self = this;
         const buffer = powerTarget(value);
+        console.log(`:tx :fec :power ${value}`);
         return await self.write('fec3', buffer);
     }
     async setTargetResistance(value) {
         const self = this;
         const buffer = resistanceTarget(value);
+        console.log(`:tx :fec :resistance ${value}`);
         return await self.write('fec3', buffer);
     }
     async setTargetSlope(value) {
         const self = this;
         const buffer = slopeTarget(value);
+        console.log(`:tx :fec :slope ${value}`);
         return await self.write('fec3', buffer);
     }
     async userConfig(value) {
         const self = this;
-        console.log(value);
         const buffer = userConfig(value);
         return await self.write('fec3', buffer);
     }
@@ -154,3 +151,4 @@ class FEC extends BLEService {
 }
 
 export { FEC };
+

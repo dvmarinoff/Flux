@@ -222,11 +222,11 @@ xf.reg(`ant:search:stopped`, (x, db) => {
 //
 xf.reg('app:start', async function(_, db) {
 
-    db.ftp = models.ftp.restore();
-    db.weight = models.weight.restore();
-    db.theme = models.theme.restore();
-    db.measurement = models.measurement.restore();
-    db.dataTileSwitch = models.dataTileSwitch.restore(),
+    db.ftp = models.ftp.set(models.ftp.restore());
+    db.weight = models.weight.set(models.weight.restore());
+    db.theme = models.theme.set(models.theme.restore());
+    db.measurement = models.measurement.set(models.measurement.restore());
+    db.dataTileSwitch = models.dataTileSwitch.set(models.dataTileSwitch.restore()),
 
     db.workouts = models.workouts.restore();
     db.workout = models.workout.restore(db);

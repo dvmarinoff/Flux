@@ -33,9 +33,8 @@ class Model {
     defaultSet(value) {
         const self = this;
         if(self.isValid(value)) {
-            if(exists(self.state)) {
-                self.state = value;
-            }
+            self.state = value;
+            // console.log(`${this.prop} : ${this.state}`);
             return value;
         } else {
             self.defaultOnInvalid(value);
@@ -108,7 +107,7 @@ class Speed extends Model {
         return (Number.isInteger(value) || Number.isFloat(value)) &&
                 inRange(self.min, self.max, value);
     }
-
+}
 
 class Distance extends Model {
     defaultValue() { return 0; }
@@ -218,7 +217,7 @@ class CadenceTarget extends Target {
 
 class Mode extends Model {
     postInit(args) {
-        this.state = self.defaultValue();
+        this.state = this.defaultValue();
         this.values = ['erg', 'resistance', 'slope'];
     }
     defaultValue() { return 'erg'; }
@@ -302,7 +301,6 @@ class Weight extends Model {
             fallback: self.defaultValue(),
             parse: parseInt,
         };
-        self.state = self.defaultValue();
         self.min = existance(args.min, 0);
         self.max = existance(args.max, 500);
         self.storage = new args.storage(storageModel);

@@ -23,9 +23,6 @@ class Controllable extends Device {
         self.control = await self.controlService(device);
         self.user    = await self.userService(device);
         self.postStart({delay: self.control.delay});
-
-        self.onMode(self.mode);
-        self.onUserWeight(self.userWeight);
     }
     postStart(args = {}) {
         const self = this;
@@ -48,10 +45,6 @@ class Controllable extends Device {
         xf.sub('db:powerTarget',      self.debounced.onPowerTarget.bind(self));
         xf.sub('db:resistanceTarget', self.debounced.onResistanceTarget.bind(self));
         xf.sub('db:slopeTarget',      self.debounced.onSlopeTarget.bind(self));
-
-        // xf.sub('db:powerTarget',      self.onPowerTarget.bind(self));
-        // xf.sub('db:resistanceTarget', self.onResistanceTarget.bind(self));
-        // xf.sub('db:slopeTarget',      self.onSlopeTarget.bind(self));
     }
     stop() {
         const self = this;
@@ -61,18 +54,16 @@ class Controllable extends Device {
     onMode(mode) {
         const self = this;
         self.mode = mode;
-        self.control.setMode(self.mode);
     }
     onUserWeight(weight) {
         const self = this;
         self.userWeight = weight;
-        console.log(`controllable userWeight ${self.userWeight}`);
 
         if(exists(self.user.setUserWeight)) {
             self.user.setUserWeight(self.userWeight);
         }
     }
-    onPowerTarget(power) {
+    async onPowerTarget(power) {
         const self = this;
         if(self.isConnected(self.device) && (equals(self.mode, 'erg'))) {
             self.control.setTargetPower(power);
@@ -108,6 +99,7 @@ class Controllable extends Device {
         if(self.hasService(self.services, uuids.fec)) {
             const service = await self.getService(uuids.fec);
             const fec = new FEC({
+                controllable: self,
                 onData: onIndoorBikeData.bind(self),
                 service,
                 ble,
@@ -119,6 +111,7 @@ class Controllable extends Device {
         if(self.hasService(self.services, uuids.cyclingPower)) {
             const service = await self.getService(uuids.cyclingPower);
             const wcps = new WahooCyclingPower({
+                controllable: self,
                 onData: onIndoorBikeData.bind(self),
                 service,
                 ble,
@@ -140,28 +133,7 @@ class Controllable extends Device {
         const self = this;
 
         if(equals(self.control.protocol, 'ftms')) {
-            if(self.hasService(self.services, uuids.fec)) {
-                const service = await self.getService(uuids.fec);
-                const fec = new FEC({
-                    flags: {read: false},
-                    service,
-                    ble,
-                });
-                await fec.start();
-
-                return fec;
-            }
-            if(self.hasService(self.services, uuids.cyclingPower)) {
-                const service = await self.getService(uuids.cyclingPower);
-                const wcps = new WahooCyclingPower({
-                    flags: {read: false},
-                    service,
-                    ble,
-                });
-                await wcps.start();
-
-                return wcps;
-            }
+            // only 1 control service allowed else they conflict
         }
         if(equals(self.control.protocol, 'fec')) {
             // use fec
@@ -172,7 +144,7 @@ class Controllable extends Device {
             return self.control;
         }
 
-        console.warn(`:userService 'no FE-C over BLE, or Wahoo CPS found on device ${self.device.name}'`);
+        console.warn(`:userService 'no compatible service found on device ${self.device.name}'`);
 
         return {
             setUserWeight: ((x) => x),
