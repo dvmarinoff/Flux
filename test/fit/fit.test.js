@@ -1,7 +1,6 @@
 import { empty, isObject, nthBit } from '../../src/functions.js';
 
-import {getUint16, getUint32,
-         calculateCRC, typeToAccessor } from '../../src/utils.js';
+import { calculateCRC, typeToAccessor } from '../../src/utils.js';
 
 import { appTypes } from '../../src/fit/profiles.js';
 import { localMessageDefinitions as lmd } from './local-message-definitions.js';
@@ -10,6 +9,13 @@ import { fit } from '../../src/fit/fit.js';
 import { activity } from '../../src/fit/activity.js';
 
 
+function toUint16(arr) {
+    return new DataView(new Uint8Array(arr).buffer).getUint16(0, true);
+}
+
+function toUint32(arr) {
+    return new DataView(new Uint8Array(arr).buffer).getUint32(0, true);
+}
 
 describe('reads fit file header', () => {
 
@@ -200,7 +206,7 @@ describe('encodes File Id definition message', () => {
         expect(res[2]).toBe(0);
     });
     test('global message number (byte 3-5)', () => {
-        expect(getUint16(res.slice(3, 5))).toBe(0);
+        expect(toUint16(res.slice(3, 5))).toBe(0);
     });
     test('number of fields (byte 5)', () => {
         expect(res[5]).toBe(5);
@@ -301,16 +307,16 @@ describe('encodes File Id data message', () => {
 
     describe('data record content', () => {
         test('time created (byte 1-4)', () => {
-            expect(getUint32(res.slice(1,5))).toBe(values.time_created);
+            expect(toUint32(res.slice(1,5))).toBe(values.time_created);
         });
         test('manufacturer (byte 5-6)', () => {
-            expect(getUint16(res.slice(5,7))).toBe(values.manufacturer);
+            expect(toUint16(res.slice(5,7))).toBe(values.manufacturer);
         });
         test('product (byte 7-8)', () => {
-            expect(getUint16(res.slice(7,9))).toBe(values.product);
+            expect(toUint16(res.slice(7,9))).toBe(values.product);
         });
         test('number (byte 9-10)', () => {
-            expect(getUint16(res.slice(9,11))).toBe(values.number);
+            expect(toUint16(res.slice(9,11))).toBe(values.number);
         });
         test('type (byte 11)', () => {
             expect(res[11]).toBe(values.type);

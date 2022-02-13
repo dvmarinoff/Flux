@@ -355,8 +355,8 @@ describe('Control Point', () => {
             const view = new DataView(res);
             expect(view.getUint8( 0, true)).toBe(0x43);
             expect(view.getUint16(1, true)).toBe(65535);
-            expect(view.getUint16(3, true)).toBe(65535);
-            expect(view.getUint16(5, true)).toBe(65535);
+            expect(view.getUint16(3, true)).toBe(65534);
+            expect(view.getUint16(5, true)).toBe(65534);
         });
 
         test('decode', () => {
