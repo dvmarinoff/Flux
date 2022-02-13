@@ -1,4 +1,5 @@
-import { xf, existance , equals, exists } from '../functions.js';
+import { xf, existance , equals, exists, delay } from '../functions.js';
+import { time } from '../utils.js';
 import { ble } from './web-ble.js';
 
 // Device
@@ -15,11 +16,11 @@ import { ble } from './web-ble.js';
 // start()    -> is called after succesful connection
 // connect()  -> scan for and connect to a device with this.filter and dispatch events
 //               for this.id
-
 class Device {
     constructor(args = {}) {
         this.init(args);
         this.id       = existance(args.id, this.defaultId());
+        this.deviceId = existance(args.id, '');
         this.name     = existance(args.name, this.defaultName());
         this.filter   = existance(args.filter, this.defaultFilter());
         this.device   = {};
@@ -59,32 +60,84 @@ class Device {
             self.server   = res.server;
             self.services = res.services;
             self.name     = res.device.name;
+            self.deviceId = res.device.id;
 
+            self.abortController = new AbortController();
+            self.signal = { signal: self.abortController.signal };
             await self.start();
 
             xf.dispatch(`${self.id}:connected`);
             xf.dispatch(`${self.id}:name`, self.name);
+
+            self.autoConnect = true;
+
         } catch(err) {
             xf.dispatch(`${self.id}:disconnected`);
             console.error(`:ble 'Could not request ${self.id}'`, err);
         } finally {
             if(self.isConnected()) {
-                self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
+                self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self), self.signal);
             }
         }
     }
     disconnect() {
         const self = this;
+        self.autoConnect = false;
         ble.disconnect(self.device);
     }
-    onDisconnect() {
+    async onDisconnect() {
         const self = this;
         xf.dispatch(`${self.id}:disconnected`);
         xf.dispatch(`${self.id}:name`, '--');
-        self.stop();
-        self.device.removeEventListener('gattserverdisconnected', self.onDisconnect.bind(self));
+        await self.stop();
         console.log(`Disconnected ${self.id}, ${self.name}.`);
+
+        if(self.autoConnect) self.onDropout();
     }
+    async onDropout() {
+        const self = this;
+        console.log(`:ble :dropout`, {name: self.name});
+        xf.dispatch(`ble:dropout`, self);
+
+        if(exists(self.device.watchAdvertisements)) {
+            console.log(`${time()} watchAdvertisements()`);
+            self.device = await ble.watchAdvertisements(self.deviceId);
+            self.reconnect();
+        } else {
+            self.reconnect();
+        }
+    }
+    async reconnect() {
+        const self = this;
+        try{
+            console.log(`${time()} device.gatt.connect()`);
+            self.server = await ble.gattConnect(self.device);
+
+            console.log(`${time()} server.getPrimaryServices()`);
+            self.services = await ble.getPrimaryServices(self.server);
+
+            self.abortController = new AbortController();
+            self.signal = { signal: self.abortController.signal };
+
+            console.log(`${time()} self.start()`);
+            await self.start();
+
+            xf.dispatch(`${self.id}:connected`);
+            xf.dispatch(`${self.id}:name`, self.name);
+
+            self.autoConnect = true;
+        } catch(err) {
+            xf.dispatch(`${self.id}:disconnected`);
+            console.error(`:ble 'Could not auto-reconnect ${self.id}'`, err);
+        } finally {
+            if(self.isConnected()) {
+                self.device.addEventListener('gattserverdisconnected', self.onDisconnect.bind(self), self.signal);
+            }
+        }
+    }
+    async watchAdvertisements() {
+    }
+
     stop() {}
     hasService(services, uuid) {
         let res = false;

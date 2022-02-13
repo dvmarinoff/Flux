@@ -90,6 +90,28 @@ class WebBLE {
         if(!exists(device.gatt)) return false;
         return device.gatt.connected;
     }
+    async watchAdvertisements(id) {
+        const devices = await navigator.bluetooth.getDevices();
+        const device = first(devices.filter(d => d.id === id));
+
+        let resolve;
+        const p = new Promise(function(res, rej) {
+            resolve = res;
+        });
+
+        const abortController = new AbortController();
+        device.addEventListener('advertisementreceived', onAdvertisementReceived.bind(this), {once: true});
+
+        async function onAdvertisementReceived(e) {
+            abortController.abort();
+            console.log(e);
+            resolve(e.device);
+        }
+
+        await device.watchAdvertisements({signal: abortController.signal});
+
+        return p;
+    }
     async sub(characteristic, handler) {
         const self = this;
         await self.startNotifications(characteristic, handler);
