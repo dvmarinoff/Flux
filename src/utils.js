@@ -47,6 +47,15 @@ function dateToDashString(date) {
     return `${day}-${month}-${year}-at-${hour}-${minute}h`;
 }
 
+function time() {
+    const date = new Date();
+    const hours = (date.getHours()).toString().padStart(2,'0');
+    const minutes = (date.getMinutes()).toString().padStart(2,'0');
+    const seconds = (date.getSeconds()).toString().padStart(2,'0');
+    const milliseconds = (date.getSeconds().toString()).padStart(2,'0');
+    return `${hours}:${minutes}:${seconds}:${milliseconds}`;
+}
+
 function format(x, precision = 1000) {
     return Math.round(x * precision) / precision;
 }
@@ -58,6 +67,42 @@ function kphToMps(kph) {
 function mpsToKph(mps) {
     return 3.6 * mps;
 };
+
+// Async
+
+// var res = await backoff({max: 4, wait: 1000, fn: maybeFailOp, msg: 'debug'});
+// needs a way to be canceled
+async function backoff(args = {}) {
+    const defaults = {
+        max:     1,
+        wait:    1000,
+        rate:    ((x) => x * 1),
+        success: ((x) => x),
+        fail:    ((x) => x),
+    };
+
+    const max     = existance(args.max, defaults.max);
+    const wait    = existance(args.wait, defaults.wait);
+    const fn      = existance(args.fn);
+    const success = existance(args.success, defaults.success);
+    const fail    = existance(args.fail, defaults.fail);
+    const rate    = existance(args.rate, defaults.rate);
+    const msg     = args.msg;
+
+    async function recur(max, wait, fn, success, fail, msg) {
+        try {
+            const result = await fn(max);
+            return success(result);
+        } catch(e) {
+            if(max <= 0) return fail(e);
+            if(exists(msg)) console.log(`:retry :${msg} :in ${rate(wait)} :left ${max}`);
+            await delay(wait);
+            return recur(max-1, rate(wait), fn, success, fail, msg);
+        }
+    }
+
+    return await recur(max, wait, fn, success, fail, msg);
+}
 
 // Math
 const bod = Math.pow(2, 31) / 180;
@@ -215,6 +260,10 @@ export {
     format,
     kphToMps,
     mpsToKph,
+    time,
+
+    // async
+    backoff,
 
     // math
     digits,
