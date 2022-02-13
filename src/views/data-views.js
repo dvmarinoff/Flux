@@ -6,8 +6,7 @@ import { models } from '../models/models.js';
 // DataView
 //
 // Usage:
-// <data-view id="count-value"
-//            prop="db:count">--</data-view>
+// <data-view id="count-value" prop="db:count">--</data-view>
 //
 // Template Method:
 // overwrite methods to augment the general logic
@@ -15,7 +14,7 @@ import { models } from '../models/models.js';
 // getDefaults() -> setup default and fallback values
 // config()      -> work with attributes and props here
 // subs()        -> subscribe to events or db
-// unsubs()      -> clean up subscribe to events or db
+// unsubs()      -> executes after abort signal
 // getValue()    -> getter for the value for state from a complex prop say an object or array
 // onUpdate()    -> determine the rules for state update that will trigger rendering
 // transform()   -> apply transforming functions to state just before rendering
@@ -41,21 +40,25 @@ class DataView extends HTMLElement {
     config() {
         return;
     }
-    subs() {
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this));
-    }
     connectedCallback() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
         this.prop     = existance(this.getAttribute('prop'), this.getDefaults().prop);
         this.disabled = this.hasAttribute('disabled');
 
         this.config();
         this.subs();
     }
-    unsubs() { return; }
-    disconnectedCallback() {
-        window.removeEventListener(`${this.prop}`, this.onUpdate);
-        this.unsubs();
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
     }
+    disconnectedCallback() {
+        this.abortController.abort();
+        this.unsub();
+    }
+    unsubs() {}
     getValue(propValue) {
         return propValue;
     }
@@ -84,6 +87,13 @@ class DataView extends HTMLElement {
 customElements.define('data-view', DataView);
 
 
+class SummaryView extends DataView {
+}
+
+customElements.define('summary-view', SummaryView);
+
+
+
 class PowerTargetControl extends DataView {
     postInit() {
         const self = this;
@@ -109,15 +119,11 @@ class PowerTargetControl extends DataView {
         this.$inc   = document.querySelector(this.selectors.inc);
         this.$dec   = document.querySelector(this.selectors.dec);
 
-        this.$input.addEventListener('change', this.onChange.bind(this));
-        this.$inc.addEventListener('pointerup', this.onInc.bind(this));
-        this.$dec.addEventListener('pointerup', this.onDec.bind(this));
+        this.$input.addEventListener('change', this.onChange.bind(this), this.signal);
+        this.$inc.addEventListener('pointerup', this.onInc.bind(this), this.signal);
+        this.$dec.addEventListener('pointerup', this.onDec.bind(this), this.signal);
 
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this));
-    }
-    disconnectedCallback() {
-        this.$input.removeEventListener('change', this.onChange);
-        xf.unsub(`db:${this.prop}`, this.onUpdate);
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
     }
     onInc(e) {
         xf.dispatch(`ui:${this.effects.inc}`);
@@ -225,10 +231,7 @@ class SpeedValue extends DataView {
         };
     }
     config() {
-        xf.sub(`db:measurement`, this.onMeasurement.bind(this));
-    }
-    unsubs() {
-        xf.unsub(`db:measurement`, this.onMeasurement.bind(this));
+        xf.sub(`db:measurement`, this.onMeasurement.bind(this), this.signal);
     }
     onMeasurement(measurement) {
         this.measurement = measurement;
@@ -262,10 +265,7 @@ class DistanceValue extends DataView {
         };
     }
     config() {
-        xf.sub(`db:measurement`, this.onMeasurement.bind(this));
-    }
-    unsubs() {
-        xf.unsub(`db:measurement`, this.onMeasurement.bind(this));
+        xf.sub(`db:measurement`, this.onMeasurement.bind(this), this.signal);
     }
     onMeasurement(measurement) {
         this.measurement = measurement;
@@ -332,16 +332,16 @@ class CadenceGroup extends DataView {
         };
     }
     config() {
-        this.main = this.querySelector('cadence-value');
-        this.aux = this.querySelector('cadence-target');
+        this.$main = this.querySelector('cadence-value');
+        this.$aux = this.querySelector('cadence-target');
     }
     render() {
         if(equals(this.state, 0)) {
-            this.main.classList.remove('active');
-            this.aux.classList.remove('active');
+            this.$main.classList.remove('active');
+            this.$aux.classList.remove('active');
         } else {
-            this.main.classList.add('active');
-            this.aux.classList.add('active');
+            this.$main.classList.add('active');
+            this.$aux.classList.add('active');
         }
     }
 }
@@ -408,12 +408,8 @@ class PowerAvg extends DataView {
         };
     }
     subs() {
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this));
-        xf.sub('watch:lap', this.onWatchLap.bind(this));
-    }
-    unsubs() {
-        xf.unsub(`${this.prop}`, this.onUpdate.bind(this));
-        xf.unsub('watch:lap', this.onWatchLap.bind(this));
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        xf.sub('watch:lap', this.onWatchLap.bind(this), this.signal);
     }
     updataState(value) {
         if(equals(this.state, 0) && equals(value, 0)) {
@@ -446,12 +442,8 @@ class PowerValue extends DataView {
         this.bufferLength = 0;
     }
     subs() {
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this));
-        xf.sub('db:powerSmoothing', this.onPowerSmoothing.bind(this));
-    }
-    unsubs() {
-        xf.unsub(`${this.prop}`, this.onUpdate.bind(this));
-        xf.unsub('db:powerSmoothing', this.onPowerSmoothing.bind(this));
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        xf.sub('db:powerSmoothing', this.onPowerSmoothing.bind(this), this.signal);
     }
     getDefaults() {
         return {
@@ -523,12 +515,10 @@ class InstantPowerGraph extends HTMLElement {
         const self = this;
         this.graphWidth = this.calcGraphWidth();
 
-        xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
-        xf.sub(`db:${this.metric}`, this.onMetric.bind(this));
+        xf.sub(`db:${this.prop}`, this.onUpdate.bind(this), this.signal);
+        xf.sub(`db:${this.metric}`, this.onMetric.bind(this), this.signal);
     }
     disconnectedCallback() {
-        document.removeEventListener(`db:${this.prop}`, this.onUpdate);
-        document.removeEventListener(`db:${this.metric}`, this.onMetric);
     }
     calcGraphWidth() {
         return this.getBoundingClientRect().width;
@@ -571,15 +561,11 @@ class SwitchGroup extends HTMLElement {
         this.postInit();
     }
     connectedCallback() {
-        this.switchList = this.querySelectorAll('.switch-item');
+        this.$switchList = this.querySelectorAll('.switch-item');
         this.config();
 
-        xf.sub(`db:${this.prop}`, this.onState.bind(this));
-        this.addEventListener('pointerup', this.onSwitch.bind(this));
-    }
-    disconnectedCallback() {
-        xf.unsub(`db:${this.prop}`, this.onState.bind(this));
-        this.removeEventListener('pointerup', this.onSwitch.bind(this));
+        xf.sub(`db:${this.prop}`, this.onState.bind(this), this.signal);
+        this.addEventListener('pointerup', this.onSwitch.bind(this), this.signal);
     }
     eventOwner(e) {
         const pathLength = e.path.length;
@@ -613,7 +599,7 @@ class SwitchGroup extends HTMLElement {
         this.renderEffect(this.state);
     }
     setSwitch(state) {
-        this.switchList.forEach(function(s, i) {
+        this.$switchList.forEach(function(s, i) {
             if(equals(i, state)) {
                 s.classList.add('active');
             } else {
@@ -638,23 +624,23 @@ class DataTileSwitchGroup extends SwitchGroup {
         this.effect = 'ui:data-tile-switch-set';
     }
     config() {
-        this.speed    = document.querySelector('#data-tile--speed');     // tab 0
-        this.distance = document.querySelector('#data-tile--distance');  // tab 0
-        this.powerAvg = document.querySelector('#data-tile--power-avg'); // tab 1
-        this.slope    = document.querySelector('#data-tile--slope');     // tab 1
+        this.$speed    = document.querySelector('#data-tile--speed');     // tab 0
+        this.$distance = document.querySelector('#data-tile--distance');  // tab 0
+        this.$powerAvg = document.querySelector('#data-tile--power-avg'); // tab 1
+        this.$slope    = document.querySelector('#data-tile--slope');     // tab 1
     }
     renderEffect(state) {
         if(equals(state, 0)) {
-            this.speed.classList.add('active');
-            this.distance.classList.add('active');
-            this.powerAvg.classList.remove('active');
-            this.slope.classList.remove('active');
+            this.$speed.classList.add('active');
+            this.$distance.classList.add('active');
+            this.$powerAvg.classList.remove('active');
+            this.$slope.classList.remove('active');
         }
         if(equals(state, 1)) {
-            this.speed.classList.remove('active');
-            this.distance.classList.remove('active');
-            this.powerAvg.classList.add('active');
-            this.slope.classList.add('active');
+            this.$speed.classList.remove('active');
+            this.$distance.classList.remove('active');
+            this.$powerAvg.classList.add('active');
+            this.$slope.classList.add('active');
         }
         return;
     }
@@ -730,3 +716,4 @@ export {
     SwitchGroup,
     DataTileSwitchGroup,
 }
+

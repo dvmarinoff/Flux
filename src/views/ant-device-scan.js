@@ -18,7 +18,7 @@ class Request extends HTMLElement {
 
         xf.sub('db:antSearchList', this.onDeviceFound.bind(this));
 
-        xf.sub('pointerup', this.onSelect.bind(this), this.list);
+        this.list.addEventListener('pointerup', this.onSelect.bind(this));
 
         xf.sub(`ant:search:started`, this.onSearchStarted.bind(this));
         xf.sub(`ant:search:stopped`, this.onSearchStopped.bind(this));
@@ -27,6 +27,8 @@ class Request extends HTMLElement {
         xf.sub(`ant:request:cancel`, this.onRequestCancel.bind(this));
     }
     disconnectedCallback() {
+        this.list.removeEventListener('pointerup', this.onSelect.bind(this));
+
         document.removeEventListener(`db:antDeviceId`, this.onDeviceId);
         document.removeEventListener(`db:antSearchList`, this.onDeviceId);
 

@@ -6,57 +6,67 @@ class ConnectionSwitch extends HTMLElement {
         super();
         this.status = 'off';
     }
+    getDefaults() {
+        return {
+            class: {
+                on: 'on',
+                off: 'off',
+                loading: 'loading',
+                indicator: 'connection-switch--indicator',
+            },
+        };
+    }
     connectedCallback() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
         this.for            = this.getAttribute('for');
-        this.onClass        = existance(this.getAttribute('onClass'), this.defaultOnClass());
-        this.offClass       = existance(this.getAttribute('offClass'), this.defaultOffClass());
-        this.loadingClass   = existance(this.getAttribute('loadingClass'), this.defaultLoadingClass());
-        this.indicatorClass = existance(this.getAttribute('indicatorClass'), this.defaultIndicatorClass());
+        this.onClass        = existance(this.getAttribute('onClass'), this.getDefaults().class.on);
+        this.offClass       = existance(this.getAttribute('offClass'), this.getDefaults().class.off);
+        this.loadingClass   = existance(this.getAttribute('loadingClass'), this.getDefaults().class.loading);
+        this.indicatorClass = existance(this.getAttribute('indicatorClass'), this.getDefaults().class.indicator);
 
-        this.indicator = this.querySelector(`.${this.indicatorClass}`);
+        this.$indicator = this.querySelector(`.${this.indicatorClass}`);
 
-        xf.sub('pointerup',                this.onEffect.bind(this), this);
-        xf.sub(`${this.for}:connected`,    this.on.bind(this));
-        xf.sub(`${this.for}:disconnected`, this.off.bind(this));
-        xf.sub(`${this.for}:connecting`,   this.loading.bind(this));
+        this.addEventListener('pointerup', this.onEffect.bind(this), this.signal);
+        xf.sub(`${this.for}:connected`,    this.on.bind(this), this.signal);
+        xf.sub(`${this.for}:disconnected`, this.off.bind(this), this.signal);
+        xf.sub(`${this.for}:connecting`,   this.loading.bind(this), this.signal);
     }
     defaultOnClass() {
-        return 'on';
+        return ;
     }
     defaultOffClass() {
-        return 'off';
+        return ;
     }
     defaultLoadingClass() {
-        return 'loading';
+        return ;
     }
     defaultIndicatorClass() {
-        return 'connection-switch--indicator';
+        return ;
     }
     disconnectedCallback() {
-        this.removeEventListener('pointerup', this.onEffect);
-        document.removeEventListener(`${this.for}:connected`,    this.on);
-        document.removeEventListener(`${this.for}:disconnected`, this.off);
-        document.removeEventListener(`${this.for}:connecting`,   this.loading);
+        this.abortController.abort();
     }
     onEffect(e) {
         xf.dispatch(`ui:${this.for}:switch`);
     }
     on(e) {
-        this.indicator.classList.remove(this.loadingClass);
-        this.indicator.classList.remove(this.offClass);
-        this.indicator.classList.add(this.onClass);
+        this.$indicator.classList.remove(this.loadingClass);
+        this.$indicator.classList.remove(this.offClass);
+        this.$indicator.classList.add(this.onClass);
     }
     off(e) {
-        this.indicator.classList.remove(this.loadingClass);
-        this.indicator.classList.remove(this.onClass);
-        this.indicator.classList.add(this.offClass);
+        this.$indicator.classList.remove(this.loadingClass);
+        this.$indicator.classList.remove(this.onClass);
+        this.$indicator.classList.add(this.offClass);
     }
     loading(e) {
-        this.indicator.classList.remove(this.offClass);
-        this.indicator.classList.remove(this.onClass);
-        this.indicator.classList.add(this.loadingClass);
+        this.$indicator.classList.remove(this.offClass);
+        this.$indicator.classList.remove(this.onClass);
+        this.$indicator.classList.add(this.loadingClass);
     }
-    render() {}
 }
 
 customElements.define('connection-switch', ConnectionSwitch);
@@ -68,17 +78,20 @@ class SourceSwitch extends HTMLElement {
         this.effect = 'sources';
     }
     connectedCallback() {
-        this.path     = this.getAttribute('for');
-        this.value    = this.getAttribute('use');
-        this.dataView = this.querySelector('.data-view');
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
 
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this));
-        this.addEventListener('pointerup', this.onEffect.bind(this));
+        this.path      = this.getAttribute('for');
+        this.value     = this.getAttribute('use');
+        this.$dataView = this.querySelector('.data-view');
+
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        this.addEventListener('pointerup', this.onEffect.bind(this), this.signal);
         this.render();
     }
     disconnectedCallback() {
-        xf.unsub(`${this.prop}`, this.onUpdate.bind(this));
-        this.removeEventListener('pointerup', this.onEffect.bind(this));
+        this.abortController.abort();
     }
     onUpdate(sources) {
         this.render();
@@ -90,11 +103,11 @@ class SourceSwitch extends HTMLElement {
     }
     disable() {
         this.classList.add('active');
-        this.dataView.removeAttribute('disabled');
+        this.$dataView.removeAttribute('disabled');
     };
     enable() {
         this.classList.remove('active');
-        this.dataView.setAttribute('disabled', '');
+        this.$dataView.setAttribute('disabled', '');
     }
     render() {
         if(models.sources.isSource(this.path, this.value)) {

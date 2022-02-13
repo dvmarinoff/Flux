@@ -10,7 +10,9 @@ function Keyboard() {
     const isKeyL     = (code) => code === 'KeyL';
     const isKeySpace = (code) => code === 'Space';
 
-    xf.sub('keydown', (e) => {
+    window.addEventListener('keydown', onKeydown);
+
+    function onKeydown(e) {
         let keyCode = e.keyCode;
         let code = e.code;
 
@@ -42,7 +44,7 @@ function Keyboard() {
             e.preventDefault();
             xf.dispatch('key:space');
         }
-    }, window);
+    }
 }
 
 

@@ -436,35 +436,39 @@ function XF(args = {}) {
         window.dispatchEvent(evt(eventType)(value));
     }
 
-    function sub(eventType, handler, element = undefined) {
-        if(exists(element)) {
-            element.addEventListener(eventType, handler, true);
-            return handler;
-        } else {
-            function handlerWraper(e) {
-                if(isStoreSource(eventType)) {
-                    handler(e.detail.data[evtProp(eventType)]);
-                } else {
-                    handler(e.detail.data);
-                }
+    function sub(eventType, handler, options = {}) {
+
+        function handlerWraper(e) {
+            if(isStoreSource(eventType)) {
+                handler(e.detail.data[evtProp(eventType)]);
+            } else {
+                handler(e.detail.data);
             }
-
-            window.addEventListener(eventType, handlerWraper, true);
-
-            return handlerWraper;
         }
+
+        window.addEventListener(
+            eventType, handlerWraper, Object.assign({capture: false}, options)
+        );
+
+        return handlerWraper;
     }
 
-    function reg(eventType, handler) {
-        window.addEventListener(eventType, e => handler(e.detail.data, data));
+    function reg(eventType, handler, options = {}) {
+
+        function handlerWraper(e) {
+            return handler(e.detail.data, data);
+        }
+
+        window.addEventListener(
+            eventType, handlerWraper, Object.assign({capture: false}, options)
+        );
+
+        return handlerWraper;
     }
 
-    function unsub(eventType, handler, element = undefined) {
-        if(exists(element)) {
-            element.removeEventListener(eventType, handler, true);
-        } else {
-            window.removeEventListener(eventType, handler, true);
-        }
+    function unsub(eventType, handler, options = {}) {
+        console.log('unsub ${element}', handler); // rmv
+        window.removeEventListener(eventType, handler, Object.assign({capture: false}, options));
     }
 
     function isStoreSource(eventType) {

@@ -3,17 +3,22 @@
  */
 
 import {
+    // values
     equals,
     isNull,
     isUndefined,
+    isFunction,
     exists,
     existance,
-
-    // collections
     isArray,
     isObject,
     isString,
     isCollection,
+    isNumber,
+    isAtomic,
+    validate,
+
+    // collections
     first,
     second,
     third,
@@ -22,14 +27,21 @@ import {
     map,
     traverse,
     getIn,
+    set,
+    setIn,
     avg,
     max,
     sum,
+    rand,
+    capitalize,
+    clamp,
 
     // functions
     compose,
     pipe,
     repeat,
+    curry2,
+    debounce,
 
     // async
     delay,
@@ -37,14 +49,17 @@ import {
     // events
     xf,
 
-    // bits
-    nthBit,
-    bitToBool,
-    nthBitToBool,
+    // format
+    toNumber,
+    toFixed,
+    toBool,
     dataviewToArray,
     dataviewToString,
     stringToCharCodes,
-    toUint8Array,
+
+    // bits
+    nthBit,
+    nthBitToBool,
     xor,
 } from '../src/functions.js';
 
@@ -436,17 +451,21 @@ describe('XF', () => {
 
     describe('A counter', () => {
         // setup
-        xf.create({count: 0});
+        const abortController = new AbortController();
+        const options = { signal: abortController.signal };
+
+        const db = {count: 0};
+        xf.create(db);
 
         xf.reg('count-set', (value, db) => {
             db.count = value;
-        });
+        }, options);
         xf.reg('count-inc', (_, db) => {
             db.count += 1;
-        });
-        xf.reg('count-dec', (_, db) => {
+        }, options);
+        const decSubId = xf.reg('count-dec', (_, db) => {
             db.count -= 1;
-        });
+        }, options);
 
         // use
         let count = 0;
@@ -455,32 +474,71 @@ describe('XF', () => {
             count = value;
         }
 
-        const subId = xf.sub('db:count', countSub);
+        const countSubId = xf.sub('db:count', countSub, options);
 
         test('init value', () => {
             expect(count).toBe(0);
+            expect(db.count).toBe(0);
         });
 
         test('inc value', () => {
             xf.dispatch('count-inc');
             expect(count).toBe(1);
+            expect(db.count).toBe(1);
         });
 
         test('dec value', () => {
             xf.dispatch('count-dec');
             expect(count).toBe(0);
+            expect(db.count).toBe(0);
         });
 
         test('set value', () => {
             xf.dispatch('count-set', 4);
             expect(count).toBe(4);
+            expect(db.count).toBe(4);
         });
 
         test('unsub', () => {
-            xf.unsub('db:count', subId);
-            xf.dispatch('count-set', 3);
+            xf.unsub('db:count', countSubId);
+            xf.unsub('count-dec', decSubId);
+
+            xf.dispatch('count-set', 2); // does not update local count
             expect(count).toBe(4);
+            expect(db.count).toBe(2);
+
+            xf.dispatch('count-dec'); // does nothing
+            expect(count).toBe(4);
+            expect(db.count).toBe(2);
         });
+
+        // subscribe again
+        test('re-sub', () => {
+            const countSubId2 = xf.sub('db:count', countSub);
+
+            expect(count).toBe(4);
+            expect(db.count).toBe(2);
+
+            xf.dispatch('count-set', 3); // now it can update local count again
+            expect(count).toBe(3);
+            expect(db.count).toBe(3);
+        });
+
+        // probably not yet supported for events in this env
+        // test('remove all subs', () => {
+        //     abortController.abort();
+
+        //     xf.dispatch('count-set', 4);
+        //     expect(count).toBe(3);
+        //     expect(db.count).toBe(3);
+        // });
+    });
+});
+
+describe('toBool', () => {
+    test('cast number to bool', () => {
+        expect(toBool(1)).toBe(true);
+        expect(toBool(0)).toBe(false);
     });
 });
 
@@ -491,13 +549,6 @@ describe('nthBit', () => {
         expect(nthBit(0b00010101, 4)).toBe(1);
         expect(nthBit(0b10010101, 6)).toBe(0);
         expect(nthBit(0b10010101, 7)).toBe(1);
-    });
-});
-
-describe('bitToBool', () => {
-    test('get the nth bit from a bit field', () => {
-        expect(bitToBool(1)).toBe(true);
-        expect(bitToBool(0)).toBe(false);
     });
 });
 
@@ -538,16 +589,6 @@ describe('stringToCharCodes', () => {
 //         expect(dataviewToString(dataview)).toBe('Functions');
 //     });
 // });
-
-describe('toUint8Array', () => {
-    test('to Uint8Array (16)', () => {
-        expect(dataviewToArray(toUint8Array(2**8, 16))).toStrictEqual([0, 1]);
-    });
-
-    test('to Uint8Array (32)', () => {
-        expect(dataviewToArray(toUint8Array(2**24, 32))).toStrictEqual([0, 0, 0, 1]);
-    });
-});
 
 describe('xor', () => {
     test('xor', () => {
