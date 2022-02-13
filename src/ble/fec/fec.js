@@ -94,7 +94,7 @@ class FEC extends BLEService {
 
     postInit(args = {}) {
         this.protocol  = 'fec';
-        this.delay     = 500;
+        this.wait      = 500;
         this.onData    = existance(args.onData,    ((x) => x));
         this.onControl = existance(args.onControl, ((x) => x));
         this.controllable = args.controllable;

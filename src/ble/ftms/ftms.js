@@ -12,7 +12,7 @@ class FitnessMachineService extends BLEService {
 
     postInit(args = {}) {
         this.protocol  = 'ftms';
-        this.delay     = 500;
+        this.wait      = 500;
         this.onData    = existance(args.onData,    this.defaultOnData);
         this.onStatus  = existance(args.onStatus,  this.defaultOnStatus);
         this.onControl = existance(args.onControl, this.defaultOnControlPoint);

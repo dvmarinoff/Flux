@@ -17,39 +17,40 @@ class Controllable extends Device {
     }
     async start(device) {
         const self = this;
-        self.mode = models.mode.state;
+        self.mode       = models.mode.state;
         self.userWeight = models.weight.state;
 
+        // services
         self.control = await self.controlService(device);
         self.user    = await self.userService(device);
-        self.postStart({delay: self.control.delay});
-    }
-    postStart(args = {}) {
-        const self = this;
-        const delay = existance(args.delay, 500);
+
+        // events
+        const wait = existance(self.control.wait, 500);
+        const options = self.signal;;
 
         self.debounced = {
             onPowerTarget: debounce(
-                self.onPowerTarget.bind(self), delay, {trailing: true, leading: true}
+                self.onPowerTarget.bind(self), wait, {trailing: true, leading: true}
             ),
             onResistanceTarget: debounce(
-                self.onResistanceTarget.bind(self), delay, {trailing: true, leading: true}
+                self.onResistanceTarget.bind(self), wait, {trailing: true, leading: true}
             ),
             onSlopeTarget: debounce(
-                self.onSlopeTarget.bind(self), delay, {trailing: true, leading: true}
+                self.onSlopeTarget.bind(self), wait, {trailing: true, leading: true}
             ),
         };
 
-        xf.sub('db:mode',             self.onMode.bind(self));
-        xf.sub('db:weight',           self.onUserWeight.bind(self));
-        xf.sub('db:powerTarget',      self.debounced.onPowerTarget.bind(self));
-        xf.sub('db:resistanceTarget', self.debounced.onResistanceTarget.bind(self));
-        xf.sub('db:slopeTarget',      self.debounced.onSlopeTarget.bind(self));
+        xf.sub('db:mode',             self.onMode.bind(self), options);
+        xf.sub('db:weight',           self.onUserWeight.bind(self), options);
+        xf.sub('db:powerTarget',      self.debounced.onPowerTarget.bind(self), options);
+        xf.sub('db:resistanceTarget', self.debounced.onResistanceTarget.bind(self), options);
+        xf.sub('db:slopeTarget',      self.debounced.onSlopeTarget.bind(self), options);
     }
     stop() {
         const self = this;
         self.control = {};
-        self.user  = {};
+        self.user    = {};
+        self.abortController.abort();
     }
     onMode(mode) {
         const self = this;

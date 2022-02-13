@@ -9,7 +9,7 @@ class WahooCyclingPower extends BLEService {
 
     postInit(args = {}) {
         this.protocol     = 'wcps';
-        this.delay        = 1000;
+        this.wait         = 1000;
         this.onData       = existance(args.onData,    this.defaultOnData);
         this.onControl    = existance(args.onControl, this.defaultOnControlPoint);
         this.controllable = args.controllable;
