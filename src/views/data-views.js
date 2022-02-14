@@ -93,15 +93,14 @@ class PowerTargetControl extends DataView {
     postInit() {
         const self = this;
         this.state = 0;
-        this.setDefaults();
     }
     setDefaults() {
+        this.prop = 'db:powerTarget';
         this.selectors = {
             input: '#power-target-input',
             inc:   '#power-target-inc',
             dec:   '#power-target-dec',
         };
-        this.prop = 'db:powerTarget';
         this.effects = {
             inc: 'power-target-inc',
             dec: 'power-target-dec',
@@ -110,6 +109,7 @@ class PowerTargetControl extends DataView {
         this.parse = parseInt;
     }
     config() {
+        this.setDefaults();
         this.$input = document.querySelector(this.selectors.input);
         this.$inc   = document.querySelector(this.selectors.inc);
         this.$dec   = document.querySelector(this.selectors.dec);
@@ -141,12 +141,12 @@ customElements.define('power-target-control', PowerTargetControl);
 
 class ResistanceTargetControl extends PowerTargetControl {
     setDefaults() {
+        this.prop = 'db:resistanceTarget';
         this.selectors = {
             input: '#resistance-target-input',
             inc:   '#resistance-target-inc',
             dec:   '#resistance-target-dec',
         };
-        this.prop = 'db:resistanceTarget';
         this.effects = {
             inc: 'resistance-target-inc',
             dec: 'resistance-target-dec',
@@ -161,12 +161,12 @@ customElements.define('resistance-target-control', ResistanceTargetControl);
 
 class SlopeTargetControl extends PowerTargetControl {
     setDefaults() {
+        this.prop = 'db:slopeTarget';
         this.selectors = {
             input: '#slope-target-input',
             inc:   '#slope-target-inc',
             dec:   '#slope-target-dec',
         };
-        this.prop = 'db:slopeTarget';
         this.effects = {
             inc: 'slope-target-inc',
             dec: 'slope-target-dec',
