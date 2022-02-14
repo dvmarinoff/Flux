@@ -42,8 +42,8 @@
                             <div class="data-tile--small wide" id="data-tile--power-avg">
                                 <h2 class="data-tile-small--heading">Power avg</h2>
                                 <div class="data-tile-small--value-cont">
-                                    <power-avg id=power-avg-value"
-                                               class="data-tile-small--value">--</power-value>
+                                    <power-lap id=power-avg-value"
+                                               class="data-tile-small--value">--</power-lap>
                                 </div>
                             </div>
 
@@ -221,6 +221,38 @@
                     <header class="page--header">
                         <h2 class="page--heading">Workouts</h2>
                     </header>
+
+                    <power-in-zone id="power-in-zone">
+                        <div class=" power--zone--item">
+                            <div class="power--zone-value">0</div>
+                            <div class="power--zone-bar zone-one"></div>
+                        </div>
+                        <div class="power--zone power--zone--item">
+                            <div class="power--zone-value">0</div>
+                            <div class="power--zone-bar  zone-two"></div>
+                        </div>
+                        <div class="power--zone power--zone--item">
+                            <div class="power--zone-value">0</div>
+                            <div class="power--zone-bar zone-three"></div>
+                        </div>
+                        <div class="power--zone power--zone--item">
+                            <div class="power--zone-value">0</div>
+                            <div class="power--zone-bar zone-four"></div>
+                        </div>
+                        <div class="power--zone power--zone--item">
+                            <div class="power--zone-value">0</div>
+                            <div class="power--zone-bar  zone-five"></div>
+                        </div>
+                        <div class="power--zone power--zone--item">
+                            <div class="power--zone-value">0</div>
+                            <div class="power--zone-bar zone-six"></div>
+                        </div>
+                        <div class="power--zone power--zone--item">
+                            <div class="power--zone-value">0</div>
+                            <div class="power--zone-bar zone-seven"></div>
+                        </div>
+                        <div class="power--unit power--zone--item chrome-bg">%</div>
+                    </power-in-zone>
 
                     <div class="buildin-workouts">
                         <ul is="workout-list" id="workout-list" class="workout-list list" prop="workouts" metric="ftp">

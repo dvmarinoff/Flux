@@ -177,6 +177,10 @@ function avg(xs, prop = false) {
     }
 }
 
+function mavg(value_c, value_p, count_c, count_p = count_c-1) {
+    return (value_c + ((count_p) * value_p)) / count_c;
+}
+
 function max(xs, prop = false) {
     if(prop !== false) {
         return xs.reduce( (acc,v,i) => v[prop] > acc ? v[prop] : acc, 0);
@@ -467,7 +471,7 @@ function XF(args = {}) {
     }
 
     function unsub(eventType, handler, options = {}) {
-        console.log('unsub ${element}', handler); // rmv
+        // console.log('unsub ${element}', handler); // rmv
         window.removeEventListener(eventType, handler, Object.assign({capture: false}, options));
     }
 
@@ -581,6 +585,7 @@ export {
     set,
     setIn,
     avg,
+    mavg,
     max,
     sum,
     rand,

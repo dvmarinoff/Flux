@@ -1,4 +1,4 @@
-import { xf, exists, existance, empty, equals,
+import { xf, exists, existance, empty, equals, mavg,
          first, second, last, clamp, toFixed } from '../functions.js';
 
 import { inRange, dateToDashString } from '../utils.js';
@@ -240,6 +240,7 @@ class FTP extends Model {
             fallback: self.defaultValue(),
             parse: parseInt,
         };
+        self.state       = self.default;
         self.min         = existance(args.min, 0);
         self.max         = existance(args.max, 500);
         self.storage     = args.storage(storageModel);
@@ -270,26 +271,34 @@ class FTP extends Model {
     }
     powerToZone(value, ftp, zones) {
         const self = this;
-        if(!exists(ftp)) ftp = self.default;
+        if(!exists(ftp)) ftp = self.state;
         if(!exists(zones)) zones = self.zones;
 
-        let name = zones[0];
+        let index = 0;
+        let name = zones[index];
         if(value < (ftp * self.percentages.one)) {
-            name = zones[0];
+            index = 0;
+            name = zones[index];
         } else if(value < (ftp * self.percentages.two)) {
-            name = zones[1];
+            index = 1;
+            name = zones[index];
         } else if(value < (ftp * self.percentages.three)) {
-            name = zones[2];
+            index = 2;
+            name = zones[index];
         } else if(value < (ftp * self.percentages.four)) {
-            name = zones[3];
+            index = 3;
+            name = zones[index];
         } else if(value < (ftp * self.percentages.five)) {
-            name = zones[4];
+            index = 4;
+            name = zones[index];
         } else if (value < (ftp * self.percentages.six)) {
-            name = zones[5];
+            index = 5;
+            name = zones[index];
         } else {
-            name = zones[6];
+            index = 6;
+            name = zones[index];
         }
-        return {name: name};
+        return {name, index};
     }
 }
 
@@ -523,14 +532,264 @@ function Session(args = {}) {
     });
 }
 
+class Prop {
+    constructor(args = {}) {
+        const self = this;
+        this.init(args);
+        this.prop     = existance(args.prop, this.getDefaults().prop);
+        this.disabled = existance(args.default, this.getDefaults().disabled);
+        this.default  = existance(args.default, this.getDefaults().default);
+        this.state    = existance(args.state, this.default);
+        this.postInit(args);
+        this.start();
+    }
+    init(args) {
+        return args;
+    }
+    postInit(args = {}) {
+        return args;
+    }
+    getPropValue(propValue) {
+        return propValue;
+    }
+    getState() {
+        return this.format(this.state);
+    }
+    setState(propValue) {
+        return this.updateState(propValue);
+    }
+    format(state) {
+        return state;
+    }
+    start() {
+        this.subs();
+    }
+    stop() {
+        this.unsubs();
+    }
+    subs() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+        this.subsConfig();
+    }
+    subsConfig() { return; }
+    unsubs() {
+        this.abortController.abort();
+    }
+    onUpdate(propValue) {
+        if(this.shouldUpdate(propValue)) {
+            this.updateState(propValue);
+        }
+    }
+    shouldUpdate() {
+        return true;
+    }
+    updateState(value) {
+        this.state = value;
+        return this.state;
+    }
+}
+
+class PropAccumulator extends Prop {
+    postInit(args = {}) {
+        this.event = existance(args.event, this.getDefaults().event);
+        this.prev  = this.getDefaults().prev;
+        this.count = this.getDefaults().count;
+    }
+    getDefaults() {
+        return {
+            value: 0,
+            default: 0,
+            disabled: false,
+            prop: '',
+
+            event: '',
+            prev: 0,
+            count: 0,
+        };
+    }
+    format(state) {
+        return Math.round(state);
+    }
+    reset() { this.count = 0;}
+    subsConfig() {
+        if(!equals(this.prop, '')) {
+            xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        }
+        if(!equals(this.event, '')) {
+            xf.sub(`${this.event}`, this.onEvent.bind(this), this.signal);
+        }
+    }
+    updateState(value) {
+        if(equals(this.state, 0) && equals(value, 0)) {
+            this.state = 0;
+        } else if(equals(value, 0)) {
+            return this.state;
+        } else {
+            this.count += 1;
+            const value_c = value;
+            const value_p = this.state;
+            const count_c = this.count;
+            const count_p = this.count-1;
+            this.state = mavg(value_c, value_p, count_c, count_p);
+        }
+        return this.state;
+    }
+    onEvent() {
+        this.reset();
+    }
+}
+
+const powerLap = new PropAccumulator({event: 'watch:lap'});
+const powerAvg = new PropAccumulator({event: 'watch:stopped'});
+
+class PropInterval {
+    constructor(args = {}) {
+        const self = this;
+        this.state   = existance(args.state,   this.getDefaults().default);
+        this.count   = existance(args.count,   this.getDefaults().count);
+        this.prop    = existance(args.prop,    this.getDefaults().prop);
+        this.effect  = existance(args.effect,   this.getDefaults().effect);
+        this.time    = existance(args.time,   this.getDefaults().time);
+        this.start();
+    }
+    getDefaults() {
+        const self = this;
+        return {
+            default: 0,
+            count: 0,
+            time: 1000,
+            prop: '',
+            effect: '',
+        };
+    }
+    start() {
+        this.subs();
+        this.intervalId = setInterval(this.onInterval.bind(this), this.time);
+    }
+    stop() {
+        clearInterval(this.intervalId);
+        this.unsubs();
+    }
+    reset() {
+        this.state = 0;
+        this.count = 0;
+    }
+    subs() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    unsubs() {
+        this.abortController.abort();
+    }
+    onUpdate(propValue) {
+        this.state += propValue;
+        this.count += 1;
+    }
+    onInterval() {
+        if(equals(this.state, 0) || equals(this.count, 0)) return;
+
+        const value = this.state / this.count;
+        xf.dispatch(`${this.effect}`, value);
+        this.reset();
+    }
+}
+
+class PowerInZone {
+    constructor(args = {}) {
+        const self = this;
+        this.ftpModel = existance(args.ftpModel);
+        this.count    = existance(args.count,   this.getDefaults().count);
+        this.weights  = existance(args.weights, this.getDefaults().weights);
+        this.state    = existance(args.state,   this.getDefaults().default);
+        this.prop     = existance(args.prop,    this.getDefaults().prop);
+        this.start();
+    }
+    getDefaults() {
+        const self = this;
+
+        const value = self.ftpModel.zones.map(x => 0);
+
+        return {
+            default: value,
+            weights: value,
+            count: 0,
+            prop: 'db:elapsed',
+        };
+    }
+    start() {
+        this.subs();
+    }
+    stop() {
+        this.unsubs();
+    }
+    subs() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
+        xf.reg(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    unsubs() {
+        this.abortController.abort();
+    }
+    onUpdate(propValue, db) {
+        this.updateState(db.power);
+    }
+    powerToZone(power) {
+        return this.ftpModel.powerToZone(power);
+    }
+    updateState(value) {
+        if(equals(value, 0)) return this.state;
+
+        const zone = this.powerToZone(value);
+
+        this.count += 1;
+        this.weights[zone.index] += 1;
+
+        for(let i=0; i < this.state.length; i++) {
+            if(!equals(this.weights[i], 0)) {
+                this.state[i] = this.weights[i] / this.count;
+            }
+        }
+
+        xf.dispatch('powerInZone', this.state);
+        return this.state;
+    }
+}
+
+
+
+class TSS {
+    // TSS = (t * NP * IF) / (FTP * 3600) * 100
+    // NP:
+    // 1. Calculate a rolling 30-second average power for the workout or
+    //    specific section of data
+    // 2. Raise the resulting values to the fourth power.
+    // 3. Determine the average of these values.
+    // 4. Find the fourth root of the resulting average.
+    // IF = NP / FTP
+}
+
 
 
 const power = new Power({prop: 'power'});
-const heartRate = new HeartRate({prop: 'heartRate'});
 const cadence = new Cadence({prop: 'cadence'});
+const heartRate = new HeartRate({prop: 'heartRate'});
 const speed = new Speed({prop: 'speed'});
 const distance = new Distance({prop: 'distance'});
 const sources = new Sources({prop: 'sources'});
+
+// const cadenceLap = new PropAccumulator({event: 'watch:lap'});
+// const heartRateLap = new PropAccumulator({event: 'watch:lap'});
+
+// const cadenceAvg = new PropAccumulator({event: 'watch:stopped'});
+// const heartRateAvg = new PropAccumulator({event: 'watch:stopped'});
+
 
 const powerTarget = new PowerTarget({prop: 'powerTarget'});
 const resistanceTarget = new ResistanceTarget({prop: 'resistanceTarget'});
@@ -545,30 +804,47 @@ const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 const dataTileSwitch = new DataTileSwitch({prop: 'dataTileSwitch', storage: LocalStorageItem});
 
+const power1s = new PropInterval({prop: 'power', effect: 'power1s', time: 1000});
+const powerInZone = new PowerInZone({ftpModel: ftp});
+
 const workout = new Workout({prop: 'workout'});
 const workouts = new Workouts({prop: 'workouts', workoutModel: workout});
 
 const session = Session();
 
-let models = { power,
-               heartRate,
-               cadence,
-               speed,
-               sources,
-               powerTarget,
-               resistanceTarget,
-               slopeTarget,
-               cadenceTarget,
-               mode,
-               page,
-               ftp,
-               weight,
-               theme,
-               measurement,
-               dataTileSwitch,
-               workout,
-               workouts,
-               session,
-             };
+let models = {
+    power,
+    heartRate,
+    cadence,
+    speed,
+    sources,
+
+    power1s,
+    powerLap,
+    powerAvg,
+    powerInZone,
+
+    // heartRateLap,
+    // cadenceLap,
+    // heartRateAvg,
+    // cadenceAvg,
+
+    powerTarget,
+    resistanceTarget,
+    slopeTarget,
+    cadenceTarget,
+
+    mode,
+    page,
+    ftp,
+    weight,
+    theme,
+    measurement,
+    dataTileSwitch,
+
+    workout,
+    workouts,
+    session,
+};
 
 export { models };

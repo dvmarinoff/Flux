@@ -10,6 +10,11 @@ let db = {
     distance: 0,
     sources: models.sources.default,
 
+    power1s: models.power1s.default,
+    powerLap: models.powerLap.default,
+    powerAvg: models.powerAvg.default,
+    powerInZone: models.powerInZone.default,
+
     // Targets
     powerTarget: models.powerTarget.default,
     resistanceTarget: models.resistanceTarget.default,
@@ -66,6 +71,8 @@ xf.reg(models.heartRate.prop, (heartRate, db) => {
 
 xf.reg(models.power.prop, (power, db) => {
     db.power = power;
+    db.powerLap = models.powerLap.setState(power);
+    db.powerAvg = models.powerAvg.setState(power);
 });
 
 xf.reg(models.cadence.prop, (cadence, db) => {
@@ -79,6 +86,14 @@ xf.reg(models.speed.prop, (speed, db) => {
 xf.reg(models.sources.prop, (sources, db) => {
     db.sources = models.sources.set(db.sources, sources);
     console.log(db.sources);
+});
+
+xf.reg('power1s', (power1s, db) => {
+    db.power1s = power1s;
+});
+
+xf.reg('powerInZone', (powerInZone, db) => {
+    db.powerInZone = powerInZone;
 });
 
 // Pages
@@ -234,7 +249,6 @@ xf.reg('app:start', async function(_, db) {
     await models.session.start();
     await models.session.restore(db);
     xf.dispatch('workout:restore');
-
 });
 
 function start () {

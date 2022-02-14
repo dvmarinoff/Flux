@@ -35,7 +35,7 @@ class DataView extends HTMLElement {
         }
     }
     getDefaults() {
-        return {};
+        return { prop: '', };
     }
     config() {
         return;
@@ -65,14 +65,14 @@ class DataView extends HTMLElement {
     shouldUpdate(value) {
         return !equals(value, this.state) && !this.disabled;
     }
-    updataState(value) {
+    updateState(value) {
         this.state = value;
     }
     onUpdate(propValue) {
         const value = this.getValue(propValue);
 
         if(this.shouldUpdate(value)) {
-            this.updataState(value);
+            this.updateState(value);
             this.render();
         }
     }
@@ -86,11 +86,6 @@ class DataView extends HTMLElement {
 
 customElements.define('data-view', DataView);
 
-
-class SummaryView extends DataView {
-}
-
-customElements.define('summary-view', SummaryView);
 
 
 
@@ -114,11 +109,12 @@ class PowerTargetControl extends DataView {
         };
         this.parse = parseInt;
     }
-    connectedCallback() {
+    config() {
         this.$input = document.querySelector(this.selectors.input);
         this.$inc   = document.querySelector(this.selectors.inc);
         this.$dec   = document.querySelector(this.selectors.dec);
-
+    }
+    subs() {
         this.$input.addEventListener('change', this.onChange.bind(this), this.signal);
         this.$inc.addEventListener('pointerup', this.onInc.bind(this), this.signal);
         this.$dec.addEventListener('pointerup', this.onDec.bind(this), this.signal);
@@ -203,6 +199,7 @@ class TimerTime extends DataView {
 
 customElements.define('timer-time', TimerTime);
 
+
 class IntervalTime extends DataView {
     getDefaults() {
         return {
@@ -230,7 +227,7 @@ class SpeedValue extends DataView {
             measurement: 'metric',
         };
     }
-    config() {
+    subs() {
         xf.sub(`db:measurement`, this.onMeasurement.bind(this), this.signal);
     }
     onMeasurement(measurement) {
@@ -254,6 +251,7 @@ class SpeedValue extends DataView {
 
 customElements.define('speed-value', SpeedValue);
 
+
 class DistanceValue extends DataView {
     postInit() {
         this.measurement = this.getDefaults().measurement;
@@ -264,7 +262,7 @@ class DistanceValue extends DataView {
             measurement: 'metric',
         };
     }
-    config() {
+    subs() {
         xf.sub(`db:measurement`, this.onMeasurement.bind(this), this.signal);
     }
     onMeasurement(measurement) {
@@ -397,36 +395,35 @@ class SlopeTarget extends DataView {
 
 customElements.define('slope-target', SlopeTarget);
 
-class PowerAvg extends DataView {
+
+class PowerValue extends DataView {
+    // update on custom interval
     postInit() {
-        this.prev = 0;
-        this.length = 0;
+        this.period = 1;
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
     }
     getDefaults() {
         return {
             prop: 'db:power',
         };
     }
+    transform(state) {
+        return Math.floor(state);
+    }
+}
+
+customElements.define('power-value', PowerValue);
+
+class PowerAvg extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:powerAvg',
+        };
+    }
     subs() {
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
-        xf.sub('watch:lap', this.onWatchLap.bind(this), this.signal);
-    }
-    updataState(value) {
-        if(equals(this.state, 0) && equals(value, 0)) {
-            this.state = 0;
-        } else if(equals(value, 0)) {
-            return;
-        } else {
-            this.length += 1;
-            this.state = (value + ((this.length - 1) * this.state)) / this.length;
-            // console.log(`${this.length} ---- ${this.state} //// ${value}`);
-        }
-    }
-    onWatchLap() {
-        this.reset();
-    }
-    reset() {
-        this.length = 0;
     }
     transform(state) {
         return Math.floor(state);
@@ -435,53 +432,63 @@ class PowerAvg extends DataView {
 
 customElements.define('power-avg', PowerAvg);
 
-class PowerValue extends DataView {
-    postInit() {
-        this.period = 1;
-        this.buffer = [];
-        this.bufferLength = 0;
+class PowerLap extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:powerLap',
+        };
     }
     subs() {
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
-        xf.sub('db:powerSmoothing', this.onPowerSmoothing.bind(this), this.signal);
-    }
-    getDefaults() {
-        return {
-            prop: 'db:power',
-        };
-    }
-    canUpdate() {
-        return this.bufferLength >= this.period;
-    }
-    shouldUpdate(value) {
-        if(this.canUpdate()) {
-            return !equals(value, this.state) && !this.disabled;
-        } else {
-            return false;
-        }
-    };
-    onUpdate(propValue) {
-        const value = this.getValue(propValue);
-
-        this.buffer.push(value);
-        this.bufferLength += 1;
-
-        if(this.shouldUpdate()) {
-            this.state = avg(this.buffer);
-            this.buffer = [];
-            this.bufferLength = 0;
-            this.render();
-        }
-    }
-    onPowerSmoothing(value) {
-        this.period = value;
     }
     transform(state) {
         return Math.floor(state);
     }
 }
 
-customElements.define('power-value', PowerValue);
+customElements.define('power-lap', PowerLap);
+
+class PowerInZone extends HTMLElement {
+    constructor() {
+        super();
+        this.state = [0,0,0,0,0,0,0];
+        this.selectors = {
+            values: '.power--zone-value',
+            bars: '.power--zone-bar',
+        };
+        this.prop = 'db:powerInZone';
+    }
+    connectedCallback() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
+        this.$values = this.querySelectorAll(this.selectors.values);
+        this.$bars = this.querySelectorAll(this.selectors.bars);
+
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    disconnectedCallback() {
+        this.abortController.abort();
+    }
+    onUpdate(propValue) {
+        console.log();
+        this.state = propValue;
+        this.render();
+    }
+    render() {
+        for(let i=0; i < this.state.length; i++) {
+            const text = Math.round(this.state[i]*100);
+            const height = `${this.state[i]*100}%`;
+
+            this.$values[i].textContent = text;
+            this.$bars[i].style.height = height;
+        }
+    }
+}
+
+customElements.define('power-in-zone', PowerInZone);
+
 
 function scale(value, max = 100) {
     return 100 * (value/max);
@@ -513,12 +520,16 @@ class InstantPowerGraph extends HTMLElement {
     }
     connectedCallback() {
         const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
         this.graphWidth = this.calcGraphWidth();
 
         xf.sub(`db:${this.prop}`, this.onUpdate.bind(this), this.signal);
         xf.sub(`db:${this.metric}`, this.onMetric.bind(this), this.signal);
     }
     disconnectedCallback() {
+        this.abortController.abort();
     }
     calcGraphWidth() {
         return this.getBoundingClientRect().width;
@@ -561,11 +572,18 @@ class SwitchGroup extends HTMLElement {
         this.postInit();
     }
     connectedCallback() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
         this.$switchList = this.querySelectorAll('.switch-item');
         this.config();
 
         xf.sub(`db:${this.prop}`, this.onState.bind(this), this.signal);
         this.addEventListener('pointerup', this.onSwitch.bind(this), this.signal);
+    }
+    disconnectedCallback() {
+        this.abortController.abort();
     }
     eventOwner(e) {
         const pathLength = e.path.length;
