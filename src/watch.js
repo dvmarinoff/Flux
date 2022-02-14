@@ -264,7 +264,7 @@ xf.reg('watch:elapsed', (x, db) => {
     db.distance  += 1 * kphToMps(db.speed);
 
     let record = {timestamp:  Date.now(),
-                  power:      db.power,
+                  power:      db.power1s,
                   cadence:    db.cadence,
                   speed:      db.speed,
                   heart_rate: db.heartRate,
