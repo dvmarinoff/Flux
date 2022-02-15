@@ -647,33 +647,35 @@ const powerAvg = new PropAccumulator({event: 'watch:stopped'});
 class PropInterval {
     constructor(args = {}) {
         const self = this;
-        this.state   = existance(args.state,   this.getDefaults().default);
-        this.count   = existance(args.count,   this.getDefaults().count);
-        this.prop    = existance(args.prop,    this.getDefaults().prop);
-        this.effect  = existance(args.effect,   this.getDefaults().effect);
-        this.time    = existance(args.time,   this.getDefaults().time);
+        this.state       = existance(args.state, this.getDefaults().default);
+        this.accumulator = existance(args.accumulator, this.getDefaults().accumulator);
+        this.count       = existance(args.count, this.getDefaults().count);
+        this.prop        = existance(args.prop, this.getDefaults().prop);
+        this.effect      = existance(args.effect, this.getDefaults().effect);
+        this.interval    = existance(args.interval, this.getDefaults().interval);
         this.start();
     }
     getDefaults() {
         const self = this;
         return {
             default: 0,
+            accumulator: 0,
             count: 0,
-            time: 1000,
+            interval: 1000,
             prop: '',
             effect: '',
         };
     }
     start() {
         this.subs();
-        this.intervalId = setInterval(this.onInterval.bind(this), this.time);
+        this.intervalId = setInterval(this.onInterval.bind(this), this.interval);
     }
     stop() {
         clearInterval(this.intervalId);
         this.unsubs();
     }
     reset() {
-        this.state = 0;
+        this.accumulator = 0;
         this.count = 0;
     }
     subs() {
@@ -687,14 +689,14 @@ class PropInterval {
         this.abortController.abort();
     }
     onUpdate(propValue) {
-        this.state += propValue;
+        this.accumulator += propValue;
         this.count += 1;
     }
     onInterval() {
-        if(equals(this.state, 0) || equals(this.count, 0)) return;
+        if(equals(this.accumulator, 0) || equals(this.count, 0)) return;
 
-        const value = this.state / this.count;
-        xf.dispatch(`${this.effect}`, value);
+        this.state = this.accumulator / this.count;
+        xf.dispatch(`${this.effect}`, this.state);
         this.reset();
     }
 }
@@ -804,7 +806,7 @@ const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 const dataTileSwitch = new DataTileSwitch({prop: 'dataTileSwitch', storage: LocalStorageItem});
 
-const power1s = new PropInterval({prop: 'power', effect: 'power1s', time: 1000});
+const power1s = new PropInterval({prop: 'power', effect: 'power1s', interval: 1000});
 const powerInZone = new PowerInZone({ftpModel: ftp});
 
 const workout = new Workout({prop: 'workout'});

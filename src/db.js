@@ -31,7 +31,7 @@ let db = {
     measurement: models.measurement.default,
 
     // UI options
-    powerSmoothing: 1,
+    powerSmoothing: 0,
     dataTileSwitch: models.dataTileSwitch.default,
 
     // Workouts
