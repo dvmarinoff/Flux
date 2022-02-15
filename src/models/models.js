@@ -632,7 +632,7 @@ class PropAccumulator extends Prop {
             const value_p = this.state;
             const count_c = this.count;
             const count_p = this.count-1;
-            this.state = mavg(value_c, value_p, count_c, count_p);
+            this.state = this.format(mavg(value_c, value_p, count_c, count_p));
         }
         return this.state;
     }
@@ -643,6 +643,8 @@ class PropAccumulator extends Prop {
 
 const powerLap = new PropAccumulator({event: 'watch:lap'});
 const powerAvg = new PropAccumulator({event: 'watch:stopped'});
+const cadenceLap = new PropAccumulator({event: 'watch:lap'});
+const heartRateLap = new PropAccumulator({event: 'watch:lap'});
 
 class PropInterval {
     constructor(args = {}) {
@@ -786,9 +788,6 @@ const speed = new Speed({prop: 'speed'});
 const distance = new Distance({prop: 'distance'});
 const sources = new Sources({prop: 'sources'});
 
-// const cadenceLap = new PropAccumulator({event: 'watch:lap'});
-// const heartRateLap = new PropAccumulator({event: 'watch:lap'});
-
 // const cadenceAvg = new PropAccumulator({event: 'watch:stopped'});
 // const heartRateAvg = new PropAccumulator({event: 'watch:stopped'});
 
@@ -826,8 +825,8 @@ let models = {
     powerAvg,
     powerInZone,
 
-    // heartRateLap,
-    // cadenceLap,
+    heartRateLap,
+    cadenceLap,
     // heartRateAvg,
     // cadenceAvg,
 

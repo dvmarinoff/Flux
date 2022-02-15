@@ -15,6 +15,9 @@ let db = {
     powerAvg: models.powerAvg.default,
     powerInZone: models.powerInZone.default,
 
+    cadenceLap: models.cadenceLap.default,
+    heartRateLap: models.heartRateLap.default,
+
     // Targets
     powerTarget: models.powerTarget.default,
     resistanceTarget: models.resistanceTarget.default,
@@ -67,6 +70,7 @@ xf.create(db);
 // Data Screen
 xf.reg(models.heartRate.prop, (heartRate, db) => {
     db.heartRate = heartRate;
+    db.heartRateLap = models.heartRateLap.setState(heartRate);
 });
 
 xf.reg(models.power.prop, (power, db) => {
@@ -77,6 +81,7 @@ xf.reg(models.power.prop, (power, db) => {
 
 xf.reg(models.cadence.prop, (cadence, db) => {
     db.cadence = cadence;
+    db.cadenceLap = models.cadenceLap.setState(cadence);
 });
 
 xf.reg(models.speed.prop, (speed, db) => {

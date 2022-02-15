@@ -1013,6 +1013,27 @@ body.dark-theme {
     z-index: -1;
 }
 
+.laps--cont {
+    margin: 2em auto 4em;
+}
+.lap--item {
+    border-bottom: 1px solid var(--white-opacity-01);
+}
+.lap--item--inner {
+    display: grid;
+    grid-template-columns: 2em repeat(4, 1fr);
+    justify-items: center;
+    align-items: center;
+    padding: 0 1em;
+    height: 4em;
+    margin: 0 auto;
+    max-width: var(--inner-max-width);
+}
+
+.lap--value {
+    font-size: 1.2em;
+}
+
 /* Workout List */
 #workouts-page {
     font-size: 1rem;

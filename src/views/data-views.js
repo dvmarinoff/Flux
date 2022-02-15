@@ -1,4 +1,4 @@
-import { xf, exists, existance, equals, avg, toFixed } from '../functions.js';
+import { xf, exists, existance, equals, last, avg, toFixed } from '../functions.js';
 import { formatTime } from '../utils.js';
 import { models } from '../models/models.js';
 
@@ -482,6 +482,45 @@ class PowerInZone extends HTMLElement {
 }
 
 customElements.define('power-in-zone', PowerInZone);
+
+
+class LapsList extends DataView {
+    getDefaults() {
+        return { prop: 'db:lap', };
+    }
+    config() {
+        this.$lapsCont = this.querySelector('.laps--cont');
+    }
+    subs() {
+        xf.reg(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    toLap(lap) {
+        const index        = this.state.length;
+        const duration     = lap.totalElapsedTime;
+        const powerLap     = existance(lap.avgPower, '--');
+        const cadenceLap   = existance(lap.avgCadence, 0); //
+        const heartRateLap = existance(lap.avgHeartRate, 0); //
+
+        return `<div class="lap--item">
+                    <div class="lap--item--inner">
+                    <div class="lap--value lap--index">${index}</div>
+                    <div class="lap--value lap--duration">${formatTime({value: duration, format: 'mm:ss'})}</div>
+                    <div class="lap--value lap--power">${powerLap} W</div>
+                    <div class="lap--value lap--cadence">${cadenceLap} rpm</div>
+                    <div class="lap--value lap--heart-rate">${heartRateLap} bpm</div>
+                    </div>
+                </div>`;
+    }
+    onUpdate(propValue, db) {
+        this.updateState(db.laps);
+        this.render();
+    }
+    render() {
+        this.$lapsCont.insertAdjacentHTML('beforeend', this.toLap(last(this.state)));
+    }
+}
+
+customElements.define('laps-list', LapsList);
 
 
 function scale(value, max = 100) {

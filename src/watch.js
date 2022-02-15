@@ -283,11 +283,16 @@ xf.reg('watch:lap', (x, db) => {
     let elapsed   = timeDiff(timeStart, timeEnd);
 
     if(elapsed > 0) {
-        db.laps.push({timestamp:        timeEnd,
-                      startTime:        timeStart,
-                      totalElapsedTime: elapsed,
-                      avgPower:         Math.round(avg(db.lap, 'power')),
-                      maxPower:         max(db.lap, 'power')});
+        db.laps.push({
+            timestamp:        timeEnd,
+            startTime:        timeStart,
+            totalElapsedTime: elapsed,
+            avgPower:         Math.round(avg(db.lap, 'power')),
+            maxPower:         max(db.lap, 'power'),
+
+            avgCadence:       Math.round(avg(db.lap, 'cadence')),
+            avgHeartRate:     Math.round(avg(db.lap, 'heartRate')),
+        });
     }
     db.lap = [];
     db.lapStartTime = timeEnd + 0;
