@@ -1,4 +1,4 @@
-import { xf, exists, existance, equals, last, avg, toFixed } from '../functions.js';
+import { xf, exists, existance, validate, equals, isNumber, last, avg, toFixed } from '../functions.js';
 import { formatTime } from '../utils.js';
 import { models } from '../models/models.js';
 
@@ -497,17 +497,17 @@ class LapsList extends DataView {
     toLap(lap) {
         const index        = this.state.length;
         const duration     = lap.totalElapsedTime;
-        const powerLap     = existance(lap.avgPower, '--');
-        const cadenceLap   = existance(lap.avgCadence, 0); //
-        const heartRateLap = existance(lap.avgHeartRate, 0); //
+        const powerLap     = validate([exists, isNumber], lap.avgPower, 0);
+        const cadenceLap   = validate([exists, isNumber], lap.avgCadence, 0);
+        const heartRateLap = validate([exists, isNumber], lap.avgHeartRate, 0);
 
         return `<div class="lap--item">
                     <div class="lap--item--inner">
                     <div class="lap--value lap--index">${index}</div>
                     <div class="lap--value lap--duration">${formatTime({value: duration, format: 'mm:ss'})}</div>
-                    <div class="lap--value lap--power">${powerLap} W</div>
-                    <div class="lap--value lap--cadence">${cadenceLap} rpm</div>
-                    <div class="lap--value lap--heart-rate">${heartRateLap} bpm</div>
+                    <div class="lap--value lap--power">${Math.round(powerLap)} W</div>
+                    <div class="lap--value lap--cadence">${Math.round(cadenceLap)} rpm</div>
+                    <div class="lap--value lap--heart-rate">${Math.round(heartRateLap)} bpm</div>
                     </div>
                 </div>`;
     }

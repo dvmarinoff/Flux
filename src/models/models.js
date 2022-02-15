@@ -594,7 +594,6 @@ class Prop {
 class PropAccumulator extends Prop {
     postInit(args = {}) {
         this.event = existance(args.event, this.getDefaults().event);
-        this.prev  = this.getDefaults().prev;
         this.count = this.getDefaults().count;
     }
     getDefaults() {
@@ -632,7 +631,7 @@ class PropAccumulator extends Prop {
             const value_p = this.state;
             const count_c = this.count;
             const count_p = this.count-1;
-            this.state = this.format(mavg(value_c, value_p, count_c, count_p));
+            this.state = mavg(value_c, value_p, count_c, count_p);
         }
         return this.state;
     }
@@ -643,8 +642,12 @@ class PropAccumulator extends Prop {
 
 const powerLap = new PropAccumulator({event: 'watch:lap'});
 const powerAvg = new PropAccumulator({event: 'watch:stopped'});
+
 const cadenceLap = new PropAccumulator({event: 'watch:lap'});
 const heartRateLap = new PropAccumulator({event: 'watch:lap'});
+
+// const cadenceAvg = new PropAccumulator({event: 'watch:stopped'});
+// const heartRateAvg = new PropAccumulator({event: 'watch:stopped'});
 
 class PropInterval {
     constructor(args = {}) {
@@ -787,10 +790,6 @@ const heartRate = new HeartRate({prop: 'heartRate'});
 const speed = new Speed({prop: 'speed'});
 const distance = new Distance({prop: 'distance'});
 const sources = new Sources({prop: 'sources'});
-
-// const cadenceAvg = new PropAccumulator({event: 'watch:stopped'});
-// const heartRateAvg = new PropAccumulator({event: 'watch:stopped'});
-
 
 const powerTarget = new PowerTarget({prop: 'powerTarget'});
 const resistanceTarget = new ResistanceTarget({prop: 'resistanceTarget'});

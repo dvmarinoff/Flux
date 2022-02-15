@@ -47,6 +47,7 @@ function isString(x) {
 }
 
 function isNumber(x) {
+    if(isNaN(x)) return false;
     return equals(typeof x, 'number');
 }
 
