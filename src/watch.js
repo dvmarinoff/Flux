@@ -263,12 +263,14 @@ xf.reg('watch:elapsed', (x, db) => {
     db.elapsed = x;
     db.distance  += 1 * kphToMps(db.speed);
 
-    let record = {timestamp:  Date.now(),
-                  power:      db.power1s,
-                  cadence:    db.cadence,
-                  speed:      db.speed,
-                  heart_rate: db.heartRate,
-                  distance:   db.distance};
+    let record = {
+        timestamp:  Date.now(),
+        power:      db.power1s,
+        cadence:    db.cadence,
+        speed:      db.speed,
+        heart_rate: db.heartRate,
+        distance:   db.distance
+    };
     db.records.push(record);
     db.lap.push(record);
 
@@ -287,11 +289,11 @@ xf.reg('watch:lap', (x, db) => {
             timestamp:        timeEnd,
             startTime:        timeStart,
             totalElapsedTime: elapsed,
-            avgPower:         Math.round(avg(db.lap, 'power')),
+            // avgPower:         Math.round(avg(db.lap, 'power')),
+            avgPower:         db.powerLap,
             maxPower:         max(db.lap, 'power'),
-
             avgCadence:       Math.round(avg(db.lap, 'cadence')),
-            avgHeartRate:     Math.round(avg(db.lap, 'heartRate')),
+            avgHeartRate:     Math.round(avg(db.lap, 'heart_rate')),
         });
     }
     db.lap = [];

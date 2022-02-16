@@ -1,4 +1,4 @@
-import { xf, exists, existance, validate, equals, isNumber, last, avg, toFixed } from '../functions.js';
+import { xf, exists, existance, validate, equals, isNumber, last, empty, avg, toFixed } from '../functions.js';
 import { formatTime } from '../utils.js';
 import { models } from '../models/models.js';
 
@@ -404,7 +404,7 @@ class PowerValue extends DataView {
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
     }
     transform(state) {
-        return Math.floor(state);
+        return Math.round(state);
     }
 }
 
@@ -420,7 +420,7 @@ class PowerAvg extends DataView {
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
     }
     transform(state) {
-        return Math.floor(state);
+        return Math.round(state);
     }
 }
 
@@ -436,7 +436,7 @@ class PowerLap extends DataView {
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
     }
     transform(state) {
-        return Math.floor(state);
+        return Math.round(state);
     }
 }
 
@@ -445,11 +445,13 @@ customElements.define('power-lap', PowerLap);
 class PowerInZone extends HTMLElement {
     constructor() {
         super();
-        this.state = [0,0,0,0,0,0,0];
+        this.state = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]];
         this.selectors = {
             values: '.power--zone-value',
             bars: '.power--zone-bar',
+            btn: '.power--unit',
         };
+        this.format = 'percentage';
         this.prop = 'db:powerInZone';
     }
     connectedCallback() {
@@ -459,6 +461,9 @@ class PowerInZone extends HTMLElement {
 
         this.$values = this.querySelectorAll(this.selectors.values);
         this.$bars = this.querySelectorAll(this.selectors.bars);
+        this.$btn = this.querySelector(this.selectors.btn);
+
+        this.$btn.addEventListener('pointerup', this.onSwitch.bind(this), this.signal);
 
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
     }
@@ -466,14 +471,30 @@ class PowerInZone extends HTMLElement {
         this.abortController.abort();
     }
     onUpdate(propValue) {
-        console.log();
         this.state = propValue;
         this.render();
     }
+    onSwitch() {
+        console.log(this.format);
+        if(equals(this.format, 'time')) {
+            this.format = 'percentage';
+            this.$btn.textContent = '%';
+            this.render();
+        } else {
+            this.format = 'time';
+            this.$btn.textContent = 'min';
+            this.render();
+        }
+    }
     render() {
         for(let i=0; i < this.state.length; i++) {
-            const text = Math.round(this.state[i]*100);
-            const height = `${this.state[i]*100}%`;
+            let text;
+            if(equals(this.format, 'percentage')) {
+                 text = Math.round(this.state[i][0]*100);
+            } else {
+                 text = formatTime({value:Math.round(this.state[i][1]), format: 'mm:ss'});
+            }
+            const height = `${this.state[i][0]*100}%`;
 
             this.$values[i].textContent = text;
             this.$bars[i].style.height = height;
@@ -485,6 +506,9 @@ customElements.define('power-in-zone', PowerInZone);
 
 
 class LapsList extends DataView {
+    postInit() {
+        this.isEmpty = true;
+    }
     getDefaults() {
         return { prop: 'db:lap', };
     }
@@ -494,29 +518,41 @@ class LapsList extends DataView {
     subs() {
         xf.reg(`${this.prop}`, this.onUpdate.bind(this), this.signal);
     }
-    toLap(lap) {
-        const index        = this.state.length;
+    toLap(lap, index) {
         const duration     = lap.totalElapsedTime;
-        const powerLap     = validate([exists, isNumber], lap.avgPower, 0);
-        const cadenceLap   = validate([exists, isNumber], lap.avgCadence, 0);
-        const heartRateLap = validate([exists, isNumber], lap.avgHeartRate, 0);
+        const powerLap     = Math.round(validate([exists, isNumber], lap.avgPower, 0));
+        const cadenceLap   = Math.round(validate([exists, isNumber], lap.avgCadence, 0));
+        const heartRateLap = Math.round(validate([exists, isNumber], lap.avgHeartRate, 0));
+        const zone         = models.ftp.powerToZone(powerLap).name;
 
         return `<div class="lap--item">
                     <div class="lap--item--inner">
                     <div class="lap--value lap--index">${index}</div>
                     <div class="lap--value lap--duration">${formatTime({value: duration, format: 'mm:ss'})}</div>
-                    <div class="lap--value lap--power">${Math.round(powerLap)} W</div>
-                    <div class="lap--value lap--cadence">${Math.round(cadenceLap)} rpm</div>
-                    <div class="lap--value lap--heart-rate">${Math.round(heartRateLap)} bpm</div>
+                    <div class="lap--value lap--power zone-${zone}-color">${powerLap} W</div>
+                    <div class="lap--value lap--cadence">${cadenceLap} rpm</div>
+                    <div class="lap--value lap--heart-rate">${heartRateLap} bpm</div>
                     </div>
                 </div>`;
     }
-    onUpdate(propValue, db) {
-        this.updateState(db.laps);
-        this.render();
+    restore(laps) {
+        this.state = laps;
+        laps.forEach((lap, index) => this.render(lap, index+1));
     }
-    render() {
-        this.$lapsCont.insertAdjacentHTML('beforeend', this.toLap(last(this.state)));
+    onUpdate(propValue, db) {
+        if(empty(db.laps)) {
+            return;
+        } else if(this.isEmpty) {
+            this.restore(db.laps);
+            this.isEmpty = false;
+        } else {
+            this.updateState(db.laps);
+            this.render(last(db.laps), this.state.length);
+        }
+
+    }
+    render(lap, i) {
+        this.$lapsCont.insertAdjacentHTML('afterbegin', this.toLap(lap, i));
     }
 }
 

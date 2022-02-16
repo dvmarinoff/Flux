@@ -239,6 +239,27 @@ body {
     background-color: var(--zone-red);
 }
 
+.zone-one-color {
+    color: var(--zone-gray);
+}
+.zone-two-color {
+    color: var(--zone-blue);
+}
+.zone-three-color {
+    color: var(--zone-teal);
+}
+.zone-four-color {
+    color: var(--zone-green);
+}
+.zone-five-color {
+    color: var(--zone-yellow);
+}
+.zone-six-color {
+    color: var(--zone-orange);
+}
+.zone-seven-color {
+    color: var(--zone-red);
+}
 
 .black {
     color: var(--black);
@@ -1000,9 +1021,11 @@ body.dark-theme {
     width: 100%;
     height: 100%;
 }
+
 .power--unit {
     cursor: pointer;
 }
+
 .power--zone-bar {
     position: absolute;
     bottom: 0;
@@ -1016,9 +1039,11 @@ body.dark-theme {
 .laps--cont {
     margin: 2em auto 4em;
 }
+
 .lap--item {
     border-bottom: 1px solid var(--white-opacity-01);
 }
+
 .lap--item--inner {
     display: grid;
     grid-template-columns: 2em repeat(4, 1fr);
@@ -1032,6 +1057,10 @@ body.dark-theme {
 
 .lap--value {
     font-size: 1.2em;
+}
+
+.lap--power {
+    font-weight: bold;
 }
 
 /* Workout List */

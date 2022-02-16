@@ -4,6 +4,7 @@
 /dist/
 /node_modules/
 /gists/
+/src/simulation-scripts.js
 **/.DS_Store
 .cache
 notes.txt

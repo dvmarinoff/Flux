@@ -1,5 +1,5 @@
 import { xf, existance , equals, exists, delay } from '../functions.js';
-import { time } from '../utils.js';
+import { time, backoff } from '../utils.js';
 import { ble } from './web-ble.js';
 
 // Device
@@ -135,9 +135,6 @@ class Device {
             }
         }
     }
-    async watchAdvertisements() {
-    }
-
     stop() {}
     hasService(services, uuid) {
         let res = false;

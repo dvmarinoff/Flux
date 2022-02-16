@@ -1,5 +1,6 @@
 import { xf, exists, equals } from '../functions.js';
 import { models } from './models/models.js';
+// import { trainerMock } from './simulation-scripts.js';
 
 let db = {
     // Data Screen
@@ -75,8 +76,6 @@ xf.reg(models.heartRate.prop, (heartRate, db) => {
 
 xf.reg(models.power.prop, (power, db) => {
     db.power = power;
-    db.powerLap = models.powerLap.setState(power);
-    db.powerAvg = models.powerAvg.setState(power);
 });
 
 xf.reg(models.cadence.prop, (cadence, db) => {
@@ -93,8 +92,10 @@ xf.reg(models.sources.prop, (sources, db) => {
     console.log(db.sources);
 });
 
-xf.reg('power1s', (power1s, db) => {
-    db.power1s = power1s;
+xf.reg('power1s', (power, db) => {
+    db.power1s = power;
+    db.powerLap = models.powerLap.setState(power);
+    db.powerAvg = models.powerAvg.setState(power);
 });
 
 xf.reg('powerInZone', (powerInZone, db) => {
@@ -254,6 +255,9 @@ xf.reg('app:start', async function(_, db) {
     await models.session.start();
     await models.session.restore(db);
     xf.dispatch('workout:restore');
+
+    // TRAINER MOCK
+    // trainerMock.init();
 });
 
 function start () {

@@ -504,6 +504,9 @@ function Session(args = {}) {
             laps: db.laps,
             lap: db.lap,
 
+            // Report
+            powerInZone: db.powerInZone,
+
             // Workouts
             workout: db.workout,
             mode: db.mode,
@@ -595,10 +598,12 @@ class PropAccumulator extends Prop {
     postInit(args = {}) {
         this.event = existance(args.event, this.getDefaults().event);
         this.count = this.getDefaults().count;
+        this.prev  = this.getDefaults().prev;
     }
     getDefaults() {
         return {
             value: 0,
+            prev: 0,
             default: 0,
             disabled: false,
             prop: '',
@@ -628,10 +633,11 @@ class PropAccumulator extends Prop {
         } else {
             this.count += 1;
             const value_c = value;
-            const value_p = this.state;
+            const value_p = this.prev;
             const count_c = this.count;
             const count_p = this.count-1;
             this.state = mavg(value_c, value_p, count_c, count_p);
+            this.prev = this.state;
         }
         return this.state;
     }
@@ -652,6 +658,7 @@ const heartRateLap = new PropAccumulator({event: 'watch:lap'});
 class PropInterval {
     constructor(args = {}) {
         const self = this;
+        this.default     = existance(args.default, this.getDefaults().default);
         this.state       = existance(args.state, this.getDefaults().default);
         this.accumulator = existance(args.accumulator, this.getDefaults().accumulator);
         this.count       = existance(args.count, this.getDefaults().count);
@@ -718,12 +725,12 @@ class PowerInZone {
     }
     getDefaults() {
         const self = this;
-
-        const value = self.ftpModel.zones.map(x => 0);
+        const value = self.ftpModel.zones.map(x => [0,0]);
+        const weights = self.ftpModel.zones.map(x => 0);
 
         return {
             default: value,
-            weights: value,
+            weights: weights,
             count: 0,
             prop: 'db:elapsed',
         };
@@ -760,7 +767,7 @@ class PowerInZone {
 
         for(let i=0; i < this.state.length; i++) {
             if(!equals(this.weights[i], 0)) {
-                this.state[i] = this.weights[i] / this.count;
+                this.state[i] = [this.weights[i] / this.count, this.weights[i]];
             }
         }
 
