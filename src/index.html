@@ -217,11 +217,20 @@
             </div> <!-- end page-home -->
 
             <div id="workouts-page" class="page" page="workouts">
-                <div class="workout-list" id="workouts">
+                <library-switch-group class="library--switch--group">
+                    <div class="library--switch switch-item switch-0 active" index="0">
+                        <div class="library--switch--icon"></div>
+                        <h2 class="library--switch--heading">Workouts</h2>
+                    </div>
+                    <div class="library--switch switch-item switch-1" index="1">
+                        <div class="library--switch--icon"></div>
+                        <h2 class="library--switch--heading">Ride report</h2>
+                    </div>
+                </library-switch-group>
 
-                    <header class="page--header">
-                        <h2 class="page--heading">Workouts</h2>
-                    </header>
+                <div class="ride-report" id="ride-report">
+
+                    <!-- <power-graph id="power-graph"></power-graph> -->
 
                     <power-in-zone id="power-in-zone">
                         <div class=" power--zone--item">
@@ -258,7 +267,9 @@
                     <laps-list>
                         <div class="laps--cont"></div>
                     </laps-list>
+                </div>
 
+                <div class="workout-list" id="workouts">
                     <div class="buildin-workouts">
                         <ul is="workout-list" id="workout-list" class="workout-list list" prop="workouts" metric="ftp">
                         </ul>

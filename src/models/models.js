@@ -520,7 +520,7 @@ function Session(args = {}) {
 
             // UI options
             powerSmoothing: db.powerSmoothing,
-            // dataTileSwitch: db.dataTileSwitch,
+            librarySwitch: db.librarySwitch,
         };
 
         return session;
@@ -717,6 +717,7 @@ class PowerInZone {
     constructor(args = {}) {
         const self = this;
         this.ftpModel = existance(args.ftpModel);
+        this.default  = existance(args.default, this.getDefaults().default);
         this.count    = existance(args.count,   this.getDefaults().count);
         this.weights  = existance(args.weights, this.getDefaults().weights);
         this.state    = existance(args.state,   this.getDefaults().default);

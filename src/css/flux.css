@@ -1063,6 +1063,46 @@ body.dark-theme {
     font-weight: bold;
 }
 
+.library--switch--group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    align-items: center;
+}
+
+.library--switch--heading {
+    font-size: 1.1em;
+    text-transform: uppercase;
+    line-height: 5em;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.library--switch .library--switch--heading {
+    color: var(--gray);
+}
+
+.library--switch.active .library--switch--heading {
+    color: #fff;
+}
+
+#workouts {
+    display: none;
+    margin-top: 20px;
+}
+
+#ride-report {
+    display: none;
+}
+
+#workouts.active {
+    display: block;
+}
+
+#ride-report.active {
+    display: block;
+}
+
 /* Workout List */
 #workouts-page {
     font-size: 1rem;

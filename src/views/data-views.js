@@ -445,7 +445,7 @@ customElements.define('power-lap', PowerLap);
 class PowerInZone extends HTMLElement {
     constructor() {
         super();
-        this.state = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]];
+        this.state = [[0,0],[0,0],[0,0],[0,0], [0,0],[0,0],[0,0]];
         this.selectors = {
             values: '.power--zone-value',
             bars: '.power--zone-bar',
@@ -634,6 +634,27 @@ class InstantPowerGraph extends HTMLElement {
 customElements.define('instant-power-graph', InstantPowerGraph);
 
 
+class PowerGraph extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    toBar(power) {
+        const zone = models.ftp.powerToZone(this.value).name;
+        const height = this.powerToHeight();
+    }
+    powerToHeight(power) {
+        return 100;
+    }
+    render(power) {
+        this.insertAdjacentHTML('beforeend', this.toBar(power));
+        this.barsCount += 1;
+    }
+}
+
+customElements.define('power-graph', PowerGraph);
+
+
 class SwitchGroup extends HTMLElement {
     constructor() {
         super();
@@ -715,6 +736,8 @@ class DataTileSwitchGroup extends SwitchGroup {
         this.$distance = document.querySelector('#data-tile--distance');  // tab 0
         this.$powerAvg = document.querySelector('#data-tile--power-avg'); // tab 1
         this.$slope    = document.querySelector('#data-tile--slope');     // tab 1
+
+        this.renderEffect(this.state);
     }
     renderEffect(state) {
         if(equals(state, 0)) {
@@ -734,6 +757,33 @@ class DataTileSwitchGroup extends SwitchGroup {
 }
 
 customElements.define('data-tile-switch-group', DataTileSwitchGroup);
+
+class LibrarySwitchGroup extends SwitchGroup {
+    postInit() {
+        this.prop = 'librarySwitch';
+        this.effect = 'ui:library-switch-set';
+    }
+    config() {
+        this.$workouts   = document.querySelector('#workouts');    // tab 0
+        this.$rideReport = document.querySelector('#ride-report'); // tab 1
+
+        this.renderEffect(this.state);
+    }
+    renderEffect(state) {
+        if(equals(state, 1)) {
+            this.$rideReport.classList.add('active');
+            this.$workouts.classList.remove('active');
+        }
+        if(equals(state, 0)) {
+            this.$workouts.classList.add('active');
+            this.$rideReport.classList.remove('active');
+        }
+        return;
+    }
+}
+
+customElements.define('library-switch-group', LibrarySwitchGroup);
+
 
 class MeasurementUnit extends DataView {
     getDefaults() {

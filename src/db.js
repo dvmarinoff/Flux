@@ -37,6 +37,7 @@ let db = {
     // UI options
     powerSmoothing: 0,
     dataTileSwitch: models.dataTileSwitch.default,
+    librarySwitch: 0,
 
     // Workouts
     workouts: [],
@@ -126,6 +127,10 @@ xf.reg('ui:mode-set', (mode, db) => {
 xf.reg('ui:data-tile-switch-set', (index, db) => {
     db.dataTileSwitch = index;
     models.dataTileSwitch.backup(db.dataTileSwitch);
+});
+
+xf.reg('ui:library-switch-set', (index, db) => {
+    db.librarySwitch = index;
 });
 
 // Targets
