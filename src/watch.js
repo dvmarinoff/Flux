@@ -295,8 +295,8 @@ xf.reg('watch:lap', (x, db) => {
             avgCadence:       Math.round(avg(db.lap, 'cadence')),
             avgHeartRate:     Math.round(avg(db.lap, 'heart_rate')),
         });
+        db.lap = [];
     }
-    db.lap = [];
     db.lapStartTime = timeEnd + 0;
 });
 
