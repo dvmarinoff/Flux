@@ -622,6 +622,10 @@ body.dark-theme {
     text-transform: uppercase;
 }
 
+.data-tile-small--heading sub {
+    text-transform: lowercase;
+}
+
 .data-tile-small--value {
     font-size: var(--data-tile-small--value-font-size);
     font-weight: bold;
