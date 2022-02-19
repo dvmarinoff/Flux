@@ -133,6 +133,7 @@ class SpeedValue extends DataView {
         };
     }
     subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
         xf.sub(`db:measurement`, this.onMeasurement.bind(this), this.signal);
     }
     onMeasurement(measurement) {
@@ -168,6 +169,7 @@ class DistanceValue extends DataView {
         };
     }
     subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
         xf.sub(`db:measurement`, this.onMeasurement.bind(this), this.signal);
     }
     onMeasurement(measurement) {
