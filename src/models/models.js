@@ -812,7 +812,8 @@ class SpeedVirtual extends Prop {
         this.slope = slope / 10;
     }
     calculate(power, mass, slope, speed) {
-        console.log(`${power}W, ${mass}kg, ${slope/10}% ${speed}`);
+        // console.log(`${power}W, ${mass}kg, ${slope/10}% ${speed}`);
+
         // return this.cycling.virtualSpeed({power, mass, slope, speed: (speed/3.6), dt: 1}).speed * 3.6;
         return this.cycling.virtualSpeed({power, mass, slope, speed: (speed/3.6), dt: 1/4}).speed * 3.6;
     }
