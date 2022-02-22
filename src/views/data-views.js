@@ -1,7 +1,6 @@
 import { xf, exists, existance, validate, equals, isNumber, last, empty, avg, toFixed } from '../functions.js';
 import { formatTime } from '../utils.js';
 import { models } from '../models/models.js';
-import { cycling } from '../physics.js';
 
 //
 // DataView
@@ -158,59 +157,16 @@ class SpeedValue extends DataView {
 
 customElements.define('speed-value', SpeedValue);
 
-class PowerToSpeed extends DataView {
-    postInit() {
-        this.measurement = this.getDefaults().measurement;
-        this.slope = this.getDefaults().slope;
-        this.weight = this.getDefaults().weight;
-        this.systemWeight = this.weight + 10;
-    }
+class SpeedVirtual extends SpeedValue {
     getDefaults() {
         return {
-            prop: 'db:power',
+            prop: 'db:speedVirtual',
             measurement: 'metric',
-            weight:  75,
-            slope: 0,
         };
-    }
-    subs() {
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
-        xf.sub(`db:measurement`, this.onMeasurement.bind(this), this.signal);
-        xf.sub(`db:weight`, this.onWeight.bind(this), this.signal);
-        xf.sub(`db:slopeTarget`, this.onSlopeTarget.bind(this), this.signal);
-    }
-    onMeasurement(measurement) {
-        this.measurement = measurement;
-    }
-    onWeight(weight) {
-        this.weight = weight;
-        this.systemWeight = this.weight + 10;
-    }
-    onSlopeTarget(slope) {
-        this.slope = slope / 10;
-    }
-    kmhToMph(kmh) {
-        return 0.621371 * kmh;
-    };
-    format(value, measurement = 'metric') {
-        if(equals(measurement, 'imperial')) {
-            value = `${this.kmhToMph(value).toFixed(1)}`;
-        } else {
-            value = `${(value).toFixed(1)}`;
-        }
-        return value;
-    }
-    calculate(power, mass, slope) {
-        console.log(`${power}W, ${mass}kg, ${slope}%`);
-        return cycling.powerToSpeed(power, mass, slope) * 3.6;
-    }
-    transform(state) {
-        console.log(this.state);
-        return this.format(this.calculate(state, this.systemWeight, this.slope), this.measurement);
     }
 }
 
-customElements.define('power-to-speed', PowerToSpeed);
+customElements.define('speed-virtual', SpeedVirtual);
 
 
 class DistanceValue extends DataView {

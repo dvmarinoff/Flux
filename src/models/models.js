@@ -12,6 +12,7 @@ import { zwo } from '../workouts/zwo.js';
 import { fileHandler } from '../file.js';
 import { activity } from '../fit/activity.js';
 import { fit } from '../fit/fit.js';
+import { Model as Cycling } from '../physics.js';
 
 class Model {
     constructor(args = {}) {
@@ -777,7 +778,53 @@ class PowerInZone {
     }
 }
 
+class SpeedVirtual extends Prop {
+    postInit() {
+        this.speed           = 0;
+        this.slope           = this.getDefaults().slope;
+        this.riderWeight     = this.getDefaults().weight;
+        this.equipmentWeight = this.getDefaults().equipmentWeight;
+        this.systemWeight    = this.getDefaults().systemWeight;
+        this.cycling         = Cycling();
+    }
+    getDefaults() {
+        return {
+            // prop: 'power1s',
+            prop: 'power',
+            disabled: false,
+            default: 0,
+            slope: 0.00,
+            riderWeight: 75,
+            equipmentWeight: 10,
+            systemWeight: 85,
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        xf.sub(`db:weight`, this.onWeight.bind(this), this.signal);
+        xf.sub(`db:slopeTarget`, this.onSlopeTarget.bind(this), this.signal);
+    }
+    onWeight(weight) {
+        this.riderWeight = weight;
+        this.systemWeight = this.riderWeight + this.equipmentWeight;
+    }
+    onSlopeTarget(slope) {
+        this.slope = slope / 10;
+    }
+    calculate(power, mass, slope, speed) {
+        console.log(`${power}W, ${mass}kg, ${slope/10}% ${speed}`);
+        // return this.cycling.virtualSpeed({power, mass, slope, speed: (speed/3.6), dt: 1}).speed * 3.6;
+        return this.cycling.virtualSpeed({power, mass, slope, speed: (speed/3.6), dt: 1/4}).speed * 3.6;
+    }
+    updateState(power) {
+        this.state = power;
+        this.speed = this.calculate(this.state, this.systemWeight, this.slope, this.speed);
+        // console.log(this.state);
+        xf.dispatch('speedVirtual', this.speed);
+    }
+}
 
+const speedVirtual = new SpeedVirtual();
 
 class TSS {
     // TSS = (t * NP * IF) / (FTP * 3600) * 100
@@ -831,6 +878,7 @@ let models = {
     powerLap,
     powerAvg,
     powerInZone,
+    speedVirtual,
 
     heartRateLap,
     cadenceLap,

@@ -15,6 +15,7 @@ let db = {
     powerLap: models.powerLap.default,
     powerAvg: models.powerAvg.default,
     powerInZone: models.powerInZone.default,
+    speedVirtual: models.speedVirtual.default,
 
     cadenceLap: models.cadenceLap.default,
     heartRateLap: models.heartRateLap.default,
@@ -101,6 +102,10 @@ xf.reg('power1s', (power, db) => {
 
 xf.reg('powerInZone', (powerInZone, db) => {
     db.powerInZone = powerInZone;
+});
+
+xf.reg('speedVirtual', (speedVirtual, db) => {
+    db.speedVirtual = speedVirtual;
 });
 
 // Pages
