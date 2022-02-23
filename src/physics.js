@@ -280,12 +280,11 @@ function Model(args = { use: {}}) {
 
         const { sinBeta, cosBeta } = Beta(slope);
 
-        const gravitationalResistance = (mass * slope) * g * sinBeta;
-        const rollingResistance       = mass * crr * g * cosBeta;
+        const gravitationalResistance = g * mass * sinBeta;
+        const rollingResistance       = g * mass * cosBeta * crr;
         const windResistance          = 0.5 * rho * (CdA + spokeDrag) * Math.pow((speed + windSpeed), 2) * draftingFactor;
 
         const totalResistance = gravitationalResistance + rollingResistance + windResistance;
-
         const force = (power * (1 - drivetrainLoss)) - (totalResistance * speed);
 
         acceleration = force / mass;
@@ -303,5 +302,4 @@ function Model(args = { use: {}}) {
 }
 
 export { Model };
-
 

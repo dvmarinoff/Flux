@@ -809,7 +809,7 @@ class SpeedVirtual extends Prop {
         this.systemWeight = this.riderWeight + this.equipmentWeight;
     }
     onSlopeTarget(slope) {
-        this.slope = slope / 10;
+        this.slope = slope / 100;
     }
     calculate(power, mass, slope, speed) {
         // console.log(`${power}W, ${mass}kg, ${slope/10}% ${speed}`);
