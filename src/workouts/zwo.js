@@ -539,6 +539,9 @@ const Attrs = {
     SlopeLow:  Attribute({name: 'SlopeLow', decode: parseFloat}),
     SlopeHigh: Attribute({name: 'SlopeHigh', decode: parseFloat}),
 
+
+    Distance: Attribute({name: 'Distance', decode: parseInt}),
+
     Sim:  Attribute({name: 'Sim', decode: decodeSim, encode: encodeSim}),
 
     Repeat: Attribute({name: 'Repeat', decode: parseInt}),

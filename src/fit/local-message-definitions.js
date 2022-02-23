@@ -18,8 +18,8 @@ const localMessageDefinitions = {
         type: 'definition',
         message: 'record',
         local_number: 3,
-        length: 6+18,
-        data_msg_length: 1+14,
+        length: 6+18+2,
+        data_msg_length: 1+14+3,
         fields: [
             {field: 'timestamp',   number: 253, size: 4, base_type: 134},
             // {field: "position_lat", number: 0, size: 4, base_type: 133},
@@ -29,7 +29,7 @@ const localMessageDefinitions = {
             // {field: "altitude", number: 2, size: 2, base_type: 132},
             {field: "speed", number: 6, size: 2, base_type: 132},
             {field: "power", number: 7, size: 2, base_type: 132},
-            // {field: "grade", number: 9, size: 2, base_type: 131},
+            {field: "grade", number: 9, size: 2, base_type: 131},
             {field: "cadence", number: 4, size: 1, base_type: 2},
             // {field: "resistance", number: 10, size: 1, base_type: 2},
         ]
