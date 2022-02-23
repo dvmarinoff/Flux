@@ -16,6 +16,7 @@ let db = {
     powerAvg: models.powerAvg.default,
     powerInZone: models.powerInZone.default,
     speedVirtual: models.speedVirtual.default,
+    altitude: models.altitude.default,
 
     cadenceLap: models.cadenceLap.default,
     heartRateLap: models.heartRateLap.default,
@@ -106,6 +107,10 @@ xf.reg('powerInZone', (powerInZone, db) => {
 
 xf.reg('speedVirtual', (speedVirtual, db) => {
     db.speedVirtual = speedVirtual;
+});
+
+xf.reg('altitude', (altitude, db) => {
+    db.altitude = altitude;
 });
 
 // Pages

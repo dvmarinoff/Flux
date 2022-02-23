@@ -536,7 +536,7 @@ function Session(args = {}) {
     });
 }
 
-class Prop {
+class MetaProp {
     constructor(args = {}) {
         const self = this;
         this.init(args);
@@ -595,7 +595,36 @@ class Prop {
     }
 }
 
-class PropAccumulator extends Prop {
+class Altitude extends Model {
+    // getDefaults() {
+    //     return {
+    //         slopeProp: 'db:slopeTarget',
+    //         effect: 'altitude',
+    //         default: 0,
+    //         disabled: false,
+    //     };
+    // }
+    // subsConfig() {
+    //     xf.reg(`${this.slopeProp}`, this.onUpdate.bind(this), this.signal);
+    // }
+    defaultValue() { return 0; }
+    calculate(args = {}) {
+        const grade    = args.grade ?? 0;
+        const distance = args.distance ?? 0;
+
+        if(equals(grade, 0) || equals(distance, 0)) return 0;
+
+        return distance * Math.sin(Math.atan(grade/100));
+    }
+    // onUpdate(propValue, db) {
+    //     // handle distance
+    //     this.state += this.calculate({grade: propValue});
+
+    //     xf.dispatch(`${this.effect}`, this.state);
+    // }
+}
+
+class PropAccumulator extends MetaProp {
     postInit(args = {}) {
         this.event = existance(args.event, this.getDefaults().event);
         this.count = this.getDefaults().count;
@@ -778,7 +807,7 @@ class PowerInZone {
     }
 }
 
-class SpeedVirtual extends Prop {
+class SpeedVirtual extends MetaProp {
     postInit() {
         this.speed           = 0;
         this.slope           = this.getDefaults().slope;
@@ -825,8 +854,6 @@ class SpeedVirtual extends Prop {
     }
 }
 
-const speedVirtual = new SpeedVirtual();
-
 class TSS {
     // TSS = (t * NP * IF) / (FTP * 3600) * 100
     // NP:
@@ -846,6 +873,8 @@ const heartRate = new HeartRate({prop: 'heartRate'});
 const speed = new Speed({prop: 'speed'});
 const distance = new Distance({prop: 'distance'});
 const sources = new Sources({prop: 'sources'});
+const speedVirtual = new SpeedVirtual();
+const altitude = new Altitude({prop: 'altitude'});
 
 const powerTarget = new PowerTarget({prop: 'powerTarget'});
 const resistanceTarget = new ResistanceTarget({prop: 'resistanceTarget'});
@@ -880,6 +909,7 @@ let models = {
     powerAvg,
     powerInZone,
     speedVirtual,
+    altitude,
 
     heartRateLap,
     cadenceLap,

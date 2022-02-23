@@ -119,7 +119,10 @@ function Event(args = {}) {
 };
 
 function Record(args = {}) {
-    const defaults = {heart_rate: 0, power: 0, cadence: 0, speed: 0, distance: 0, grade: 0, };
+    const defaults = {
+        heart_rate: 0, power: 0, cadence: 0, speed: 0,
+        distance: 0, grade: 0, altidude: 0,
+    };
 
     const transforms = {
         timestamp: toFitTimestamp,

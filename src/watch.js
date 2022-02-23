@@ -263,6 +263,9 @@ xf.reg('watch:elapsed', (x, db) => {
     db.elapsed = x;
     // db.distance  += 1 * kphToMps(db.speed);
     db.distance  += 1 * kphToMps(db.speedVirtual);
+    // db.altitude  += models.altitude.calculate({
+    //     grade: db.slopeTarget, distance: db.distance
+    // });
 
     let record = {
         timestamp:  Date.now(),
@@ -273,7 +276,10 @@ xf.reg('watch:elapsed', (x, db) => {
         heart_rate: db.heartRate,
         distance:   db.distance,
         grade:      db.slopeTarget,
+        altitude:   db.altitude,
     };
+
+    // console.log(`${record.grade} ${record.altitude}`);
 
     db.records.push(record);
     db.lap.push(record);
