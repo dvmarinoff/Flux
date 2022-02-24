@@ -159,7 +159,7 @@ describe('Model', () => {
     });
 
     test('powerToMaxSpeed 0%', () => {
-        var model = Model({
+        const model = Model({
             use: {
                 spokeDrag: true,
                 bearingLoss: false,
@@ -169,30 +169,21 @@ describe('Model', () => {
             }});
 
         const power = 180;
-        const speed_init = 0;
-        let speed_prev = 0;
-
-        let acceleration_init = 0;
-        let acceleration_prev = 0;
-        let res = {};
+        let state = { speed: 0, acceleration: 0 };
 
         for(var t=0; t < 20; t++) {
-            res = model.virtualSpeed({
-                power, speed: speed_prev, acceleration: acceleration_prev, dt: 1,
-            });
-            speed_prev = res.speed;
-            acceleration_prev = res.acceleration;
+            state = model.virtualSpeed({ power, dt: 1, ...state, });
         }
 
-        const speedReached = res.speed * 3.6;
+        const speedReached = state.speed * 3.6;
         const speedPredicted = model.powerToMaxSpeed({power}) * 3.6;
-        console.log(`reached: ${speedReached} predicted: ${speedPredicted}, error: ${speedReached - speedPredicted}, t: ${t}`);
+        // console.log(`reached: ${speedReached} predicted: ${speedPredicted}, error: ${speedReached - speedPredicted}, t: ${t}`);
 
-        expect(speedReached - speedPredicted).toBeLessThan(0.45);
+        expect(Math.abs(speedReached - speedPredicted)).toBeLessThan(0.45);
     });
 
     describe('virtualSpeed', () => {
-        var model = Model({
+        const model = Model({
             use: {
                 spokeDrag: true,
                 bearingLoss: false,
@@ -201,25 +192,22 @@ describe('Model', () => {
                 smallAngleApprox: false,
             }});
 
+        const power = 180;
+        let state = { speed: 0, acceleration: 0 };
+
+        for(var t=0; t < 20; t++) {
+            state = model.virtualSpeed({ power, dt: 1, ...state, });
+        }
+
+        const speedReached = state.speed * 3.6;
+        const speedPredicted = model.powerToMaxSpeed({power}) * 3.6;
+
         function testRecord(record) {
             const power = record.power;
             const slope = record.slope / 100;
             const error = 0.45;
 
-            const speed_init = 0;
-            let speed_prev = 0;
-            let res = {};
-
-            for(var t=0; t < 20; t++) {
-                res = model.virtualSpeed({power, slope, speed: speed_prev, dt: 1,});
-                speed_prev = res.speed;
-            }
-
-            const speedReached = res.speed * 3.6;
-            const speedPredicted = model.powerToMaxSpeed({power, slope: slope}) * 3.6;
-            // console.log(`${slope*100}%, ${power}W, ${(speedReached).toFixed(2)} | ${(speedPredicted).toFixed(2)} km/h, diff: ${(speedReached - speedPredicted).toFixed(4)}, t: ${t}`);
-
-            expect(speedReached - speedPredicted).toBeLessThan(error);
+            expect(Math.abs(speedReached - speedPredicted)).toBeLessThan(error);
         }
 
         test('grade 0%', () => {

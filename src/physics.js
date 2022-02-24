@@ -275,6 +275,7 @@ function Model(args = { use: {}}) {
         const windSpeed      = args.windSpeed ?? 0; // m/s
         const draftingFactor = args.draftingFactor ?? defaults.draftingFactor; // 0..1
         const dt             = args.dt ?? 1; // s
+        const speedPrev      = args.speed ?? 0; // m/s
         let speed            = args.speed ?? 0; // m/s
         let acceleration     = args.acceleration ?? 0;
 
@@ -283,16 +284,23 @@ function Model(args = { use: {}}) {
         const gravitationalResistance = g * mass * sinBeta;
         const rollingResistance       = g * mass * cosBeta * crr;
         const windResistance          = 0.5 * rho * (CdA + spokeDrag) * Math.pow((speed + windSpeed), 2) * draftingFactor;
+  	    const keResistance            = 0; // zero acceleration
 
-        const totalResistance = gravitationalResistance + rollingResistance + windResistance;
-        const force = (power * (1 - drivetrainLoss)) - (totalResistance * speed);
+        const totalResistance = gravitationalResistance + rollingResistance + windResistance + keResistance;
+        const powerSteadyState = totalResistance * speedPrev; // zero-acceleration power
+        const powerKE = (power * (1 - drivetrainLoss)) - powerSteadyState;
 
-        acceleration = force / mass;
+
+        // speed = Math.sqrt((Math.pow(speedPrev, 2) + (2 * powerKE * dt)) / (mass + wheelInertia));
+        // if(speed < 0) speed = 0;
+        // acceleration = (speed - speedPrev) / dt;
+
+        acceleration = powerKE / (mass + wheelInertia);
         speed        = speed + acceleration * dt;
 
         if(speed < 0) speed = 0;
 
-        return { totalResistance, force, acceleration, speed };
+        return { acceleration, speed };
     }
 
     return Object.freeze({
@@ -300,6 +308,9 @@ function Model(args = { use: {}}) {
         virtualSpeed,
     });
 }
+
+// how to update keResistance when acceleration in not 0
+// what happens to drivetrainLoss
 
 export { Model };
 

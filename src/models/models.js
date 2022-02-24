@@ -815,10 +815,10 @@ class SpeedVirtual extends MetaProp {
         this.equipmentWeight = this.getDefaults().equipmentWeight;
         this.systemWeight    = this.getDefaults().systemWeight;
         this.cycling         = Cycling();
+        this.state           = { speed: 0, acceleration: 0 };
     }
     getDefaults() {
         return {
-            // prop: 'power1s',
             prop: 'power',
             disabled: false,
             default: 0,
@@ -829,7 +829,7 @@ class SpeedVirtual extends MetaProp {
         };
     }
     subs() {
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        xf.sub(`power`, this.onUpdate.bind(this), this.signal);
         xf.sub(`db:weight`, this.onWeight.bind(this), this.signal);
         xf.sub(`db:slopeTarget`, this.onSlopeTarget.bind(this), this.signal);
     }
@@ -840,17 +840,22 @@ class SpeedVirtual extends MetaProp {
     onSlopeTarget(slope) {
         this.slope = slope / 100;
     }
-    calculate(power, mass, slope, speed) {
-        // console.log(`${power}W, ${mass}kg, ${slope/10}% ${speed}`);
+    calculate() {
+        // console.log(`${this.power}W, ${this.systemWeight}kg, ${this.slope/10}% ${(this.state.speed * 3.6).toFixed(2)}kmh, ${(this.state.acceleration).toFixed(2)}m/s`);
 
-        // return this.cycling.virtualSpeed({power, mass, slope, speed: (speed/3.6), dt: 1}).speed * 3.6;
-        return this.cycling.virtualSpeed({power, mass, slope, speed: (speed/3.6), dt: 1/4}).speed * 3.6;
+        return this.cycling.virtualSpeed({
+            power: this.power,
+            mass:  this.systemWeight,
+            slope: this.slope,
+            speed: this.state.speed,
+            acceleration: this.state.acceleration,
+            dt: 1/4
+        });
     }
     updateState(power) {
-        this.state = power;
-        this.speed = this.calculate(this.state, this.systemWeight, this.slope, this.speed);
-        // console.log(this.state);
-        xf.dispatch('speedVirtual', this.speed);
+        this.power = power;
+        this.state = this.calculate();
+        xf.dispatch('speedVirtual', (this.state.speed * 3.6));
     }
 }
 
