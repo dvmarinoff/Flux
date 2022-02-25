@@ -124,7 +124,6 @@ describe('Model', () => {
                 bearingLoss: true,
                 wheelInertia: true,
                 dynamicCrr: true,
-                smallAngleApprox: false,
             }});
 
         function range(start, stop, step) {
@@ -158,57 +157,55 @@ describe('Model', () => {
         });
     });
 
-    test('powerToMaxSpeed 0%', () => {
+
+    function configTestRecord(args = {}) {
+        const model = args.model;
+        const error = args.error ?? 0.01;
+        const dt    = args.dt ?? 1;
+
+        return function (record) {
+            const power = record.power;
+            const slope = (record.slope / 100) ?? 0;
+
+            let state = { speed: 0, acceleration: 0 };
+
+            for(var t=0; t < 70; t++) {
+                state = model.virtualSpeed({ power, slope, dt, ...state, });
+            }
+
+            const speedReached = state.speed * 3.6;
+            const speedPredicted = model.powerToMaxSpeed({power, slope, acceleration: state.acceleration}) * 3.6;
+
+            // console.log(`${record.slope}%, ${power}W, reached: ${speedReached} predicted: ${speedPredicted}, error: ${speedReached - speedPredicted}, t: ${t}`);
+
+            expect(Math.abs(speedReached - speedPredicted)).toBeLessThan(error);
+        };
+    }
+
+    test('virtualSpeed (single)', () => {
         const model = Model({
             use: {
                 spokeDrag: true,
-                bearingLoss: false,
-                wheelInertia: false,
+                bearingLoss: true,
+                wheelInertia: true,
                 dynamicCrr: true,
-                smallAngleApprox: false,
             }});
 
-        const power = 180;
-        let state = { speed: 0, acceleration: 0 };
+        const testRecord = configTestRecord({model});
 
-        for(var t=0; t < 20; t++) {
-            state = model.virtualSpeed({ power, dt: 1, ...state, });
-        }
-
-        const speedReached = state.speed * 3.6;
-        const speedPredicted = model.powerToMaxSpeed({power}) * 3.6;
-        // console.log(`reached: ${speedReached} predicted: ${speedPredicted}, error: ${speedReached - speedPredicted}, t: ${t}`);
-
-        expect(Math.abs(speedReached - speedPredicted)).toBeLessThan(0.45);
+        testRecord({power: 180, slope: 0});
     });
 
     describe('virtualSpeed', () => {
         const model = Model({
             use: {
                 spokeDrag: true,
-                bearingLoss: false,
-                wheelInertia: false,
+                bearingLoss: true,
+                wheelInertia: true,
                 dynamicCrr: true,
-                smallAngleApprox: false,
             }});
 
-        const power = 180;
-        let state = { speed: 0, acceleration: 0 };
-
-        for(var t=0; t < 20; t++) {
-            state = model.virtualSpeed({ power, dt: 1, ...state, });
-        }
-
-        const speedReached = state.speed * 3.6;
-        const speedPredicted = model.powerToMaxSpeed({power}) * 3.6;
-
-        function testRecord(record) {
-            const power = record.power;
-            const slope = record.slope / 100;
-            const error = 0.45;
-
-            expect(Math.abs(speedReached - speedPredicted)).toBeLessThan(error);
-        }
+        const testRecord = configTestRecord({model});
 
         test('grade 0%', () => {
             dataGribble[0].forEach(testRecord);
@@ -226,6 +223,66 @@ describe('Model', () => {
             dataGribble[8].forEach(testRecord);
         });
     });
+
+    function configDecelerate(args = {}) {
+        const model = args.model;
+        const dt    = args.dt ?? 1/10;
+
+        return function (record) {
+            const power = 0;
+            const speed = record.speed;
+            const slope = (record.slope / 100) ?? 0;
+
+            let state = { speed, acceleration: 0 };
+
+            let t=0;
+            while(state.speed > 0) {
+                state = model.virtualSpeed({ power, slope, dt, ...state, });
+                t++;
+            }
+            console.log(`${record.speed}km/h, ${power}W, dt: ${dt}, t: ${t}`);
+
+            expect(t).toBeLessThan(2000);
+        };
+    }
+
+
+    test('virtualSpeed decelerate from 180W', () => {
+        const model = Model({
+            use: {
+                spokeDrag: true,
+                bearingLoss: true,
+                wheelInertia: true,
+                dynamicCrr: true,
+            }});
+
+        const decelerate = configDecelerate({model});
+
+        decelerate({slope: 0, speed: (model.powerToMaxSpeed({power: 68, slope: 0}) * 3.6)}); // 20 km/h
+        decelerate({slope: 0, speed: (model.powerToMaxSpeed({power: 190, slope: 0}) * 3.6)}); // 30 km/h
+        decelerate({slope: 0, speed: (model.powerToMaxSpeed({power: 415, slope: 0}) * 3.6)}); // 40 km/h
+        decelerate({slope: 0, speed: (model.powerToMaxSpeed({power: 1310, slope: 0}) * 3.6)}); // 60 km/h
+
+        // Sqrt: 180W->0W, 122t, 1000ms = 122s
+        // Sqrt: 180W->0W, 505t, 250ms  = 126s
+        // Sqrt: 180W->0W, 1272t, 100ms = 127s
+
+        // Sqrt: 20->0kmh, 118t, 1000ms = 118s
+        // Sqrt: 30->0kmh, 122t, 1000ms = 122s
+        // Sqrt: 40->0kmh, 125t, 1000ms = 125s
+        // Sqrt: 60->0kmh, 127t, 1000ms = 127s
+
+        // Sqrt: 20->0kmh, 485t, 250ms = 121s
+        // Sqrt: 30->0kmh, 506t, 250ms = 126s
+        // Sqrt: 40->0kmh, 516t, 250ms = 129s
+        // Sqrt: 60->0kmh, 527t, 250ms = 131s
+
+        // Sqrt: 20->0kmh, 1221t, 100ms = 121s
+        // Sqrt: 30->0kmh, 1274t, 100ms = 127s
+        // Sqrt: 40->0kmh, 1301t, 100ms = 130s
+        // Sqrt: 60->0kmh, 1328t, 100ms = 132s
+    });
+
 });
 
 // describe('', () => {

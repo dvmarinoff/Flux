@@ -178,7 +178,6 @@ function Model(args = { use: {}}) {
             bearingLoss: false,
             wheelInertia: false,
             useDynamicCrr: false,
-            useSmallAngleApprox: false,
         }
     };
 
@@ -194,18 +193,12 @@ function Model(args = { use: {}}) {
 
     const use = Object.assign(defaults.use, args.use);
 
-    function ConfigBeta(useSmallAngleApprox) {
-        return useSmallAngleApprox ? smallAngleApprox : angle;
+    function CosBeta(slope) {
+        return 1 / Math.sqrt(slope * slope + 1);
     }
 
-    function smallAngleApprox(slope) {
-        return { cosBeta: 1, sinBeta: slope };
-    }
-
-    function angle(slope) {
-        const cosBeta = 1 / Math.sqrt(slope * slope + 1);
-        const sinBeta = slope * cosBeta;
-        return { cosBeta, sinBeta };
+    function SinBeta(slope, cosBeta) {
+        return slope * cosBeta;
     }
 
     function calcWheelInertia(wheelCircumference, useWheelInertia = false) {
@@ -217,7 +210,6 @@ function Model(args = { use: {}}) {
         return 0;
     }
 
-    const Beta          = ConfigBeta(use.smallAngleApprox);
     const wheelInertia  = calcWheelInertia(wheelCircumference, use.wheelInertia);
     const spokeDrag     = use.spokeDrag   ? 0.0044 : 0;
     const c1bearingLoss = use.bearingLoss ? 0.091  : 0;
@@ -232,7 +224,8 @@ function Model(args = { use: {}}) {
         const acceleration   = args.acceleration ?? 0;
         const draftingFactor = args.draftingFactor ?? defaults.draftingFactor;
 
-        const { sinBeta, cosBeta } = Beta(slope);
+        const cosBeta = CosBeta(slope);
+        const sinBeta = SinBeta(slope, cosBeta);
 
         const c1KE   = (mass + wheelInertia) * acceleration;
         const c1Grav = g * mass * sinBeta;
@@ -277,28 +270,32 @@ function Model(args = { use: {}}) {
         const dt             = args.dt ?? 1; // s
         const speedPrev      = args.speed ?? 0; // m/s
         let speed            = args.speed ?? 0; // m/s
-        let acceleration     = args.acceleration ?? 0;
 
-        const { sinBeta, cosBeta } = Beta(slope);
+        const cosBeta = CosBeta(slope);
+        const sinBeta = SinBeta(slope, cosBeta);
 
         const gravitationalResistance = g * mass * sinBeta;
-        const rollingResistance       = g * mass * cosBeta * crr;
+        const rollingResistance       = g * mass * cosBeta * crr + speedPrev * crv * cosBeta;
         const windResistance          = 0.5 * rho * (CdA + spokeDrag) * Math.pow((speed + windSpeed), 2) * draftingFactor;
-  	    const keResistance            = 0; // zero acceleration
+        const bearingLossResistance   = use.bearingLoss ? (0.091  + 0.0087 * speedPrev) : 0;
+  	    const keResistance            = 0;
 
-        const totalResistance = gravitationalResistance + rollingResistance + windResistance + keResistance;
-        const powerSteadyState = totalResistance * speedPrev; // zero-acceleration power
+        const totalResistance =
+              gravitationalResistance +
+              rollingResistance +
+              windResistance +
+              bearingLossResistance +
+              keResistance;
+        const powerSteadyState = totalResistance * speedPrev;
         const powerKE = (power * (1 - drivetrainLoss)) - powerSteadyState;
 
+        speed = Math.sqrt(Math.pow(speedPrev, 2) + 2 * powerKE * dt / (mass + wheelInertia));
+        if(speed < 0 || isNaN(speed)) speed = 0;
+        const acceleration = (speed - speedPrev) / dt;
 
-        // speed = Math.sqrt((Math.pow(speedPrev, 2) + (2 * powerKE * dt)) / (mass + wheelInertia));
+        // const acceleration = powerKE / (mass + wheelInertia);
+        // speed        = speed + acceleration * dt;
         // if(speed < 0) speed = 0;
-        // acceleration = (speed - speedPrev) / dt;
-
-        acceleration = powerKE / (mass + wheelInertia);
-        speed        = speed + acceleration * dt;
-
-        if(speed < 0) speed = 0;
 
         return { acceleration, speed };
     }
@@ -309,8 +306,6 @@ function Model(args = { use: {}}) {
     });
 }
 
-// how to update keResistance when acceleration in not 0
-// what happens to drivetrainLoss
 
 export { Model };
 

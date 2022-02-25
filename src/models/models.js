@@ -614,6 +614,9 @@ class Altitude extends Model {
 
         if(equals(grade, 0) || equals(distance, 0)) return 0;
 
+
+        console.log(`${grade} ${distance}, ${distance * Math.sin(Math.atan(grade/100))}`);
+
         return distance * Math.sin(Math.atan(grade/100));
     }
     // onUpdate(propValue, db) {
