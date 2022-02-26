@@ -270,6 +270,8 @@ function Model(args = { use: {}}) {
         const dt             = args.dt ?? 1; // s
         const speedPrev      = args.speed ?? 0; // m/s
         let speed            = args.speed ?? 0; // m/s
+        let distance         = args.distance ?? 0; // m
+        let altitude         = args.altitude ?? 0; // m
 
         const cosBeta = CosBeta(slope);
         const sinBeta = SinBeta(slope, cosBeta);
@@ -292,12 +294,18 @@ function Model(args = { use: {}}) {
         speed = Math.sqrt(Math.pow(speedPrev, 2) + 2 * powerKE * dt / (mass + wheelInertia));
         if(speed < 0 || isNaN(speed)) speed = 0;
         const acceleration = (speed - speedPrev) / dt;
+        const dx = speed * dt;
+        const da = dx * sinBeta; // Math.sin(Math.atan(slope));
+        distance += dx;
+        altitude += da;
+
+        if(altitude < 0) altitude = 0;
 
         // const acceleration = powerKE / (mass + wheelInertia);
         // speed        = speed + acceleration * dt;
         // if(speed < 0) speed = 0;
 
-        return { acceleration, speed };
+        return { acceleration, speed, distance, altitude };
     }
 
     return Object.freeze({

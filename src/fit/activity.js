@@ -45,7 +45,16 @@ function toFitDistance(unit = 'm') {
     };
 }
 
+function toFitGrade(grade) {
+    const scale = 100;
+    return grade * scale;
+}
 
+function toFitAltitude(altitude) {
+    const scale = 5;
+    const offset = 500;
+    return parseInt((altitude * scale), 10) + (offset * scale);
+}
 
 function FileHeader(args = {}) {
     return {
@@ -121,13 +130,15 @@ function Event(args = {}) {
 function Record(args = {}) {
     const defaults = {
         heart_rate: 0, power: 0, cadence: 0, speed: 0,
-        distance: 0, grade: 0, altidude: 0,
+        distance: 0, grade: 0, altitude: 0,
     };
 
     const transforms = {
         timestamp: toFitTimestamp,
         distance: toFitDistance('m'),
         speed: toFitSpeed,
+        altitude: toFitAltitude,
+        grade: toFitGrade,
     };
 
     return Data({values: args, definition: lmd.record, transforms, defaults});

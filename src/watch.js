@@ -259,19 +259,18 @@ xf.reg('watch:started',   (x, db) => {
 });
 xf.reg('watch:paused',  (x, db) => db.watchStatus = 'paused');
 xf.reg('watch:stopped', (x, db) => db.watchStatus = 'stopped');
+
 xf.reg('watch:elapsed', (x, db) => {
-    db.elapsed = x;
-    // db.distance  += 1 * kphToMps(db.speed);
-    db.distance  += 1 * kphToMps(db.speedVirtual);
-    db.altitude = models.altitude.calculate({
-        grade: db.slopeTarget, distance: db.distance
-    });
+    db.elapsed   = x;
+    // db.distance += 1 * kphToMps(db.speedVirtual);
+    // db.altitude  = models.altitude.calculate({
+    //     grade: db.slopeTarget, distance: db.distance - distancePrev
+    // });
 
     let record = {
         timestamp:  Date.now(),
         power:      db.power1s,
         cadence:    db.cadence,
-        // speed:      db.speed,
         speed:      db.speedVirtual,
         heart_rate: db.heartRate,
         distance:   db.distance,

@@ -113,6 +113,10 @@ xf.reg('altitude', (altitude, db) => {
     db.altitude = altitude;
 });
 
+xf.reg('distance', (distance, db) => {
+    db.distance = distance;
+});
+
 // Pages
 xf.reg('ui:page-set', (page, db) => {
     db.page = models.page.set(page);

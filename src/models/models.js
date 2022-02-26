@@ -615,7 +615,7 @@ class Altitude extends Model {
         if(equals(grade, 0) || equals(distance, 0)) return 0;
 
 
-        console.log(`${grade} ${distance}, ${distance * Math.sin(Math.atan(grade/100))}`);
+        // console.log(`g: ${grade} d: ${(distance).toFixed(3)}, a: ${(distance * Math.sin(Math.atan(grade/100))).toFixed(3)}`);
 
         return distance * Math.sin(Math.atan(grade/100));
     }
@@ -818,7 +818,12 @@ class SpeedVirtual extends MetaProp {
         this.equipmentWeight = this.getDefaults().equipmentWeight;
         this.systemWeight    = this.getDefaults().systemWeight;
         this.cycling         = Cycling();
-        this.state           = { speed: 0, acceleration: 0 };
+        this.state           = {
+            speed: 0,
+            acceleration: 0,
+            distance: 0,
+            altitude: 0,
+        };
     }
     getDefaults() {
         return {
@@ -835,6 +840,10 @@ class SpeedVirtual extends MetaProp {
         xf.sub(`power`, this.onUpdate.bind(this), this.signal);
         xf.sub(`db:weight`, this.onWeight.bind(this), this.signal);
         xf.sub(`db:slopeTarget`, this.onSlopeTarget.bind(this), this.signal);
+
+
+        xf.sub(`db:altitude`, this.onAltitude.bind(this), this.signal);
+        xf.sub(`db:distance`, this.onDistance.bind(this), this.signal);
     }
     onWeight(weight) {
         this.riderWeight = weight;
@@ -842,6 +851,12 @@ class SpeedVirtual extends MetaProp {
     }
     onSlopeTarget(slope) {
         this.slope = slope / 100;
+    }
+    onAltitude(altitude) {
+        this.altitude = altitude;
+    }
+    onDistance(distance) {
+        this.distance = distance;
     }
     calculate() {
         // console.log(`${this.power}W, ${this.systemWeight}kg, ${this.slope/10}% ${(this.state.speed * 3.6).toFixed(2)}kmh, ${(this.state.acceleration).toFixed(2)}m/s`);
@@ -852,13 +867,22 @@ class SpeedVirtual extends MetaProp {
             slope: this.slope,
             speed: this.state.speed,
             acceleration: this.state.acceleration,
-            dt: 1/4
+            dt: 1/4,
+
+            distance: this.distance, // this.distance
+            altitude: this.altitude, // this.altitude
         });
     }
     updateState(power) {
         this.power = power;
+
         this.state = this.calculate();
+
+        // console.log(`a: ${this.state.altitude}, d: ${this.state.distance}`);
+
         xf.dispatch('speedVirtual', (this.state.speed * 3.6));
+        xf.dispatch('distance', this.state.distance);
+        xf.dispatch('altitude', this.state.altitude);
     }
 }
 
