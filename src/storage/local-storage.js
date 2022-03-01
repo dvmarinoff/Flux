@@ -8,13 +8,15 @@ function LocalStorageItem(args = {}) {
     const defaults = {
         fallback: '',
         isValid:  function (v) { return exists(v); },
-        parse:    function(str) { return str; }
+        parse:    function(str) { return str; },
+        encode:   function(str) { return str; },
     };
 
     let key      = args.key;
     let fallback = existance(args.fallback, defaults.fallback);
     let isValid  = existance(args.isValid, defaults.isValid);
     let parse    = existance(args.parse, defaults.parse);
+    let encode   = existance(args.encode, defaults.encode);
 
     if(!exists(key)) throw new Error('LocalStorageItem needs a key!');
 
@@ -41,7 +43,7 @@ function LocalStorageItem(args = {}) {
 
     function set(value) {
         if(isValid(value)) {
-            window.localStorage.setItem(`${key}`, value);
+            window.localStorage.setItem(`${key}`, encode(value));
             return value;
         } else {
             console.warn(`Trying to enter invalid ${key} value in Local Storage: ${typeof value}`, value);

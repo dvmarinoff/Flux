@@ -293,6 +293,7 @@ function Model(args = { use: {}}) {
 
         speed = Math.sqrt(Math.pow(speedPrev, 2) + 2 * powerKE * dt / (mass + wheelInertia));
         if(speed < 0 || isNaN(speed)) speed = 0;
+
         const acceleration = (speed - speedPrev) / dt;
         const dx = speed * dt;
         const da = dx * sinBeta; // Math.sin(Math.atan(slope));
@@ -301,16 +302,99 @@ function Model(args = { use: {}}) {
 
         if(altitude < 0) altitude = 0;
 
-        // const acceleration = powerKE / (mass + wheelInertia);
-        // speed        = speed + acceleration * dt;
-        // if(speed < 0) speed = 0;
+        return { acceleration, speed, distance, altitude };
+    }
+
+    function virtualSpeedCF(args = {}) {
+        const power          = args.power; // W
+        const slope          = args.slope ?? defaults.slope; // 0.01 is 1%
+        const mass           = args.mass ?? defaults.mass; // kg
+        const windSpeed      = args.windSpeed ?? 0; // m/s
+        const draftingFactor = args.draftingFactor ?? defaults.draftingFactor; // 0..1
+        const dt             = args.dt ?? 1; // s
+        const speedPrev      = args.speed ?? 0; // m/s
+        let speed            = args.speed ?? 0; // m/s
+        let distance         = args.distance ?? 0; // m
+        let altitude         = args.altitude ?? 0; // m
+
+        const cosBeta = CosBeta(slope);
+        const sinBeta = SinBeta(slope, cosBeta);
+
+        const c1bl = c1bearingLoss;
+        const c2bl = c2bearingLoss;
+
+        const c0ke      = -.5 * (mass + wheelInertia) * Math.pow(speedPrev, 2) / dt;
+        const c2ke      =  .5 * (mass + wheelInertia) / dt;
+        const c1grav    = g * mass * sinBeta;
+        const c1roll    = g * mass * crr * cosBeta;
+        const c1air     = 0.5 * (CdA + spokeDrag) * rho * (Math.pow(windSpeed, 2)) * draftingFactor;
+        const c2air     = (CdA + spokeDrag) * rho * windSpeed * draftingFactor;
+        const c2dynroll = crv * cosBeta;
+        const c3air     = 0.5 * (CdA + spokeDrag) * rho * draftingFactor;
+
+        const c0 = -power * (1 - drivetrainLoss) + c0ke;
+        const c1 = c1grav + c1roll + c1air + c1bl;
+        const c2 = c2air + c2bl + c2dynroll + c2ke;
+        const c3 = c3air;
+
+        const roots = Qubic(c3, c2, c1, c0);
+
+        speed = roots[0];
+
+        let thisSpeed;
+        for(var root of roots) {
+            thisSpeed = root;
+            if(speed > 0) {
+                if((thisSpeed > 0) && (thisSpeed < speed)) {
+                    speed = thisSpeed;
+                }
+            } else {
+                if(thisSpeed > speed) {
+                    speed = thisSpeed;
+                }
+            }
+        }
+
+        if(speed < 0.1 || isNaN(speed)) speed = 0;
+
+        const acceleration = (speed - speedPrev) / dt;
+        const dx = speed * dt;
+        const da = dx * sinBeta;
+        distance += dx;
+        altitude += da;
+
+        if(altitude < 0) altitude = 0;
 
         return { acceleration, speed, distance, altitude };
+    }
+
+    function trainerSpeed(args = {}) {
+        const slope          = args.slope ?? defaults.slope; // 0.01 is 1%
+        const dt             = args.dt ?? 1; // s
+        const speedPrev      = args.speedPrev ?? 0; // m/s
+        let speed            = args.speed ?? 0; // m/s
+        let distance         = args.distance ?? 0; // m
+        let altitude         = args.altitude ?? 0; // m
+
+        const cosBeta = CosBeta(slope);
+        const sinBeta = SinBeta(slope, cosBeta);
+
+        const acceleration = (speed - speedPrev) / dt;
+        const dx = speed * dt;
+        const da = dx * sinBeta;
+        distance += dx;
+        altitude += da;
+
+        if(altitude < 0) altitude = 0;
+
+        return { acceleration, distance, altitude };
     }
 
     return Object.freeze({
         powerToMaxSpeed,
         virtualSpeed,
+        virtualSpeedCF,
+        trainerSpeed,
     });
 }
 

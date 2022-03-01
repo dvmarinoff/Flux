@@ -1,6 +1,6 @@
 import { xf, exists, equals } from '../functions.js';
 import { models } from './models/models.js';
-// import { trainerMock } from './simulation-scripts.js';
+import { trainerMock } from './simulation-scripts.js';
 
 let db = {
     // Data Screen
@@ -8,15 +8,16 @@ let db = {
     heartRate: models.heartRate.default,
     cadence: models.cadence.default,
     speed: models.speed.default,
-    distance: 0,
     sources: models.sources.default,
+
+    speedVirtual: models.virtualState.speed,
+    altitude: models.virtualState.altitude,
+    distance: models.virtualState.distance,
 
     power1s: models.power1s.default,
     powerLap: models.powerLap.default,
     powerAvg: models.powerAvg.default,
     powerInZone: models.powerInZone.default,
-    speedVirtual: models.speedVirtual.default,
-    altitude: models.altitude.default,
 
     cadenceLap: models.cadenceLap.default,
     heartRateLap: models.heartRateLap.default,
@@ -92,6 +93,7 @@ xf.reg(models.speed.prop, (speed, db) => {
 
 xf.reg(models.sources.prop, (sources, db) => {
     db.sources = models.sources.set(db.sources, sources);
+    models.sources.backup(db.sources);
     console.log(db.sources);
 });
 
@@ -267,6 +269,8 @@ xf.reg('app:start', async function(_, db) {
     db.theme = models.theme.set(models.theme.restore());
     db.measurement = models.measurement.set(models.measurement.restore());
     db.dataTileSwitch = models.dataTileSwitch.set(models.dataTileSwitch.restore()),
+
+    db.sources = models.sources.set(models.sources.restore());
 
     db.workouts = models.workouts.restore();
     db.workout = models.workout.restore(db);

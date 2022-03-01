@@ -55,8 +55,8 @@ class Watch {
     }
     startWorkout() {
         let self         = this;
-        let intervalTime = self.intervals[0].duration;
-        let stepTime     = self.intervals[0].steps[0].duration;
+        let intervalTime = self.intervals[0].duration ?? 0;
+        let stepTime     = self.intervals[0].steps[0].duration ?? 0;
 
         xf.dispatch('workout:started');
 

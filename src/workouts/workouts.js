@@ -1,4 +1,25 @@
 let workouts = [
+//         `<workout_file>
+//     <author>Marinov</author>
+//     <name>Test Sim Mode</name>
+//     <category>Sim</category>
+//     <description>Intervals with slope and distance</description>
+//     <sportType>bike</sportType>
+//     <tags>
+//     </tags>
+//     <workout>
+//         <SteadyState Distance="10" Slope="1" Power="0.80"/>
+//         <SteadyState Distance="10" Slope="2" Power="0.80"/>
+//         <SteadyState Distance="10" Slope="3" Power="0.80"/>
+//         <SteadyState Distance="10" Slope="-3" Power="0.80"/>
+//         <SteadyState Distance="10" Slope="-2" Power="0.80"/>
+//         <SteadyState Distance="10" Slope="-1" Power="0.80"/>
+//         <SteadyState Distance="100" Slope="10" Power="0.90"/>
+//         <SteadyState Distance="100" Slope="-10" Power="0.39"/>
+//         <SteadyState Distance="100" Slope="0" Power="0.75"/>
+//     </workout>
+// </workout_file>
+// `,
         `<workout_file>
     <author>Marinov</author>
     <name>Dijon</name>
