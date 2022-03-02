@@ -796,7 +796,12 @@ class VirtualState extends MetaProp {
         this.mass            = this.getDefaults().mass;
 
         this.source          = this.getDefaults().source;
-        this.cycling         = Cycling();
+        this.cycling         = Cycling({
+            rho:             1.275,
+            dragCoefficient: 0.88,   // 1.0, 0.88
+            frontalArea:     0.36,   // 0.4, 0.36
+            CdA:             0.3168, // 0.4, 0.3168
+        });
     }
     getDefaults() {
         return {
@@ -846,7 +851,7 @@ class VirtualState extends MetaProp {
         xf.dispatch('distance', distance);
         xf.dispatch('altitude', altitude);
 
-        console.log(`s: ${speed}, a: ${altitude}, d: ${distance}`);
+        // console.log(`s: ${speed}, a: ${altitude}, d: ${distance}`);
     }
 }
 

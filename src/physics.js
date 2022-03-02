@@ -166,12 +166,12 @@ function Model(args = { use: {}}) {
 
         drivetrainLoss: 0.02,
         crr: 0.004,
-        rho: 1.275,
         windSpeed: 0,
-        dragCoefficient: 1,
-        frontalArea: 0.4,
-        CdA: 0.4,
-        draftingFactor: 1,
+        rho:             1.275,
+        dragCoefficient: 1.0,
+        frontalArea:     0.4,
+        CdA:             0.4,
+        draftingFactor:  1,
 
         use: {
             spokeDrag: false,
@@ -222,6 +222,7 @@ function Model(args = { use: {}}) {
         const mass           = args.mass ?? defaults.mass;
         const windSpeed      = args.windSpeed ?? defaults.windSpeed;
         const acceleration   = args.acceleration ?? 0;
+        const drivetrainLoss = args.drivetrainLoss ?? 0; //defaults.drivetrainLoss;
         const draftingFactor = args.draftingFactor ?? defaults.draftingFactor;
 
         const cosBeta = CosBeta(slope);
@@ -266,6 +267,7 @@ function Model(args = { use: {}}) {
         const slope          = args.slope ?? defaults.slope; // 0.01 is 1%
         const mass           = args.mass ?? defaults.mass; // kg
         const windSpeed      = args.windSpeed ?? 0; // m/s
+        const drivetrainLoss = args.drivetrainLoss ?? 0;
         const draftingFactor = args.draftingFactor ?? defaults.draftingFactor; // 0..1
         const dt             = args.dt ?? 1; // s
         const speedPrev      = args.speed ?? 0; // m/s
@@ -296,7 +298,7 @@ function Model(args = { use: {}}) {
 
         const acceleration = (speed - speedPrev) / dt;
         const dx = speed * dt;
-        const da = dx * sinBeta; // Math.sin(Math.atan(slope));
+        const da = dx * sinBeta;
         distance += dx;
         altitude += da;
 
@@ -310,6 +312,7 @@ function Model(args = { use: {}}) {
         const slope          = args.slope ?? defaults.slope; // 0.01 is 1%
         const mass           = args.mass ?? defaults.mass; // kg
         const windSpeed      = args.windSpeed ?? 0; // m/s
+        const drivetrainLoss = args.drivetrainLoss ?? 0;
         const draftingFactor = args.draftingFactor ?? defaults.draftingFactor; // 0..1
         const dt             = args.dt ?? 1; // s
         const speedPrev      = args.speed ?? 0; // m/s

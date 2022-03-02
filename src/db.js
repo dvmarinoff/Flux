@@ -161,7 +161,6 @@ xf.reg(`ui:power-target-dec`, (_, db) => {
 });
 xf.reg('ui:cadence-target-set', (cadenceTarget, db) => {
     db.cadenceTarget = models.cadenceTarget.set(cadenceTarget);
-    console.log(`:zwo set target cadence ${db.cadenceTarget}`);
 });
 
 xf.reg('ui:resistance-target-set', (resistanceTarget, db) => {
