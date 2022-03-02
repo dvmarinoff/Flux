@@ -48,6 +48,78 @@ function scale(value, max = 100) {
     return 100 * (value/max);
 }
 
+function durationInterval(acc, interval, width, ftp, scaleMax) {
+    const stepsCount = interval.steps.length;
+
+    return acc + interval.steps.reduce((a, step) => {
+        const power    = existance(models.ftp.toAbsolute(step.power, ftp), 0);
+        const cadence  = step.cadence;
+        const slope    = step.slope;
+
+        const width    = 100 / stepsCount;
+        const height   = scale(equals(power, 0) ? 80 : power, scaleMax);
+
+        const zone     = (models.ftp.powerToZone(power, ftp)).name;
+        const infoTime = formatTime({value: step.duration, format: 'mm:ss'});
+
+        return a +
+            `<div class="graph--bar zone-${zone}" style="height: ${height}%; width: ${width}%">
+                     <div class="graph--info">
+                         ${targetsToHtml({power, cadence, slope})}
+                         <div class="graph--info--time">${infoTime}<span></span></div>
+                     </div>
+                </div>`;
+    }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
+}
+
+function slopeToGradient(slope) {
+    slope = Math.abs(slope);
+    if(slope < 1) return 'one';
+    if(slope < 2) return 'two';
+    if(slope < 3) return 'three';
+    if(slope < 5) return 'four';
+    if(slope < 8) return 'five';
+    if(slope < 12) return 'six';
+    if(slope >= 12) return 'seven';
+    return 'one';
+}
+
+function translate(value, leftMin, leftMax, rightMin, rightMax) {
+    const leftSpan = leftMax - leftMin;
+    const rightSpan = rightMax - rightMin;
+
+    const valueScaled = (value - leftMin) / (leftSpan);
+
+    return rightMin + (valueScaled * rightSpan);
+}
+
+function distanceInterval(acc, interval, width, ftp, scaleMax) {
+    const distanceTotal = interval.distance;
+    let altitude = 0;
+
+    return acc + interval.steps.reduce((a, step) => {
+        const power    = existance(models.ftp.toAbsolute(step.power, ftp), 0);
+        const cadence  = step.cadence;
+        const slope    = step.slope;
+        const distance = step.distance;
+
+        altitude += distance * Math.sin(Math.atan(slope));
+        const width    = distance * 100 / distanceTotal;
+        const height   = translate(altitude, 0, 1000, 0, scaleMax);
+
+        const gradient = slopeToGradient(slope);
+        const infoTime = formatTime({value: step.duration, format: 'mm:ss'});
+
+        return a +
+            `<div class="graph--bar zone-${gradient}" style="height: ${height}%; width: ${width}%">
+                     <div class="graph--info">
+                         ${targetsToHtml({power, cadence, slope})}
+                         <div class="graph--info--time">${distance}m, ${(altitude).toFixed(2)}m<span></span></div>
+                     </div>
+                </div>`;
+    }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
+}
+
 function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 118) {
     const minAbsPower = 9;
 
@@ -61,28 +133,20 @@ function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 
 
     const scaleMax = ftp * maxInterval * (useGraphHeight ? (90 / graphHeight) : 1);
 
-    return intervals.reduce( (acc, interval) => {
-        const width = (interval.duration < 1) ? 1 : parseInt(Math.round(interval.duration)); // ?
-        const stepsCount = interval.steps.length;
-        return acc + interval.steps.reduce((a, step) => {
-            const power   = existance(models.ftp.toAbsolute(step.power, ftp), 0);
-            const cadence = step.cadence;
-            const slope   = step.slope;
+    return intervals.reduce((acc, interval) => {
+        let width = 1;
 
-            const width    = 100 / stepsCount;
-            const height   = scale(equals(power, 0) ? 80 : power, scaleMax);
-            const zone     = (models.ftp.powerToZone(power, ftp)).name;
-            const infoTime = formatTime({value: step.duration, format: 'mm:ss'});
+        if(exists(interval.duration)) {
+            width = (interval.duration < 1) ? 1 : Math.round(interval.duration);
+            return durationInterval(acc, interval, width, ftp, scaleMax);
+        }
 
-            return a +
-                `<div class="graph--bar zone-${zone}" style="height: ${height}%; width: ${width}%">
-                     <div class="graph--info">
-                         ${targetsToHtml({power, cadence, slope})}
-                         <div class="graph--info--time">${infoTime}<span></span></div>
-                     </div>
-                </div>`;
-        }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
+        if(exists(interval.distance)) {
+            width = Math.round(interval.distance);
+            return distanceInterval(acc, interval, width, ftp, scaleMax);
+        }
 
+        return '';
     }, '');
 }
 
