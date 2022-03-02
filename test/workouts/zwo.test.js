@@ -589,12 +589,14 @@ describe('FreeRide', () => {
     const xml = `<workout>
                      <FreeRide Duration="300" />
                      <FreeRide Duration="16" Sim="-1,4,0,4,1,4,3.5,4" />
+                     <FreeRide Track="-1,4,0,4,1,4,3.5,4" />
                  </workout>`;
 
-    const doc   = parser.parseFromString(xml, 'text/xml');
-    const els   = doc.querySelectorAll('FreeRide');
-    const el    = els[0];
-    const elSim = els[1];
+    const doc     = parser.parseFromString(xml, 'text/xml');
+    const els     = doc.querySelectorAll('FreeRide');
+    const el      = els[0];
+    const elSim   = els[1];
+    const elTrack = els[2];
 
     test('getName', () => {
         expect(FreeRide.getName()).toBe('FreeRide');
@@ -610,13 +612,26 @@ describe('FreeRide', () => {
             Duration: 16,
             Sim: [-1,4, 0,4, 1,4, 3.5,4],
         });
+        expect(FreeRide.read({el: elTrack})).toStrictEqual({
+            element: 'FreeRide',
+            // Distance: 16,
+            Track: [-1,4, 0,4, 1,4, 3.5,4],
+        });
     });
 
-    test('write', () => {
+    test('write Sim', () => {
         const res = `<FreeRide Duration="16" Sim="-1,4,0,4,1,4,3.5,4" />`;
         expect(FreeRide.write({
             Duration: 16,
             Sim: [-1,4, 0,4, 1,4, 3.5,4],
+        })).toEqual(res);
+    });
+
+    test('write Track', () => {
+        const res = `<FreeRide Distance="16" Track="-1,4,0,4,1,4,3.5,4" />`;
+        expect(FreeRide.write({
+            Distance: 16,
+            Track: [-1,4, 0,4, 1,4, 3.5,4],
         })).toEqual(res);
     });
 
@@ -656,6 +671,19 @@ describe('FreeRide', () => {
                 {duration: 4, power: 0, slope: 1},
                 {duration: 4, power: 0, slope: 3.5},
                 {duration: 44, power: 0, slope: 0},
+            ]
+        });
+
+        expect(FreeRide.toInterval({
+           Distance: 16,
+           Track: [-1,4, 0,4, 1,4, 3.5,4],
+        })).toStrictEqual({
+            distance: 16,
+            steps: [
+                {distance: 4, power: 0, slope: -1},
+                {distance: 4, power: 0, slope: 0},
+                {distance: 4, power: 0, slope: 1},
+                {distance: 4, power: 0, slope: 3.5},
             ]
         });
     });
