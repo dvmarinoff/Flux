@@ -1,4 +1,23 @@
 let workouts = [
+            `<workout_file>
+        <author>Marinov</author>
+        <name>Test Distance Mode</name>
+        <category>Sim</category>
+        <description>Intervals with slope and distance</description>
+        <sportType>bike</sportType>
+        <tags>
+        </tags>
+        <workout>
+            <SteadyState Duration="20" Power="0.75"/>
+            <FreeRide Track="0,10, 1,10, 2,10, 3,10, 4,10, 5,10, 6,10, 7,10, 8,10, 9,10, 10,10, 12,10, -10,10, -9,10, -8,10, -7,10, -6,10, -5,10, -4,10, -3,10, -2,10, -1,10, 0,10"/>
+            <SteadyState Duration="10" Power="0.88"/>
+            <SteadyState Duration="10" Power="0.49"/>
+            <FreeRide Track="6,100"/>
+            <SteadyState Duration="10" Power="0.88"/>
+            <SteadyState Duration="10" Power="0.49"/>
+        </workout>
+    </workout_file>
+    `,
         `<workout_file>
     <author>Marinov</author>
     <name>Dijon</name>
