@@ -72,16 +72,47 @@ function durationInterval(acc, interval, width, ftp, scaleMax) {
     }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
 }
 
-function slopeToGradient(slope) {
-    slope = Math.abs(slope);
-    if(slope < 1) return 'one';
-    if(slope < 2) return 'two';
-    if(slope < 3) return 'three';
-    if(slope < 5) return 'four';
-    if(slope < 8) return 'five';
-    if(slope < 12) return 'six';
-    if(slope >= 12) return 'seven';
-    return 'one';
+function hexColorToArray(hex) {
+    return hex.replace('#','').match(/.{1,2}/g).map(x => parseInt(x, 16));
+}
+
+function arrayToHexColor(arr) {
+    return '#' + arr.map(x => x.toString(16).toUpperCase()).join('');
+}
+
+function avgColor(hex1, hex2) {
+    const color1 = hexColorToArray(hex1);
+    const color2 = hexColorToArray(hex2);
+    const color =  color1.map((channel, i) => parseInt((channel+color2[i])/2));
+    return arrayToHexColor(color);
+}
+
+function slopeToColor(slope) {
+    const colors = new Map([
+        ['-20',   '#328AFF'],
+        ['-17.5', '#3690EA'],
+        ['-15',   '#3B97D5'],
+        ['-12.5', '#3F9EC0'],
+        ['-10',   '#44A5AB'],
+        ['-7.5',  '#48AB96'],
+        ['-5',    '#4DB281'],
+        ['-2.5',  '#52B96C'],
+        ['0',     '#57C057'],
+        ['2.5',   '#68AC4E'],
+        ['5',     '#799845'],
+        ['7.5',   '#8A843C'],
+        ['10',    '#9B7134'],
+        ['12.5',  '#B36129'],
+        ['15',    '#CC521F'],
+        ['17.5',  '#E54315'],
+        ['20',    '#FE340B'],
+    ]);
+
+    for(var [key, value] of colors) {
+        if(slope <= parseFloat(key)) {
+            return value;
+        }
+    }
 }
 
 function translate(value, leftMin, leftMax, rightMin, rightMax) {
@@ -93,37 +124,74 @@ function translate(value, leftMin, leftMax, rightMin, rightMax) {
     return rightMin + (valueScaled * rightSpan);
 }
 
-function distanceInterval(acc, interval, width, ftp, scaleMax) {
+function gradeToDeg(grade) {
+    // 10 % = 5.71 deg, 5% = 2.86
+    return 180/Math.PI * Math.atan(grade/100);
+}
+
+function adjacent(deg, r) {
+    return r * Math.cos(Math.PI/180 * deg);
+}
+
+function opposite(deg, r) {
+    return r * Math.sin(Math.PI/180 * deg);
+}
+
+function stepToDelta(step) {
+    const { distance, slope } = step;
+    const deg   = gradeToDeg(slope);
+    const delta = {};
+    delta.distance  = distance;
+    delta.altitude  = opposite(deg, distance);
+    delta.distanceH = adjacent(deg, distance);
+    delta.deg       = deg;
+    return delta;
+}
+
+function nextState(state, delta) {
+    state.altitude  += delta.altitude;
+    state.distance  += delta.distance;
+    state.distanceH += delta.distanceH;
+    state.deg        = delta.deg;
+    return state;
+}
+
+function distanceInterval(acc, interval, maxAltitude = 1038) {
     const distanceTotal = interval.distance;
-    let altitude = 0;
+    const aspectRatio   = 7.5;
+    const yMax          = distanceTotal / aspectRatio;
+    const altitudeScale = yMax / (maxAltitude) * 1;
 
-    return acc + interval.steps.reduce((a, step) => {
-        const power    = existance(models.ftp.toAbsolute(step.power, ftp), 0);
-        const cadence  = step.cadence;
-        const slope    = step.slope;
-        const distance = step.distance;
+    const viewBox = { width: interval.distance, height: yMax };
 
-        altitude += distance * Math.sin(Math.atan(slope));
-        const width    = distance * 100 / distanceTotal;
-        const height   = translate(altitude, 0, 1000, 0, scaleMax);
+    let state = { altitude: 727, distance: 0, distanceH: 0, deg: 0 };
 
-        const gradient = slopeToGradient(slope);
-        const infoTime = formatTime({value: step.duration, format: 'mm:ss'});
+    const track = interval.steps.reduce((a, step) => {
+        const color = slopeToColor(step.slope);
+        const delta = stepToDelta(step);
+        state = nextState(state, delta);
 
-        return a +
-            `<div class="graph--bar zone-${gradient}" style="height: ${height}%; width: ${width}%">
-                     <div class="graph--info">
-                         ${targetsToHtml({power, cadence, slope})}
-                         <div class="graph--info--time">${distance}m, ${(altitude).toFixed(2)}m<span></span></div>
-                     </div>
-                </div>`;
-    }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
+        const x1 = (state.distance - delta.distance);
+        const y1 = yMax;
+        const x2 = (state.distance - delta.distance);
+        const y2 = yMax - ((state.altitude - delta.altitude) * altitudeScale);
+        const x3 = (state.distance);
+        const y3 = yMax - (state.altitude * altitudeScale);
+        const x4 = (state.distance);
+        const y4 = yMax;
+
+        return a + `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}" stroke="#000" fill="${color}" />`;
+    }, ``);
+
+    const position = `<rect x="1000" y="0" width="${1000 / aspectRatio}" height="100%" fill="#fff" stroke="#000"/>`;
+
+    return acc + `<svg class="graph--bar-group" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}${position}</svg>`;
 }
 
 function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 118) {
     const minAbsPower = 9;
 
-    const maxInterval = intervals.reduce((highest, interval) => {
+    const maxDuration = intervals.reduce((highest, interval) => {
         interval.steps.forEach((step) => {
             const power = models.ftp.toRelative(step.power, ftp);
             if(power > highest) highest = power;
@@ -131,7 +199,16 @@ function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 
         return highest;
     }, 1.6);
 
-    const scaleMax = ftp * maxInterval * (useGraphHeight ? (90 / graphHeight) : 1);
+    const maxAltitude = intervals.reduce((highest, interval) => {
+        interval.steps.forEach((step) => {
+            const slope    = step.slope;
+            const altitude = slope;
+            if(altitude > highest) highest = altitude;
+        });
+        return highest;
+    }, 100);
+
+    const scaleMax = ftp * maxDuration * (useGraphHeight ? (90 / graphHeight) : 1);
 
     return intervals.reduce((acc, interval) => {
         let width = 1;
@@ -143,7 +220,7 @@ function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 
 
         if(exists(interval.distance)) {
             width = Math.round(interval.distance);
-            return distanceInterval(acc, interval, width, ftp, scaleMax);
+            return distanceInterval(acc, interval);
         }
 
         return '';

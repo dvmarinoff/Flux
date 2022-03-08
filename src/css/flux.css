@@ -752,6 +752,8 @@ body.dark-theme {
 .graph--info--time {
     color: var(--gray);
 }
+.graph--bar-distance {
+}
 
 .workout--graph-cont {
     display: flex;

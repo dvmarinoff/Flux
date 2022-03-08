@@ -8,13 +8,8 @@ let workouts = [
         <tags>
         </tags>
         <workout>
-            <SteadyState Duration="20" Power="0.75"/>
-            <FreeRide Track="0,10, 1,10, 2,10, 3,10, 4,10, 5,10, 6,10, 7,10, 8,10, 9,10, 10,10, 12,10, -10,10, -9,10, -8,10, -7,10, -6,10, -5,10, -4,10, -3,10, -2,10, -1,10, 0,10"/>
-            <SteadyState Duration="10" Power="0.88"/>
-            <SteadyState Duration="10" Power="0.49"/>
-            <FreeRide Track="6,100"/>
-            <SteadyState Duration="10" Power="0.88"/>
-            <SteadyState Duration="10" Power="0.49"/>
+            <SteadyState Duration="30" Power="0.49"/>
+            <FreeRide Altitude="727" Track="0,2000, 6.5,4800, -1.9,7800, 2.9,4200, -5.1,14000, 4.8,5800, -3.2,7400, 9.0,2600, 0,3400, 2.6,4800, -3.1,9800, 0.6,6600, 6.3,800, -4.2,9200, 4.6,2400, -4.8,4400"/>
         </workout>
     </workout_file>
     `,

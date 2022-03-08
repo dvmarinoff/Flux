@@ -304,6 +304,16 @@ class FTP extends Model {
         }
         return {name, index};
     }
+    zoneToColor(zone) {
+        if(equals(zone, 'one'))   return '#636468';
+        if(equals(zone, 'two'))   return '#328AFF';
+        if(equals(zone, 'thee'))  return '#44A5AB';
+        if(equals(zone, 'four'))  return '#57C057';
+        if(equals(zone, 'five'))  return '#F8C73A';
+        if(equals(zone, 'six'))   return '#FF663A';
+        if(equals(zone, 'seven')) return '#FE340B';
+        return '#636468';
+    }
 }
 
 class Weight extends Model {
