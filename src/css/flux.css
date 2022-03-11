@@ -672,7 +672,7 @@ body.dark-theme {
     overflow: hidden;
 }
 
-.graph--bar-group {
+div.graph--bar-group {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -682,6 +682,11 @@ body.dark-theme {
     height: 8em;
     /* min-height: 100%; */
     padding: 0;
+}
+
+#workout-list svg.graph--bar-group {
+    height: var(--graph-height);
+    height: 8em;
 }
 
 .graph--heading {

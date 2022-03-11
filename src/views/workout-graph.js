@@ -124,6 +124,14 @@ function translate(value, leftMin, leftMax, rightMin, rightMax) {
     return rightMin + (valueScaled * rightSpan);
 }
 
+function slopeToAltitude(slope, distance) {
+    return distance * Math.sin(Math.atan(slope/100));
+}
+
+function slopeToDistanceH(slope, distance) {
+    return distance * Math.cos(Math.atan(slope/100));
+}
+
 function gradeToDeg(grade) {
     // 10 % = 5.71 deg, 5% = 2.86
     return 180/Math.PI * Math.atan(grade/100);
@@ -156,15 +164,19 @@ function nextState(state, delta) {
     return state;
 }
 
-function distanceInterval(acc, interval, maxAltitude = 1038) {
-    const distanceTotal = interval.distance;
-    const aspectRatio   = 7.5;
-    const yMax          = distanceTotal / aspectRatio;
-    const altitudeScale = yMax / (maxAltitude) * 1;
+function distanceInterval(acc, interval, viewPort, altitudeSpec) {
+    const distanceTotal  = interval.distance;
+    const aspectRatio    = viewPort.aspectRatio;
+    const altitudeOffset = Math.min(altitudeSpec.min, altitudeSpec.start, altitudeSpec.end);
+    const yMax           = (altitudeSpec.max - altitudeSpec.min);
+    const yScale         = (1 / ((aspectRatio * yMax) / interval.distance));
+    const altitudeScale  = yScale * 0.6;
 
-    const viewBox = { width: interval.distance, height: yMax };
+    const viewBox = { width: interval.distance, height: yMax, };
 
-    let state = { altitude: 727, distance: 0, distanceH: 0, deg: 0 };
+    // console.table({distanceTotal, yMax, aspectRatio, yScale, altitudeScale, altitudeSpec});
+
+    let state = { altitude: altitudeSpec.start, distance: 0, distanceH: 0, deg: 0 };
 
     const track = interval.steps.reduce((a, step) => {
         const color = slopeToColor(step.slope);
@@ -174,22 +186,41 @@ function distanceInterval(acc, interval, maxAltitude = 1038) {
         const x1 = (state.distance - delta.distance);
         const y1 = yMax;
         const x2 = (state.distance - delta.distance);
-        const y2 = yMax - ((state.altitude - delta.altitude) * altitudeScale);
+        const y2 = yMax - ((state.altitude - delta.altitude - altitudeOffset) * altitudeScale);
         const x3 = (state.distance);
-        const y3 = yMax - (state.altitude * altitudeScale);
+        const y3 = yMax - ((state.altitude - altitudeOffset) * altitudeScale);
         const x4 = (state.distance);
         const y4 = yMax;
 
         return a + `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}" stroke="#000" fill="${color}" />`;
     }, ``);
 
-    const position = `<rect x="1000" y="0" width="${1000 / aspectRatio}" height="100%" fill="#fff" stroke="#000"/>`;
-
-    return acc + `<svg class="graph--bar-group" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}${position}</svg>`;
+    return acc + `<svg class="graph--bar-group" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
 }
 
-function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 118) {
+function AltitudeSpec(intervals) {
+    return intervals.reduce((acc, interval) => {
+        acc.start = interval.altitude ?? 727;
+        let altitude = acc.start;
+
+        interval.steps.forEach((step, stepIndex, steps) => {
+            if(exists(step.distance)) {
+                altitude += slopeToAltitude(step.slope, step.distance);
+                if(altitude > acc.max) acc.max = altitude;
+                if(altitude < acc.min) acc.min = altitude;
+                if(equals(stepIndex, 0)) acc.min = altitude;
+                if(equals(stepIndex, steps.length-1)) acc.end = altitude;
+            }
+        });
+
+        return acc;
+
+    }, {min: 0, max: 0, start: 0, end: 0});
+}
+
+function intervalsToGraph(intervals, ftp, viewPort) {
     const minAbsPower = 9;
+    const graphHeight = viewPort.height ?? 118;
 
     const maxDuration = intervals.reduce((highest, interval) => {
         interval.steps.forEach((step) => {
@@ -199,16 +230,9 @@ function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 
         return highest;
     }, 1.6);
 
-    const maxAltitude = intervals.reduce((highest, interval) => {
-        interval.steps.forEach((step) => {
-            const slope    = step.slope;
-            const altitude = slope;
-            if(altitude > highest) highest = altitude;
-        });
-        return highest;
-    }, 100);
+    const altitudeSpec = AltitudeSpec(intervals);
 
-    const scaleMax = ftp * maxDuration * (useGraphHeight ? (90 / graphHeight) : 1);
+    const scaleMax = ftp * maxDuration;
 
     return intervals.reduce((acc, interval) => {
         let width = 1;
@@ -220,7 +244,7 @@ function intervalsToGraph(intervals, ftp, useGraphHeight = false, graphHeight = 
 
         if(exists(interval.distance)) {
             width = Math.round(interval.distance);
-            return distanceInterval(acc, interval);
+            return distanceInterval(acc, interval, viewPort, altitudeSpec);
         }
 
         return '';
@@ -237,18 +261,22 @@ class WorkoutGraph extends HTMLElement {
         this.minHeight = 30;
     }
     connectedCallback() {
+        const self = this;
         this.prop = this.getAttribute('prop');
         this.metric = this.getAttribute('metric');
         this.width = this.getWidth();
         this.height = this.getHeight();
+        this.viewPort = {
+            width: self.width,
+            height: self.height,
+            aspectRatio: self.width / self.height,
+        };
 
         xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
         xf.sub(`db:${this.metric}`, this.onMetric.bind(this));
 
-        xf.sub('db:intervalIndex', index => {
-            this.index = index;
-            this.progress(this.index);
-        });
+        xf.sub('db:intervalIndex', this.onIntervalIndex.bind(this));
+        xf.reg('distance',      this.onDistance.bind(this));
 
         window.addEventListener('resize', this.onWindowResize.bind(this));
     }
@@ -268,38 +296,68 @@ class WorkoutGraph extends HTMLElement {
         if(exists(this.workout.intervals)) this.render();
     }
     onWindowResize(e) {
+        const self = this;
         const height = this.getHeight();
 
         if(height < this.minHeight) {
             return;
         }
 
-        this.width = this.getWidth();
-        this.height = this.getHeight();
+        this.width    = this.getWidth();
+        this.height   = this.getHeight();
+        this.viewPort = {
+            width: self.width,
+            height: self.height,
+            aspectRatio: self.width / self.height,
+        };
         this.render();
     }
     onUpdate(value) {
         this.workout = value;
         this.render();
     }
-    progress() {
+    onIntervalIndex(index) {
+        this.index = index;
+        this.progressInterval(this.index);
+    }
+    onDistance(distance, db) {
+        const self = this;
+        this.progressDistance({
+            distance: distance,
+            lapPosition: db.lapPosition,
+            lapDistance: db.lapDistance,
+            viewPort: self.viewPort,
+        });
+    }
+    progressDistance(args = {}) {
+        // accumulate and draw only when a min descreate px reached
+        const lapPosition = args.lapPosition ?? 0;
+        const lapDistance = args.lapDistance ?? 0;
+        const viewPort    = args.viewPort;
+        const markerWidth = 3;
+        const position    = translate(lapPosition, 0, lapDistance, 0, viewPort.width);
+
+        // console.log(`progressDistance: ${lapDistance} ${position}, ${position - (markerWidth / 1)}px`, );
+        this.dom.active.style.left = `${position - (markerWidth / 1)}px`;
+        this.dom.active.style.width = `${markerWidth}px`;
+    }
+    progressInterval() {
         const rect = this.dom.intervals[this.index].getBoundingClientRect();
         this.dom.active.style.left  = `${rect.left - this.getBoundingClientRect().left}px`;
         this.dom.active.style.width = `${rect.width}px`;
         this.dom.active.style.height = `${this.getBoundingClientRect().height}px`;
-
     }
     render() {
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
 
-        this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue, true, this.height);
+        this.innerHTML = progress + intervalsToGraph(this.workout.intervals, this.metricValue, this.viewPort);
 
         this.dom.progress  = this.querySelector('#progress');
         this.dom.active    = this.querySelector('#progress-active');
         this.dom.intervals = this.querySelectorAll('.graph--bar-group');
         this.dom.steps     = this.querySelectorAll('.graph--bar');
 
-        this.progress();
+        // this.progress();
     }
 }
 

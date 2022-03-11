@@ -18,11 +18,18 @@ const radioOn = `
         </svg>`;
 
 function workoutTemplate(workout) {
+    let duration = '';
+    if(workout.meta.duration) {
+        duration = `${Math.round(workout.meta.duration / 60)} min`;
+    }
+    if(workout.meta.distance) {
+        duration = `${Math.round(workout.meta.distance) / 1000} km`;
+    }
     return `<li is="workout-item" class='workout cf' id="${workout.id}" metric="ftp">
                 <div class="workout--short-info">
                     <div class="workout--name">${workout.meta.name}</div>
                     <div class="workout--type">${workout.meta.category}</div>
-                    <div class="workout--duration">${Math.round(workout.meta.duration / 60)} min</div>
+                    <div class="workout--duration">${duration}</div>
                     <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
                 </div>
                 <div class="workout--full-info">
@@ -52,6 +59,9 @@ class WorkoutList extends HTMLUListElement {
     disconnectedCallback() {
         document.removeEventListener(`db:${this.prop}`, this.onUpdate);
     }
+    getWidth() {
+        return window.innerWidth;
+    }
     onWorkout(workout) {
         this.workout = workout;
     }
@@ -70,8 +80,10 @@ class WorkoutList extends HTMLUListElement {
         // }
     }
     stateToHtml (state, metric, selectedWorkout) {
+        const self = this;
+        const viewPort = {height: 118, width: self.getWidth(), aspectRatio: self.getWidth() / 118 };
         return state.reduce((acc, workout, i) => {
-            const graph = intervalsToGraph(workout.intervals, metric);
+            const graph = intervalsToGraph(workout.intervals, metric, viewPort);
             const selected = equals(workout.id, selectedWorkout.id);
             workout = Object.assign(workout, {graph: graph, selected: selected});
             return acc + workoutTemplate(workout);

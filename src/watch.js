@@ -17,10 +17,15 @@ class Watch {
         this.stateWorkout     = 'stopped';
 
         // Distance
-        this.distance         = 0;
-        this.distanceLapStart = 0;
-        this.distanceTarget   = undefined;
-        this.intervalType     = 'duration';
+        this.distance          = 0;
+        this.positionLapStart  = 0;
+        this.positionStepStart = 0;
+        this.lapPosition       = 0;
+        this.stepPosition      = 0;
+        this.lapDistance       = 0;
+        this.stepDistance      = 0;
+        this.distanceTarget    = undefined;
+        this.intervalType      = 'duration';
         // end Distance
 
         this.intervals        = [];
@@ -47,6 +52,8 @@ class Watch {
         });
 
         xf.sub('db:distance', this.onDistance.bind(this));
+        xf.sub('db:lapDistance',  distance => self.lapDistance = distance);
+        xf.sub('db:stepDistance', distance => self.stepDistance = distance);
     }
     isStarted()        { return this.state        === 'started'; };
     isPaused()         { return this.state        === 'paused'; };
@@ -67,8 +74,26 @@ class Watch {
     }
     startWorkout() {
         const self         = this;
-        let intervalTime = self.intervals[0].duration ?? 0;
-        let stepTime     = self.intervals[0].steps[0].duration ?? 0;
+
+        let intervalTime = 0;
+        let stepTime     = 0;
+        if(exists(self.intervals[0].duration)) {
+            let intervalTime = self.intervals[0].duration ?? 0;
+            let stepTime     = self.intervals[0].steps[0].duration ?? 0;
+        }
+
+        let intervalDistance = 0;
+        let stepDistance     = 0;
+        if(exists(self.intervals[0].distance)) {
+            intervalDistance  = self.intervals[0].distance ?? 0;
+            stepDistance      = self.intervals[0].steps[0].distance ?? 0;
+            self.intervalType = 'distance';
+
+            xf.dispatch('watch:lapDistance',  intervalDistance);
+            xf.dispatch('watch:stepDistance', stepDistance);
+            xf.dispatch('watch:lapPosition',  0);
+            xf.dispatch('watch:stepPosition', 0);
+        }
 
         xf.dispatch('workout:started');
 
@@ -142,10 +167,10 @@ class Watch {
         xf.dispatch('watch:lapTime',  lapTime);
         xf.dispatch('watch:stepTime', stepTime);
 
-        if( self.isWorkoutStarted() &&
+        if(self.isWorkoutStarted() &&
            (stepTime <= 0) &&
             this.isIntervalType('duration')) {
-            self.step();
+            // self.step(); // ??
         }
     }
     lap() {
@@ -182,7 +207,6 @@ class Watch {
 
         if(moreSteps) {
             s += 1;
-
             self.nextStep(intervals, i, s);
         } else if (moreIntervals) {
             i += 1;
@@ -247,21 +271,35 @@ class Watch {
 
     // Distance
     onDistance(distance) {
+        const self = this;
         this.distance = distance;
 
         if(this.isWorkoutStarted() && this.isIntervalType('distance')) {
-            console.log(`d: ${this.distance}, dx: ${this.dx}, dls: ${this.distanceLapStart}, reached: ${this.distanceReached()}`);
+
+            this.lapPosition  = (this.distance - this.positionLapStart);
+            this.stepPosition = (this.distance - this.positionStepStart);
+
+            xf.dispatch('watch:lapPosition',  this.lapPosition);
+            xf.dispatch('watch:stepPosition', this.stepPosition);
+
+            console.info({
+                // intervalIndex: self.intervalIndex,
+                stepIndex: self.stepIndex,
+                distance: self.distance,
+                lapPosition: self.lapPosition,
+                lapDistance: self.lapDistance,
+                stepPosition: self.stepPosition,
+                stepDistance: self.stepDistance,
+            });
+
             if(this.distanceReached()) {
                 this.step();
             }
         }
     }
     distanceReached() {
-        const dx = (this.distance - this.distanceLapStart);
-        this.dx = dx;
-        // console.log(`dx: ${dx} : distanceTarget: ${this.distanceTarget}`); // rmv
-        if(dx >= this.distanceTarget) {
-
+        if(this.stepPosition >= this.stepDistance && this.isIntervalType('distance')) {
+            console.log(`${this.distance - this.positionStepStart}`);
             return true;
         } else {
             return false;
@@ -283,21 +321,31 @@ class Watch {
         this.dispatchDistanceStep(stepDistance, stepIndex);
     }
     dispatchDistanceInterval(intervalDistance, intervalIndex) {
+        this.positionLapStart = this.distance;
         xf.dispatch('watch:intervalDistance', intervalDistance);
         xf.dispatch('watch:lapTime',          0);
+        xf.dispatch('watch:lapDistance',      intervalDistance);
         xf.dispatch('watch:intervalIndex',    intervalIndex);
         xf.dispatch('watch:lap');
     }
     dispatchDistanceStep(stepDistance, stepIndex) {
-        this.distanceLapStart = this.distance;
         this.distanceTarget = stepDistance;
+        stepDistance = stepDistance - ((this.distance - this.positionStepStart) - this.stepDistance);
+        this.positionStepStart = this.distance;
         xf.dispatch('watch:stepDistance', stepDistance);
-        // xf.dispatch('watch:stepTime',     stepDistance);
         xf.dispatch('watch:stepIndex',    stepIndex);
         xf.dispatch('watch:step');
     }
     // end Distance
 }
+
+
+// Distance
+xf.reg('watch:lapDistance',  (distance, db) => db.lapDistance  = distance);
+xf.reg('watch:stepDistance', (distance, db) => db.stepDistance = distance);
+xf.reg('watch:lapPosition',  (position, db) => db.lapPosition  = position);
+xf.reg('watch:stepPosition', (position, db) => db.stepPosition = position);
+// end Distance
 
 // Register DB Events
 xf.reg('watch:lapDuration',    (time, db) => db.intervalDuration = time);
@@ -320,7 +368,7 @@ xf.reg('watch:stepIndex',     (index, db) => {
         }
     }
     if(exists(distanceTarget)) {
-        xf.dispatch('ui:distance-target-set', distanceTarget); // rmv
+        xf.dispatch('ui:distance-target-set', distanceTarget);
     }
     if(exists(cadenceTarget)) {
         xf.dispatch('ui:cadence-target-set', cadenceTarget);

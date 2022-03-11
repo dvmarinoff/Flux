@@ -586,9 +586,10 @@ function readToInterval(zwo) {
     const meta      = head.read({doc});
     const intervals = body.readToInterval({doc});
     const duration  = intervals.reduce((acc, i) => acc + i.duration, 0);
+    const distance  = intervals.reduce((acc, i) => acc + i.distance, 0);
 
     return {
-        meta:      Object.assign(meta, {duration}),
+        meta:      Object.assign(meta, {duration, distance}),
         intervals: intervals,
     };
 }

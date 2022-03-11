@@ -65,6 +65,14 @@ let db = {
     watchStatus: 'stopped',
     workoutStatus: 'stopped',
 
+
+    positionLapStart: 0,
+    positionStepStart: 0,
+    lapPosition: 0,
+    stepPosition: 0,
+    lapDistance: 0,
+    stepDistance: 0,
+
     // Request ANT+ Device
     antSearchList: [],
     antDeviceId: {},
