@@ -140,10 +140,35 @@ function divisors(number) {
     }
     return divisors;
 }
+// end Math
 
-//
+// Graphs
+function translate(value, leftMin, leftMax, rightMin, rightMax) {
+    const leftSpan = leftMax - leftMin;
+    const rightSpan = rightMax - rightMin;
+
+    const valueScaled = (value - leftMin) / (leftSpan);
+
+    return rightMin + (valueScaled * rightSpan);
+}
+
+function hexColorToArray(hex) {
+    return hex.replace('#','').match(/.{1,2}/g).map(x => parseInt(x, 16));
+}
+
+function arrayToHexColor(arr) {
+    return '#' + arr.map(x => x.toString(16).toUpperCase()).join('');
+}
+
+function avgColor(hex1, hex2) {
+    const color1 = hexColorToArray(hex1);
+    const color2 = hexColorToArray(hex2);
+    const color =  color1.map((channel, i) => parseInt((channel+color2[i])/2));
+    return arrayToHexColor(color);
+}
+// end Graphs
+
 // WebBLE
-//
 function hex(n) {
     let h = parseInt(n).toString(16).toUpperCase();
     if(h.length === 1) {
@@ -151,10 +176,9 @@ function hex(n) {
     }
     return '0x' + h;
 }
+// end WebBLE
 
-//
 // ANT+ and .FIT
-//
 const garmin_epoch = Date.parse('31 Dec 1989 00:00:00 GMT');
 
 function toFitTimestamp(timestamp) {
@@ -274,6 +298,12 @@ export {
     lt,
     inRange,
     divisors,
+
+    // graph
+    translate,
+    hexColorToArray,
+    arrayToHexColor,
+    avgColor,
 
     // WebBLE
     hex,
