@@ -262,7 +262,7 @@ class WorkoutGraph extends HTMLElement {
     }
     connectedCallback() {
         const self = this;
-        this.prop = this.getAttribute('prop');
+        this.prop = this.getAttribute('prop'); // db:workout
         this.metric = this.getAttribute('metric');
         this.width = this.getWidth();
         this.height = this.getHeight();
@@ -295,6 +295,9 @@ class WorkoutGraph extends HTMLElement {
         this.metricValue = value;
         if(exists(this.workout.intervals)) this.render();
     }
+    isIntervalType(type = 'duration') {
+        return exists(this.workout.intervals[this.index][type]);
+    }
     onWindowResize(e) {
         const self = this;
         const height = this.getHeight();
@@ -318,16 +321,36 @@ class WorkoutGraph extends HTMLElement {
     }
     onIntervalIndex(index) {
         this.index = index;
-        this.progressInterval(this.index);
+        this.progress();
     }
     onDistance(distance, db) {
         const self = this;
-        this.progressDistance({
-            distance: distance,
-            lapPosition: db.lapPosition,
-            lapDistance: db.lapDistance,
-            viewPort: self.viewPort,
-        });
+
+        this.distance = distance;
+        this.lapPosition = db.lapPosition;
+        this.lapDistance = db.lapDistance;
+
+        // if(this.isIntervalType('duration')) return;
+        this.progress();
+
+    }
+    progress() {
+        const self = this;
+        if(this.isIntervalType('duration')) {
+            this.progressDuration({
+                index:  self.index,
+                dom:    self.dom,
+                parent: self,
+            });
+        };
+        if(this.isIntervalType('distance')) {
+            this.progressDistance({
+                distance:    self.distance,
+                lapPosition: self.lapPosition,
+                lapDistance: self.lapDistance,
+                viewPort:    self.viewPort,
+            });
+        };
     }
     progressDistance(args = {}) {
         // accumulate and draw only when a min descreate px reached
@@ -337,15 +360,19 @@ class WorkoutGraph extends HTMLElement {
         const markerWidth = 3;
         const position    = translate(lapPosition, 0, lapDistance, 0, viewPort.width);
 
-        // console.log(`progressDistance: ${lapDistance} ${position}, ${position - (markerWidth / 1)}px`, );
         this.dom.active.style.left = `${position - (markerWidth / 1)}px`;
         this.dom.active.style.width = `${markerWidth}px`;
     }
-    progressInterval() {
-        const rect = this.dom.intervals[this.index].getBoundingClientRect();
-        this.dom.active.style.left  = `${rect.left - this.getBoundingClientRect().left}px`;
-        this.dom.active.style.width = `${rect.width}px`;
-        this.dom.active.style.height = `${this.getBoundingClientRect().height}px`;
+    progressDuration(args = {}) {
+        const index   = args.index ?? 0;
+        const $dom    = args.dom;
+        const $parent = args.parent;
+        const rect    = $dom.intervals[index].getBoundingClientRect();
+        const left    = rect.left - $parent.getBoundingClientRect().left;
+
+        $dom.active.style.left   = `${left}px`;
+        $dom.active.style.width  = `${rect.width}px`;
+        $dom.active.style.height = `${$parent.getBoundingClientRect().height}px`;
     }
     render() {
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
@@ -357,7 +384,7 @@ class WorkoutGraph extends HTMLElement {
         this.dom.intervals = this.querySelectorAll('.graph--bar-group');
         this.dom.steps     = this.querySelectorAll('.graph--bar');
 
-        // this.progress();
+        this.progress();
     }
 }
 

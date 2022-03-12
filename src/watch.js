@@ -77,14 +77,15 @@ class Watch {
 
         let intervalTime = 0;
         let stepTime     = 0;
+
         if(exists(self.intervals[0].duration)) {
-            let intervalTime = self.intervals[0].duration ?? 0;
-            let stepTime     = self.intervals[0].steps[0].duration ?? 0;
+            intervalTime = self.intervals[0].duration ?? 0;
+            stepTime     = self.intervals[0].steps[0].duration ?? 0;
         }
 
-        let intervalDistance = 0;
-        let stepDistance     = 0;
         if(exists(self.intervals[0].distance)) {
+            let intervalDistance = 0;
+            let stepDistance     = 0;
             intervalDistance  = self.intervals[0].distance ?? 0;
             stepDistance      = self.intervals[0].steps[0].distance ?? 0;
             self.intervalType = 'distance';
@@ -170,7 +171,7 @@ class Watch {
         if(self.isWorkoutStarted() &&
            (stepTime <= 0) &&
             this.isIntervalType('duration')) {
-            // self.step(); // ??
+            self.step();
         }
     }
     lap() {
