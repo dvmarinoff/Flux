@@ -855,6 +855,11 @@ class VirtualState extends MetaProp {
         const dt  = (now - this.lastUpdate) / 1000;
         this.lastUpdate = now;
 
+        if(equals(dt, 0)) {
+            console.warn(`dt: ${dt}, s: ${this.speed}`);
+            return;
+        };
+
         const { speed, distance, altitude, } = this.cycling.virtualSpeedCF({
             power:    db.power,
             slope:    db.slopeTarget / 100,
