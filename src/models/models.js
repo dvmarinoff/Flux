@@ -1,5 +1,6 @@
 import { xf, exists, existance, empty, equals, mavg,
-         first, second, last, clamp, toFixed } from '../functions.js';
+         first, second, last, clamp, toFixed, isArray,
+         isString, isObject } from '../functions.js';
 
 import { inRange, dateToDashString } from '../utils.js';
 
@@ -11,6 +12,7 @@ import { workouts as workoutsFile }  from '../workouts/workouts.js';
 import { zwo } from '../workouts/zwo.js';
 import { fileHandler } from '../file.js';
 import { activity } from '../fit/activity.js';
+import { course } from '../fit/course.js';
 import { fit } from '../fit/fit.js';
 import { Model as Cycling } from '../physics.js';
 
@@ -404,12 +406,16 @@ class Workout extends Model {
     restore(db) {
         return first(db.workouts);
     }
-    async readFromFile(workoutFile) {
-        const workout = await fileHandler.readTextFile(workoutFile);
-        return workout;
+    async readFromFile(file) {
+        const result = await fileHandler.read(file);
+        return result;
     }
-    parse(workout) {
-        return zwo.readToInterval(workout);
+    parse(result) {
+        if(isArray(result) || isObject(result)) {
+            const view = new DataView(result);
+            result = course.toZwo(view);
+        }
+        return zwo.readToInterval(result);
     }
     fileName () {
         const self = this;
@@ -418,7 +424,6 @@ class Workout extends Model {
     }
     encode(db) {
         const fitjsActivity = activity.encode({records: db.records, laps: db.laps});
-        console.log(fitjsActivity);
         return fit.activity.encode(fitjsActivity);
     }
     download(activity) {
@@ -812,6 +817,7 @@ class VirtualState extends MetaProp {
             frontalArea:     0.36,   // 0.4, 0.36
             CdA:             0.3168, // 0.4, 0.3168
         });
+        this.lastUpdate      = undefined;
     }
     getDefaults() {
         return {
@@ -845,6 +851,10 @@ class VirtualState extends MetaProp {
     onUpdate(power, db) {
         if(!equals(this.source, this.prop)) return;
 
+        const now = Date.now();
+        const dt  = (now - this.lastUpdate) / 1000;
+        this.lastUpdate = now;
+
         const { speed, distance, altitude, } = this.cycling.virtualSpeedCF({
             power:    db.power,
             slope:    db.slopeTarget / 100,
@@ -852,7 +862,7 @@ class VirtualState extends MetaProp {
             altitude: db.altitude,
             mass:     this.mass,
             speed:    this.speed,
-            dt: 1/4,
+            dt:       isNaN(dt) ? 1/4 : dt,
         });
 
         this.speed = speed;
@@ -886,6 +896,10 @@ class SpeedState extends VirtualState {
     onUpdate(speed, db) {
         if(!equals(this.source, this.prop)) return;
 
+        const now = Date.now();
+        const dt  = (now - this.lastUpdate) / 1000;
+        this.lastUpdate = now;
+
         const { distance, altitude } = this.cycling.trainerSpeed({
             slope:     db.slopeTarget / 100,
             speed:     db.speed / 3.6,
@@ -893,7 +907,7 @@ class SpeedState extends VirtualState {
             altitude:  db.altitude,
             speedPrev: this.speedPrev,
             mass:      this.mass,
-            dt: 1/4,
+            dt:        isNaN(dt) ? 1/4 : dt,
         });
 
         this.speedPrev = speed / 3.6;
@@ -901,7 +915,7 @@ class SpeedState extends VirtualState {
         xf.dispatch('distance', distance);
         xf.dispatch('altitude', altitude);
 
-        console.log(`s: ${speed}, a: ${altitude}, d: ${distance}`);
+        // console.log(`s: ${speed}, a: ${altitude}, d: ${distance}`);
     }
 }
 
