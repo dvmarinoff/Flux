@@ -5,6 +5,7 @@ import { models } from '../models/models.js';
 
 
 function slopeToColor(slope) {
+    // avg hex
     const colors = new Map([
         ['-20',   '#328AFF'],
         ['-17.5', '#3690EA'],
@@ -30,6 +31,14 @@ function slopeToColor(slope) {
             return value;
         }
     }
+    // end avg hex
+
+    // base hue
+    // const baseHue = 120;
+    // const hue = baseHue - (slope * 12);
+
+    // return `hsl(${hue}, 45%, 55%)`;
+    // end base hue
 }
 
 function slopeToAltitude(slope, distance) {
@@ -104,7 +113,7 @@ function distanceInterval(acc, interval, viewPort, altitudeSpec) {
     const altitudeOffset = Math.min(altitudeSpec.min, altitudeSpec.start, altitudeSpec.end);
     const yMax           = (altitudeSpec.max - altitudeSpec.min);
     const yScale         = (1 / ((aspectRatio * yMax) / interval.distance));
-    const altitudeScale  = yScale * 0.6;
+    const altitudeScale  = yScale * 0.7;
 
     const viewBox = { width: interval.distance, height: yMax, };
 
@@ -126,10 +135,10 @@ function distanceInterval(acc, interval, viewPort, altitudeSpec) {
         const x4 = (state.distance);
         const y4 = yMax;
 
-        return a + `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}" stroke="#000" fill="${color}" class="graph--bar" index="${i}" slope="${step.slope}" distance="${step.distance}" />`;
+        return a + `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}" stroke="none" fill="${color}" class="graph--bar" index="${i}" slope="${step.slope}" distance="${step.distance}" />`;
     }, ``);
 
-    return acc + `<svg class="graph--bar-group" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
+    return acc + `<svg class="graph--bar-group" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height+(viewBox.height*0.01)}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
 }
 
 function durationInterval(acc, interval, width, ftp, scaleMax) {
@@ -360,9 +369,6 @@ class WorkoutGraph extends HTMLElement {
         const left = args.rect.left ?? 0;
         const width = args.rect.width ?? 0;
         // const overflowRight = ((left + width) >= this.getWidth());
-
-        // console.log(this.dom.info.getBoundingClientRect());
-        // console.log(window.getComputedStyle(this.dom.info).getPropertyValue('width'));
 
         this.dom.info.style.display = 'block';
         this.dom.info.innerHTML = `${power}${cadence}${slope}<span class="graph--info--time">${duration}</span><span class="graph--info--time">${distance}</span>`;

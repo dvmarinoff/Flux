@@ -106,6 +106,19 @@ const localMessageDefinitions = {
             {field: 'event',            number:   3, size: 1, base_type: 0},
             {field: 'event_type',       number:   4, size: 1, base_type: 0},
         ]
+    },
+    course: {
+        type: 'definition',
+        message: 'course',
+        local_number: 31,
+        length: 6+(1*3),
+        data_msg_length: 1+15,
+        fields: [
+            // {field: 'sport',        number: 4, size: 1, base_type: 0},
+            {field: 'name',         number: 5, size: 1, base_type: 7},
+            // {field: 'capabilities', number: 6, size: 1, base_type: 0}, // uint32z
+            // {field: 'sport_sport',  number: 7, size: 1, base_type: 0},
+        ]
     }
 };
 

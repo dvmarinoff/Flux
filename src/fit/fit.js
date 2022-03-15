@@ -1,4 +1,4 @@
-import { exists, empty, isUndefined,
+import { exists, empty, equals, isUndefined,
          map, first, last, traverse,
          nthBitToBool } from '../functions.js';
 import { calculateCRC, typeToAccessor } from '../utils.js';
@@ -146,14 +146,18 @@ function Definition(args = {}) {
 
     function numberToMessage(number) {
         let res = Object.entries(messages)
-                        .filter(x => x[1].global_number === number)[0];
-        if(res === undefined) console.error(`message global number ${number} not found`);
+                        .filter(x => equals(x[1].global_number, number))[0];
+        if(isUndefined(res)) {
+            console.error(`reading definition message with global number ${number} not found`);
+        };
         return res;
     }
 
     function messageToNumber(message) {
         let res = messages[message].global_number;
-        if(res === undefined) console.error(`message name ${message} not found`);
+        if(isUndefined(res)) {
+            console.error(`message name ${message} not found`);
+        }
         return res;
     }
 
@@ -169,9 +173,10 @@ function Definition(args = {}) {
         const header         = view.getUint8(start, true);
         const local_number   = header & 0b00001111;
         const architecture   = view.getUint8(start+2, true);
-        const messageNumber  = view.getUint16(start+3, true);
-        const message        = numberToMessage(messageNumber)[0];
-        const numberOfFields = view.getUint8(start+5, true);
+        const littleEndian   = !architecture;
+        const messageNumber  = view.getUint16(start+3, littleEndian);
+        const message        = first(numberToMessage(messageNumber));
+        const numberOfFields = view.getUint8(start+5, littleEndian);
         const length         = getLength(numberOfFields);
 
         let fields = [];
@@ -185,7 +190,7 @@ function Definition(args = {}) {
 
         const data_msg_length = getDataMsgLength(fields);
 
-        return { type, message, local_number, fields, length, data_msg_length };
+        return { type, architecture, message, local_number, fields, length, data_msg_length };
     }
 
     function encode(definition) {
@@ -255,6 +260,8 @@ function Data() {
     function encode(definition, values) {
         const fieldsLength = fieldsToLength(definition);
         const length       = headerLength + fieldsLength;
+        const architecture = definition.architecture ?? 0;
+        const endian       = !architecture;
 
         let buffer = new ArrayBuffer(length);
         let view   = new DataView(buffer);
@@ -266,7 +273,7 @@ function Data() {
         index += headerLength;
 
         definition.fields.forEach((field) => {
-            view[typeToAccessor(field.base_type, 'set')](index, values[field.field], true);
+            view[typeToAccessor(field.base_type, 'set')](index, values[field.field], endian);
             index += field.size;
         });
 
@@ -277,12 +284,14 @@ function Data() {
         const header       = view.getUint8(start, true);
         const local_number = header & 0b00001111;
         const message      = definition.message;
+        const architecture = definition.architecture;
+        const endian       = !architecture;
 
         let index = start + headerLength;
         let fields = {};
 
         definition.fields.forEach((fieldDef) => {
-            let value = view[typeToAccessor(fieldDef.base_type, 'get')](index, true);
+            let value = view[typeToAccessor(fieldDef.base_type, 'get')](index, endian);
             fields[fieldDef.field] = value;
             index += fieldDef.size;
         });
