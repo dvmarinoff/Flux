@@ -18,11 +18,18 @@ const radioOn = `
         </svg>`;
 
 function workoutTemplate(workout) {
+    let duration = '';
+    if(workout.meta.duration) {
+        duration = `${Math.round(workout.meta.duration / 60)} min`;
+    }
+    if(workout.meta.distance) {
+        duration = `${Math.round(workout.meta.distance) / 1000} km`;
+    }
     return `<li is="workout-item" class='workout cf' id="${workout.id}" metric="ftp">
                 <div class="workout--short-info">
                     <div class="workout--name">${workout.meta.name}</div>
                     <div class="workout--type">${workout.meta.category}</div>
-                    <div class="workout--duration">${Math.round(workout.meta.duration / 60)} min</div>
+                    <div class="workout--duration">${duration}</div>
                     <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
                 </div>
                 <div class="workout--full-info">
@@ -52,6 +59,9 @@ class WorkoutList extends HTMLUListElement {
     disconnectedCallback() {
         document.removeEventListener(`db:${this.prop}`, this.onUpdate);
     }
+    getWidth() {
+        return window.innerWidth;
+    }
     onWorkout(workout) {
         this.workout = workout;
     }
@@ -70,8 +80,10 @@ class WorkoutList extends HTMLUListElement {
         // }
     }
     stateToHtml (state, metric, selectedWorkout) {
+        const self = this;
+        const viewPort = {height: 118, width: self.getWidth(), aspectRatio: self.getWidth() / 118 };
         return state.reduce((acc, workout, i) => {
-            const graph = intervalsToGraph(workout.intervals, metric);
+            const graph = intervalsToGraph(workout.intervals, metric, viewPort);
             const selected = equals(workout.id, selectedWorkout.id);
             workout = Object.assign(workout, {graph: graph, selected: selected});
             return acc + workoutTemplate(workout);
@@ -94,20 +106,22 @@ class WorkoutListItem extends HTMLLIElement {
     }
     postInit() { return; }
     connectedCallback() {
+        const self = this;
         this.summary = this.querySelector('.workout--short-info');
         this.description = this.querySelector('.workout--full-info');
         this.selectBtn = this.querySelector('.workout--select');
         this.indicator = this.selectBtn;
         this.id = this.getAttribute('id');
 
-        xf.sub('db:workout', this.onWorkout.bind(this));
-        this.summary.addEventListener('pointerup', this.toggleExpand.bind(this));
-        this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this));
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
+        xf.sub('db:workout', this.onWorkout.bind(this), this.signal);
+        this.summary.addEventListener('pointerup', this.toggleExpand.bind(this), this.signal);
+        this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this), this.signal);
     }
     disconnectedCallback() {
-        document.removeEventListener('db:workout', this.onWorkout);
-        this.summary.removeEventListener('pointerup', this.toggleExpand);
-        this.selectBtn.removeEventListener('pointerup', this.onRadio);
+        this.abortController.abort();
     }
     toggleExpand(e) {
         if(this.isExpanded) {

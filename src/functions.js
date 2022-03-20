@@ -472,7 +472,7 @@ function XF(args = {}) {
     }
 
     function unsub(eventType, handler, options = {}) {
-        // console.log('unsub ${element}', handler); // rmv
+        // console.log(`unsub ${eventType}`, handler); // rmv
         window.removeEventListener(eventType, handler, Object.assign({capture: false}, options));
     }
 

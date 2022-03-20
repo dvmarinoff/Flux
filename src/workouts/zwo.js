@@ -249,12 +249,15 @@ function FreeRide(args = {}) {
     function toInterval(element) {
         let duration   = existance(element.Duration, 1);
         const sim      = element.Sim;
+        const track    = element.Track;
         const power    = 0;
         const slope    = 0;
         const steps    = [];
 
+        let simDuration   = 0;
+        let trackDistance = 0;
+
         if(exists(sim)) {
-            let simDuration = 0;
             for(let i=0; i< sim.length; i+=2) {
                 simDuration += sim[i+1];
                 steps.push({duration: sim[i+1], slope: sim[i], power});
@@ -265,8 +268,17 @@ function FreeRide(args = {}) {
             if(simDuration > duration) {
                 duration = simDuration;
             }
+        } else if(exists(track)) {
+            for(let i=0; i< track.length; i+=2) {
+                trackDistance += track[i+1];
+                steps.push({distance: track[i+1], slope: track[i], power});
+            }
         } else {
             steps.push({duration, slope, power});
+        }
+
+        if(exists(track)) {
+            return {distance: trackDistance, steps: steps};
         }
 
         return {
@@ -539,7 +551,10 @@ const Attrs = {
     SlopeLow:  Attribute({name: 'SlopeLow', decode: parseFloat}),
     SlopeHigh: Attribute({name: 'SlopeHigh', decode: parseFloat}),
 
-    Sim:  Attribute({name: 'Sim', decode: decodeSim, encode: encodeSim}),
+    Distance: Attribute({name: 'Distance', decode: parseInt}),
+
+    Sim:   Attribute({name: 'Sim', decode: decodeSim, encode: encodeSim}),
+    Track: Attribute({name: 'Track', decode: decodeSim, encode: encodeSim}),
 
     Repeat: Attribute({name: 'Repeat', decode: parseInt}),
 };
@@ -571,9 +586,10 @@ function readToInterval(zwo) {
     const meta      = head.read({doc});
     const intervals = body.readToInterval({doc});
     const duration  = intervals.reduce((acc, i) => acc + i.duration, 0);
+    const distance  = intervals.reduce((acc, i) => acc + i.distance, 0);
 
     return {
-        meta:      Object.assign(meta, {duration}),
+        meta:      Object.assign(meta, {duration, distance}),
         intervals: intervals,
     };
 }

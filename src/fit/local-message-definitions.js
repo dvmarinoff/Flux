@@ -18,18 +18,18 @@ const localMessageDefinitions = {
         type: 'definition',
         message: 'record',
         local_number: 3,
-        length: 6+18,
-        data_msg_length: 1+14,
+        length: 6+18+3+3,
+        data_msg_length: 1+14+2+2,
         fields: [
             {field: 'timestamp',   number: 253, size: 4, base_type: 134},
             // {field: "position_lat", number: 0, size: 4, base_type: 133},
             // {field: "position_long", number: 1, size: 4, base_type: 133},
             {field: "distance", number: 5, size: 4, base_type: 134},
             {field: "heart_rate", number: 3, size: 1, base_type: 2},
-            // {field: "altitude", number: 2, size: 2, base_type: 132},
+            {field: "altitude", number: 2, size: 2, base_type: 132},
             {field: "speed", number: 6, size: 2, base_type: 132},
             {field: "power", number: 7, size: 2, base_type: 132},
-            // {field: "grade", number: 9, size: 2, base_type: 131},
+            {field: "grade", number: 9, size: 2, base_type: 131},
             {field: "cadence", number: 4, size: 1, base_type: 2},
             // {field: "resistance", number: 10, size: 1, base_type: 2},
         ]
@@ -105,6 +105,19 @@ const localMessageDefinitions = {
             {field: 'type',             number:   2, size: 1, base_type: 0},
             {field: 'event',            number:   3, size: 1, base_type: 0},
             {field: 'event_type',       number:   4, size: 1, base_type: 0},
+        ]
+    },
+    course: {
+        type: 'definition',
+        message: 'course',
+        local_number: 31,
+        length: 6+(1*3),
+        data_msg_length: 1+15,
+        fields: [
+            // {field: 'sport',        number: 4, size: 1, base_type: 0},
+            {field: 'name',         number: 5, size: 1, base_type: 7},
+            // {field: 'capabilities', number: 6, size: 1, base_type: 0}, // uint32z
+            // {field: 'sport_sport',  number: 7, size: 1, base_type: 0},
         ]
     }
 };

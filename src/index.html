@@ -71,11 +71,17 @@
                             </div>
 
                             <div class="data-tile--small wide" id="data-tile--speed">
+                                <!-- <h2 class="data-tile-small--heading">Speed</h2>
+                                     <div class="data-tile-small--value-cont">
+                                     <speed-value id="speed-value"
+                                     class="data-tile-small--value">--</speed-value>
+                                     </div> -->
+                                <!-- <speed-virtual id="distance-value"
+                                     class="data-tile-small--value">--</speed-virtual> -->
                                 <h2 class="data-tile-small--heading">Speed</h2>
-                                <div class="data-tile-small--value-cont">
-                                    <speed-value id="speed-value"
-                                                 class="data-tile-small--value">--</speed-value>
-                                </div>
+
+                                    <speed-switch id="distance-value"
+                                                  class="data-tile-small--value">--</speed-switch>
                             </div>
                             <div class="data-tile--small wide" id="data-tile--slope">
                                 <h2 class="data-tile-small--heading">Slope</h2>
@@ -114,6 +120,7 @@
                                 <div class="data-tile-small--value-cont">
                                     <distance-value id="distance-value"
                                                     class="data-tile-small--value">--</distance-value>
+
                                 </div>
                             </div>
 
@@ -618,6 +625,17 @@
                         </div>
                     </div>
                 </div> <!--end ant hrm settings -->
+
+                <div class="simulation">
+                    <div class="simulation--cont">
+                        <div class="simulation--header">
+                            <div class="simulation-header--label">Simulation</div>
+                        </div>
+                        <div class="">
+                            <virtual-state-source class="simulation--switch">power</virtual-state-source>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="app-connections">
                     <h2 class="page--heading">Connections</h2>

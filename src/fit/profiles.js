@@ -153,6 +153,28 @@ const messages = {
     },
     'workout_step': {
         global_number: 27,
+    },
+    course: {
+        global_number: 31,
+        fields: {
+            sport:        {number: 4, base_type: 0},
+            name:         {number: 5, base_type: 7},
+            capabilities: {number: 6, base_type: 140},
+            sport_sport:  {number: 7, base_type: 0},
+        }
+    },
+    course_point: {
+        global_number: 32,
+        fields: {
+            message_index: {number: 254, base_type: 132},
+            timestamp:     {number:   1, base_type: 134},
+            position_lat:  {number:   2, base_type: 133}, // semicircles
+            position_long: {number:   3, base_type: 133}, // semicircles
+            distance:      {number:   4, base_type: 134}, // scale 100, m
+            type:          {number:   5, base_type: 0},   // course_point
+            name:          {number:   6, base_type: 7},   // string
+            favorite:      {number:   8, base_type: 0},   // bool
+        }
     }
 };
 
@@ -211,7 +233,8 @@ const appTypes = {
     'local_datatime':  {basetype: 134, values: false},
     'device_index':    {basetype: 2, values: false}, // Creator of the file is always device index 0
     'battery_status':  {basetype: 2,
-                        values: {new: 1, good: 2, ok: 3, low: 4, critical: 5, charging: 6, unknown: 7}}
+                        values: {new: 1, good: 2, ok: 3, low: 4, critical: 5, charging: 6, unknown: 7}},
+    'course_point': {basetype: 0, values: {generic: 0, summit: 1, valley: 2, water: 3, food: 4, danger: 5, left: 6, right: 7, straight: 8, first_aid: 9, fourth_category: 10, third_category: 11, second_category: 12, first_category: 13, hors_category: 14, sprint: 15, left_fork: 16, right_fork: 17, middle_fork: 18, slight_left: 19, sharp_left: 20, slight_right: 21, sharp_right: 22, u_turn: 23, segment_start: 24, segment_end: 25}},
 };
 
 export {

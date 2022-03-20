@@ -157,6 +157,46 @@ class SpeedValue extends DataView {
 
 customElements.define('speed-value', SpeedValue);
 
+class SpeedVirtual extends SpeedValue {
+    getDefaults() {
+        return {
+            prop: 'db:speedVirtual',
+            measurement: 'metric',
+        };
+    }
+}
+
+customElements.define('speed-virtual', SpeedVirtual);
+
+class SpeedSwitch extends SpeedValue {
+    postInit() {
+        this.measurement = this.getDefaults().measurement;
+    }
+    getDefaults() {
+        return {
+            prop: '',
+            measurement: 'metric',
+        };
+    }
+    subs() {
+        xf.sub(`db:speed`,        this.onSpeed.bind(this), this.signal);
+        xf.sub(`db:speedVirtual`, this.onSpeedVirtual.bind(this), this.signal);
+        xf.sub(`db:measurement`,  this.onMeasurement.bind(this), this.signal);
+        xf.sub(`db:sources`,      this.onSources.bind(this), this.signal);
+    }
+    onSpeed(value) {
+        if(equals(this.source, 'speed')) this.onUpdate(value);
+    }
+    onSpeedVirtual(value) {
+        if(equals(this.source, 'power')) this.onUpdate(value);
+    }
+    onSources(sources) {
+        this.source = sources.virtualState;
+    }
+}
+
+customElements.define('speed-switch', SpeedSwitch);
+
 
 class DistanceValue extends DataView {
     postInit() {
@@ -477,7 +517,6 @@ class PowerInZone extends HTMLElement {
         this.render();
     }
     onSwitch() {
-        console.log(this.format);
         if(equals(this.format, 'time')) {
             this.format = 'percentage';
             this.$btn.textContent = '%';
@@ -827,6 +866,44 @@ class MeasurementValue extends DataView {
 }
 
 customElements.define('measurement-value', MeasurementValue);
+
+
+class VirtualStateSource extends DataView {
+    postInit() {
+        this.sources = ['power', 'speed'];
+        this.source  = 'power';
+        this.effect  = 'sources';
+        this.state   = { virtualState: 'power' };
+    }
+    getDefaults() {
+        return {
+            prop: 'db:sources',
+            effect: 'sources'
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        this.addEventListener('pointerup', this.onEffect.bind(this), this.signal);
+    }
+    onUpdate(value) {
+        this.state = value;
+        this.render();
+    }
+    onEffect() {
+        if(equals(this.state.virtualState, 'power')) {
+            this.source = 'speed';
+            xf.dispatch(`${this.effect}`, {virtualState: 'speed'});
+        } else {
+            this.source = 'power';
+            xf.dispatch(`${this.effect}`, {virtualState: 'power'});
+        }
+    }
+    render() {
+        this.textContent = this.source;
+    }
+}
+
+customElements.define('virtual-state-source', VirtualStateSource);
 
 export {
     DataView,
