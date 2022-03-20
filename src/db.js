@@ -65,14 +65,6 @@ let db = {
     watchStatus: 'stopped',
     workoutStatus: 'stopped',
 
-
-    positionLapStart: 0,
-    positionStepStart: 0,
-    lapPosition: 0,
-    stepPosition: 0,
-    lapDistance: 0,
-    stepDistance: 0,
-
     // Request ANT+ Device
     antSearchList: [],
     antDeviceId: {},
@@ -218,10 +210,7 @@ xf.reg('ui:workout:select', (id, db) => {
 });
 xf.reg('ui:workout:upload', async function(file, db) {
     const result = await models.workout.readFromFile(file);
-    console.log(result);
-    console.log(typeof result);
     const workout = models.workout.parse(result);
-    console.log(workout);
     models.workouts.add(db.workouts, workout);
     xf.dispatch('db:workouts', db);
 });

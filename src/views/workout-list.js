@@ -106,20 +106,22 @@ class WorkoutListItem extends HTMLLIElement {
     }
     postInit() { return; }
     connectedCallback() {
+        const self = this;
         this.summary = this.querySelector('.workout--short-info');
         this.description = this.querySelector('.workout--full-info');
         this.selectBtn = this.querySelector('.workout--select');
         this.indicator = this.selectBtn;
         this.id = this.getAttribute('id');
 
-        xf.sub('db:workout', this.onWorkout.bind(this));
-        this.summary.addEventListener('pointerup', this.toggleExpand.bind(this));
-        this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this));
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
+        xf.sub('db:workout', this.onWorkout.bind(this), this.signal);
+        this.summary.addEventListener('pointerup', this.toggleExpand.bind(this), this.signal);
+        this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this), this.signal);
     }
     disconnectedCallback() {
-        document.removeEventListener('db:workout', this.onWorkout);
-        this.summary.removeEventListener('pointerup', this.toggleExpand);
-        this.selectBtn.removeEventListener('pointerup', this.onRadio);
+        this.abortController.abort();
     }
     toggleExpand(e) {
         if(this.isExpanded) {

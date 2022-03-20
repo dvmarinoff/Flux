@@ -413,7 +413,8 @@ class Workout extends Model {
     parse(result) {
         if(isArray(result) || isObject(result)) {
             const view = new DataView(result);
-            result = course.toZwo(view);
+            result = course.read(view);
+            return result;
         }
         return zwo.readToInterval(result);
     }

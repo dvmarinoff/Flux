@@ -1,42 +1,4 @@
 let workouts = [
-            `<workout_file>
-        <author>Marinov</author>
-        <name>K2C Cycle Tour</name>
-        <category>Course</category>
-        <description>90km course, simplified</description>
-        <sportType>bike</sportType>
-        <tags>
-        </tags>
-        <workout>
-            <FreeRide Altitude="727" Track="0,2000, 6.5,4800, -1.9,7800, 2.9,4200, -5.1,14000, 4.8,5800, -3.2,7400, 9.0,2600, 0,3400, 2.6,4800, -3.1,9800, 0.6,6600, 6.3,800, -4.2,9200, 4.6,2400, -4.8,4400"/>
-        </workout>
-    </workout_file>
-    `,
-    `<workout_file>
-        <author>Marinov</author>
-        <name>Test Climb</name>
-        <category>Course</category>
-        <description>Intervals with slope and distance</description>
-        <sportType>bike</sportType>
-        <tags>
-        </tags>
-        <workout>
-        <FreeRide Altitude="727" Track="0,100, 2,100, 1,100, 4,50, 5,50, 6,50, 5,50, 6.5,50, -1.9,50, 2.9,50, -5.1,50, 4.8,50, -3.2,50, 9.0,50, 0,50, 2.6,50, -3.1,50, 0.6,50, 6.3,50, -4.2,50, 4.6,50, -4.8,50, 0,50"/>
-        </workout>
-    </workout_file>`,
-            `<workout_file>
-        <author>Marinov</author>
-        <name>K2C Cycle Tour</name>
-        <category>Course</category>
-        <description>90km course, simplified</description>
-        <sportType>bike</sportType>
-        <tags>
-        </tags>
-        <workout>
-            <FreeRide Altitude="727" Track="0,2000, 6.5,4800, -1.9,7800, 2.9,4200, -5.1,14000, 4.8,5800, -3.2,7400, 9.0,2600, 0,3400, 2.6,4800, -3.1,9800, 0.6,6600, 6.3,800, -4.2,9200, 4.6,2400, -4.8,4400"/>
-        </workout>
-    </workout_file>
-    `,
         `<workout_file>
     <author>Marinov</author>
     <name>Dijon</name>

@@ -148,9 +148,10 @@ function Definition(args = {}) {
         let res = Object.entries(messages)
                         .filter(x => equals(x[1].global_number, number))[0];
         if(isUndefined(res)) {
-            console.error(`reading definition message with global number ${number} not found`);
+            console.warn(`unkown definition message with global number ${number}`);
+            return `message_${number}`;
         };
-        return res;
+        return first(res);
     }
 
     function messageToNumber(message) {
@@ -175,7 +176,7 @@ function Definition(args = {}) {
         const architecture   = view.getUint8(start+2, true);
         const littleEndian   = !architecture;
         const messageNumber  = view.getUint16(start+3, littleEndian);
-        const message        = first(numberToMessage(messageNumber));
+        const message        = numberToMessage(messageNumber);
         const numberOfFields = view.getUint8(start+5, littleEndian);
         const length         = getLength(numberOfFields);
 
@@ -226,18 +227,21 @@ function Definition(args = {}) {
 function FieldDefinition(args = {}) {
 
     function numberToField(message, number) {
-        const messageFields = messages[message].fields;
-        let res = Object.entries(messageFields)
-                        .filter(x => x[1].number === number)[0];
-        if(res === undefined) console.error(`field number ${number} on message ${message} not found`);
-        return res;
+        const messageFields = messages[message]?.fields;
+        if(isUndefined(messageFields)) {
+            console.warn(`custom field number ${number} on message ${message}`);
+            return `field_${number}`;
+        }
+        const res = Object.entries(messageFields)
+                          .filter(x => x[1].number === number)[0];
+        return first(res);
     }
 
     function read(view, messageName) {
-        let number    = view.getUint8(0, true);
-        let size      = view.getUint8(1, true);
-        let base_type = view.getUint8(2, true);
-        let field     = numberToField(messageName, number)[0];
+        const number    = view.getUint8(0, true);
+        const size      = view.getUint8(1, true);
+        const base_type = view.getUint8(2, true);
+        const field     = numberToField(messageName, number);
 
         return { field, number, size, base_type };
     }

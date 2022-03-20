@@ -11,7 +11,6 @@ class FileHandler {
 
         return new Promise((resolve, reject) => {
             reader.onload = function(event) {
-                console.log(`read text file onload`);
                 console.log(reader.result);
                 return resolve(reader.result);
             };
@@ -27,7 +26,6 @@ class FileHandler {
 
         return new Promise((resolve, reject) => {
             reader.onload = function(event) {
-                console.log(`read binary file onload`);
                 console.log(reader.result);
                 return resolve(reader.result);
             };

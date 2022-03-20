@@ -2,6 +2,8 @@ import { equals, exists, existance, first, last, xf, avg, max } from './function
 import { kphToMps, mpsToKph, timeDiff } from './utils.js';
 import { models } from './models/models.js';
 
+const timer = new Worker('./timer.js');
+
 class Watch {
     constructor(args) {
         this.elapsed          = 0;
@@ -17,14 +19,6 @@ class Watch {
         this.stateWorkout     = 'stopped';
 
         // Distance
-        this.distance          = 0;
-        this.positionLapStart  = 0;
-        this.positionStepStart = 0;
-        this.lapPosition       = 0;
-        this.stepPosition      = 0;
-        this.lapDistance       = 0;
-        this.stepDistance      = 0;
-        this.distanceTarget    = undefined;
         this.intervalType      = 'duration';
         // end Distance
 
@@ -33,6 +27,7 @@ class Watch {
     }
     init() {
         const self = this;
+
         xf.sub('db:workout',       workout => { self.intervals     = workout.intervals; });
         xf.sub('db:elapsed',       elapsed => { self.elapsed       = elapsed; });
         xf.sub('db:lapTime',          time => { self.lapTime       = time; });
@@ -51,9 +46,7 @@ class Watch {
             }
         });
 
-        xf.sub('db:distance', this.onDistance.bind(this));
-        xf.sub('db:lapDistance',  distance => self.lapDistance = distance);
-        xf.sub('db:stepDistance', distance => self.stepDistance = distance);
+        timer.addEventListener('message', self.onTick.bind(self));
     }
     isStarted()        { return this.state        === 'started'; };
     isPaused()         { return this.state        === 'paused'; };
@@ -68,7 +61,8 @@ class Watch {
         if(self.isStarted() && !self.isWorkoutStarted()) {
             self.pause();
         } else {
-            self.timer = setInterval(self.onTick.bind(self), 1000);
+            // self.timer = setInterval(self.onTick.bind(self), 1000);
+            timer.postMessage('start');
             xf.dispatch('watch:started');
         }
     }
@@ -84,16 +78,7 @@ class Watch {
         }
 
         if(exists(self.intervals[0].distance)) {
-            let intervalDistance = 0;
-            let stepDistance     = 0;
-            intervalDistance  = self.intervals[0].distance ?? 0;
-            stepDistance      = self.intervals[0].steps[0].distance ?? 0;
             self.intervalType = 'distance';
-
-            xf.dispatch('watch:lapDistance',  intervalDistance);
-            xf.dispatch('watch:stepDistance', stepDistance);
-            xf.dispatch('watch:lapPosition',  0);
-            xf.dispatch('watch:stepPosition', 0);
         }
 
         xf.dispatch('workout:started');
@@ -123,19 +108,22 @@ class Watch {
     resume() {
         const self = this;
         if(!self.isStarted()) {
-            self.timer = setInterval(self.onTick.bind(self), 1000);
+            // self.timer = setInterval(self.onTick.bind(self), 1000);
+            timer.postMessage('start');
             xf.dispatch('watch:started');
         }
     }
     pause() {
         const self = this;
-        clearInterval(self.timer);
+        // clearInterval(self.timer);
+        timer.postMessage('pause');
         xf.dispatch('watch:paused');
     }
     stop() {
         const self = this;
         if(self.isStarted() || self.isPaused()) {
-            clearInterval(self.timer);
+            // clearInterval(self.timer);
+            timer.postMessage('stop');
 
             xf.dispatch('watch:stopped');
 
@@ -223,19 +211,14 @@ class Watch {
         if(exists(intervals[intervalIndex].duration)) {
             return this.nextDurationInterval(intervals, intervalIndex, stepIndex);
         }
-        if(exists(intervals[intervalIndex].distance)) {
-            return this.nextDistanceInterval(intervals, intervalIndex, stepIndex);
-        }
+        return undefined;
     }
     nextStep(intervals, intervalIndex, stepIndex) {
         if(this.isDurationStep(intervals, intervalIndex, stepIndex)) {
             this.intervalType = 'duration';
             return this.nextDurationStep(intervals, intervalIndex, stepIndex);
         }
-        if(this.isDistanceStep(intervals, intervalIndex, stepIndex)) {
-            this.intervalType = 'distance';
-            return this.nextDistanceStep(intervals, intervalIndex, stepIndex);
-        }
+        return undefined;
     }
 
     isDurationStep(intervals, intervalIndex, stepIndex) {
@@ -269,84 +252,7 @@ class Watch {
         xf.dispatch('watch:stepIndex',    stepIndex);
         xf.dispatch('watch:step');
     }
-
-    // Distance
-    onDistance(distance) {
-        const self = this;
-        this.distance = distance;
-
-        if(this.isWorkoutStarted() && this.isIntervalType('distance')) {
-
-            this.lapPosition  = (this.distance - this.positionLapStart);
-            this.stepPosition = (this.distance - this.positionStepStart);
-
-            xf.dispatch('watch:lapPosition',  this.lapPosition);
-            xf.dispatch('watch:stepPosition', this.stepPosition);
-
-            console.info({
-                // intervalIndex: self.intervalIndex,
-                stepIndex: self.stepIndex,
-                distance: self.distance,
-                lapPosition: self.lapPosition,
-                lapDistance: self.lapDistance,
-                stepPosition: self.stepPosition,
-                stepDistance: self.stepDistance,
-            });
-
-            if(this.distanceReached()) {
-                this.step();
-            }
-        }
-    }
-    distanceReached() {
-        if(this.stepPosition >= this.stepDistance && this.isIntervalType('distance')) {
-            console.log(`${this.distance - this.positionStepStart}`);
-            return true;
-        } else {
-            return false;
-        }
-    }
-    isDistanceInterval(intervals, intervalIndex,) {
-        return exists(intervals[intervalIndex].distance);
-    }
-    isDistanceStep(intervals, intervalIndex, stepIndex) {
-        return exists(intervals[intervalIndex].steps[stepIndex].distance);
-    }
-    nextDistanceInterval(intervals, intervalIndex, stepIndex) {
-        const intervalDistance = intervals[intervalIndex].distance;
-        const stepDuration     = intervals[intervalIndex].steps[stepIndex].distance;
-        this.dispatchDistanceInterval(intervalDistance, intervalIndex);
-    }
-    nextDistanceStep(intervals, intervalIndex, stepIndex) {
-        let stepDistance = intervals[intervalIndex].steps[stepIndex].distance;
-        this.dispatchDistanceStep(stepDistance, stepIndex);
-    }
-    dispatchDistanceInterval(intervalDistance, intervalIndex) {
-        this.positionLapStart = this.distance;
-        xf.dispatch('watch:intervalDistance', intervalDistance);
-        xf.dispatch('watch:lapTime',          0);
-        xf.dispatch('watch:lapDistance',      intervalDistance);
-        xf.dispatch('watch:intervalIndex',    intervalIndex);
-        xf.dispatch('watch:lap');
-    }
-    dispatchDistanceStep(stepDistance, stepIndex) {
-        this.distanceTarget = stepDistance;
-        stepDistance = stepDistance - ((this.distance - this.positionStepStart) - this.stepDistance);
-        this.positionStepStart = this.distance;
-        xf.dispatch('watch:stepDistance', stepDistance);
-        xf.dispatch('watch:stepIndex',    stepIndex);
-        xf.dispatch('watch:step');
-    }
-    // end Distance
 }
-
-
-// Distance
-xf.reg('watch:lapDistance',  (distance, db) => db.lapDistance  = distance);
-xf.reg('watch:stepDistance', (distance, db) => db.stepDistance = distance);
-xf.reg('watch:lapPosition',  (position, db) => db.lapPosition  = position);
-xf.reg('watch:stepPosition', (position, db) => db.stepPosition = position);
-// end Distance
 
 // Register DB Events
 xf.reg('watch:lapDuration',    (time, db) => db.intervalDuration = time);

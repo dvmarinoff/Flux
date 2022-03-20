@@ -686,27 +686,23 @@ div.graph--bar-group {
 #graph--info--cont {
     display: none;
     position: absolute;
-    top: 2rem;
-    height: 2rem;
-    min-width: 8rem;
-    padding: 2px 2px;
+    padding: 4px 4px;
     color: var(--black);
-    overflow: nowrap;
     white-space: nowrap;
     background-color: var(--white);
-    border-radius: 2px;
+    /* border-radius: 2px; */
     z-index: 1;
 }
 
-#graph--info--cont::before {
-    content: "";
-    position: absolute;
-    top: 10px;
-    left: 0;
-    width: 1px;
-    height: 1000px;
-    background-color: var(--white);
-}
+/* #graph--info--cont::before { */
+/*     content: ""; */
+/*     position: absolute; */
+/*     top: 100%; */
+/*     left: calc(50% - 1px); */
+/*     width: 1px; */
+/*     height: 1000px; */
+/*     background-color: var(--white); */
+/* } */
 
 #workout-list svg.graph--bar-group {
     height: var(--graph-height);
