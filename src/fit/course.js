@@ -3,7 +3,6 @@ import { fit } from './fit.js';
 import { fields } from './fields.js';
 import { appTypes } from './profiles.js';
 import { localMessageDefinitions as lmd } from './local-message-definitions.js';
-import { g } from '../graph.js';
 
 function coordsToDistance(coord1, coord2) {
     const R = 6371e3; // metres
