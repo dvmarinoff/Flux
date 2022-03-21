@@ -98,7 +98,9 @@ class SourceSwitch extends HTMLElement {
     }
     onEffect(e) {
         const update = {};
+
         update[this.path] = this.value;
+
         xf.dispatch(`${this.effect}`, update);
     }
     disable() {

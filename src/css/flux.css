@@ -622,6 +622,10 @@ body.dark-theme {
     text-transform: uppercase;
 }
 
+.data-tile-small--heading sub {
+    text-transform: lowercase;
+}
+
 .data-tile-small--value {
     font-size: var(--data-tile-small--value-font-size);
     font-weight: bold;
@@ -668,7 +672,7 @@ body.dark-theme {
     overflow: hidden;
 }
 
-.graph--bar-group {
+div.graph--bar-group {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -678,6 +682,31 @@ body.dark-theme {
     height: 8em;
     /* min-height: 100%; */
     padding: 0;
+}
+#graph--info--cont {
+    display: none;
+    position: absolute;
+    padding: 4px 4px;
+    color: var(--black);
+    white-space: nowrap;
+    background-color: var(--white);
+    /* border-radius: 2px; */
+    z-index: 1;
+}
+
+/* #graph--info--cont::before { */
+/*     content: ""; */
+/*     position: absolute; */
+/*     top: 100%; */
+/*     left: calc(50% - 1px); */
+/*     width: 1px; */
+/*     height: 1000px; */
+/*     background-color: var(--white); */
+/* } */
+
+#workout-list svg.graph--bar-group {
+    height: var(--graph-height);
+    height: 8em;
 }
 
 .graph--heading {
@@ -747,6 +776,8 @@ body.dark-theme {
 }
 .graph--info--time {
     color: var(--gray);
+}
+.graph--bar-distance {
 }
 
 .workout--graph-cont {
@@ -1068,6 +1099,10 @@ body.dark-theme {
     grid-template-columns: repeat(2, 1fr);
     justify-items: center;
     align-items: center;
+}
+
+.library--switch {
+    cursor: pointer;
 }
 
 .library--switch--heading {
@@ -1412,6 +1447,30 @@ body.dark-theme {
 .device-card--tile--value {
     font-size: var(--font-size-value);
     font-weight: bold;
+}
+
+.simulation {
+    --settings-row-max-width: 60em;
+    margin: 4em auto 4em;
+}
+
+.simulation--cont {
+    max-width: var(--settings-row-max-width);
+    margin: 0 auto;
+    padding: 0.2em 0 0.8em 0;
+}
+.simulation--header {
+}
+.simulation-header--label {
+    font-size: 1.1em;
+    line-height: 3em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.simulation--switch {
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .connection-icon-switch {

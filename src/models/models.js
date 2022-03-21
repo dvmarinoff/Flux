@@ -1,5 +1,6 @@
 import { xf, exists, existance, empty, equals, mavg,
-         first, second, last, clamp, toFixed } from '../functions.js';
+         first, second, last, clamp, toFixed, isArray,
+         isString, isObject } from '../functions.js';
 
 import { inRange, dateToDashString } from '../utils.js';
 
@@ -11,7 +12,9 @@ import { workouts as workoutsFile }  from '../workouts/workouts.js';
 import { zwo } from '../workouts/zwo.js';
 import { fileHandler } from '../file.js';
 import { activity } from '../fit/activity.js';
+import { course } from '../fit/course.js';
 import { fit } from '../fit/fit.js';
+import { Model as Cycling } from '../physics.js';
 
 class Model {
     constructor(args = {}) {
@@ -109,18 +112,20 @@ class Speed extends Model {
     }
 }
 
-class Distance extends Model {
-    defaultValue() { return 0; }
-    defaultIsValid(value) {
-        return Number.isInteger(value) || Number.isFloat(value);
-    }
-}
-
 class Sources extends Model {
     postInit(args = {}) {
         const self = this;
         self.state = self.default;
         xf.sub('db:sources', value => self.state = value);
+
+        const storageModel = {
+            key: self.prop,
+            fallback: self.defaultValue(),
+            parse: JSON.parse,
+            encode: JSON.stringify
+        };
+
+        self.storage = new args.storage(storageModel);
     }
     defaultSet(target, source) {
         return Object.assign(target, source);
@@ -134,11 +139,12 @@ class Sources extends Model {
     }
     defaultValue() {
         const sources = {
-            power:     'ble:controllable',
-            cadence:   'ble:controllable',
-            speed:     'ble:controllable',
-            control:   'ble:controllable',
-            heartRate: 'ble:hrm'
+            power:        'ble:controllable',
+            cadence:      'ble:controllable',
+            speed:        'ble:controllable',
+            control:      'ble:controllable',
+            heartRate:    'ble:hrm',
+            virtualState: 'power',
         };
         return sources;
     }
@@ -300,6 +306,16 @@ class FTP extends Model {
         }
         return {name, index};
     }
+    zoneToColor(zone) {
+        if(equals(zone, 'one'))   return '#636468';
+        if(equals(zone, 'two'))   return '#328AFF';
+        if(equals(zone, 'thee'))  return '#44A5AB';
+        if(equals(zone, 'four'))  return '#57C057';
+        if(equals(zone, 'five'))  return '#F8C73A';
+        if(equals(zone, 'six'))   return '#FF663A';
+        if(equals(zone, 'seven')) return '#FE340B';
+        return '#636468';
+    }
 }
 
 class Weight extends Model {
@@ -390,12 +406,17 @@ class Workout extends Model {
     restore(db) {
         return first(db.workouts);
     }
-    async readFromFile(workoutFile) {
-        const workout = await fileHandler.readTextFile(workoutFile);
-        return workout;
+    async readFromFile(file) {
+        const result = await fileHandler.read(file);
+        return result;
     }
-    parse(workout) {
-        return zwo.readToInterval(workout);
+    parse(result) {
+        if(isArray(result) || isObject(result)) {
+            const view = new DataView(result);
+            result = course.read(view);
+            return result;
+        }
+        return zwo.readToInterval(result);
     }
     fileName () {
         const self = this;
@@ -404,7 +425,6 @@ class Workout extends Model {
     }
     encode(db) {
         const fitjsActivity = activity.encode({records: db.records, laps: db.laps});
-        console.log(fitjsActivity);
         return fit.activity.encode(fitjsActivity);
     }
     download(activity) {
@@ -503,6 +523,8 @@ function Session(args = {}) {
             records: db.records,
             laps: db.laps,
             lap: db.lap,
+            distance: db.distance,
+            altitude: db.altitude,
 
             // Report
             powerInZone: db.powerInZone,
@@ -516,7 +538,8 @@ function Session(args = {}) {
             powerTarget: db.powerTarget,
             resistanceTarget: db.resistanceTarget,
             slopeTarget: db.slopeTarget,
-            sources: db.sources,
+
+            // sources: db.sources,
 
             // UI options
             powerSmoothing: db.powerSmoothing,
@@ -535,7 +558,7 @@ function Session(args = {}) {
     });
 }
 
-class Prop {
+class MetaProp {
     constructor(args = {}) {
         const self = this;
         this.init(args);
@@ -594,7 +617,7 @@ class Prop {
     }
 }
 
-class PropAccumulator extends Prop {
+class PropAccumulator extends MetaProp {
     postInit(args = {}) {
         this.event = existance(args.event, this.getDefaults().event);
         this.count = this.getDefaults().count;
@@ -777,7 +800,130 @@ class PowerInZone {
     }
 }
 
+class VirtualState extends MetaProp {
+    postInit() {
+        this.speed           = this.getDefaults().speed;
+        this.altitude        = this.getDefaults().altitude;
+        this.distance        = this.getDefaults().distance;
 
+        this.slope           = this.getDefaults().slope;
+        this.riderWeight     = this.getDefaults().riderWeight;
+        this.equipmentWeight = this.getDefaults().equipmentWeight;
+        this.mass            = this.getDefaults().mass;
+
+        this.source          = this.getDefaults().source;
+        this.cycling         = Cycling({
+            rho:             1.275,
+            dragCoefficient: 0.88,   // 1.0, 0.88
+            frontalArea:     0.36,   // 0.4, 0.36
+            CdA:             0.3168, // 0.4, 0.3168
+        });
+        this.lastUpdate      = undefined;
+    }
+    getDefaults() {
+        return {
+            riderWeight: 75,
+            equipmentWeight: 10,
+            mass: 85,
+            slope: 0.00,
+
+            speed: 0,
+            altitude: 0,
+            distance: 0,
+
+            prop: 'power',
+            source: 'power',
+            disabled: false,
+            default: 0,
+        };
+    }
+    subs() {
+        xf.reg(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        xf.sub(`db:sources`, this.onSources.bind(this), this.signal);
+        xf.sub(`db:weight`, this.onWeight.bind(this), this.signal);
+    }
+    onSources(sources) {
+        this.source = sources.virtualState;
+    }
+    onWeight(weight) {
+        this.riderWeight = weight;
+        this.systemWeight = this.riderWeight + this.equipmentWeight;
+    }
+    onUpdate(power, db) {
+        if(!equals(this.source, this.prop)) return;
+
+        const now = Date.now();
+        const dt  = (now - this.lastUpdate) / 1000;
+        this.lastUpdate = now;
+
+        if(equals(dt, 0)) {
+            console.warn(`dt: ${dt}, s: ${this.speed}`);
+            return;
+        };
+
+        const { speed, distance, altitude, } = this.cycling.virtualSpeedCF({
+            power:    db.power,
+            slope:    db.slopeTarget / 100,
+            distance: db.distance,
+            altitude: db.altitude,
+            mass:     this.mass,
+            speed:    this.speed,
+            dt:       isNaN(dt) ? 1/4 : dt,
+        });
+
+        this.speed = speed;
+
+        xf.dispatch('speedVirtual', (speed * 3.6));
+        xf.dispatch('distance', distance);
+        xf.dispatch('altitude', altitude);
+
+        // console.log(`s: ${speed}, a: ${altitude}, d: ${distance}`);
+    }
+}
+
+class SpeedState extends VirtualState {
+    getDefaults() {
+        return {
+            prop: 'speed',
+            source: 'power',
+            disabled: false,
+            default: 0,
+
+            riderWeight: 75,
+            equipmentWeight: 10,
+            mass: 85,
+            slope: 0.00,
+
+            speed: 0,
+            altitude: 0,
+            distance: 0,
+        };
+    }
+    onUpdate(speed, db) {
+        if(!equals(this.source, this.prop)) return;
+
+        const now = Date.now();
+        const dt  = (now - this.lastUpdate) / 1000;
+        this.lastUpdate = now;
+
+        const { distance, altitude } = this.cycling.trainerSpeed({
+            slope:     db.slopeTarget / 100,
+            speed:     db.speed / 3.6,
+            distance:  db.distance,
+            altitude:  db.altitude,
+            speedPrev: this.speedPrev,
+            mass:      this.mass,
+            dt:        isNaN(dt) ? 1/4 : dt,
+        });
+
+        this.speedPrev = speed / 3.6;
+
+        xf.dispatch('distance', distance);
+        xf.dispatch('altitude', altitude);
+
+        // console.log(`s: ${speed}, a: ${altitude}, d: ${distance}`);
+    }
+}
 
 class TSS {
     // TSS = (t * NP * IF) / (FTP * 3600) * 100
@@ -796,8 +942,10 @@ const power = new Power({prop: 'power'});
 const cadence = new Cadence({prop: 'cadence'});
 const heartRate = new HeartRate({prop: 'heartRate'});
 const speed = new Speed({prop: 'speed'});
-const distance = new Distance({prop: 'distance'});
-const sources = new Sources({prop: 'sources'});
+const sources = new Sources({prop: 'sources', storage: LocalStorageItem});
+
+const virtualState = new VirtualState();
+const speedState   = new SpeedState();
 
 const powerTarget = new PowerTarget({prop: 'powerTarget'});
 const resistanceTarget = new ResistanceTarget({prop: 'resistanceTarget'});
@@ -827,6 +975,8 @@ let models = {
     speed,
     sources,
 
+    virtualState,
+
     power1s,
     powerLap,
     powerAvg,
@@ -834,8 +984,6 @@ let models = {
 
     heartRateLap,
     cadenceLap,
-    // heartRateAvg,
-    // cadenceAvg,
 
     powerTarget,
     resistanceTarget,

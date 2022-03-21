@@ -8,8 +8,11 @@ let db = {
     heartRate: models.heartRate.default,
     cadence: models.cadence.default,
     speed: models.speed.default,
-    distance: 0,
     sources: models.sources.default,
+
+    speedVirtual: models.virtualState.speed,
+    altitude: models.virtualState.altitude,
+    distance: models.virtualState.distance,
 
     power1s: models.power1s.default,
     powerLap: models.powerLap.default,
@@ -90,6 +93,7 @@ xf.reg(models.speed.prop, (speed, db) => {
 
 xf.reg(models.sources.prop, (sources, db) => {
     db.sources = models.sources.set(db.sources, sources);
+    models.sources.backup(db.sources);
     console.log(db.sources);
 });
 
@@ -101,6 +105,18 @@ xf.reg('power1s', (power, db) => {
 
 xf.reg('powerInZone', (powerInZone, db) => {
     db.powerInZone = powerInZone;
+});
+
+xf.reg('speedVirtual', (speedVirtual, db) => {
+    db.speedVirtual = speedVirtual;
+});
+
+xf.reg('altitude', (altitude, db) => {
+    db.altitude = altitude;
+});
+
+xf.reg('distance', (distance, db) => {
+    db.distance = distance;
 });
 
 // Pages
@@ -145,7 +161,6 @@ xf.reg(`ui:power-target-dec`, (_, db) => {
 });
 xf.reg('ui:cadence-target-set', (cadenceTarget, db) => {
     db.cadenceTarget = models.cadenceTarget.set(cadenceTarget);
-    console.log(`:zwo set target cadence ${db.cadenceTarget}`);
 });
 
 xf.reg('ui:resistance-target-set', (resistanceTarget, db) => {
@@ -193,9 +208,9 @@ xf.reg('workout', (workout, db) => {
 xf.reg('ui:workout:select', (id, db) => {
     db.workout = models.workouts.get(db.workouts, id);
 });
-xf.reg('ui:workout:upload', async function(workoutFile, db) {
-    const workoutText = await models.workout.readFromFile(workoutFile);
-    const workout = models.workout.parse(workoutText);
+xf.reg('ui:workout:upload', async function(file, db) {
+    const result = await models.workout.readFromFile(file);
+    const workout = models.workout.parse(result);
     models.workouts.add(db.workouts, workout);
     xf.dispatch('db:workouts', db);
 });
@@ -253,6 +268,8 @@ xf.reg('app:start', async function(_, db) {
     db.theme = models.theme.set(models.theme.restore());
     db.measurement = models.measurement.set(models.measurement.restore());
     db.dataTileSwitch = models.dataTileSwitch.set(models.dataTileSwitch.restore()),
+
+    db.sources = models.sources.set(models.sources.restore());
 
     db.workouts = models.workouts.restore();
     db.workout = models.workout.restore(db);

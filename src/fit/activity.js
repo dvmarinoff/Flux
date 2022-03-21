@@ -1,49 +1,12 @@
-//
-// Activity
+// // Activity
 // encodes records and laps to FIT activity file
 //
 
 import { exists, existance, equals, first, last, map } from '../functions.js';
 import { fit } from './fit.js';
+import { fields } from './fields.js';
 import { appTypes } from './profiles.js';
 import { localMessageDefinitions as lmd } from './local-message-definitions.js';
-
-
-
-const garmin_epoch = Date.parse('31 Dec 1989 00:00:00 GMT');
-
-function toFitTimestamp(timestamp) {
-    return Math.round((timestamp - garmin_epoch) / 1000);
-}
-
-function toFitElapsedTime(fitTimestamp) {
-    return (fitTimestamp + 1) * 1000;
-}
-
-function toFitSpeed(speed, unit = 'kph') {
-    const scale = 1000;
-
-    if(unit === 'kph') {
-        return parseInt((speed / 3.6) * scale, 10);
-    }
-    return speed;
-}
-
-function toFitDistance(unit = 'm') {
-    const scale = 100;
-
-    return function (distance) {
-
-        if(equals(unit, 'km')) {
-            return parseInt((distance * 1000) * scale, 10);
-        }
-        if(equals(unit, 'm')) {
-            return parseInt(distance * scale, 10);
-        }
-
-        return parseInt(distance * scale, 10);
-    };
-}
 
 
 
@@ -59,8 +22,8 @@ function FileHeader(args = {}) {
 
 function Data(args = {}) {
     const fields = args.definition.fields.reduce((acc, x) => {
-        const transform = existance(args.transforms[x.field], ((x) => x));
-        acc[x.field] = transform(existance(args.values[x.field], args.defaults[x.field]));
+        const encode = existance(args.encoders[x.field], ((x) => x));
+        acc[x.field] = encode(existance(args.values[x.field], args.defaults[x.field]));
         return acc;
     }, {});
 
@@ -81,11 +44,11 @@ function FileId(args = {}) {
         type:         4
     };
 
-    const transforms = {
-        time_created: toFitTimestamp,
+    const encoders = {
+        time_created: fields.timestamp.encode,
     };
 
-    return Data({values: args, definition: lmd.fileId, transforms, defaults});
+    return Data({values: args, definition: lmd.fileId, encoders, defaults});
 }
 
 function DeviceInfo(args = {}) {
@@ -97,11 +60,11 @@ function DeviceInfo(args = {}) {
         product: 0,
     };
 
-    const transforms = {
-        timestamp:  toFitTimestamp,
+    const encoders = {
+        timestamp:  fields.timestamp.encode,
     };
 
-    return Data({values: args, definition: lmd.deviceInfo, transforms, defaults});
+    return Data({values: args, definition: lmd.deviceInfo, encoders, defaults});
 }
 
 function Event(args = {}) {
@@ -111,23 +74,28 @@ function Event(args = {}) {
         event_group: 0,
     };
 
-    const transforms = {
-        timestamp:  toFitTimestamp,
+    const encoders = {
+        timestamp:  fields.timestamp.encode,
     };
 
-    return Data({values: args, definition: lmd.event, transforms, defaults});
+    return Data({values: args, definition: lmd.event, encoders, defaults});
 };
 
 function Record(args = {}) {
-    const defaults = {heart_rate: 0, power: 0, cadence: 0, speed: 0, distance: 0};
-
-    const transforms = {
-        timestamp: toFitTimestamp,
-        distance: toFitDistance('m'),
-        speed: toFitSpeed,
+    const defaults = {
+        heart_rate: 0, power: 0, cadence: 0, speed: 0,
+        distance: 0, grade: 0, altitude: 0,
     };
 
-    return Data({values: args, definition: lmd.record, transforms, defaults});
+    const encoders = {
+        timestamp: fields.timestamp.encode,
+        distance:  fields.distance.encode,
+        speed:     fields.speed.encode,
+        altitude:  fields.altitude.encode,
+        grade:     fields.grade.encode,
+    };
+
+    return Data({values: args, definition: lmd.record, encoders, defaults});
 }
 
 function Lap(args = {}) {
@@ -135,27 +103,27 @@ function Lap(args = {}) {
         avg_power:          0,
         max_power:          0,
         message_index:      0,
-        total_elapsed_time: toFitTimestamp(args.timestamp) - toFitTimestamp(args.start_time),
+        total_elapsed_time: fields.timestamp.elapsed(args.start_time, args.timestamp),
         // calculate properly in the future by excluding pauses
-        total_timer_time:   toFitTimestamp(args.timestamp) - toFitTimestamp(args.start_time),
+        total_timer_time:   fields.timestamp.timer(args.start_time, args.timestamp),
         event:              appTypes.event.values.lap,
         event_type:         appTypes.event_type.values.stop,
     };
 
-    let transforms = {
-        timestamp:          toFitTimestamp,
-        start_time:         toFitTimestamp,
-        total_elapsed_time: toFitElapsedTime,
-        total_timer_time:   toFitElapsedTime,
+    let encoders = {
+        timestamp:          fields.timestamp.encode,
+        start_time:         fields.timestamp.encode,
+        // total_elapsed_time: fields.timestamp.encode,
+        // total_timer_time:   fields.timestamp.encode,
     };
 
-    return Data({values: args, definition: lmd.lap, transforms, defaults});
+    return Data({values: args, definition: lmd.lap, encoders, defaults});
 }
 
 function Session(args = {}) {
     let defaults = {
-        total_elapsed_time: toFitTimestamp(args.timestamp) - toFitTimestamp(args.start_time),
-        total_timer_time:   toFitTimestamp(args.timestamp) - toFitTimestamp(args.start_time),
+        total_elapsed_time: fields.timestamp.elapsed(args.start_time, args.timestamp),
+        total_timer_time:   fields.timestamp.timer(args.start_time, args.timestamp),
 
         message_index:      0,
         first_lap_index:    0,
@@ -174,23 +142,23 @@ function Session(args = {}) {
         total_distance:     0, // meters
     };
 
-    let transforms = {
-        timestamp:          toFitTimestamp,
-        start_time:         toFitTimestamp,
-        total_elapsed_time: toFitElapsedTime,
-        total_timer_time:   toFitElapsedTime, // calculate properly in the future by excluding pauses
-        avg_speed:          toFitSpeed,
-        max_speed:          toFitSpeed,
-        total_distance:     toFitDistance('m'),
+    let encoders = {
+        timestamp:          fields.timestamp.encode,
+        start_time:         fields.timestamp.encode,
+        // total_elapsed_time: fields.timestamp.encode,
+        // total_timer_time:   fields.timestamp.encode, // calculate properly in the future by excluding pauses
+        avg_speed:          fields.speed.encode,
+        max_speed:          fields.speed.encode,
+        total_distance:     fields.distance.encode,
     };
 
-    return Data({values: args, definition: lmd.session, transforms, defaults});
+    return Data({values: args, definition: lmd.session, encoders, defaults});
 }
 
 function Activity(args = {}) {
     let defaults = {
-        total_elapsed_time: toFitTimestamp(args.timestamp) - toFitTimestamp(args.start_time),
-        total_timer_time:   toFitTimestamp(args.timestamp) - toFitTimestamp(args.start_time),
+        total_elapsed_time: fields.timestamp.elapsed(args.start_time, args.timestamp),
+        total_timer_time:   fields.timestamp.elapsed(args.start_time, args.timestamp),
         local_timestamp:    0,
         num_sessions:       1,
         type:               appTypes.activity.values.manual,
@@ -198,13 +166,13 @@ function Activity(args = {}) {
         event_type:         appTypes.event_type.values.stop,
     };
 
-    let transforms = {
-        timestamp:        toFitTimestamp,
-        local_timestamp:  exists(args.local_timestamp) ? toFitTimestamp : ((x) => x),
-        total_timer_time: toFitElapsedTime,
+    let encoders = {
+        timestamp:        fields.timestamp.encode,
+        local_timestamp:  exists(args.local_timestamp) ? fields.timestamp.encode : ((x) => x),
+        // total_timer_time: fields.timestamp.toElapsed,
     };
 
-    return Data({values: args, definition: lmd.activity, transforms, defaults});
+    return Data({values: args, definition: lmd.activity, encoders, defaults});
 }
 
 function Summary(args = {}) {
@@ -245,6 +213,11 @@ function Summary(args = {}) {
     }, defaults), format);
 }
 
+function decode(args = {}) {
+    const view = args.view;
+    return fit.activity.read(view);
+}
+
 function encode(args = {}) {
     const records      = existance(args.records);
     const laps         = existance(args.laps);
@@ -283,6 +256,7 @@ function encode(args = {}) {
 
 const activity = {
     encode,
+    decode,
 
     Data,
     FileHeader,
@@ -293,11 +267,6 @@ const activity = {
     Lap,
     Session,
     Activity,
-
-    toFitTimestamp,
-    toFitElapsedTime,
-    toFitSpeed,
-    toFitDistance,
 };
 
 export { activity };
