@@ -1,4 +1,5 @@
 let workouts = [
+
         `<workout_file>
     <author>Marinov</author>
     <name>Dijon</name>
@@ -278,6 +279,23 @@ let workouts = [
         <Warmup Duration="600" PowerLow="0.30" PowerHigh="0.5"/>
         <SteadyState Duration="2400" Power="0.5"/>
         <Cooldown Duration="600" PowerLow="0.5" PowerHigh="0.30"/>
+    </workout>
+</workout_file>`,
+`<workout_file>
+    <author>Marinov</author>
+    <name>Blackcurrant+1</name>
+    <category>Recovery</category>
+    <description></description>
+    <sportType>bike</sportType>
+    <tags>
+    </tags>
+    <workout>
+        <Warmup Duration="240" PowerLow="0.32" PowerHigh="0.60"/>
+        <SteadyState Duration="60" Power="0.60"/>
+        <SteadyState Duration="60" Power="0.70"/>
+        <SteadyState Duration="60" Power="0.50"/>
+        <IntervalsT Repeat="10" OnDuration="120" OffDuration="120" OnPower="0.58" OffPower="0.53"/>
+        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.32"/>
     </workout>
 </workout_file>`,
 `<workout_file>

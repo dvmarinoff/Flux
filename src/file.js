@@ -11,7 +11,6 @@ class FileHandler {
 
         return new Promise((resolve, reject) => {
             reader.onload = function(event) {
-                console.log(reader.result);
                 return resolve(reader.result);
             };
             reader.onerror = function(event) {
@@ -26,7 +25,6 @@ class FileHandler {
 
         return new Promise((resolve, reject) => {
             reader.onload = function(event) {
-                console.log(reader.result);
                 return resolve(reader.result);
             };
             reader.onerror = function(event) {

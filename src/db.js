@@ -116,6 +116,7 @@ xf.reg('altitude', (altitude, db) => {
 });
 
 xf.reg('distance', (distance, db) => {
+    if(!equals(db.watchStatus, 'started')) return;
     db.distance = distance;
 });
 

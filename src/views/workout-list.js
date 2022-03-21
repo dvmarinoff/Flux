@@ -1,6 +1,6 @@
-import { xf, empty, equals } from '../functions.js';
+import { xf, exists, empty, equals } from '../functions.js';
 import { models } from '../models/models.js';
-import { intervalsToGraph } from './workout-graph.js';
+import { intervalsToGraph, courseToGraph } from './workout-graph.js';
 
 const radioOff = `
         <svg class="radio radio-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
@@ -23,7 +23,7 @@ function workoutTemplate(workout) {
         duration = `${Math.round(workout.meta.duration / 60)} min`;
     }
     if(workout.meta.distance) {
-        duration = `${Math.round(workout.meta.distance) / 1000} km`;
+        duration = `${(workout.meta.distance / 1000).toFixed(2)} km`;
     }
     return `<li is="workout-item" class='workout cf' id="${workout.id}" metric="ftp">
                 <div class="workout--short-info">
@@ -79,11 +79,18 @@ class WorkoutList extends HTMLUListElement {
             this.render();
         // }
     }
-    stateToHtml (state, metric, selectedWorkout) {
+    stateToHtml(state, metric, selectedWorkout) {
         const self = this;
         const viewPort = {height: 118, width: self.getWidth(), aspectRatio: self.getWidth() / 118 };
         return state.reduce((acc, workout, i) => {
-            const graph = intervalsToGraph(workout.intervals, metric, viewPort);
+            let graph = '';
+
+            if(exists(workout.intervals)) {
+                graph = intervalsToGraph(workout.intervals, metric, viewPort);
+            } else {
+                graph = courseToGraph(workout, viewPort);
+            }
+
             const selected = equals(workout.id, selectedWorkout.id);
             workout = Object.assign(workout, {graph: graph, selected: selected});
             return acc + workoutTemplate(workout);

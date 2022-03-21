@@ -21,3 +21,4 @@ function Course() {
         start,
     });
 }
+

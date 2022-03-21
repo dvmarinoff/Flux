@@ -69,27 +69,30 @@ class Watch {
     startWorkout() {
         const self         = this;
 
+
         let intervalTime = 0;
         let stepTime     = 0;
 
-        if(exists(self.intervals[0].duration)) {
-            intervalTime = self.intervals[0].duration ?? 0;
-            stepTime     = self.intervals[0].steps[0].duration ?? 0;
+        if(exists(self.intervals)) {
+            intervalTime = self.intervals[0]?.duration ?? 0;
+            stepTime     = self.intervals[0]?.steps[0].duration ?? 0;
+
+            xf.dispatch('watch:intervalIndex',  0);
+            xf.dispatch('watch:stepIndex', 0);
+
+            xf.dispatch('workout:started');
+
+            xf.dispatch('watch:intervalDuration', intervalTime);
+            xf.dispatch('watch:stepDuration',     stepTime);
+            xf.dispatch('watch:lapTime',          intervalTime);
+            xf.dispatch('watch:stepTime',         stepTime);
         }
 
-        if(exists(self.intervals[0].distance)) {
+        if(exists(self.points)) {
             self.intervalType = 'distance';
         }
 
-        xf.dispatch('workout:started');
-
-        xf.dispatch('watch:intervalDuration', intervalTime);
-        xf.dispatch('watch:stepDuration',     stepTime);
-        xf.dispatch('watch:lapTime',          intervalTime);
-        xf.dispatch('watch:stepTime',         stepTime);
-
-        xf.dispatch('watch:intervalIndex',  0);
-        xf.dispatch('watch:stepIndex', 0);
+        console.log(self);
 
         if(!self.isStarted()) {
             self.start();
@@ -159,6 +162,7 @@ class Watch {
         if(self.isWorkoutStarted() &&
            (stepTime <= 0) &&
             this.isIntervalType('duration')) {
+
             self.step();
         }
     }

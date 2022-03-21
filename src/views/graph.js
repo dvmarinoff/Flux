@@ -109,9 +109,78 @@ function simplify(points, tolerance, highestQuality) {
     return points;
 }
 
+
+//
+function slopeToColor(slope) {
+    // avg hex
+    const colors = new Map([
+        ['-40',   '#328AFF'],
+        ['-17.5', '#3690EA'],
+        ['-15',   '#3B97D5'],
+        ['-12.5', '#3F9EC0'],
+        ['-10',   '#44A5AB'],
+        ['-7.5',  '#48AB96'],
+        ['-5',    '#4DB281'],
+        ['-2.5',  '#52B96C'],
+        ['0',     '#57C057'],
+        ['2.5',   '#68AC4E'],
+        ['5',     '#799845'],
+        ['7.5',   '#8A843C'],
+        ['10',    '#9B7134'],
+        ['12.5',  '#B36129'],
+        ['15',    '#CC521F'],
+        ['17.5',  '#E54315'],
+        ['40',    '#FE340B'],
+    ]);
+
+    for(var [key, value] of colors) {
+        if(slope <= parseFloat(key)) {
+            return value;
+        }
+    }
+    // end avg hex
+
+    // base hue
+    // const baseHue = 120;
+    // const hue = baseHue - (slope * 12);
+
+    // return `hsl(${hue}, 45%, 55%)`;
+    // end base hue
+}
+
+function gradeToDeg(grade) {
+    // 10 % = 5.71 deg, 5% = 2.86
+    return 180/Math.PI * Math.atan(grade/100);
+}
+
+function slopeToRise(slope, distance) {
+    return distance * Math.sin(Math.atan(slope/100));
+}
+
+function slopeToRun(slope, distance) {
+    return distance * Math.cos(Math.atan(slope/100));
+}
+
+function adjacent(deg, r) {
+    return r * Math.cos(Math.PI/180 * deg);
+}
+
+function opposite(deg, r) {
+    return r * Math.sin(Math.PI/180 * deg);
+}
+
+
+
 const g = {
     simplifyDouglasPeucker,
     simplify,
+
+    slopeToColor,
+    gradeToDeg,
+    slopeToRise,
+    slopeToRun,
+    adjacent,
+    opposite,
 };
 
 export { g };
