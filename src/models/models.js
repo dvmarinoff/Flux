@@ -852,6 +852,7 @@ class VirtualState extends MetaProp {
     onUpdate(power, db) {
         if(!equals(this.source, this.prop)) return;
 
+        // Take into acount the pauses
         const now = Date.now();
         const dt  = (now - this.lastUpdate) / 1000;
         this.lastUpdate = now;

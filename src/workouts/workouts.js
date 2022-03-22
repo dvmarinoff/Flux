@@ -1,5 +1,4 @@
 let workouts = [
-
         `<workout_file>
     <author>Marinov</author>
     <name>Dijon</name>

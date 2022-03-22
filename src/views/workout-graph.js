@@ -78,10 +78,11 @@ class WorkoutGraph extends HTMLElement {
         this.abortController = new AbortController();
         this.signal = { signal: self.abortController.signal };
 
-        xf.sub(`db:workout`, this.onUpdate.bind(this), this.signal);
+        xf.sub(`db:workout`, this.onWorkout.bind(this), this.signal);
         xf.sub(`db:ftp`, this.onFTP.bind(this), this.signal);
 
         xf.sub('db:intervalIndex', this.onIntervalIndex.bind(this), this.signal);
+        xf.sub('db:distance', this.onDistance.bind(this), this.signal);
 
         this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
         this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
@@ -133,16 +134,34 @@ class WorkoutGraph extends HTMLElement {
     onMouseOut(e) {
         this.dom.info.style.display = 'none';
     }
-    onUpdate(value) {
+    onWorkout(value) {
+        if(exists(value.intervals)) {
+            this.type = 'workout';
+        }
+        if(exists(value.points)) {
+            this.type = 'course';
+        }
+        // this.workout = Object.assign({}, value);
         this.workout = value;
-        if(value.intervals) this.type = 'workout';
-        if(value.points)    this.type = 'course';
         this.render();
     }
     onIntervalIndex(index) {
         const self = this;
         this.index = index;
         this.progress({index: self.index, dom: self.dom, parent: self,});
+    }
+    onDistance(distance) {
+        const self = this;
+        if(exists(this.workout?.points)) {
+            const totalDistance = this.workout.meta.distance;
+            const $dom = self.dom;
+            const $parent = self;
+            const left = translate(distance, 0, totalDistance, 0, window.innerWidth);
+            $dom.active.style.left   = `${left % window.innerWidth}px`;
+            $dom.active.style.width  = `2px`;
+            $dom.active.style.height = `${$parent.getBoundingClientRect().height}px`;
+        }
+        return;
     }
     progress(args = {}) {
         const index   = args.index ?? 0;
@@ -175,6 +194,9 @@ class WorkoutGraph extends HTMLElement {
         if(equals(this.type, 'course')) {
             this.innerHTML = progress +
                 courseToGraph(this.workout, this.viewPort);
+
+            this.dom.progress  = this.querySelector('#progress');
+            this.dom.active = this.querySelector('#progress-active');
         }
     }
     renderInfo(args = {}) {
@@ -217,7 +239,6 @@ function scale(value, max = 100) {
 
 function courseToGraph(course, viewPort) {
     const altitudeSpec   = Segment(course.points, 'y');
-    course.points = g.simplify(course.points, 0.5, true);
 
     const distanceTotal = course.meta.distance;
     const aspectRatio   = viewPort.aspectRatio;
@@ -231,7 +252,7 @@ function courseToGraph(course, viewPort) {
 
     // console.table({distanceTotal, yMax, aspectRatio, yScale, flatness, altitudeScale, altitudeSpec});
 
-    const track = course.points.reduce((acc, p, i, xs) => {
+    const track = course.pointsSimplified.reduce((acc, p, i, xs) => {
         const color = g.slopeToColor(p.slope);
 
         const px1 = p.x;

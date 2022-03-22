@@ -3,10 +3,26 @@ import { fit } from './fit.js';
 import { fields } from './fields.js';
 import { appTypes } from './profiles.js';
 import { localMessageDefinitions as lmd } from './local-message-definitions.js';
+import { g } from '../views/graph.js';
 
 
 
 function toCourse(points, distance, name) {
+    const pointsSimplified = g.simplify(points, 0.5, true).map((p, i, xs) => {
+        const x1 = xs[i].x;
+        const y1 = xs[i].y;
+        const x2 = (xs[i+1]?.x ?? xs[i].x);
+        const y2 = (xs[i+1]?.y ?? xs[i].y);
+        const run = x2 - x1;
+        const rise = y2 - y1;
+        const r = Math.sqrt(run**2 + rise**2);
+        const slope = equals(run, 0) ? 0 : (100 * (rise/run));
+        // console.table({rise,run,slope,r});
+        xs[i].r = r;
+        xs[i].slope = slope;
+        return xs[i];
+    });
+
     return {
         meta: {
             name: name ?? 'Course',
@@ -17,6 +33,7 @@ function toCourse(points, distance, name) {
         },
         id: 0,
         points,
+        pointsSimplified,
     };
 }
 
@@ -33,8 +50,6 @@ function read(view) {
 
     let distanceTotal = 0;
     let x = 0;
-
-    console.log(course);
 
     const points = course.reduce((acc, m, i, xs) => {
         if(isDataRecord(m)) {

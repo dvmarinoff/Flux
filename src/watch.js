@@ -92,8 +92,6 @@ class Watch {
             self.intervalType = 'distance';
         }
 
-        console.log(self);
-
         if(!self.isStarted()) {
             self.start();
         }

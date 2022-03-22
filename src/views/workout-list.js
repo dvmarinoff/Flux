@@ -43,50 +43,54 @@ class WorkoutList extends HTMLUListElement {
     constructor() {
         super();
         this.state = [];
-        this.metric = 0;
+        this.ftp = 0;
         this.items = [];
         this.postInit();
         this.workout = {};
     }
     postInit() { return; }
     connectedCallback() {
-        this.prop = this.getAttribute('prop');
-        this.metricProp = this.getAttribute('metric');
-        xf.sub(`db:${this.prop}`, this.onUpdate.bind(this));
-        xf.sub(`db:${this.metricProp}`, this.onMetric.bind(this));
-        xf.sub('db:workout', this.onWorkout.bind(this));
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
+        xf.sub(`db:workouts`, this.onWorkouts.bind(this), this.signal);
+        xf.sub('db:workout',  this.onWorkout.bind(this), this.signal); // ?
+        xf.sub(`db:ftp`,      this.onFTP.bind(this), this.signal);
     }
     disconnectedCallback() {
-        document.removeEventListener(`db:${this.prop}`, this.onUpdate);
+        this.abortController.abort();
     }
     getWidth() {
         return window.innerWidth;
     }
-    onWorkout(workout) {
-        this.workout = workout;
+    onWorkout(value) {
+        this.workout = value;
     }
-    onMetric(value) {
-        if(!equals(value, this.metric)) {
-            this.metric = value;
+    onFTP(value) {
+        if(!equals(value, this.ftp)) {
+            this.ftp = value;
             if(!empty(this.state)) {
                 this.render();
             }
         }
     }
-    onUpdate(value) {
-        // if(!equals(value, this.state)) {
-            this.state = value;
-            this.render();
-        // }
+    onWorkouts(value) {
+        this.state = value;
+        this.render();
     }
-    stateToHtml(state, metric, selectedWorkout) {
+    stateToHtml(state, ftp, selectedWorkout) {
         const self = this;
-        const viewPort = {height: 118, width: self.getWidth(), aspectRatio: self.getWidth() / 118 };
+        const viewPort = {
+            height: 118, // ?
+            width: self.getWidth(),
+            aspectRatio: self.getWidth() / 118
+        };
         return state.reduce((acc, workout, i) => {
             let graph = '';
 
             if(exists(workout.intervals)) {
-                graph = intervalsToGraph(workout.intervals, metric, viewPort);
+                graph = intervalsToGraph(workout.intervals, ftp, viewPort);
             } else {
                 graph = courseToGraph(workout, viewPort);
             }
@@ -97,7 +101,7 @@ class WorkoutList extends HTMLUListElement {
         }, '');
     }
     render() {
-        this.innerHTML = this.stateToHtml(this.state, this.metric, this.workout);
+        this.innerHTML = this.stateToHtml(this.state, this.ftp, this.workout);
     }
 }
 
