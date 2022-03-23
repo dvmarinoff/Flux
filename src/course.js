@@ -39,9 +39,6 @@ function Course() {
         }
     }
     function onWorkout(workout) {
-        // console.log(workout?.points?.length);
-        // console.log(workout?.points);
-        // console.log(workout?.pointsSimplified);
         course = workout;
     }
     function onWatchStart() {

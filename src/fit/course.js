@@ -7,7 +7,7 @@ import { g } from '../views/graph.js';
 
 
 
-function toCourse(points, distance, name) {
+function toCourse(points, distance, name, description) {
     const pointsSimplified = g.simplify(points, 0.5, true).map((p, i, xs) => {
         const x1 = xs[i].x;
         const y1 = xs[i].y;
@@ -17,7 +17,6 @@ function toCourse(points, distance, name) {
         const rise = y2 - y1;
         const r = Math.sqrt(run**2 + rise**2);
         const slope = equals(run, 0) ? 0 : (100 * (rise/run));
-        // console.table({rise,run,slope,r});
         xs[i].r = r;
         xs[i].slope = slope;
         return xs[i];
@@ -28,10 +27,10 @@ function toCourse(points, distance, name) {
             name: name ?? 'Course',
             author: 'n/a',
             category: 'Course',
-            discription: '',
+            description: description,
             distance,
         },
-        id: 0,
+        // id: 0,
         points,
         pointsSimplified,
     };
@@ -41,11 +40,21 @@ function isDataRecord(x) {
     return equals(x.type, 'data') && equals(x.message, 'record');
 }
 
-function read(view) {
+function isCourseDataMessage(x) {
+    return equals(x.type, 'data') && equals(x.message, 'course');
+}
+
+function courseName(course, fileName) {
+    const courseDataMessage = course.find(isCourseDataMessage);
+    const name = courseDataMessage?.fields?.name ?? fileName;
+    return name.replace(/.fit/gi, '').replace(/_|-/gi, ' ');
+}
+
+function read(view, fileName) {
     const course = fit.activity.read(view);
 
-    const author      = `n/a`;
-    const name        = `Course Name`;
+    const name = courseName(course, fileName);
+    const author = `n/a`;
     const description = ``;
 
     let distanceTotal = 0;
@@ -73,7 +82,7 @@ function read(view) {
         return acc;
     }, []);
 
-    return toCourse(points, distanceTotal);
+    return toCourse(points, distanceTotal, name, description);
 }
 
 const course = {

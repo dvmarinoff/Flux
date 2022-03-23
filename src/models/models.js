@@ -408,13 +408,13 @@ class Workout extends Model {
     }
     async readFromFile(file) {
         const result = await fileHandler.read(file);
-        return result;
+        return {result, name: file.name};
     }
-    parse(result) {
+    parse(result, name = '') {
         if(isArray(result) || isObject(result)) {
             const view = new DataView(result);
-            result = course.read(view);
-            return result;
+            const courseJS = course.read(view, name);
+            return courseJS;
         }
         return zwo.readToInterval(result);
     }

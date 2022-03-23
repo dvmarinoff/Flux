@@ -296,7 +296,17 @@ function Data() {
         let fields = {};
 
         definition.fields.forEach((fieldDef) => {
-            let value = view[typeToAccessor(fieldDef.base_type, 'get')](index, endian);
+            let value;
+            if(equals(fieldDef.base_type, 7)) {
+                value = '';
+                for(let i=0; i < fieldDef.size; i++) {
+                    value += String.fromCharCode(view.getUint8(index+i, endian));
+                }
+                value = value.replace(/\x00/gi, '');
+            } else {
+                value = view[typeToAccessor(fieldDef.base_type, 'get')](index, endian);
+            }
+
             fields[fieldDef.field] = value;
             index += fieldDef.size;
         });
