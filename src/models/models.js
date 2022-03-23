@@ -838,9 +838,10 @@ class VirtualState extends MetaProp {
         };
     }
     subs() {
-        xf.reg(`${this.prop}`, this.onUpdate.bind(this), this.signal);
-        xf.sub(`db:sources`, this.onSources.bind(this), this.signal);
-        xf.sub(`db:weight`, this.onWeight.bind(this), this.signal);
+        xf.reg(`${this.prop}`,  this.onUpdate.bind(this), this.signal);
+        xf.sub(`db:sources`,    this.onSources.bind(this), this.signal);
+        xf.sub(`db:weight`,     this.onWeight.bind(this), this.signal);
+        xf.sub('watch:started', this.onStarted.bind(this), this.signal);
     }
     onSources(sources) {
         this.source = sources.virtualState;
@@ -848,6 +849,9 @@ class VirtualState extends MetaProp {
     onWeight(weight) {
         this.riderWeight = weight;
         this.systemWeight = this.riderWeight + this.equipmentWeight;
+    }
+    onStarted() {
+        this.lastUpdate = Date.now();
     }
     onUpdate(power, db) {
         if(!equals(this.source, this.prop)) return;
