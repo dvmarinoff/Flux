@@ -669,7 +669,7 @@ body.dark-theme {
     position: relative;
     height: var(--graph-total-height);
     width: 100%;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 div.graph--bar-group {

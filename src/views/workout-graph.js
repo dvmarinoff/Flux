@@ -273,7 +273,7 @@ function courseToGraph(course, viewPort) {
 
     }, ``);
 
-    return `<svg class="graph--bar-group" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height+(viewBox.height)}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
+    return `<svg class="graph--bar-group" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
 }
 
 export {
