@@ -55,7 +55,7 @@ function FileHeader(args = {}) {
         const profileVersionCode  = view.getUint16(2, true);
         const dataRecordsLength   = view.getInt32( 4, true);
         const fileType            = readFileType(view);
-        const crc                 = (length === defaultSize) ? view.getUint16(crcIndex(length), true) : false;
+        const crc                 = equals(length, defaultSize) ? view.getUint16(crcIndex(length), true) : false;
 
         const protocolVersion = readProtocolVersion(protocolVersionCode);
         const profileVersion  = readProfileVersion(profileVersionCode);
@@ -67,20 +67,20 @@ function FileHeader(args = {}) {
             dataRecordsLength,
             fileType,
             crc,
-            length
+            length,
         };
     };
 
     function encode(args) {
-        const length            = args.length || defaultSize;
-        const dataRecordsLength = args.dataRecordsLength || 0;                // without header and crc
+        const length            = args.length ?? defaultSize;
+        const dataRecordsLength = args.dataRecordsLength ?? 0;                // without header and crc
         const protocolVersion   = writeProtocolVersion(args.protocolVersion); // 16 v1, 32 v2
         const profileVersion    = writeProfileVersion(args.profileVersion);   // v21.40
         const dataTypeByte      = [46, 70, 73, 84];                           // ASCII values for ".FIT"
         let crc                 = 0x0000; // default value for optional crc of the header of bytes 0-11
 
-        let buffer   = new ArrayBuffer(length);
-        let view     = new DataView(buffer);
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
 
         view.setUint8( 0, length,            true);
         view.setUint8( 1, protocolVersion,   true);
@@ -93,7 +93,9 @@ function FileHeader(args = {}) {
 
         crc = calculateCRC(new Uint8Array(view.buffer), 0, crcIndex(length));
 
-        if(length === defaultSize) view.setUint16(crcIndex(length), crc, true);
+        if(equals(length, defaultSize)) {
+            view.setUint16(crcIndex(length), crc, true);
+        }
 
         return new Uint8Array(buffer);
     };
@@ -145,13 +147,12 @@ function Definition(args = {}) {
     const type               = 'definition';
 
     function numberToMessage(number) {
-        let res = Object.entries(messages)
-                        .filter(x => equals(x[1].global_number, number))[0];
+        let res = first(Object.entries(messages)
+                              .filter(x => equals(x[1].global_number, number))[0]);
         if(isUndefined(res)) {
             console.warn(`unkown definition message with global number ${number}`);
-            return `message_${number}`;
         };
-        return first(res);
+        return res ?? `message_${number}`;
     }
 
     function messageToNumber(message) {
@@ -232,9 +233,9 @@ function FieldDefinition(args = {}) {
             console.warn(`custom field number ${number} on message ${message}`);
             return `field_${number}`;
         }
-        const res = Object.entries(messageFields)
-                          .filter(x => x[1].number === number)[0];
-        return first(res);
+        const res = first(Object.entries(messageFields)
+                                .filter(x => equals(x[1].number, number))[0]);
+        return res ?? `field_${number}`;
     }
 
     function read(view, messageName) {
@@ -367,21 +368,24 @@ function Activity() {
         let offset = 0;
 
         activity.forEach((msg) => {
-            if(msg.type === 'header') {
+            if(equals(msg.type, 'header')) {
                 const encoded = fit.fileHeader.encode(
-                    Object.assign(msg, {dataRecordsLength: dataRecordsLength}));
+                    Object.assign(msg, {dataRecordsLength,})
+                );
                 uint8.set(encoded, offset);
-                offset+= encoded.byteLength;
+                offset += encoded.byteLength;
             }
-            if(msg.type === 'definition') {
+            if(equals(msg.type, 'definition')) {
                 const encoded = fit.definition.encode(msg);
                 uint8.set(encoded, offset);
-                offset+= encoded.byteLength;
+                offset += encoded.byteLength;
             }
-            if(msg.type === 'data') {
-                const encoded = fit.data.encode(definitions[msg.local_number], msg.fields);
+            if(equals(msg.type, 'data')) {
+                const encoded = fit.data.encode(
+                    definitions[msg.local_number], msg.fields
+                );
                 uint8.set(encoded, offset);
-                offset+= encoded.byteLength;
+                offset += encoded.byteLength;
             }
         });
 
@@ -403,15 +407,16 @@ function Activity() {
         let definition  = {};
 
         function isLastMessage(header, i) {
-            if(header.local_number in definitions) {
-                let definition = definitions[header.local_number];
-                return (i > (fileLength - definition.data_msg_length));
-            }
+            // this handles broken files, but fails with wrongly set local numbers (RGT)
+            // if(header.local_number in definitions) {
+            //     let definition = definitions[header.local_number];
+            //     return (i > (fileLength - definition?.data_msg_length ?? 0));
+            // }
             return (i >= (fileLength - 2));
         }
 
         function isCRC(i) {
-            return (fileLength - i) === crcLength;
+            return equals(fileLength - i, crcLength);
         }
 
         function getLocalDefinition(local_number) {
@@ -487,19 +492,21 @@ function Summary() {
         acc.speed.avg     += record.fields.speed / length;
         acc.heartRate.avg += record.fields.heart_rate / length;
 
-        if(record.fields.power      > acc.power.max)     acc.power.max     = record.fields.power;
-        if(record.fields.cadence    > acc.cadence.max)   acc.cadence.max   = record.fields.cadence;
-        if(record.fields.speed      > acc.speed.max)     acc.speed.max     = record.fields.speed;
+        if(record.fields.power > acc.power.max) acc.power.max = record.fields.power;
+        if(record.fields.cadence > acc.cadence.max) acc.cadence.max = record.fields.cadence;
+        if(record.fields.speed > acc.speed.max) acc.speed.max = record.fields.speed;
         if(record.fields.heart_rate > acc.heartRate.max) acc.heartRate.max = record.fields.heart_rate;
 
         return acc;
     }
 
     function accumulations(dataRecords) {
-        let init = {power:     {avg: 0, max: 0},
-                    cadence:   {avg: 0, max: 0},
-                    speed:     {avg: 0, max: 0},
-                    heartRate: {avg: 0, max: 0}};
+        let init = {
+            power:     {avg: 0, max: 0},
+            cadence:   {avg: 0, max: 0},
+            speed:     {avg: 0, max: 0},
+            heartRate: {avg: 0, max: 0}
+        };
 
         return map(dataRecords.reduce(accumulate, init), format);
     }
@@ -510,12 +517,15 @@ function Summary() {
         let res = accumulations(dataRecords);
 
         if(empty(dataRecords)) {
-            const file_id = activity.filter(m => m.type === 'data' && m.message === 'file_id')[0];
+            const file_id = first(activity.filter(m => {
+                return equals(m.type, 'data') && equals(m.message, 'file_id');
+            }));
             return Object.assign(res, {
-                distance: 0,
+                distance:  0,
                 timeStart: file_id.fields.timecreated,
-                timeEnd: file_id.fields.timecreated,
-                elapsed: 0});
+                timeEnd:   file_id.fields.timecreated,
+                elapsed:   0,
+            });
         }
 
         res.distance  = last(dataRecords).fields.distance;

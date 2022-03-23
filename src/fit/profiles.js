@@ -175,7 +175,14 @@ const messages = {
             name:          {number:   6, base_type: 7},   // string
             favorite:      {number:   8, base_type: 0},   // bool
         }
-    }
+    },
+    file_creator: {
+        global_number: 49,
+        fields: {
+            software_version: {number: 0, base_type: 132}, // uint16
+            hardware_version: {number: 1, base_type: 1},   // uint8
+        },
+    },
 };
 
 // uint8 2, uint16 132, uint32 134, sint8 1, sint16 131, sint32 133, enum 0, string 7, byte: 13

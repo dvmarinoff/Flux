@@ -51,24 +51,25 @@ function read(view) {
     let distanceTotal = 0;
     let x = 0;
 
-    const points = course.reduce((acc, m, i, xs) => {
-        if(isDataRecord(m)) {
-            const altitude     = fields.altitude.decode(m.fields.altitude);
-            const altitudeNext = fields.altitude.decode(course[i+1]?.fields?.altitude ??
-                                                        m.fields.altitude);
+    const dataRecords = course.filter(isDataRecord);
+    const points = dataRecords.reduce((acc, m, i, xs) => {
+        const altitude     = fields.altitude.decode(m.fields.altitude);
+        const altitudeNext = fields.altitude.decode(xs[i+1]?.fields?.altitude ??
+                                                    m.fields.altitude);
 
-            const distance = fields.distance.decode(m.fields.distance);
-            const distanceNext = fields.distance.decode(course[i+1]?.fields?.distance ??
-                                                        m.fields.distance);
-            const rise  = altitudeNext - altitude;
-            const r     = distanceNext - distance;
-            const run   = Math.sqrt(r**2 - rise**2);
-            const slope = equals(run, 0) ? 0 : 100 * (rise/run);
+        const distance = fields.distance.decode(m.fields.distance);
+        const distanceNext = fields.distance.decode(xs[i+1]?.fields?.distance ??
+                                                    m.fields.distance);
 
-            acc.push({x, y: altitude, r, slope, distance,});
-            x += run;
-            distanceTotal = distance;
-        }
+
+        const rise  = altitudeNext - altitude;
+        const r     = distanceNext - distance;
+        const run   = equals(r, 0) ? 0 : Math.sqrt(Math.abs(r**2 - rise**2));
+        const slope = equals(run, 0) ? 0 : 100 * (rise/run);
+
+        acc.push({x, y: altitude, r, slope, distance,});
+        x += run;
+        distanceTotal = distance;
         return acc;
     }, []);
 
