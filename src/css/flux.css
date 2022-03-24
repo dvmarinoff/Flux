@@ -1002,6 +1002,8 @@ div.graph--bar-group {
     display: block;
     margin: 0 0.8em;
     float: left;
+    text-align: left;
+    max-width: 50%;
 }
 
 #watch-pause, #watch-lap, #watch-stop, #activity-save {
