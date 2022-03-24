@@ -51,10 +51,11 @@
                                 <h2 class="data-tile--heading">Power</h2>
                                 <div class="data-tile--value-cont">
                                     <power-value id=power-value"
-                                                 class="data-tile--value">--</power-value>
-
+                                                 class="data-tile--value"
+                                                 prop="db:power1s">--</power-value>
                                 </div>
                             </div>
+
                             <div class="data-tile" id="data-tile--interval-time">
                                 <h2 class="data-tile--heading">Interval Time</h2>
                                 <div class="data-tile--value-cont">
@@ -71,15 +72,7 @@
                             </div>
 
                             <div class="data-tile--small wide" id="data-tile--speed">
-                                <!-- <h2 class="data-tile-small--heading">Speed</h2>
-                                     <div class="data-tile-small--value-cont">
-                                     <speed-value id="speed-value"
-                                     class="data-tile-small--value">--</speed-value>
-                                     </div> -->
-                                <!-- <speed-virtual id="distance-value"
-                                     class="data-tile-small--value">--</speed-virtual> -->
                                 <h2 class="data-tile-small--heading">Speed</h2>
-
                                     <speed-switch id="distance-value"
                                                   class="data-tile-small--value">--</speed-switch>
                             </div>
@@ -94,9 +87,15 @@
                             <div class="data-tile" id="data-tile--target">
                                 <h2 class="data-tile--heading">Target</h2>
                                 <div class="data-tile--value-cont">
-                                    <power-target id=power-target-value"
-                                                  class="data-tile--value">--</power-target>
+                                    <power-target-group class="data-tile--value-cont complex">
+                                        <power-target id=power-target-value"
+                                                      class="data-tile--value">--</power-target>
+                                        <power-target-ftp id="power-target-ftp"
+                                                         class="data-tile-target--value" ></power-ftp-value>
+                                    </power-target-group>
                                 </div>
+
+
                             </div>
                             <div class="data-tile" id="data-tile--elapsed-time">
                                 <h2 class="data-tile--heading">Elapsed Time</h2>

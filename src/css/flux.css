@@ -534,6 +534,7 @@ body.dark-theme {
 }
 #data-tile--target {
     grid-area: 2 / 1 / 2 / 3;
+    cursor: pointer;
 }
 #data-tile--elapsed-time {
     grid-area: 2 / 3 / 2 / 5;
@@ -652,11 +653,14 @@ body.dark-theme {
 }
 
 .data-tile-target--value {
+    display: none;
     width: 0;
 }
 .data-tile-target--value.active {
+    display: block;
     font-size: 1.6em;
-    width: 1.5em;
+    width: auto;
+    min-width: 1.5em;
 }
 
 /* Graphs */
@@ -670,6 +674,9 @@ body.dark-theme {
     height: var(--graph-total-height);
     width: 100%;
     /* overflow: hidden; */
+}
+#graph-power {
+    overflow: hidden;
 }
 
 div.graph--bar-group {

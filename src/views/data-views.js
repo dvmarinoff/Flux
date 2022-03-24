@@ -327,6 +327,65 @@ class PowerTarget extends DataView {
     }
 }
 
+class PowerTargetFTP extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:powerTarget',
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        xf.sub(`db:ftp`,       this.onFTP.bind(this), this.signal);
+    }
+    onFTP(ftp) {
+        this.ftp = ftp;
+    }
+    toPercentage(state, ftp) {
+        return Math.round((state * 100) / ftp);
+    }
+    transform(state) {
+        return `${this.toPercentage(state, this.ftp)}%`;
+    }
+}
+
+customElements.define('power-target-ftp', PowerTargetFTP);
+
+class PowerTargetGroup extends DataView {
+    getDefaults() {
+        return {
+            prop: '',
+            state: '',
+        };
+    }
+    subs() {
+        this.addEventListener(`pointerup`, this.onPointerup.bind(this), this.signal);
+    }
+    onPointerup() {
+        if(equals(this.state, 'active')) {
+            this.state = '';
+            this.render();
+        } else {
+            this.state = 'active';
+            this.render();
+        }
+    }
+    config() {
+        this.$main = this.querySelector('power-target');
+        this.$aux = this.querySelector('power-target-ftp');
+    }
+    render() {
+        if(equals(this.state, 'active')) {
+            this.$main.classList.add('active');
+            this.$aux.classList.add('active');
+        } else {
+            this.$main.classList.remove('active');
+            this.$aux.classList.remove('active');
+        }
+    }
+}
+
+customElements.define('power-target-group', PowerTargetGroup);
+
 customElements.define('power-target', PowerTarget);
 
 class SlopeTarget extends DataView {
