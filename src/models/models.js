@@ -519,6 +519,11 @@ function Session(args = {}) {
             watchStatus: db.watchStatus,
             workoutStatus: db.workoutStatus,
 
+            // Course
+            courseIndex: db.courseIndex,
+            speedVirtual: db.speedVirtual,
+            speed: db.speed,
+
             // Recording
             records: db.records,
             laps: db.laps,

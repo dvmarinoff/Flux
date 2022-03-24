@@ -65,6 +65,9 @@ let db = {
     watchStatus: 'stopped',
     workoutStatus: 'stopped',
 
+    // Course
+    courseIndex: 0,
+
     // Request ANT+ Device
     antSearchList: [],
     antDeviceId: {},
@@ -214,7 +217,6 @@ xf.reg('ui:workout:upload', async function(file, db) {
     const { result, name } = await models.workout.readFromFile(file);
     const workout = models.workout.parse(result, name);
     models.workouts.add(db.workouts, workout);
-    console.log(workout);
     xf.dispatch('db:workouts', db);
 });
 xf.reg('ui:activity:save', (_, db) => {
@@ -233,6 +235,11 @@ xf.reg('activity:save:success', (e, db) => {
     db.resistanceTarget = 0;
     db.slopeTarget = 0;
     db.powerTarget = 0;
+});
+
+xf.reg('course:index', (index, db) => {
+    db.courseIndex = index;
+    console.log(`course:index ${index}`);
 });
 
 // Wake Lock
