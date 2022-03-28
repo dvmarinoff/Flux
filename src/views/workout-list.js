@@ -33,7 +33,7 @@ function workoutTemplate(workout) {
                     <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
                 </div>
                 <div class="workout--full-info">
-                    <div class="workout--graph-cont">${workout.graph}</div>
+                    <div class="workout-list--graph-cont">${workout.graph}</div>
                     <div class="workout--description">${workout.meta.description}</div>
                 </div>
             </li>`;
@@ -79,18 +79,35 @@ class WorkoutList extends HTMLUListElement {
         this.state = value;
         this.render();
     }
+    getViewPort() {
+        const self = this;
+
+        const $el = document.querySelector('#workouts-page');
+        const fontSize = parseInt(window.getComputedStyle($el).getPropertyValue('font-size'));
+        const em = 8;
+
+        const width = self.getWidth();
+        const height = fontSize * em;
+        const aspectRatio = width / height;
+
+
+        return {
+            height,
+            width,
+            aspectRatio,
+        };
+    }
     stateToHtml(state, ftp, selectedWorkout) {
         const self = this;
-        const viewPort = {
-            height: 118, // ?
-            width: self.getWidth(),
-            aspectRatio: self.getWidth() / 118
-        };
+        const viewPort = this.getViewPort();
+
+        console.log(viewPort);
+
         return state.reduce((acc, workout, i) => {
             let graph = '';
 
             if(exists(workout.intervals)) {
-                graph = intervalsToGraph(workout.intervals, ftp, viewPort);
+                graph = intervalsToGraph(workout, ftp, viewPort);
             } else {
                 graph = courseToGraph(workout, viewPort);
             }

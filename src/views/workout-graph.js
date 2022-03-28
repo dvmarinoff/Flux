@@ -1,54 +1,68 @@
-import { xf, exists, existance, equals } from '../functions.js';
+import { xf, exists, existance, equals, clamp } from '../functions.js';
 import { formatTime, translate } from '../utils.js';
 import { models } from '../models/models.js';
 import { g } from './graph.js';
 
-function Interval(acc, interval, width, ftp, scaleMax) {
-    const stepsCount = interval.steps.length;
-
-    return acc + interval.steps.reduce((a, step) => {
-        const power    = existance(models.ftp.toAbsolute(step.power, ftp), 0);
-        const cadence  = step.cadence;
-        const slope    = step.slope;
-        const duration = step.duration;
-
-        const width    = 100 / stepsCount;
-        const height   = scale(equals(power, 0) ? 80 : power, scaleMax); // ??
-
-        const zone     = (models.ftp.powerToZone(power, ftp)).name;
-        const infoTime = formatTime({value: duration, format: 'mm:ss'});
-
-
-        const powerAttr    = exists(power) ? `power="${power}"` : '';
-        const cadenceAttr  = exists(cadence) ? `cadence="${cadence}"` : '';
-        const slopeAttr    = exists(slope) ? `slope="${slope}"` : '';
-        const durationAttr = exists(duration) ? `duration="${infoTime}"` : '';
-
-        return a +
-            `<div class="graph--bar zone-${zone}" style="height: ${height}%; width: ${width}%" ${powerAttr} ${cadenceAttr} ${slopeAttr} ${durationAttr}></div>`;
-    }, `<div class="graph--bar-group" style="width: ${width}px">`) + `</div>`;
+function powerToHeight(power, powerMax, viewPort) {
+    const height = translate(power, 0, powerMax, 0, viewPort.height * 0.90);
+    if(height < (viewPort.height * 0.10)) {
+        return viewPort.height * 0.14;
+    }
+    return height;
 }
 
-function intervalsToGraph(intervals, ftp, viewPort) {
-    const minAbsPower = 9;
-    const graphHeight = viewPort.height ?? 118;
+function intervalToWidth(intervalDuration, totalDuration, totalWidth) {
+    return clamp(1,
+                 totalDuration,
+                 translate(intervalDuration, 0, totalDuration, 0, totalWidth)
+                );
+}
 
-    const maxDuration = intervals.reduce((highest, interval) => {
+function intervalsToMaxPower(intervals, ftp) {
+    return intervals.reduce((highest, interval) => {
         interval.steps.forEach((step) => {
-            const power = models.ftp.toRelative(step.power, ftp);
+            const power = models.ftp.toAbsolute(step.power, ftp);
             if(power > highest) highest = power;
         });
         return highest;
-    }, 1.6);
+    }, ftp * 1.6);
+}
 
-    const scaleMax = ftp * maxDuration;
+function Interval(acc, interval, width, ftp, powerMax, viewPort) {
+    const stepsLength = interval.steps.length;
+
+    return acc + interval.steps.reduce((a, step) => {
+        const power    = models.ftp.toAbsolute(step.power, ftp) ?? 0;
+        const cadence  = step.cadence;
+        const slope    = step.slope;
+        const duration = step.duration;
+        const width    = 100 / stepsLength;
+        const height   = powerToHeight(power, powerMax, viewPort);
+        const zone     = (models.ftp.powerToZone(power, ftp)).name;
+        const infoTime = formatTime({value: duration, format: 'mm:ss'});
+
+        const powerAttr    = exists(power)    ? `power="${power}"` : '';
+        const cadenceAttr  = exists(cadence)  ? `cadence="${cadence}"` : '';
+        const slopeAttr    = exists(slope)    ? `slope="${slope}"` : '';
+        const durationAttr = exists(duration) ? `duration="${infoTime}"` : '';
+
+        return a +
+            `<div class="graph--bar zone-${zone}" style="height: ${height}px; width: ${width}%" ${powerAttr} ${cadenceAttr} ${slopeAttr} ${durationAttr}></div>`;
+    }, `<div class="graph--bar-group" style="width: ${width}px;">`) + `</div>`;
+}
+
+function intervalsToGraph(workout, ftp, viewPort) {
+    const totalWidth    = viewPort.width;
+    const intervals     = workout.intervals;
+    const totalDuration = workout.meta.duration;
+    const maxPower      = intervalsToMaxPower(intervals, ftp);
 
     return intervals.reduce((acc, interval) => {
         let width = 1;
 
         if(exists(interval.duration)) {
-            width = (interval.duration < 1) ? 1 : Math.round(interval.duration);
-            return Interval(acc, interval, width, ftp, scaleMax);
+            width = intervalToWidth(interval.duration, totalDuration, totalWidth);
+            return Interval(acc, interval, width, ftp, maxPower, viewPort);
         }
 
         return '';
@@ -156,10 +170,12 @@ class WorkoutGraph extends HTMLElement {
             const totalDistance = this.workout.meta.distance;
             const $dom = self.dom;
             const $parent = self;
+            const height = $parent.getBoundingClientRect().height;
+            const width = $parent.getBoundingClientRect().width;
             const left = translate(distance, 0, totalDistance, 0, window.innerWidth);
-            $dom.active.style.left   = `${left % window.innerWidth}px`;
+            $dom.active.style.left   = `${left % width}px`;
             $dom.active.style.width  = `2px`;
-            $dom.active.style.height = `${$parent.getBoundingClientRect().height}px`;
+            $dom.active.style.height = `${height}px`;
         }
         return;
     }
@@ -178,9 +194,11 @@ class WorkoutGraph extends HTMLElement {
         const self = this;
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
 
+        console.log(this.viewPort);
+
         if(equals(this.type, 'workout')) {
             this.innerHTML = progress +
-                intervalsToGraph(this.workout.intervals, this.ftp, this.viewPort);
+                intervalsToGraph(this.workout, this.ftp, this.viewPort);
 
             this.dom.info      = this.querySelector('#graph--info--cont');
             this.dom.progress  = this.querySelector('#progress');

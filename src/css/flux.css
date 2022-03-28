@@ -390,6 +390,7 @@ body.dark-theme {
     overflow-x: hidden;
 
     font-family: var(--ssr-font-family);
+    /* font-variant-numeric: tabular-nums; */
 }
 .page {
     width: 100%;
@@ -685,19 +686,21 @@ div.graph--bar-group {
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: flex-end;
-    height: var(--graph-height);
-    height: 8em;
+    /* height: var(--graph-height); */
+    /* height: 8em; */
     /* min-height: 100%; */
     padding: 0;
 }
 #graph--info--cont {
     display: none;
+    font-size: 1.4em;
+    line-height: 1.2em;
     position: absolute;
-    padding: 4px 4px;
+    padding: 0.4em 0.4em;
     color: var(--black);
     white-space: nowrap;
     background-color: var(--white);
-    /* border-radius: 2px; */
+    border-radius: 0.2em;
     z-index: 1;
 }
 
@@ -746,8 +749,6 @@ div.graph--bar-group {
     left: 0px;
     bottom: 0px;
     padding: 0;
-    /* min-height: 40px; */
-    /* z-index: 0; */
 }
 .graph--bar {
     position: relative;
@@ -794,6 +795,15 @@ div.graph--bar-group {
     justify-content: center;
     align-items: flex-end;
     height: var(--graph-height);
+    padding: 0;
+}
+.workout-list--graph-cont {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-end;
+    min-height: var(--list--graph--height);
     padding: 0;
 }
 
@@ -1157,6 +1167,7 @@ div.graph--bar-group {
     --workout--description-font-size: 1.4em;
     --inner-max-width: 47em;
     --size--icon--global: 2.4em;
+    --list--graph--height: 8em;
 
     text-align: center;
 }
@@ -1738,6 +1749,10 @@ and (orientation: portrait) {
         line-height: 2em;
     }
 
+    #graph--info--cont {
+        font-size: 1.6em;
+    }
+
     #targets {
         --number-input-height: 4rem;
         --mode-selector-margin: 1.7em auto;
@@ -1772,6 +1787,10 @@ and (min-height: 768px) {
 
     .data-tiles {
         font-size: 1.6rem;
+    }
+
+    #graph--info--cont {
+        font-size: 1.6em;
     }
 }
 
@@ -1874,6 +1893,10 @@ and (min-height: 850px) {
         font-size: 3rem;
     }
 
+    #graph--info--cont {
+        font-size: 2.0em;
+    }
+
     #targets {
         --number-input-height: 5rem;
         --mode-selector-margin: 2em auto;
@@ -1931,6 +1954,10 @@ and (min-height: 1200px) {
         line-height: 1.5em;
     }
 
+    #graph--info--cont {
+        font-size: 2.4em;
+    }
+
     #targets {
         font-size: 1.4rem;
         --number-input-height: 6rem;
@@ -1971,6 +1998,10 @@ and (min-height: 1600px) {
 
     .connections-header {
         font-size: 2.4rem;
+    }
+
+    #graph--info--cont {
+        font-size: 4.0em;
     }
 
     #targets {
@@ -2271,14 +2302,22 @@ and (min-width: 1024px) {
     }
 
     #graph-power {
+        display: block;
         grid-area: 1 / 4 / 2 / 5;
     }
 
     #targets {
         --mode-selector-padding: 0 1em;
         --mode-selector-margin: 1em auto;
-
         grid-area: 2 / 4 / 3 / 5;
+    }
+    .targets--cont {
+        display: grid;
+        grid-template-rows: 50% 50%;
+    }
+    tab-group {
+        width: 100%;
+        padding: 0 0;
     }
 
     .fixed-bottom {
@@ -2337,7 +2376,8 @@ and (min-width: 1200px) {
     }
 
     .data-tiles {
-        grid-template-columns: repeat(5, 20%);
+        /* grid-template-columns: repeat(5, 20%); */
+        grid-template-columns: 19% 19% 24% 19% 19%;
     }
 
     #data-tile--power-avg {
@@ -2367,12 +2407,17 @@ and (min-width: 1200px) {
         grid-area: 2 / 4 / 2 / 5;
     }
     #data-tile--speed {
-        display: block;
         grid-area: 1 / 5 / 1 / 6;
     }
     #data-tile--distance {
-        display: block;
         grid-area: 2 / 5 / 2 / 6;
+    }
+
+    #data-tile--speed,
+    #data-tile--speed.active,
+    #data-tile--distance,
+    #data-tile--distance.active {
+        display: block;
     }
 
 }
