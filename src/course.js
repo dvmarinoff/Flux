@@ -1,4 +1,4 @@
-import { xf, equals, exists, } from './functions.js';
+import { xf, equals, exists, first, } from './functions.js';
 import { models } from './models/models.js';
 
 console.log(`course.js ...`);
@@ -50,6 +50,11 @@ function Course() {
     }
     function onWorkout(workout) {
         course = workout;
+
+        if(exists(course?.points)) {
+            console.log(first(course.points).y);
+            xf.dispatch('altitude', first(course.points).y);
+        }
     }
     function onWatchStart() {
         if(isCourse()) {

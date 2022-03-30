@@ -886,8 +886,6 @@ class VirtualState extends MetaProp {
         xf.dispatch('speedVirtual', (speed * 3.6));
         xf.dispatch('distance', distance);
         xf.dispatch('altitude', altitude);
-
-        // console.log(`s: ${speed}, a: ${altitude}, d: ${distance}`);
     }
 }
 
