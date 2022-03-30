@@ -1,6 +1,6 @@
-import { xf, exists, empty, equals } from '../functions.js';
+import { xf, exists, empty, equals, debounce } from '../functions.js';
 import { models } from '../models/models.js';
-import { intervalsToGraph, courseToGraph } from './workout-graph.js';
+import { intervalsToGraph, courseToGraph, renderInfo } from './workout-graph.js';
 
 const radioOff = `
         <svg class="radio radio-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
@@ -101,8 +101,6 @@ class WorkoutList extends HTMLUListElement {
         const self = this;
         const viewPort = this.getViewPort();
 
-        console.log(viewPort);
-
         return state.reduce((acc, workout, i) => {
             let graph = '';
 
@@ -144,9 +142,24 @@ class WorkoutListItem extends HTMLLIElement {
         this.abortController = new AbortController();
         this.signal = { signal: self.abortController.signal };
 
+        this.debounced = {
+            onWindowResize: debounce(
+                self.onWindowResize.bind(this), 300, {trailing: true, leading: false},
+            ),
+        };
+
+        this.dom = {};
+        this.dom.info = this.querySelector('#graph--info--cont');
+        this.dom.cont = this.querySelector('.workout-list--graph-cont');
+        this.viewPort = this.getViewPort();
+
         xf.sub('db:workout', this.onWorkout.bind(this), this.signal);
         this.summary.addEventListener('pointerup', this.toggleExpand.bind(this), this.signal);
         this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this), this.signal);
+
+        this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
+        this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
+        window.addEventListener('resize', this.debounced.onWindowResize.bind(this), this.signal);
     }
     disconnectedCallback() {
         this.abortController.abort();
@@ -198,7 +211,49 @@ class WorkoutListItem extends HTMLLIElement {
             this.render();
         }
     }
+    onHover(e) {
+        const self = this;
+        const target = this.querySelector('.graph--bar:hover');
+        if(exists(target)) {
+            const power        = target.getAttribute('power');
+            const cadence      = target.getAttribute('cadence');
+            const slope        = target.getAttribute('slope');
+            const duration     = target.getAttribute('duration');
+            const distance     = target.getAttribute('distance');
+            const intervalRect = target.getBoundingClientRect();
+            this.viewPort      = this.getViewPort(); // move to more sensible event
+
+            this.renderInfo({
+                power,
+                cadence,
+                slope,
+                duration,
+                distance,
+                intervalRect,
+                contRect: self.viewPort,
+                dom: self.dom,
+            });
+        }
+    }
+    onMouseOut(e) {
+        this.dom.info.style.display = 'none';
+    }
+    getViewPort() {
+        const rect = this.dom.cont.getBoundingClientRect();
+        return {
+            width: rect.width,
+            height: rect.height,
+            left: rect.left,
+            aspectRatio: rect.width / rect.height,
+        };
+    }
+    onWindowResize(e) {
+        this.viewPort = this.getViewPort();
+    }
     render() {}
+    renderInfo(args = {}) {
+        renderInfo(args);
+    }
 }
 
 customElements.define('workout-list', WorkoutList, {extends: 'ul'});

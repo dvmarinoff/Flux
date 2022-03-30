@@ -803,6 +803,7 @@ div.graph--bar-group {
     flex-wrap: nowrap;
     justify-content: center;
     align-items: flex-end;
+    position: relative;
     min-height: var(--list--graph--height);
     padding: 0;
 }

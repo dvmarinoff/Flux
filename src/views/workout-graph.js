@@ -1,7 +1,9 @@
-import { xf, exists, existance, equals, clamp } from '../functions.js';
+import { xf, exists, existance, equals, clamp, debounce, toFixed  } from '../functions.js';
 import { formatTime, translate } from '../utils.js';
 import { models } from '../models/models.js';
 import { g } from './graph.js';
+
+
 
 function powerToHeight(power, powerMax, viewPort) {
     const height = translate(power, 0, powerMax, 0, viewPort.height * 0.90);
@@ -69,6 +71,27 @@ function intervalsToGraph(workout, ftp, viewPort) {
     }, '<div id="graph--info--cont"></div>');
 }
 
+function renderInfo(args = {}) {
+    const power    = exists(args.power)    ? `${args.power}W `: '';
+    const cadence  = exists(args.cadence)  ? `${args.cadence}rpm `: '';
+    const slope    = exists(args.slope)    ? `${toFixed(args.slope, 2)}%` : '';
+    const duration = exists(args.duration) ? `${args.duration}min `: '';
+    const distance = exists(args.distance) ? `${args.distance}m `: '';
+    const dom      = args.dom;
+
+    const intervalLeft = args.intervalRect.left;
+    const contLeft     = args.contRect.left;
+    const contWidth    = args.contRect.width;
+    const left         = intervalLeft - contLeft;
+    const bottom       = args.intervalRect.height;
+
+    dom.info.style.display = 'block';
+    dom.info.innerHTML = `<div>${power}</div><div>${cadence}</div><div>${slope}</div><div class="graph--info--time">${duration}</div>`;
+    const width = dom.info.getBoundingClientRect().width;
+    dom.info.style.left   = `min(${contWidth}px - ${width}px, ${left}px)`;
+    dom.info.style.bottom = bottom;
+}
+
 class WorkoutGraph extends HTMLElement {
     constructor() {
         super();
@@ -80,17 +103,16 @@ class WorkoutGraph extends HTMLElement {
     }
     connectedCallback() {
         const self = this;
-        this.width = this.getWidth();
-        this.height = this.getHeight();
         this.dom = {};
-        this.viewPort = {
-            width: self.width,
-            height: self.height,
-            aspectRatio: self.width / self.height,
-        };
-
+        this.viewPort = this.getViewPort();
         this.abortController = new AbortController();
         this.signal = { signal: self.abortController.signal };
+
+        this.debounced = {
+            onWindowResize: debounce(
+                self.onWindowResize.bind(this), 300, {trailing: true, leading: false},
+            ),
+        };
 
         xf.sub(`db:workout`, this.onWorkout.bind(this), this.signal);
         xf.sub(`db:ftp`, this.onFTP.bind(this), this.signal);
@@ -100,49 +122,49 @@ class WorkoutGraph extends HTMLElement {
 
         this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
         this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
-        window.addEventListener('resize', this.onWindowResize.bind(this), this.signal);
+        window.addEventListener('resize', this.debounced.onWindowResize.bind(this), this.signal);
     }
     disconnectedCallback() {
         this.abortController.abort();
     }
-    getWidth() {
-        return this.getBoundingClientRect().width;
-    }
-    getHeight() {
-        return this.getBoundingClientRect().height;
+    getViewPort() {
+        const rect = this.getBoundingClientRect();
+        return {
+            width: rect.width,
+            height: rect.height,
+            left: rect.left,
+            aspectRatio: rect.width / rect.height,
+        };
     }
     onFTP(value) {
         this.ftp = value;
         if(exists(this.workout.intervals)) this.render();
     }
     onWindowResize(e) {
-        const self = this;
-        const height = this.getHeight();
-
-        if(height < this.minHeight) {
-            return;
-        }
-
-        this.width    = this.getWidth();
-        this.height   = this.getHeight();
-        this.viewPort = {
-            width: self.width,
-            height: self.height,
-            aspectRatio: self.width / self.height,
-        };
+        this.viewPort = this.getViewPort();
         this.render();
     }
     onHover(e) {
+        const self = this;
         const target = this.querySelector('.graph--bar:hover');
         if(exists(target)) {
-            const power    = target.getAttribute('power');
-            const cadence  = target.getAttribute('cadence');
-            const slope    = target.getAttribute('slope');
-            const duration = target.getAttribute('duration');
-            const distance = target.getAttribute('distance');
-            const rect     = target.getBoundingClientRect();
+            const power        = target.getAttribute('power');
+            const cadence      = target.getAttribute('cadence');
+            const slope        = target.getAttribute('slope');
+            const duration     = target.getAttribute('duration');
+            const distance     = target.getAttribute('distance');
+            const intervalRect = target.getBoundingClientRect();
 
-            this.renderInfo({power,cadence,slope,duration,distance,rect});
+            this.renderInfo({
+                power,
+                cadence,
+                slope,
+                duration,
+                distance,
+                intervalRect,
+                contRect: self.viewPort,
+                dom: self.dom,
+            });
         }
     }
     onMouseOut(e) {
@@ -194,8 +216,6 @@ class WorkoutGraph extends HTMLElement {
         const self = this;
         const progress = `<div id="progress" class="progress"></div><div id="progress-active"></div>`;
 
-        console.log(this.viewPort);
-
         if(equals(this.type, 'workout')) {
             this.innerHTML = progress +
                 intervalsToGraph(this.workout, this.ftp, this.viewPort);
@@ -218,25 +238,11 @@ class WorkoutGraph extends HTMLElement {
         }
     }
     renderInfo(args = {}) {
-        const self = this;
-        const power    = exists(args.power) ? `${args.power}W `: '';
-        const cadence  = exists(args.cadence) ? `${args.cadence}rpm `: '';
-        const slope    = exists(args.slope) ? `${args.slope}% `: '';
-        const duration = exists(args.duration) ? `${args.duration}min `: '';
-        const distance = exists(args.distance) ? `${args.distance}m `: '';
-
-        const left = args.rect.left ?? 0;
-        const width = args.rect.width ?? 0;
-
-        this.dom.info.style.display = 'block';
-        this.dom.info.innerHTML = `<div>${power}</div><div>${cadence}</div><div>${slope}</div><div class="graph--info--time">${duration}</div>`;
-        this.dom.info.style.left = left;
-        this.dom.info.style.bottom = args.rect.height;
+        renderInfo(args);
     }
 }
 
 customElements.define('workout-graph', WorkoutGraph);
-
 
 
 
@@ -291,12 +297,13 @@ function courseToGraph(course, viewPort) {
 
     }, ``);
 
-    return `<svg class="graph--bar-group" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
+    return `<div id="graph--info--cont"></div><svg class="graph--bar-group" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
 }
 
 export {
     WorkoutGraph,
     intervalsToGraph,
     courseToGraph,
+    renderInfo,
 };
 
