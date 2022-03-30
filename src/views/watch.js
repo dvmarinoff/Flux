@@ -50,7 +50,7 @@ class Watch extends HTMLElement {
     }
     onWorkoutStatus(status) {
         if(status === 'started') { this.renderWorkoutStarted(this.dom); }
-        if(status === 'done')    { console.log(`Workout done!`); }
+        if(status === 'done')    {  }
     }
     renderInit(dom) {
         dom.pause.style.display = 'none';

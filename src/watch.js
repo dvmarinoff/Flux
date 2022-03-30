@@ -42,6 +42,9 @@ class Watch {
 
             if(self.isWorkoutDone()) {
                 xf.dispatch('watch:lap');
+                // reset to slope mode 0% when workout is done
+                xf.dispatch('ui:slope-target-set', 0);
+                xf.dispatch('ui:mode-set', 'slope');
                 console.log(`Workout done!`);
             }
         });
