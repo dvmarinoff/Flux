@@ -141,7 +141,12 @@ class WorkoutGraph extends HTMLElement {
         if(exists(this.workout.intervals)) this.render();
     }
     onWindowResize(e) {
-        this.viewPort = this.getViewPort();
+        let viewPort = this.getViewPort();
+        if(equals(viewPort.width, 0)) {
+            this.viewPort.width = window.innerWidth;
+        } else {
+            this.viewPort = viewPort;
+        }
         this.render();
     }
     onHover(e) {
