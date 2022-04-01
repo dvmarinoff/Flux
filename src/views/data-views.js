@@ -942,23 +942,22 @@ class VirtualStateSource extends DataView {
     }
     subs() {
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        console.log(`VirtualStateSource.sub()`);
         this.addEventListener('pointerup', this.onEffect.bind(this), this.signal);
     }
     onUpdate(value) {
-        this.state = value;
+        this.state = value.virtualState;
         this.render();
     }
     onEffect() {
-        if(equals(this.state.virtualState, 'power')) {
-            this.source = 'speed';
+        if(equals(this.state, 'power')) {
             xf.dispatch(`${this.effect}`, {virtualState: 'speed'});
         } else {
-            this.source = 'power';
             xf.dispatch(`${this.effect}`, {virtualState: 'power'});
         }
     }
     render() {
-        this.textContent = this.source;
+        this.textContent = this.state;
     }
 }
 
