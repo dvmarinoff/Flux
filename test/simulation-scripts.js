@@ -2,12 +2,17 @@ import { xf, equals, rand } from './functions.js';
 
 class TrainerMock {
     constructor() {
-        this.powerTarget = 180;
-        this.slope = 0;
-        this.ftp = 256;
+        this.defaults = {
+            powerTarget: 220,
+            slope: 0,
+            ftp: 256,
+        };
+        this.powerTarget = this.defaults.powerTarget;
+        this.slope = this.defaults.slope;
+        this.ftp = this.defaults.ftp;
 
         this.cadence = 80;
-        this.power = 180;
+        this.power = 220;
         this.speed = 20;
         this.heartRate = 140;
 
@@ -55,7 +60,9 @@ class TrainerMock {
         clearInterval(self.interval);
     }
     broadcast(handler) {
-        const interval = setInterval(handler, 1000);
+        // broadcast interval in ms
+        const interval = setInterval(handler, 250);
+        // const interval = setInterval(handler, 1000);
         return interval;
     }
     indoorBikeData() {
@@ -63,7 +70,7 @@ class TrainerMock {
         self.power = this.powerNext(self.power);
         self.heartRate = this.heartRateNext(self.heartRate);
         self.cadence = this.cadenceNext(self.cadence);
-        self.speed = this.powerToSpeed(self.power);
+        self.speed = 20;
 
         xf.dispatch('power', self.power);
         xf.dispatch('heartRate', self.heartRate);
@@ -72,7 +79,7 @@ class TrainerMock {
     }
     onPowerTarget(powerTarget) {
         this.powerTarget = powerTarget;
-        this.power = powerTarget;
+        this.power = powerTarget > 0 ? powerTarget : this.defaults.powerTarget;
         this.heartRate = this.powerToHeartRate(powerTarget, this.ftp, this.zones);
     }
     onSlopeTarget(slope) {
@@ -82,20 +89,13 @@ class TrainerMock {
         this.ftp = ftp;
     }
     powerNext(prev) {
-        return this.powerTarget + rand(-Math.round(prev * 0.02), Math.round(prev * 0.02));
+        return this.powerTarget;
     }
     cadenceNext(prev) {
         return prev + rand(-1, 1);
     }
     heartRateNext(prev) {
-        if(rand(0, 20) > 18) {
-            return prev + 1;
-        }
-        return prev;
-    }
-    powerToSpeed(power) {
-        // use a model
-        return 20;
+        return prev + rand(-1, 1);
     }
     powerToHeartRate(power, ftp, zones) {
         let base = 90;
@@ -151,22 +151,6 @@ class TrainerMock {
         }
         return {name, index};
     }
-}
-
-function cadenceTargetMock() {
-
-    setInterval(function() {
-        xf.dispatch('cadence', 100 + rand(-4, 4));
-    }, 1000);
-
-    setInterval(function() {
-        const t = rand(0, 1);
-        if(equals(t, 0)) {
-            xf.dispatch('ui:cadence-target-set', 100);
-        } else {
-            xf.dispatch('ui:cadence-target-set', 0);
-        }
-    }, 4000);
 }
 
 const trainerMock = new TrainerMock();
