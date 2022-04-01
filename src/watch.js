@@ -311,11 +311,15 @@ xf.reg('watch:stopped', (x, db) => db.watchStatus = 'stopped');
 xf.reg('watch:elapsed', (x, db) => {
     db.elapsed   = x;
 
-    let record = {
+    const speed = equals(db.sources.virtualState, 'speed') ?
+                  db.speed :
+                  db.speedVirtual;
+
+    const record = {
         timestamp:  Date.now(),
         power:      db.power1s,
         cadence:    db.cadence,
-        speed:      db.speedVirtual,
+        speed:      speed,
         heart_rate: db.heartRate,
         distance:   db.distance,
         grade:      db.slopeTarget,
