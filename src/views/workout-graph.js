@@ -85,6 +85,7 @@ function renderInfo(args = {}) {
     const left         = intervalLeft - contLeft;
     const bottom       = args.intervalRect.height;
 
+
     dom.info.style.display = 'block';
     dom.info.innerHTML = `<div>${power}</div><div>${cadence}</div><div>${slope}</div><div class="graph--info--time">${duration}</div>`;
     const width = dom.info.getBoundingClientRect().width;
@@ -119,6 +120,7 @@ class WorkoutGraph extends HTMLElement {
 
         xf.sub('db:intervalIndex', this.onIntervalIndex.bind(this), this.signal);
         xf.sub('db:distance', this.onDistance.bind(this), this.signal);
+        xf.sub('db:page', this.onPage.bind(this), this.signal);
 
         this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
         this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
@@ -140,13 +142,15 @@ class WorkoutGraph extends HTMLElement {
         this.ftp = value;
         if(exists(this.workout.intervals)) this.render();
     }
+    onPage(page) {
+        const viewPort = this.getViewPort();
+        this.viewPort = viewPort;
+        this.render();
+    }
     onWindowResize(e) {
-        let viewPort = this.getViewPort();
-        if(equals(viewPort.width, 0)) {
-            this.viewPort.width = window.innerWidth;
-        } else {
-            this.viewPort = viewPort;
-        }
+        const viewPort = this.getViewPort();
+        if(equals(viewPort.width, 0)) return;
+        this.viewPort = viewPort;
         this.render();
     }
     onHover(e) {
@@ -238,8 +242,9 @@ class WorkoutGraph extends HTMLElement {
             this.innerHTML = progress +
                 courseToGraph(this.workout, this.viewPort);
 
-            this.dom.progress  = this.querySelector('#progress');
-            this.dom.active = this.querySelector('#progress-active');
+            this.dom.info     = this.querySelector('#graph--info--cont');
+            this.dom.progress = this.querySelector('#progress');
+            this.dom.active   = this.querySelector('#progress-active');
         }
     }
     renderInfo(args = {}) {
