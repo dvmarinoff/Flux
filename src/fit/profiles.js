@@ -1,189 +1,219 @@
+import { first, second, third, } from '../functions.js';
 
-const messages = {
-    'file_id': {
+const global_message_definitions = [
+    ['file_id', 0, {
+        message: 'file_id',
         global_number: 0,
-        fields: {
-            type:          {number: 0, base_type: 2},
-            manufacturer:  {number: 1, base_type: 132},
-            product:       {number: 2, base_type: 132},
-            serial_number: {number: 3, base_type: 140},
-            time_created:  {number: 4, base_type: 134}, // the same as first record timestamp
-            number:        {number: 5, base_type: 132}, // Only set for files that are not created/erased.
-            product_name:  {number: 8, base_type: 7},
-        }
-    },
-    'device_info': {
+        fields: [
+            ['type', 0, {field: 'type', number: 0, base_type: 2}],
+            ['manufacturer', 1, {field: 'manufacturer', number: 1, base_type: 132}],
+            ['product', 2, {field: 'product', number: 2, base_type: 132}],
+            ['serial_number', 3, {field: 'serial_number', number: 3, base_type: 140}],
+            ['time_created', 4, {field: 'time_created', number: 4, base_type: 134}], // the same as first record timestamp
+            ['number', 5, {field: 'number', number: 5, base_type: 132}], // Only set for files that are not created/erased.
+            ['product_name', 8, {field: 'product_name', number: 8, base_type: 7}],
+        ]}],
+    ['device_info', 23, {
+        message: 'device_info',
         global_number: 23,
-        fields: {
-            timestamp:          {number: 253, base_type: 134},
-            serial_number:      {number:   3, base_type: 140},
-            cum_operating_time: {number:   7, base_type: 134},
-            manufacturer:       {number:   2, base_type: 132},
-            product:            {number:   4, base_type: 132},
-	          software_version:   {number:   5, base_type: 132},
-	          battery_voltage:    {number:  10, base_type: 132},
-	          device_index:       {number:   0, base_type: 2},
-	          device_type:        {number:   1, base_type: 2},
-	          hardware_version:   {number:   6, base_type: 2},
-	          battery_status:     {number:  11, base_type: 2},
-        }
-    },
-    'record': {
+        fields: [
+            ['timestamp', 253, {field: 'timestamp', number: 253, base_type: 134}],
+            ['serial_number', 3, {field: 'serial_number', number:   3, base_type: 140}],
+            ['cum_operating_time', 7, {field: 'cum_operating_time', number:   7, base_type: 134}],
+            ['manufacturer', 2, {field: 'manufacturer', number:   2, base_type: 132}],
+            ['product', 4, {field: 'product', number:   4, base_type: 132}],
+            ['software_version', 5, {field: 'software_version', number:   5, base_type: 132}],
+            ['battery_voltage', 10, {field: 'battery_voltage', number:  10, base_type: 132}],
+            ['device_index', 0, {field: 'device_index', number:   0, base_type: 2}],
+            ['device_type', 1, {field: 'device_type', number:   1, base_type: 2}],
+            ['hardware_version', 6, {field: 'hardware_version', number:   6, base_type: 2}],
+            ['battery_status', 11, {field: 'battery_status', number:  11, base_type: 2}],
+        ]
+    }],
+    ['record', 20, {
+        message: 'record',
         global_number: 20,
-        fields: {
+        fields: [
             // uint8 2, uint16 132, uint32 134, sint8 1, sint16 131, sint32 133, enum 0, string 7, byte: 13
-            timestamp:                 {number: 253, base_type: 134},
-            position_lat:              {number:   0, base_type: 133}, // semicircles
-            position_long:             {number:   1, base_type: 133}, // semicircles
-            distance:                  {number:   5, base_type: 134}, // scale 100, m
-            time_from_course:          {number:  11, base_type: 133}, // 0x7FFFFFFF, 2147483647
-            compressed_speed_distance: {number:   8, base_type: 13},  // 255
-            heart_rate:                {number:   3, base_type: 2},
-            altitude:                  {number:   2, base_type: 132}, // scale 5, offset 500
-            speed:                     {number:   6, base_type: 132}, // scale 1000, m/s
-            power:                     {number:   7, base_type: 132},
-            grade:                     {number:   9, base_type: 131}, // 0b111111111111111, 32767
-            cadence:                   {number:   4, base_type: 2},
-            resistance:                {number:  10, base_type: 2},   // 255
-            cycle_length:              {number:  12, base_type: 2},   // 255
-            temperature:               {number:  13, base_type: 1},   // 0b1111111, 127
-            enhanced_altitude:         {number:  78, base_type: 134}, // non
-            enhanced_speed:            {number:  73, base_type: 134}, // non
-        }
-    },
-    'event': {
+            ['timestamp', 253, {field: 'timestamp', number: 253, base_type: 134}],
+            ['position_lat', 0, {field: 'position_lat', number:   0, base_type: 133}], // semicircles
+            ['position_long', 1, {field: 'position_long', number:   1, base_type: 133}], // semicircles
+            ['distance', 5, {field: 'distance', number:   5, base_type: 134}], // scale 100, m
+            ['time_from_course', 11, {field: 'time_from_course', number:  11, base_type: 133}], // 0x7FFFFFFF, 2147483647
+            ['compressed_speed_distance', 8, {field: 'compressed_speed_distance', number:   8, base_type: 13}],  // 255
+            ['heart_rate', 3, {field: 'heart_rate', number:   3, base_type: 2}],
+            ['altitude', 2, {field: 'altitude', number:   2, base_type: 132}], // scale 5, offset 500
+            ['speed', 6, {field: 'speed', number:   6, base_type: 132}], // scale 1000, m/s
+            ['power', 7, {field: 'power', number:   7, base_type: 132}],
+            ['grade', 9, {field: 'grade', number:   9, base_type: 131}], // 0b111111111111111, 32767
+            ['cadence', 4, {field: 'cadence', number:   4, base_type: 2}],
+            ['resistance', 10, {field: 'resistance', number:  10, base_type: 2}],   // 255
+            ['cycle_length', 12, {field: 'cycle_length', number:  12, base_type: 2}],   // 255
+            ['temperature', 13, {field: 'temperature', number:  13, base_type: 1}],   // 0b1111111, 127
+            ['enhanced_altitude', 78, {field: 'enhanced_altitude', number:  78, base_type: 134}], // non
+            ['enhanced_speed', 73, {field: 'enhanced_speed', number:  73, base_type: 134}], // non
+        ]
+    }],
+    ['event', 21, {
+        message: 'event',
         global_number: 21,
-        fields: {
-            timestamp:          {number: 253, base_type: 134},
-            data:               {number: 3,   base_type: 134},
-            data16:             {number: 2,   base_type: 132},
-            event:              {number: 0,   base_type: 0},
-            event_type:         {number: 1,   base_type: 0},
-            event_group:        {number: 4,   base_type: 2},
-        }
-    },
-    'lap': {
+        fields: [
+            ['timestamp', 253, {field: 'timestamp', number: 253, base_type: 134}],
+            ['data', 3, {field: 'data', number: 3,   base_type: 134}],
+            ['data16', 2, {field: 'data16', number: 2,   base_type: 132}],
+            ['event', 0, {field: 'event', number: 0,   base_type: 0}],
+            ['event_type', 1, {field: 'event_type', number: 1,   base_type: 0}],
+            ['event_group', 4, {field: 'event_group', number: 4,   base_type: 2}],
+        ]
+    }],
+    ['lap', 19, {
+        message: 'lap',
         global_number: 19,
-        fields: {
-            timestamp:           {number: 253, base_type: 134},
-	          start_time:	         {number:   2, base_type: 134},
-	          start_position_lat:  {number:   3, base_type: 133}, // 0.0
-            start_position_long: {number:   4, base_type: 133}, // 0.0
-	          end_position_lat:	   {number:   5, base_type: 133}, // 0.0
-	          end_position_long:	 {number:   6, base_type: 133}, // 0.0
-	          total_elapsed_time:  {number:   7, base_type: 134},
-            total_timer_time:    {number:   8, base_type: 134}, // Exclude pauses
-	          total_distance:	     {number:   9, base_type: 134},
-	          total_cycles:	       {number:  10, base_type: 134}, // 0
-            message_index:       {number: 254, base_type: 132},
-	          total_calories:	     {number:  11, base_type: 132}, // 0
-	          total_fat_calories:  {number:  12, base_type: 132}, // 0
-	          avg_speed:	         {number:  13, base_type: 132}, // m/s
-	          max_speed:           {number:  14, base_type: 132},
-	          avg_power:	         {number:  19, base_type: 132},
-	          max_power:	         {number:  20, base_type: 132},
-            total_ascent:        {number:  21, base_type: 132}, // 0
-            total_descent:       {number:  22, base_type: 132}, // 0
-            event:               {number:   0, base_type: 0},
-            event_type:          {number:   1, base_type: 0},
-            avg_heart_rate:      {number:  15, base_type: 2},
-            max_heart_rate:      {number:  16, base_type: 2},
-            avg_cadence:         {number:  17, base_type: 2},
-            max_cadence:         {number:  18, base_type: 2},
-            intensity:           {number:  23, base_type: 0},
-            lap_trigger:         {number:  24, base_type: 0},
-            sport:               {number:  25, base_type: 0},
-            event_group:         {number:  26, base_type: 2},
-        }
-    },
-    'session': {
+        fields: [
+            ['timestamp', 253, {field: 'timestamp', number: 253, base_type: 134}],
+	          ['start_time', 2, {field: 'start_time', number:   2, base_type: 134}],
+	          ['start_position_lat', 3, {field: 'start_position_lat', number:   3, base_type: 133}], // 0.0
+            ['start_position_long', 4, {field: 'start_position_long', number:   4, base_type: 133}], // 0.0
+	          ['end_position_lat', 5, {field: 'end_position_lat', number:   5, base_type: 133}], // 0.0
+	          ['end_position_long', 6, {field: 'end_position_long', number:   6, base_type: 133}], // 0.0
+	          ['total_elapsed_time', 7, {field: 'total_elapsed_time', number:   7, base_type: 134}],
+            ['total_timer_time', 8, {field: 'total_timer_time', number:   8, base_type: 134}], // Exclude pauses
+	          ['total_distance', 9, {field: 'total_distance', number:   9, base_type: 134}],
+	          ['total_cycles', 10, {field: 'total_cycles', number:  10, base_type: 134}], // 0
+            ['message_index', 254, {field: 'message_index', number: 254, base_type: 132}],
+	          ['total_calories', 11, {field: 'total_calories', number:  11, base_type: 132}], // 0
+	          ['total_fat_calories', 12, {field: 'total_fat_calories', number:  12, base_type: 132}], // 0
+	          ['avg_speed', 13, {field: 'avg_speed', number:  13, base_type: 132}], // m/s
+	          ['max_speed', 14, {field: 'max_speed', number:  14, base_type: 132}],
+	          ['avg_power', 19, {field: 'avg_power', number:  19, base_type: 132}],
+	          ['max_power', 20, {field: 'max_power', number:  20, base_type: 132}],
+            ['total_ascent', 21, {field: 'total_ascent', number:  21, base_type: 132}], // 0
+            ['total_descent', 22, {field: 'total_descent', number:  22, base_type: 132}], // 0
+            ['event', 0, {field: 'event', number:   0, base_type: 0}],
+            ['event_type', 1, {field: 'event_type', number:   1, base_type: 0}],
+            ['avg_heart_rate', 15, {field: 'avg_heart_rate', number:  15, base_type: 2}],
+            ['max_heart_rate', 16, {field: 'max_heart_rate', number:  16, base_type: 2}],
+            ['avg_cadence', 17, {field: 'avg_cadence', number:  17, base_type: 2}],
+            ['max_cadence', 18, {field: 'max_cadence', number:  18, base_type: 2}],
+            ['intensity', 23, {field: 'intensity', number:  23, base_type: 0}],
+            ['lap_trigger', 24, {field: 'lap_trigger', number:  24, base_type: 0}],
+            ['sport', 25, {field: 'sport', number:  25, base_type: 0}],
+            ['event_group', 26, {field: 'event_group', number:  26, base_type: 2}],
+        ]
+    }],
+    ['session', 18, {
+        message: 'session',
         global_number: 18,
-        fields: {
-            timestamp:             {number: 253, base_type: 134},
-            start_time:	           {number:   2, base_type: 134},
-            start_position_lat:    {number:   3, base_type: 133},
-            start_position_long:   {number:   4, base_type: 133},
-            total_elapsed_time:	   {number:   7, base_type: 134},
-            total_timer_time:      {number:   8, base_type: 134},
-            total_distance:        {number:   9, base_type: 134},
-            total_cycles:	         {number:  10, base_type: 134},
-            nec_lat:               {number:  29, base_type: 133},
-            nec_long:              {number:  30, base_type: 133},
-            swc_lat:               {number:  31, base_type: 133},
-            swc_long:              {number:  32, base_type: 133},
-            message_index:         {number: 254, base_type: 132},
-            total_calories:        {number:  11, base_type: 132},
-            total_fat_calories:    {number:  13, base_type: 132},
-            avg_speed:             {number:  14, base_type: 132},
-            max_speed:             {number:  15, base_type: 132},
-            avg_power:             {number:  20, base_type: 132},
-            max_power:             {number:  21, base_type: 132},
-            total_ascent:          {number:  22, base_type: 132},
-            total_descent:         {number:  23, base_type: 132},
-            first_lap_index:       {number:  25, base_type: 132},
-            num_laps:              {number:  26, base_type: 132},
-            event:                 {number:   0, base_type: 0},
-            event_type:            {number:   1, base_type: 0},
-            sport:                 {number:   5, base_type: 0},
-            sub_sport:             {number:   6, base_type: 0},
-            avg_heart_rate:        {number:  16, base_type: 2},
-            max_heart_rate:        {number:  17, base_type: 2},
-            avg_cadence:           {number:  18, base_type: 2},
-            max_cadence:           {number:  19, base_type: 2},
-            total_training_effect: {number:  24, base_type: 2},
-            event_group:           {number:  27, base_type: 2},
-            trigger:               {number:  28, base_type: 0}
-        }
-    },
-    'activity': {
+        fields: [
+            ['timestamp', 253, {field: 'timestamp', number: 253, base_type: 134}],
+            ['start_time', 2, {field: 'start_time', number:   2, base_type: 134}],
+            ['start_position_lat', 3, {field: 'start_position_lat', number:   3, base_type: 133}],
+            ['start_position_long', 4, {field: 'start_position_long', number:   4, base_type: 133}],
+            ['total_elapsed_time', 7, {field: 'total_elapsed_time', number:   7, base_type: 134}],
+            ['total_timer_time', 8, {field: 'total_timer_time', number:   8, base_type: 134}],
+            ['total_distance', 9, {field: 'total_distance', number:   9, base_type: 134}],
+            ['total_cycles', 10, {field: 'total_cycles', number:  10, base_type: 134}],
+            ['nec_lat', 29, {field: 'nec_lat', number:  29, base_type: 133}],
+            ['nec_long', 30, {field: 'nec_long', number:  30, base_type: 133}],
+            ['swc_lat', 31, {field: 'swc_lat', number:  31, base_type: 133}],
+            ['swc_long', 32, {field: 'swc_long', number:  32, base_type: 133}],
+            ['message_index', 254, {field: 'message_index', number: 254, base_type: 132}],
+            ['total_calories', 11, {field: 'total_calories', number:  11, base_type: 132}],
+            ['total_fat_calories', 13, {field: 'total_fat_calories', number:  13, base_type: 132}],
+            ['avg_speed', 14, {field: 'avg_speed', number:  14, base_type: 132}],
+            ['max_speed', 15, {field: 'max_speed', number:  15, base_type: 132}],
+            ['avg_power', 20, {field: 'avg_power', number:  20, base_type: 132}],
+            ['max_power', 21, {field: 'max_power', number:  21, base_type: 132}],
+            ['total_ascent', 22, {field: 'total_ascent', number:  22, base_type: 132}],
+            ['total_descent', 23, {field: 'total_descent', number:  23, base_type: 132}],
+            ['first_lap_index', 25, {field: 'first_lap_index', number:  25, base_type: 132}],
+            ['num_laps', 26, {field: 'num_laps', number:  26, base_type: 132}],
+            ['event', 0, {field: 'event', number:   0, base_type: 0}],
+            ['event_type', 1, {field: 'event_type', number:   1, base_type: 0}],
+            ['sport', 5, {field: 'sport', number:   5, base_type: 0}],
+            ['sub_sport', 6, {field: 'sub_sport', number:   6, base_type: 0}],
+            ['avg_heart_rate', 16, {field: 'avg_heart_rate', number:  16, base_type: 2}],
+            ['max_heart_rate', 17, {field: 'max_heart_rate', number:  17, base_type: 2}],
+            ['avg_cadence', 18, {field: 'avg_cadence', number:  18, base_type: 2}],
+            ['max_cadence', 19, {field: 'max_cadence', number:  19, base_type: 2}],
+            ['total_training_effect', 24, {field: 'total_training_effect', number:  24, base_type: 2}],
+            ['event_group', 27, {field: 'event_group', number:  27, base_type: 2}],
+            ['trigger', 28, {field: 'trigger', number:  28, base_type: 0}]
+        ]
+    }],
+    ['activity', 34, {
+        message: 'activity',
         global_number: 34,
-        fields: {
-            timestamp:        {number: 253, base_type: 134},
-            total_timer_time: {number:   0, base_type: 134}, // Exclude pauses
-            num_sessions:     {number:   1, base_type: 132},
-            type:             {number:   2, base_type: 0},
-            event:            {number:   3, base_type: 0},
-            event_type:       {number:   4, base_type: 0},
-            local_timestamp:  {number:   5, base_type: 134},
-            event_group:      {number:   6, base_type: 2},
-        },
-    },
-    'workout': {
+        fields: [
+            ['timestamp', 253, {field: 'timestamp', number: 253, base_type: 134}],
+            ['total_timer_time', 0, {field: 'total_timer_time', number:   0, base_type: 134}], // Exclude pauses
+            ['num_sessions', 1, {field: 'num_sessions', number:   1, base_type: 132}],
+            ['type', 2, {field: 'type', number:   2, base_type: 0}],
+            ['event', 3, {field: 'event', number:   3, base_type: 0}],
+            ['event_type', 4, {field: 'event_type', number:   4, base_type: 0}],
+            ['local_timestamp', 5, {field: 'local_timestamp', number:   5, base_type: 134}],
+            ['event_group', 6, {field: 'event_group', number:   6, base_type: 2}],
+        ],
+    }],
+    ['workout', 26, {
+        message: 'workout',
         global_number: 26,
-    },
-    'workout_step': {
+        fields: [],
+    }],
+    ['workout_step', 27, {
+        message: 'workout_step',
         global_number: 27,
-    },
-    course: {
+        fields: [],
+    }],
+    ['course', 31, {
+        message: 'course',
         global_number: 31,
-        fields: {
-            sport:        {number: 4, base_type: 0},
-            name:         {number: 5, base_type: 7},
-            capabilities: {number: 6, base_type: 140},
-            sport_sport:  {number: 7, base_type: 0},
-        }
-    },
-    course_point: {
+        fields: [
+            ['sport', 4, {field: 'sport', number: 4, base_type: 0}],
+            ['name', 5, {field: 'name', number: 5, base_type: 7}],
+            ['capabilities', 6, {field: 'capabilities', number: 6, base_type: 140}],
+            ['sport_sport', 7, {field: 'sport_sport', number: 7, base_type: 0}],
+        ]
+    }],
+    ['course_point', 32, {
+        message: 'course_point',
         global_number: 32,
-        fields: {
-            message_index: {number: 254, base_type: 132},
-            timestamp:     {number:   1, base_type: 134},
-            position_lat:  {number:   2, base_type: 133}, // semicircles
-            position_long: {number:   3, base_type: 133}, // semicircles
-            distance:      {number:   4, base_type: 134}, // scale 100, m
-            type:          {number:   5, base_type: 0},   // course_point
-            name:          {number:   6, base_type: 7},   // string
-            favorite:      {number:   8, base_type: 0},   // bool
-        }
-    },
-    file_creator: {
+        fields: [
+            ['message_index', 254, {field: 'message_index', number: 254, base_type: 132}],
+            ['timestamp', 1, {field: 'timestamp', number:   1, base_type: 134}],
+            ['position_lat', 2, {field: 'position_lat', number:   2, base_type: 133}], // semicircles
+            ['position_long', 3, {field: 'position_long', number:   3, base_type: 133}], // semicircles
+            ['distance', 4, {field: 'distance', number:   4, base_type: 134}], // scale 100, m
+            ['type', 5, {field: 'type', number:   5, base_type: 0}],   // course_point
+            ['name', 6, {field: 'name', number:   6, base_type: 7}],   // string
+            ['favorite', 8, {field: 'favorite', number:   8, base_type: 0}],   // bool
+        ]
+    }],
+    ['file_creator', 49, {
+        message: 'file_creator',
         global_number: 49,
-        fields: {
-            software_version: {number: 0, base_type: 132}, // uint16
-            hardware_version: {number: 1, base_type: 1},   // uint8
-        },
-    },
-};
+        fields: [
+            ['software_version', 0, {field: 'software_version', number: 0, base_type: 132}], // uint16
+            ['hardware_version', 1, {field: 'hardware_version', number: 1, base_type: 1}],   // uint8
+        ],
+    }]
+];
+
+const messages = new Map();
+
+global_message_definitions.forEach(definition => {
+    const fields = new Map();
+
+    third(definition).fields.forEach(field => {
+        fields.set(first(field),  third(field));
+        fields.set(second(field), third(field));
+    });
+
+    third(definition).fields = fields;
+
+    messages.set(first(definition),  third(definition));
+    messages.set(second(definition), third(definition));
+});
 
 // uint8 2, uint16 132, uint32 134, sint8 1, sint16 131, sint32 133, enum 0, string 7, byte: 13
 const basetypes  = {

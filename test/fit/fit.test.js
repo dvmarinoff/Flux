@@ -168,6 +168,7 @@ describe('reads File Id definition message', () => {
         expect(res).toEqual({
             type: 'definition',
             message: 'file_id',
+            architecture: 0,
             local_number: 0,
             length: 21,
             data_msg_length: 12,
@@ -345,6 +346,7 @@ describe('reads Event definition message', () => {
         expect(res).toEqual({
             type: 'definition',
             message: 'event',
+            architecture: 0,
             local_number: 2,
             length: 6+18,
             data_msg_length: 1+13,
@@ -372,6 +374,7 @@ describe('reads Lap definition message', () => {
         expect(res).toEqual({
             type: 'definition',
             message: 'lap',
+            architecture: 0,
             local_number: 4,
             length: 6+27,
             data_msg_length: 1+22,
@@ -603,7 +606,10 @@ describe('reads Minimal FIT file', () => {
         });
         test('definition file id', () => {
             expect(activity[1]).toEqual({
-                type: 'definition', message: 'file_id', local_number: 0,
+                type: 'definition',
+                message: 'file_id',
+                architecture: 0,
+                local_number: 0,
                 length: 21, data_msg_length: 12, fields: [
                     {field: 'time_created', number: 4, size: 4, base_type: 134},
                     {field: 'manufacturer', number: 1, size: 2, base_type: 132},
@@ -613,7 +619,10 @@ describe('reads Minimal FIT file', () => {
         });
         test('data file id', () => {
             expect(activity[2]).toEqual({
-                type: 'data', message: 'file_id', local_number: 0, fields: {
+                type: 'data',
+                message: 'file_id',
+                local_number: 0,
+                fields: {
                     time_created: 992483978,
                     manufacturer: 260,
                     product:      0,

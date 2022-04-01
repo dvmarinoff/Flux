@@ -1,5 +1,5 @@
 import { exists, empty, equals, isUndefined,
-         map, first, last, traverse,
+         map, first, second, last, traverse,
          nthBitToBool } from '../functions.js';
 import { calculateCRC, typeToAccessor } from '../utils.js';
 import { messages, basetypes, appTypes } from './profiles.js';
@@ -17,8 +17,8 @@ function FileHeader(args = {}) {
     }
 
     function readProtocolVersion(code) {
-        if(code === 32) return '2.0';
-        if(code === 16) return '1.0';
+        if(equals(code, 32)) return '2.0';
+        if(equals(code, 16)) return '1.0';
         return '1.0';
     }
 
@@ -31,15 +31,16 @@ function FileHeader(args = {}) {
             view.getUint8( 8, true),
             view.getUint8( 9, true),
             view.getUint8(10, true),
-            view.getUint8(11, true)];
+            view.getUint8(11, true),
+        ];
 
         return charCodes.reduce((acc, n) => acc+String.fromCharCode(n), '');
     }
 
     function writeProtocolVersion(version) {
-        if(isUndefined(version)) return 32;
-        if(version === '2.0')    return 32;
-        if(version === '1.0')    return 16;
+        if(isUndefined(version))   return 32;
+        if(equals(version, '2.0')) return 32;
+        if(equals(version, '1.0')) return 16;
         return 16;
     }
 
@@ -55,7 +56,9 @@ function FileHeader(args = {}) {
         const profileVersionCode  = view.getUint16(2, true);
         const dataRecordsLength   = view.getInt32( 4, true);
         const fileType            = readFileType(view);
-        const crc                 = equals(length, defaultSize) ? view.getUint16(crcIndex(length), true) : false;
+        const crc                 = equals(length, defaultSize) ?
+                                    view.getUint16(crcIndex(length), true) :
+                                    false;
 
         const protocolVersion = readProtocolVersion(protocolVersionCode);
         const profileVersion  = readProfileVersion(profileVersionCode);
@@ -114,29 +117,34 @@ function Header() {
     }
 
     function isDefinition(header) {
-        return (header.type === 'definition');
+        return equals(header.type, 'definition');
     }
 
     function isData(header) {
-        return (header.type === 'data');
+        return equals(header.type, 'data');
     }
 
     function encode(args) {
         let header = setLocalNumber(0b00000000, args.local_number);
-        if(args.type === 'definition') header |= 0b01000000;
-        if(args.type === 'data')       header |= 0b00000000;
+        if(equals(args.type, 'definition')) header |= 0b01000000;
+        if(equals(args.type, 'data'))       header |= 0b00000000;
         return header;
     }
 
     function read(byte) {
-        const header_type  = nthBitToBool(byte, 7) ? 'timestamp' : 'normal';
+        const header_type  = nthBitToBool(byte, 7) ? 'timestamp'  : 'normal';
         const type         = nthBitToBool(byte, 6) ? 'definition' : 'data';
         const local_number = getLocalNumber(byte); // bits 0-3, value 0-15
 
         return { type, header_type, local_number };
     }
 
-    return Object.freeze({ read, encode, isDefinition, isData });
+    return Object.freeze({
+        read,
+        encode,
+        isDefinition,
+        isData,
+    });
 }
 
 function Definition(args = {}) {
@@ -147,8 +155,7 @@ function Definition(args = {}) {
     const type               = 'definition';
 
     function numberToMessage(number) {
-        let res = first(Object.entries(messages)
-                              .filter(x => equals(x[1].global_number, number))[0]);
+        const res = messages.get(number)?.message;
         if(isUndefined(res)) {
             console.warn(`unkown definition message with global number ${number}`);
         };
@@ -156,7 +163,7 @@ function Definition(args = {}) {
     }
 
     function messageToNumber(message) {
-        let res = messages[message].global_number;
+        const res = messages.get(message)?.global_number;
         if(isUndefined(res)) {
             console.error(`message name ${message} not found`);
         }
@@ -192,7 +199,15 @@ function Definition(args = {}) {
 
         const data_msg_length = getDataMsgLength(fields);
 
-        return { type, architecture, message, local_number, fields, length, data_msg_length };
+        return {
+            type,
+            architecture,
+            message,
+            local_number,
+            fields,
+            length,
+            data_msg_length,
+        };
     }
 
     function encode(definition) {
@@ -201,9 +216,9 @@ function Definition(args = {}) {
                                          .reduce((acc, x) => acc+=1, 0);
         const globalNumber   = messageToNumber(definition.message);
 
-        let length = fixedContentLength + (numberOfFields * fieldLength);
-        let buffer = new ArrayBuffer(length);
-        let view   = new DataView(buffer);
+        const length = fixedContentLength + (numberOfFields * fieldLength);
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
 
         view.setUint8( 0, header,         true);
         view.setUint8( 1, 0,              true);
@@ -222,20 +237,26 @@ function Definition(args = {}) {
         return new Uint8Array(buffer);
     }
 
-    return Object.freeze({ read, encode, numberToMessage, messageToNumber });
+    return Object.freeze({
+        read,
+        encode,
+        numberToMessage,
+        messageToNumber,
+    });
 }
 
 function FieldDefinition(args = {}) {
 
     function numberToField(message, number) {
-        const messageFields = messages[message]?.fields;
-        if(isUndefined(messageFields)) {
+        const fieldDefinitions = messages.get(message)?.fields;
+        const res = fieldDefinitions?.get(number)?.field;
+
+        if(isUndefined(res)) {
             console.warn(`custom field number ${number} on message ${message}`);
             return `field_${number}`;
         }
-        const res = first(Object.entries(messageFields)
-                                .filter(x => equals(x[1].number, number))[0]);
-        return res ?? `field_${number}`;
+
+        return res;
     }
 
     function read(view, messageName) {
@@ -251,7 +272,11 @@ function FieldDefinition(args = {}) {
         throw new Error('Not Implemented!');
     }
 
-    return Object.freeze({ read, encode, numberToField });
+    return Object.freeze({
+        read,
+        encode,
+        numberToField,
+    });
 }
 
 function Data() {
@@ -268,8 +293,8 @@ function Data() {
         const architecture = definition.architecture ?? 0;
         const endian       = !architecture;
 
-        let buffer = new ArrayBuffer(length);
-        let view   = new DataView(buffer);
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
 
         let index    = 0;
         const header = 0 + definition.local_number;
@@ -314,7 +339,10 @@ function Data() {
         return { type, message, local_number, fields };
     }
 
-    return Object.freeze({ read, encode });
+    return Object.freeze({
+        read,
+        encode,
+    });
 }
 
 function CRC() {
@@ -324,7 +352,9 @@ function CRC() {
         return {type: 'crc', value: value};
     }
 
-    return Object.freeze({ read });
+    return Object.freeze({
+        read,
+    });
 }
 
 function Activity() {
@@ -335,7 +365,7 @@ function Activity() {
 
     function toDefinitions(activity) {
         return activity.reduce((acc, msg) => {
-            if(msg.type === 'definition') {
+            if(equals(msg.type, 'definition')) {
                 acc[msg.local_number] = msg;
                 return acc;
             }
@@ -344,20 +374,20 @@ function Activity() {
     }
 
     function toFileLength(activity, definitions) {
-        const init = last(activity).type === 'crc' ? 0 : 2;
+        const init = equals(last(activity).type, 'crc') ? 0 : 2;
 
         const length = activity.reduce((acc, msg) => {
-            if(msg.type === 'header') {
+            if(equals(msg.type, 'header')) {
                 return acc + msg.length;
             }
-            if(msg.type === 'definition') {
+            if(equals(msg.type, 'definition')) {
                 return acc + msg.length;
             }
-            if(msg.type === 'data') {
+            if(equals(msg.type, 'data')) {
                 let definition = definitions[msg.local_number];
                 return acc + definition.data_msg_length;
             }
-            if(msg.type === 'crc') {
+            if(equals(msg.type, 'crc')) {
                 return acc + crcLength;
             };
             return acc;
@@ -372,8 +402,8 @@ function Activity() {
         const headerLength      = activity[0].length;
         const dataRecordsLength = fileLength - headerLength - crcLength;
 
-        let uint8 = new Uint8Array(fileLength);
-        let view  = new DataView(uint8.buffer);
+        const uint8 = new Uint8Array(fileLength);
+        const view  = new DataView(uint8.buffer);
 
         let offset = 0;
 
@@ -422,6 +452,7 @@ function Activity() {
             //     let definition = definitions[header.local_number];
             //     return (i > (fileLength - definition?.data_msg_length ?? 0));
             // }
+            // end broken files
             return (i >= (fileLength - 2));
         }
 
@@ -430,13 +461,16 @@ function Activity() {
         }
 
         function getLocalDefinition(local_number) {
-            let definition = Object.entries(lmd).filter(d => d[1].local_number === local_number)[0][1];
-            return definition;
+            return first(second(
+                Object.entries(lmd).filter(d => {
+                    return equals(second(d).local_number, local_number);
+                })
+            ));
         }
 
         while(i < fileLength) {
             try {
-                let currentByte = view.getUint8(i, true);
+                let currentByte = view.getUint8(i, true); // maybe var is better
                 let header = fit.header.read(currentByte);
 
                 if(isLastMessage(header, i)) {
@@ -475,14 +509,20 @@ function Activity() {
         return records;
     }
 
-    return Object.freeze({ read, encode, toDefinitions, toFileLength });
+    return Object.freeze({
+        read,
+        encode,
+        toDefinitions,
+        toFileLength,
+    });
 }
 
 function Summary() {
 
     function isDataRecord(record) {
         if(exists(record.type) && exists(record.message)) {
-            return (record.type === 'data') && (record.message === 'record');
+            return equals(record.type, 'data') &&
+                   equals(record.message, 'record');
         }
         return false;
     }
@@ -527,9 +567,12 @@ function Summary() {
         let res = accumulations(dataRecords);
 
         if(empty(dataRecords)) {
-            const file_id = first(activity.filter(m => {
-                return equals(m.type, 'data') && equals(m.message, 'file_id');
-            }));
+            const file_id = first(
+                activity.filter(m => {
+                    return equals(m.type, 'data') &&
+                           equals(m.message, 'file_id');
+                })
+            );
             return Object.assign(res, {
                 distance:  0,
                 timeStart: file_id.fields.timecreated,
@@ -550,7 +593,10 @@ function Summary() {
         let footer = [];
 
         const eventStopAllData = {
-            type: "data", message: "event", local_number: lmd.event.local_number, fields: {
+            type: "data",
+            message: "event",
+            local_number: lmd.event.local_number,
+            fields: {
                   timestamp: summary.timeEnd,
                   data: 0,
                   data16: 0,
@@ -560,7 +606,10 @@ function Summary() {
             }};
 
         const lapData = {
-            type: "data", message: "lap", local_number: lmd.lap.local_number, fields: {
+            type: "data",
+            message: "lap",
+            local_number: lmd.lap.local_number,
+            fields: {
                 timestamp:          summary.timeEnd,
                 start_time:         summary.timeStart,
                 total_elapsed_time: summary.elapsed,
@@ -572,7 +621,10 @@ function Summary() {
                 lap_trigger:        appTypes.lap_trigger.values.manual}};
 
         const sessionData = {
-            type: "data", message: "session", local_number: lmd.session.local_number, fields: {
+            type: "data",
+            message: "session",
+            local_number: lmd.session.local_number,
+            fields: {
                 timestamp:          summary.timeEnd,
                 start_time:         summary.timeStart,
                 total_elapsed_time: summary.elapsed,
@@ -594,7 +646,10 @@ function Summary() {
             }};
 
         const activityData = {
-            type: "data", message: "activity", local_number: lmd.activity.local_number, fields: {
+            type: "data",
+            message: "activity",
+            local_number: lmd.activity.local_number,
+            fields: {
                   timestamp:       summary.timeEnd,
                   local_timestamp: summary.timeEnd,
                   num_sessions:    1,
@@ -605,7 +660,7 @@ function Summary() {
             }};
 
 
-        if(check !== false) {
+        if(!equals(check, false)) { // this is not C use proper value
             if(!check.data.event.stop)      footer.push(eventStopAllData);
             if(!check.definitions.lap)      footer.push(lmd.lap);
             if(!check.data.lap)             footer.push(lapData);
@@ -614,13 +669,24 @@ function Summary() {
             if(!check.definitions.activity) footer.push(lmd.activity);
             if(!check.data.activity)        footer.push(activityData);
         } else {
-            footer = [eventStopAllData, lmd.lap, lapData, lmd.session, sessionData, lmd.activity, activityData];
+            footer = [
+                eventStopAllData,
+                lmd.lap,      lapData,
+                lmd.session,  sessionData,
+                lmd.activity, activityData,
+            ];
         }
 
         return footer;
     }
 
-    return { calculate, toFooter, accumulations, getDataRecords, isDataRecord };
+    return {
+        calculate,
+        toFooter,
+        accumulations,
+        getDataRecords,
+        isDataRecord,
+    };
 }
 
 
