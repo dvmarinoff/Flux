@@ -741,26 +741,6 @@ class PropInterval {
     }
 }
 
-// class PowerInterval extends PropInterval {
-//     onInterval() {
-//         const self = this;
-//         if(equals(this.accumulator, 0) || equals(this.count, 0)) {
-//             console.log('if');
-//             this.state = 0;
-//         } else {
-//             console.log('else');
-//             this.state = this.accumulator / this.count;
-//         };
-//         console.log({
-//             state: self.state,
-//             accumulator: self.accumulator,
-//             count: self.count,
-//         });
-//         xf.dispatch(`${this.effect}`, this.state);
-//         this.reset();
-//     }
-// }
-
 class PowerInZone {
     constructor(args = {}) {
         const self = this;
