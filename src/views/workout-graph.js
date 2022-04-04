@@ -143,9 +143,11 @@ class WorkoutGraph extends HTMLElement {
         if(exists(this.workout.intervals)) this.render();
     }
     onPage(page) {
-        const viewPort = this.getViewPort();
-        this.viewPort = viewPort;
-        this.render();
+        if(equals(page, 'home')) {
+            const viewPort = this.getViewPort();
+            this.viewPort = viewPort;
+            this.render();
+        }
     }
     onWindowResize(e) {
         const viewPort = this.getViewPort();
@@ -188,7 +190,9 @@ class WorkoutGraph extends HTMLElement {
         }
         // this.workout = Object.assign({}, value);
         this.workout = value;
-        this.render();
+        if(!equals(this.viewPort.width, 0)) {
+            this.render();
+        }
     }
     onIntervalIndex(index) {
         const self = this;
@@ -272,7 +276,7 @@ function scale(value, max = 100) {
 }
 
 function courseToGraph(course, viewPort) {
-    const altitudeSpec   = Segment(course.points, 'y');
+    const altitudeSpec  = Segment(course.points, 'y');
 
     const distanceTotal = course.meta.distance;
     const aspectRatio   = viewPort.aspectRatio;

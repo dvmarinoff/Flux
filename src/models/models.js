@@ -733,13 +733,33 @@ class PropInterval {
         this.count += 1;
     }
     onInterval() {
-        if(equals(this.accumulator, 0) || equals(this.count, 0)) return;
+        if(equals(this.count, 0)) return;
 
         this.state = this.accumulator / this.count;
         xf.dispatch(`${this.effect}`, this.state);
         this.reset();
     }
 }
+
+// class PowerInterval extends PropInterval {
+//     onInterval() {
+//         const self = this;
+//         if(equals(this.accumulator, 0) || equals(this.count, 0)) {
+//             console.log('if');
+//             this.state = 0;
+//         } else {
+//             console.log('else');
+//             this.state = this.accumulator / this.count;
+//         };
+//         console.log({
+//             state: self.state,
+//             accumulator: self.accumulator,
+//             count: self.count,
+//         });
+//         xf.dispatch(`${this.effect}`, this.state);
+//         this.reset();
+//     }
+// }
 
 class PowerInZone {
     constructor(args = {}) {
@@ -968,7 +988,7 @@ const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 const dataTileSwitch = new DataTileSwitch({prop: 'dataTileSwitch', storage: LocalStorageItem});
 
-const power1s = new PropInterval({prop: 'power', effect: 'power1s', interval: 1000});
+const power1s = new PropInterval({prop: 'db:power', effect: 'power1s', interval: 1000});
 const powerInZone = new PowerInZone({ftpModel: ftp});
 
 const workout = new Workout({prop: 'workout'});
@@ -1009,6 +1029,8 @@ let models = {
     workout,
     workouts,
     session,
+
+    PropInterval,
 };
 
 export { models };
