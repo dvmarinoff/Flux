@@ -1,8 +1,6 @@
 import { xf, equals, exists, first, } from './functions.js';
 import { models } from './models/models.js';
 
-console.log(`course.js ...`);
-
 function Course() {
 
     const abortController = new AbortController();
@@ -69,6 +67,7 @@ function Course() {
         r = indexToR(index);
         slope = indexToSlope(index);
         xf.dispatch(`ui:slope-target-set`, slope);
+        xf.dispatch(`ui:mode-set`, 'slope');
         console.log(`start a course ...`);
     }
     function indexToSlope(index) {

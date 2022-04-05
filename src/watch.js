@@ -137,8 +137,10 @@ class Watch {
 
             self.lap();
 
-            xf.dispatch('watch:intervalIndex', 0);
-            xf.dispatch('watch:stepIndex',     0);
+            if(exists(self.intervals)) {
+                xf.dispatch('watch:intervalIndex', 0);
+                xf.dispatch('watch:stepIndex',     0);
+            }
             xf.dispatch('watch:elapsed',       0);
             xf.dispatch('watch:lapTime',       0);
         }

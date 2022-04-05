@@ -942,7 +942,6 @@ class VirtualStateSource extends DataView {
     }
     subs() {
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
-        console.log(`VirtualStateSource.sub()`);
         this.addEventListener('pointerup', this.onEffect.bind(this), this.signal);
     }
     onUpdate(value) {

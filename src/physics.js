@@ -325,9 +325,11 @@ function Model(args = { use: {}}) {
 
         const c1bl = c1bearingLoss;
         const c2bl = c2bearingLoss;
+        // set to zero for no pke modeling, one for full pke modeling
+        const pkefactor = 0.25;
 
-        const c0ke      = -0.5 * (mass + wheelInertia) * Math.pow(speedPrev, 2) / dt;
-        const c2ke      =  0.5 * (mass + wheelInertia) / dt;
+        const c0ke      = -0.5 * (mass + wheelInertia) * Math.pow(speedPrev, 2) * pkefactor / dt;
+        const c2ke      =  0.5 * (mass + wheelInertia) * pkefactor / dt;
         const c1grav    = g * mass * sinBeta;
         const c1roll    = g * mass * crr * cosBeta;
         const c1air     = 0.5 * (CdA + spokeDrag) * rho * (Math.pow(windSpeed, 2)) * draftingFactor;
@@ -335,9 +337,9 @@ function Model(args = { use: {}}) {
         const c2dynroll = crv * cosBeta;
         const c3air     = 0.5 * (CdA + spokeDrag) * rho * draftingFactor;
 
-        const c0 = -power * (1 - drivetrainLoss) + c0ke * 0.25;
+        const c0 = -power * (1 - drivetrainLoss) + c0ke;
         const c1 = c1grav + c1roll + c1air + c1bl;
-        const c2 = c2air + c2bl + c2dynroll + c2ke * 0.25;
+        const c2 = c2air + c2bl + c2dynroll + c2ke;
         const c3 = c3air;
 
         const roots = Qubic(c3, c2, c1, c0);
