@@ -2,8 +2,6 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="theme-color" content="#35363a" />
 
         <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
@@ -340,13 +338,18 @@
                     </div>
                 </div>
                 <div class="settings-btn-row">
-                    <button is="effect-button"
-                            id="theme-settings"
-                            class="flat-btn settings-switch-btn-cont"
-                            effect="theme-switch">
-                        <theme-value id="theme-btn"
-                                     class="settings-switch-bnt">Dark</theme-value>
-                    </button>
+                    <!-- <button is="effect-button"
+                         id="theme-settings"
+                         class="flat-btn settings-switch-btn-cont"
+                         effect="theme-switch">
+                         <theme-value id="theme-btn"
+                         class="settings-switch-bnt">Dark</theme-value>
+                         </button> -->
+
+                    <dock-mode-btn class="flat-btn settings-switch-btn-cont">
+                        <div class="settings-switch-bnt">Dock</div>
+                    </dock-mode-btn>
+
                     <button is="effect-button"
                             id="msystem-settings"
                             class="flat-btn settings-switch-btn-cont"
@@ -355,6 +358,7 @@
                                            class="settings-switch-bnt">Metric</measurement-value>
                     </button>
                 </div> <!-- end settings btn row -->
+
 
                 <div class="protocol-settings settings-btn-row">
                     <div class="protocol-btn flat-btn settings-switch-btn-cont">

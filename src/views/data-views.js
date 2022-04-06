@@ -962,6 +962,24 @@ class VirtualStateSource extends DataView {
 
 customElements.define('virtual-state-source', VirtualStateSource);
 
+class DockModeBtn extends DataView {
+    subs() {
+        console.log('DockModeBtn.sub()');
+        this.addEventListener('pointerup', this.onSwitch.bind(this), this.signal);
+    }
+    onSwitch() {
+        const href = document.location.href;
+        const width = window.screen.availWidth;
+        const height = 150;
+        const top = 0; // window.screen.availHeight - height;
+
+        // window.resizeTo(width, height);
+        window.open(`${href}`, '', `width=${width},height=${height},left=0,top=${top}`);
+    }
+}
+
+customElements.define('dock-mode-btn', DockModeBtn);
+
 export {
     DataView,
 
@@ -988,5 +1006,7 @@ export {
 
     SwitchGroup,
     DataTileSwitchGroup,
+
+    DockModeBtn,
 }
 

@@ -1,8 +1,9 @@
-const cacheName = 'Flux-v003';
+const cacheName = 'Flux-v004';
 const resources = [
     './',
     'index.html',
     'css/flux.css',
+
     'images/connections/garmin-connect.jpg',
     'images/logo/logo-36dpi-192px.png',
     'images/logo/logo-96dpi-512px.png',
@@ -15,14 +16,15 @@ const resources = [
 
     'ant/ant.js',
     'ant/channel.js',
+    'ant/common.js',
+    'ant/constants.js',
     'ant/controllable.js',
     'ant/device.js',
     'ant/fec-channel.js',
-    'ant/fit.js',
-    'ant/hrm.js',
+    'ant/fec.js',
     'ant/hrm-channel.js',
+    'ant/hrm.js',
     'ant/message.js',
-    'ant/page.js',
     'ant/polyfill.js',
     'ant/search-channel.js',
     'ant/types.js',
@@ -33,58 +35,82 @@ const resources = [
     'ble/cps/cps.js',
     'ble/cps/cycling-power-feature.js',
     'ble/cps/cycling-power-measurement.js',
+
+    'ble/cscs/feature.js',
+    'ble/cscs/measurement.js',
+    'ble/cscs/cscs.js',
+
     'ble/dis/dis.js',
     'ble/fec/fec.js',
+
     'ble/ftms/control-point.js',
     'ble/ftms/fitness-machine-feature.js',
     'ble/ftms/fitness-machine-status.js',
     'ble/ftms/ftms.js',
     'ble/ftms/indoor-bike-data.js',
-    'ble/ftms/supported.js',
+    'ble/ftms/supported-ranges.js',
+
     'ble/hrs/heartRateMeasurement.js',
     'ble/hrs/hrs.js',
+
+    'ble/wcps/control.js',
+    'ble/wcps/wcps.js',
+
+    'ble/common.js',
     'ble/controllable.js',
     'ble/device.js',
     'ble/hrm.js',
     'ble/power-meter.js',
+    'ble/service.js',
+    'ble/speed-cadence.js',
     'ble/uuids.js',
     'ble/web-ble.js',
 
-    'controllers/controllers.js',
+    // 'css/flux.css',
+
+    'fit/activity.js',
+    'fit/course.js',
+    'fit/fields.js',
+    'fit/fit.js',
+    'fit/local-message-definitions.js',
+    'fit/profiles.js',
+
     'models/models.js',
 
     'storage/idb.js',
-    'storage/idb-store.js',
     'storage/local-storage.js',
-    'storage/session.js',
     'storage/uuid.js',
-    'storage/workout.js',
 
+    'views/ant-device-scan.js',
     'views/connection-switch.js',
-    'views/data-display.js',
-    'views/data-graph.js',
-    'views/graphs.js',
-    'views/inputs.js',
-    'views/list.js',
-    'views/q.js',
-    'views/request.js',
+    'views/data-views.js',
+    'views/effect-views.js',
+    'views/graph.js',
+    'views/keyboard.js',
     'views/tabs.js',
-    'views/upload.js',
     'views/views.js',
     'views/watch.js',
     'views/workout-graph.js',
+    'views/workout-list.js',
 
-    'workouts/parser.js',
     'workouts/workouts.js',
+    'workouts/zwo.js',
 
+    'connectionManager.js',
+    'course.js',
     'db.js',
     'file.js',
     'functions.js',
-    'gps.js',
+    // 'index.html',
+    // 'index.js',
     'lock.js',
-    'manifest.webmanifest',
+    'physics.js',
+    // 'sw.js',
+    'utils.js',
     'vibrate.js',
     'watch.js',
+
+    'manifest.webmanifest',
 ];
 
 self.addEventListener('install', e => {
