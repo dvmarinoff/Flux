@@ -3,6 +3,7 @@
 Flux is an App for executing structured workouts on a smart trainer.
 
 - executing Zwift .zwo workouts
+- riding .fit courses and activities
 - works with bluetooth smart trainers, power meters and heart rate monitors.
 - ERG mode and extended manual control of your trainer with Grade Simulation and Resistance mode.
 - workouts with [Slope targets](https://github.com/dvmarinoff/Flux/wiki/Slope-target-for-workout-intervals)
