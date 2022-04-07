@@ -2222,7 +2222,7 @@ and (min-width: 1024px) {
 
     page-group {
         display: block;
-        padding-right: 120px;
+        padding-right: 12em;
     }
 
     #home-page .page-header {
@@ -2260,6 +2260,13 @@ and (min-width: 1024px) {
 
         justify-items: center;
         align-items: center;
+
+        --data-tile--heading-font-size: 0.8em;
+        /* --data-tile--value-font-size: 3.2em; */
+        /* --data-tile--unit-font-size: 1em; */
+        --data-tile-small--heading-font-size: 0.8em;
+        /* --data-tile-small--value-font-size: 3em; */
+        /* --data-tile-small--unit-font-size: 0.6em; */
 
         /* border-right: 1px solid var(--white-opacity-01); */
         /* border-left: 1px solid var(--white-opacity-01); */
@@ -2347,7 +2354,7 @@ and (min-width: 1024px) {
         display: flex;
         top: 0;
         right: 0;
-        width: 120px;
+        width: 12em;
    }
 
     .controls {
@@ -2366,23 +2373,35 @@ and (min-width: 1024px) {
     .watch {
         display: flex;
         flex-direction: column;
+        /* flex-direction: row; */
         justify-content: space-between;
         align-items: center;
         align-content: center;
-        height: 100vh;
+        height: var(--controls-height);
         padding: 0;
     }
 
     .menu--row {
         flex-direction: column;
+        /* flex-direction: row; */
         justify-content: space-between;
         align-items: center;
         align-content: center;
-        height: 100vh;
+        height: var(--menu-height);
     }
 
     #workout-name {
         display: none;
+    }
+
+    .workout-list--graph-cont {
+        float: left;
+        width: 50%;
+    }
+    .workout--description {
+        float: right;
+        width: 50%;
+        padding: 1em 1em 0;
     }
 }
 

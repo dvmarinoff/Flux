@@ -85,12 +85,19 @@ function renderInfo(args = {}) {
     const left         = intervalLeft - contLeft;
     const bottom       = args.intervalRect.height;
 
-
     dom.info.style.display = 'block';
     dom.info.innerHTML = `<div>${power}</div><div>${cadence}</div><div>${slope}</div><div class="graph--info--time">${duration}</div>`;
-    const width = dom.info.getBoundingClientRect().width;
+
+    const width  = dom.info.getBoundingClientRect().width;
+    const height = dom.info.getBoundingClientRect().height;
+    const minHeight = (bottom + height + (40)); // fix 40
     dom.info.style.left   = `min(${contWidth}px - ${width}px, ${left}px)`;
-    dom.info.style.bottom = bottom;
+
+    if(window.innerHeight > minHeight) {
+        dom.info.style.bottom = bottom;
+    } else {
+        dom.info.style.bottom = bottom - (minHeight - window.innerHeight);
+    }
 }
 
 class WorkoutGraph extends HTMLElement {
@@ -277,6 +284,7 @@ function scale(value, max = 100) {
 
 function courseToGraph(course, viewPort) {
     const altitudeSpec  = Segment(course.points, 'y');
+
 
     const distanceTotal = course.meta.distance;
     const aspectRatio   = viewPort.aspectRatio;
