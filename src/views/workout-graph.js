@@ -138,6 +138,7 @@ class WorkoutGraph extends HTMLElement {
     }
     getViewPort() {
         const rect = this.getBoundingClientRect();
+
         return {
             width: rect.width,
             height: rect.height,
@@ -189,14 +190,15 @@ class WorkoutGraph extends HTMLElement {
         this.dom.info.style.display = 'none';
     }
     onWorkout(value) {
+        this.workout = value; // this.workout = Object.assign({}, value);
+
         if(exists(value.intervals)) {
             this.type = 'workout';
         }
         if(exists(value.points)) {
             this.type = 'course';
         }
-        // this.workout = Object.assign({}, value);
-        this.workout = value;
+
         if(!equals(this.viewPort.width, 0)) {
             this.render();
         }
@@ -319,7 +321,7 @@ function courseToGraph(course, viewPort) {
 
     }, ``);
 
-    return `<div id="graph--info--cont"></div><svg class="graph--bar-group" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
+    return `<div id="graph--info--cont"></div><svg class="graph--bar-group" width="100%" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
 }
 
 export {
