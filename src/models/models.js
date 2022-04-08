@@ -185,7 +185,7 @@ class Target extends Model {
 class PowerTarget extends Target {
     postInit(args = {}) {
         this.min = existance(args.min, 0);
-        this.max = existance(args.max, 800);
+        this.max = existance(args.max, 4000);
         this.step = existance(args.step, 10);
     }
 }
