@@ -328,7 +328,7 @@ function SIM() {
 
     const definitions = {
         weight: {
-            resolution: 0.01, unit: 'kg', size: 2, min: 0, max: 655.35, default: 75
+            resolution: 0.01, unit: 'kg', size: 2, min: 0, max: 655.35, default: 85
         },
         crr: {
             resolution: 0.0001, unit: '', size: 2, min: 0, max: 6.5535, default: 0.004

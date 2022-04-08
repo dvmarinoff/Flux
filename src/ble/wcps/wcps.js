@@ -14,6 +14,7 @@ class WahooCyclingPower extends BLEService {
         this.onControl    = existance(args.onControl, this.defaultOnControlPoint);
         this.controllable = args.controllable;
         this.userWeight   = args.controllable.userWeight;
+        this.bikeWeight   = 10;
 
         this.characteristics = {
             wahooTrainer: {
@@ -70,7 +71,7 @@ class WahooCyclingPower extends BLEService {
 
         // console.log(self.controllable.mode);
 
-        await self.setSIM({weight: self.userWeight});
+        await self.setSIM({weight: (self.userWeight + self.bikeWeight)});
         await delay(1000); // test if this is really needed
 
         const buffer = control.slopeTarget.encode({grade: value});;
@@ -82,7 +83,7 @@ class WahooCyclingPower extends BLEService {
         const params = {
             circumference: 2105,
             windSpeed: 0,
-            weight: self.userWeight,
+            weight: self.userWeight + self.bikeWeight,
         };
 
         await delay(1000);
@@ -116,10 +117,11 @@ class WahooCyclingPower extends BLEService {
         const buffer = control.wheelCircumference.encode({circumference: value});
         return await self.write('wahooTrainer', buffer);
     }
-    async setUserWeight(kg = 75) {
+    async setUserWeight(kg = 85) {
         const self = this;
         self.userWeight = kg;
-        await self.setSIM({weight: kg});
+        const weight = self.userWeight + self.bikeWeight;
+        await self.setSIM({weight});
     }
     defaultOnData(decoded) {
         console.log(':rx :wcps :measurement ', JSON.stringify(decoded));
