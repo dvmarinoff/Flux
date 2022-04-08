@@ -964,7 +964,6 @@ customElements.define('virtual-state-source', VirtualStateSource);
 
 class DockModeBtn extends DataView {
     subs() {
-        console.log('DockModeBtn.sub()');
         this.addEventListener('pointerup', this.onSwitch.bind(this), this.signal);
     }
     onSwitch() {
