@@ -849,6 +849,10 @@ class VirtualState extends MetaProp {
         xf.sub('watch:started', this.onStarted.bind(this), this.signal);
     }
     onSources(sources) {
+        if(!equals(this.source, sources.virtualState)) {
+            this.lastUpdate = Date.now();
+        }
+
         this.source = sources.virtualState;
     }
     onWeight(weight) {
@@ -928,8 +932,6 @@ class SpeedState extends VirtualState {
 
         xf.dispatch('distance', distance);
         xf.dispatch('altitude', altitude);
-
-        // console.log(`s: ${speed}, a: ${altitude}, d: ${distance}`);
     }
 }
 
