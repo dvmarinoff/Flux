@@ -30,7 +30,7 @@ function Course() {
     function restore() {
     }
     function onCourseIndex(courseIndex) {
-        console.log(`course.onCourseIndex() ${courseIndex}`);
+        console.log(`:course :index ${courseIndex}`);
         index = courseIndex;
     }
     function onDistance(value) {
