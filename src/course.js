@@ -12,6 +12,7 @@ function Course() {
     xf.sub('ui:watchStart',   onWatchStart.bind(this), signal);
     xf.sub('db:courseIndex',  onCourseIndex.bind(this), signal);
 
+    let started = false;
     let distance = 0;
     let index = 0;
     let maxIndex = 0;
@@ -29,21 +30,21 @@ function Course() {
     function restore() {
     }
     function onCourseIndex(courseIndex) {
-        // console.log(`course.onCourseIndex() ${courseIndex}`);
+        console.log(`course.onCourseIndex() ${courseIndex}`);
         index = courseIndex;
     }
     function onDistance(value) {
+        if(!started) return;
+
         distance = (parseFloat(value) % courseDistance);
 
         if((distance - segmentStart) >= r || (segmentStart > distance)) {
             const indexNext = (index + 1) % maxIndex;
             xf.dispatch('course:index', indexNext);
-            segment = indexToSegment(indexNext);
-            r = segment.r;
-            slope = segment.slope;
-            segmentStart = segment.distance ?? distance;
+
+            setSegment(indexNext);
+
             xf.dispatch(`ui:slope-target-set`, slope);
-            // console.table({r,distance,courseDistance,slope,index,maxIndex,segment});
         }
     }
     function onWorkout(workout) {
@@ -51,6 +52,10 @@ function Course() {
 
         if(exists(course?.points)) {
             console.log(first(course.points).y);
+
+            setCourse(course);
+            setSegment(index);
+
             xf.dispatch('altitude', first(course.points).y);
         }
     }
@@ -61,14 +66,27 @@ function Course() {
     }
     function start() {
         if(distance > 0) return;
+        started = true;
 
-        maxIndex = course.pointsSimplified.length-1;
-        courseDistance = course.meta.distance;
-        r = indexToR(index);
-        slope = indexToSlope(index);
+        // setWorkout
+        setCourse(course);
+        setSegment(index);
+        // r = indexToR(index);
+        // slope = indexToSlope(index);
+
         xf.dispatch(`ui:slope-target-set`, slope);
         xf.dispatch(`ui:mode-set`, 'slope');
         console.log(`start a course ...`);
+    }
+    function setCourse(course) {
+        maxIndex = course.pointsSimplified.length-1;
+        courseDistance = course.meta.distance;
+    }
+    function setSegment(index) {
+        segment = indexToSegment(index);
+        r = segment.r;
+        slope = segment.slope;
+        segmentStart = segment.distance ?? distance;
     }
     function indexToSlope(index) {
         return course.pointsSimplified[index].slope;

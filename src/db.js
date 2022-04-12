@@ -239,7 +239,6 @@ xf.reg('activity:save:success', (e, db) => {
 
 xf.reg('course:index', (index, db) => {
     db.courseIndex = index;
-    console.log(`course:index ${index}`);
 });
 
 // Wake Lock
