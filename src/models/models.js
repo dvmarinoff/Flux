@@ -316,6 +316,26 @@ class FTP extends Model {
         if(equals(zone, 'seven')) return '#FE340B';
         return '#636468';
     }
+    percentageToZone(value) {
+        const self = this;
+        const zones = self.zones;
+        if(value < (self.percentages.one)) {
+            return zones[0];
+        } else if(value < (self.percentages.two)) {
+            return zones[1];
+        } else if(value < (self.percentages.three)) {
+            return zones[2];
+        } else if(value < (self.percentages.four)) {
+            return zones[3];
+        } else if(value < (self.percentages.five)) {
+            return zones[4];
+        } else if (value < (self.percentages.six)) {
+            return zones[5];
+        } else {
+            return zones[6];
+        }
+        return zones[0];
+    }
 }
 
 class Weight extends Model {

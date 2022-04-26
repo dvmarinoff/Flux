@@ -226,18 +226,108 @@
                         <div class="library--switch--icon"></div>
                         <h2 class="library--switch--heading">Workouts</h2>
                     </div>
-                    <div class="library--switch switch-item switch-1" index="1">
+                    <div class="library--switch switch-item switch-1 active" index="1">
+                        <div class="library--switch--icon"></div>
+                        <h2 class="library--switch--heading">Editor</h2>
+                    </div>
+                    <div class="library--switch switch-item switch-2" index="2">
                         <div class="library--switch--icon"></div>
                         <h2 class="library--switch--heading">Ride report</h2>
                     </div>
                 </library-switch-group>
+
+                <workout-editor id="workout-editor">
+                    <div class="editor-cont">
+                        <form action="">
+                            <div class="editor--meta">
+                                <div class="editor--form--group">
+                                    <label class="editor--label"
+                                           for="name">Name:</label>
+                                    <input class="editor--name editor--input"
+                                           name="name"
+                                           type="text" />
+                                </div>
+                                <div class="editor--form--group">
+                                    <label class="editor--label"
+                                           for="author">Author:</label>
+                                    <input class="editor--author editor--input"
+                                        name="author"
+                                        type="text" />
+                                </div>
+                                <div class="editor--form--group">
+                                    <label class="editor--label"
+                                           for="category">Category:</label>
+                                    <input class="editor--category editor--input"
+                                        name="category"
+                                        type="text" />
+                                </div>
+                                <div class="editor--form--group">
+                                    <label class="editor--label editor--label--textarea"
+                                           for="description">Description:</label>
+                                    <textarea class="editor--description editor--input"
+                                            name="description"
+                                            type="text"
+                                            rows="4"></textarea>
+                                </div>
+                            </div>
+                            <div class="editor--table">
+                                <h3 class="editor--header">Intervals:</h3>
+                                <div class="editor--head">
+                                    <div class="editor--row">
+                                        <div class="editor--th"></div>
+                                        <div class="editor--th">Time</div>
+                                        <div class="editor--th">Duration</div>
+                                        <div class="editor--th">Power</div>
+                                        <div class="editor--th">Ramp</div>
+                                        <div class="editor--th">Slope</div>
+                                        <div class="editor--th">Cadence</div>
+                                    </div>
+                                </div>
+                                <div class="editor--body"></div>
+                            </div>
+                            <div class="editor--controls">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="editor--add editor--icon"
+                                    viewBox="0 0 24 24"
+                                    height="24px" width="24px" fill="#FFFFFF">
+                                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="editor--remove editor--icon"
+                                    height="24px"
+                                    width="24px"
+                                    viewBox="0 0 24 24" fill="#FFFFFF">
+                                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                                    <path d="M19 13H5v-2h14v2z"/>
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="editor--save editor--icon"
+                                    height="24px"
+                                    width="24px"
+                                    viewBox="0 0 24 24" fill="#FFFFFF">
+                                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                                    <path d="M17 3H3v18h18V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="editor--download editor--icon"
+                                    height="24px"
+                                    width="24px"
+                                    viewBox="0 0 24 24" fill="#FFFFFF">
+                                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                                    <path d="M19 12v7H5v-7H3v9h18v-9h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+                                </svg>
+                            </div> <!-- end editor--controls -->
+                        </form>
+                    </div> <!-- end editor--cont -->
+                </workout-editor>
 
                 <div class="ride-report" id="ride-report">
 
                     <!-- <power-graph id="power-graph"></power-graph> -->
 
                     <power-in-zone id="power-in-zone">
-                        <div class=" power--zone--item">
+                        <div class="power--zone--item">
                             <div class="power--zone-value">0</div>
                             <div class="power--zone-bar zone-one"></div>
                         </div>
@@ -288,7 +378,7 @@
                                    class="file-btn-native"
                                    name="workout-file"
                                    type="file"
-                                   value=""/>
+                                   value="" />
                         </div>
                     </div>
                     <br/><br/><br/>

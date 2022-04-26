@@ -1,4 +1,6 @@
-import { equals, existance, exists, empty, repeat, capitalize, toFixed } from '../functions.js';
+import { equals, existance, exists,
+         empty, first, last, repeat,
+         capitalize, toFixed } from '../functions.js';
 
 function readAttribute(args = {}) {
     const el       = args.el;
@@ -108,6 +110,7 @@ function Element(args = {}) {
     const tagOpen      = existance(args.tagOpen, defaults.tagOpen);
     const tagClose     = existance(args.tagClose, defaults.tagClose);
     const toInterval   = existance(args.toInterval, defaultToInterval);
+    const fromInterval = existance(args.fromInterval, defaultFromInterval);
     const calcDuration = existance(args.calcDuration, defaultCalcDuration);
 
     function getName() {
@@ -178,8 +181,26 @@ function Element(args = {}) {
         };
     }
 
+    function defaultFromInterval(interval) {
+        const res = {
+            element: name,
+            Duration: interval.duration,
+        };
+        const step = first(interval.steps);
+
+        if(exists(step.power)) res.Power = step.power;
+        if(exists(step.cadence)) res.Cadence = step.cadence;
+        if(exists(step.slope)) res.Slope = step.slope;
+
+        return res;
+    }
+
     function readToInterval(args = {}) {
         return toInterval(read(args));
+    }
+
+    function writeFromInterval(args = {}) {
+        return fromInterval(write(args));
     }
 
     return Object.freeze({
@@ -188,10 +209,13 @@ function Element(args = {}) {
         read,
         write,
         toInterval,
+        fromInterval,
         calcDuration,
         defaultCalcDuration,
         defaultToInterval,
         readToInterval,
+        defaultFromInterval,
+        writeFromInterval,
     });
 }
 
@@ -299,10 +323,11 @@ function Warmup(args = {}) {
     const timeDx = existance(args.timeDx, defaults.timeDx);
 
     const spec = Object.assign({
-        name:       'Warmup',
-        tagOpen:    '<Warmup',
-        tagClose:   ' />',
-        toInterval: toInterval,
+        name:         'Warmup',
+        tagOpen:      '<Warmup',
+        tagClose:     ' />',
+        toInterval:   toInterval,
+        fromInterval: fromInterval,
     }, args.spec);
 
     function toInterval(element) {
@@ -332,6 +357,20 @@ function Warmup(args = {}) {
         };
     }
 
+    function fromInterval(interval) {
+        const res = {
+            element:  spec.name,
+            Duration: interval.duration,
+        };
+        const start = first(interval.steps);
+        const end   = last(interval.steps);
+
+        if(exists(start.power)) res.PowerLow = start.power;
+        if(exists(end.power))   res.PowerHigh = end.power;
+
+        return res;
+    }
+
     return Element(spec);
 }
 
@@ -343,10 +382,11 @@ function Cooldown(args = {}) {
     const timeDx = existance(args.timeDx, defaults.timeDx);
 
     const spec = {
-        name:       'Cooldown',
-        tagOpen:    '<Cooldown',
-        tagClose:   ' />',
-        toInterval: toInterval,
+        name:         'Cooldown',
+        tagOpen:      '<Cooldown',
+        tagClose:     ' />',
+        toInterval:   toInterval,
+        fromInterval: fromInterval,
     };
 
     function toInterval(element) {
@@ -374,6 +414,20 @@ function Cooldown(args = {}) {
             duration: duration,
             steps: fixedSteps,
         };
+    }
+
+    function fromInterval(interval) {
+        const res = {
+            element:  spec.name,
+            Duration: interval.duration,
+        };
+        const start = first(interval.steps);
+        const end   = last(interval.steps);
+
+        if(exists(start.power)) res.PowerLow = start.power;
+        if(exists(end.power))   res.PowerHigh  = end.power;
+
+        return res;
     }
 
     return Element(spec);
@@ -441,20 +495,36 @@ function Head(args = {}) {
         const subcategory = existance(args.subcategory, defaults.subcategory);
         const tags        = existance(args.tags, defaults.tags);
 
-        return `
-            ${Elements.Author.write({content: author})}
-            ${Elements.Name.write({content: name})}
-            ${Elements.Category.write({content: category})}
-            ${Elements.SubCategory.write({content: subcategory})}
-            ${Elements.Description.write({content: description})}
-            ${Elements.SportType.write({content: sportType})}
-            ${Elements.Tags.write({content: tags})}`
-        ;
+        const elements = [
+            Elements.Author.write({content: author}),
+            Elements.Name.write({content: name}),
+            Elements.Category.write({content: category}),
+            Elements.Name.write({content: name}),
+            Elements.Category.write({content: category}),
+            Elements.SubCategory.write({content: subcategory}),
+            Elements.Description.write({content: description}),
+            Elements.SportType.write({content: sportType}),
+            Elements.Tags.write({content: tags}),
+        ];
+
+        return elements.reduce((acc, el) => acc + el.padStart(el.length+4, ' ') + '\n', '\n');
+    }
+
+    function fromInterval(intervals) {
+        return {
+            author: intervals.meta.author,
+            name: intervals.meta.name,
+            category: intervals.meta.category,
+            subcategory: intervals.meta.subcategory,
+            sportType: intervals.meta.sportType,
+            description: intervals.meta.description,
+        };
     }
 
     return Object.freeze({
         read,
         write,
+        fromInterval,
     });
 }
 
@@ -503,17 +573,58 @@ function Body() {
         return Elements.Unknown.write(spec);
     }
 
+    function isRamp(steps) {
+        return steps.length > 1;
+    }
+    function isRampUp(steps) {
+        return first(steps).power < last(steps).power;
+    }
+    function isRampDown(steps) {
+        return first(steps).power > last(steps).power;
+    }
+
+    function fromInterval(value) {
+        const intervals = value.intervals;
+        const acc = [];
+
+        for(var i = 0; i < intervals.length; i++) {
+            var interval = intervals[i];
+            var steps = intervals[i].steps;
+            var node = {};
+
+            if(isRamp(steps)) {
+                if(isRampUp(steps)) {
+                    node = Elements.Warmup.fromInterval(interval);
+                } else
+                if(isRampDown(steps)) {
+                    node = Elements.Cooldown.fromInterval(interval);
+                }
+            } else {
+                node = Elements.SteadyState.fromInterval(interval);
+            }
+
+            acc.push(node);
+        }
+
+        return acc;
+    }
+
     function writeElements(elements) {
-        return elements.reduce((acc, element) => acc + writeElement(element), '');
+        return elements.reduce((acc, element) => {
+            const row = writeElement(element);
+            acc += row.padStart(row.length+8, ' ') + '\n';
+            return acc;
+        }, '');
     }
 
     function write(args = {}) {
-        return `<workout>${writeElements(args)}</workout>`;
+        return `<workout>\n${writeElements(args)}    </workout>`;
     }
 
     return Object.freeze({
         read,
         readToInterval,
+        fromInterval,
         write,
     });
 }
@@ -586,10 +697,9 @@ function readToInterval(zwo) {
     const meta      = head.read({doc});
     const intervals = body.readToInterval({doc});
     const duration  = intervals.reduce((acc, i) => acc + i.duration, 0);
-    const distance  = intervals.reduce((acc, i) => acc + i.distance, 0);
 
     return {
-        meta:      Object.assign(meta, {duration, distance}),
+        meta:      Object.assign(meta, {duration}),
         intervals: intervals,
     };
 }
@@ -605,15 +715,20 @@ function read(zwo) {
     };
 }
 
+function fromInterval(intervals) {
+    const res = {
+        head: head.fromInterval(intervals),
+        body: body.fromInterval(intervals),
+    };
+
+    return res;
+}
+
 function write(args = {}) {
     const headElements = head.write(args.head);
     const bodyElements = body.write(args.body);
 
-    return `
-    <workout_file>
-        ${headElements}
-        ${bodyElements}
-    </workout_file>`;
+    return `<workout_file>${headElements}    ${bodyElements}\n</workout_file>`;
 }
 
 const zwo = {
@@ -633,7 +748,9 @@ const zwo = {
     body,
     readToInterval,
     read,
+    fromInterval,
     write,
 };
 
 export { zwo };
+

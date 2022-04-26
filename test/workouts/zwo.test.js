@@ -150,6 +150,58 @@ describe('Zwo', () => {
         expect(removeWhiteSpace(res)).toEqual(removeWhiteSpace(expected));
     });
 
+    test('Zwo.fromInterval', () => {
+
+        const input = {
+            meta: {
+                author: 'Flux',
+                name: "Test Workout",
+                category: "Sweet Spot",
+                subcategory: "",
+                sportType: "bike",
+                description: "Description of test workout",
+                duration: 3 * 60, // 60s
+            },
+            intervals: [
+                {duration: 10, steps: [{duration: 10, power: 0.50}]},
+                {duration: 15, steps: [{duration: 15, power: 0.90}]},
+                {duration: 10, steps: [
+                    {duration: 10, power: 0.70, slope: 2.1, cadence: 90}]},
+                {duration: 15, steps: [{duration: 15, power: 0.92, cadence: 80}]},
+                {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
+                {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
+                {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
+                {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
+                {duration: 10, steps: [{duration: 10, cadence: 90}]},
+            ],
+        };
+
+        const expected = {
+            head: {
+                author: 'Flux',
+                name: "Test Workout",
+                category: "Sweet Spot",
+                subcategory: "",
+                sportType: "bike",
+                description: "Description of test workout",
+            },
+            body: [
+                {element: 'SteadyState', Duration: 10, Power: 0.50},
+                {element: 'SteadyState', Duration: 15, Power: 0.90,},
+                {element: 'SteadyState', Duration: 10, Power: 0.70, Slope: 2.1, Cadence: 90},
+                {element: 'SteadyState', Duration: 15, Power: 0.92, Cadence: 80},
+                {element: 'SteadyState', Duration: 40, Power: 1.21, Slope: 4.8},
+                {element: 'SteadyState', Duration: 20, Power: 0.7, Slope: 0.0},
+                {element: 'SteadyState', Duration: 40, Power: 1.21, Slope: 4.8},
+                {element: 'SteadyState', Duration: 20, Power: 0.7, Slope: 0.0},
+                {element: 'SteadyState', Duration: 10, Cadence: 90},
+            ],
+        };
+
+        let res = zwo.fromInterval(input);
+
+        expect(res).toEqual(expected);
+    });
 });
 
 describe('Head', () => {
@@ -427,6 +479,7 @@ describe('SteadyState', () => {
 
     test('toInterval', () => {
         expect(SteadyState.toInterval({
+            element: 'SteadyState',
             Duration: 300,
             Power: 0.88,
             Cadence: 90,
@@ -451,6 +504,24 @@ describe('SteadyState', () => {
                 cadence: 90,
                 slope: 4.8
             }]
+        });
+    });
+
+    test('fromInterval', () => {
+        expect(SteadyState.fromInterval({
+            duration: 300,
+            steps: [{
+                duration: 300,
+                power: 0.88,
+                cadence: 90,
+                slope: 4.8
+            }]}
+        )).toStrictEqual({
+            element: 'SteadyState',
+            Duration: 300,
+            Power: 0.88,
+            Cadence: 90,
+            Slope: 4.8
         });
     });
 });
@@ -775,7 +846,6 @@ describe('Warmup', () => {
                 {duration: 10, power: 0.51}, // 0.508
                 {duration: 10, power: 0.54}, // 0.535
 
-
                 {duration: 10, power: 0.56}, // 0.562
                 {duration: 10, power: 0.59}, // 0.589
                 {duration: 10, power: 0.62}, // 0.616
@@ -784,6 +854,31 @@ describe('Warmup', () => {
                 {duration: 10, power: 0.67}, // 0.670
                 {duration: 10, power: 0.70}, // 0.697
             ]
+        });
+    });
+
+    test('fromInterval 0.4 to 0.7 in 120s', () => {
+        expect(Warmup.fromInterval({
+            duration: 120,
+            steps: [
+                {duration: 10, power: 0.4},
+                {duration: 10, power: 0.43}, // 0.427
+                {duration: 10, power: 0.45}, // 0.454
+                {duration: 10, power: 0.48}, // 0.481
+                {duration: 10, power: 0.51}, // 0.508
+                {duration: 10, power: 0.54}, // 0.535
+                {duration: 10, power: 0.56}, // 0.562
+                {duration: 10, power: 0.59}, // 0.589
+                {duration: 10, power: 0.62}, // 0.616
+                {duration: 10, power: 0.65}, // 0.643 ? should be 0.64
+                {duration: 10, power: 0.67}, // 0.670
+                {duration: 10, power: 0.70}, // 0.697
+            ]
+        })).toStrictEqual({
+            element: 'Warmup',
+            Duration: 120,
+            PowerLow: 0.4,
+            PowerHigh: 0.7,
         });
     });
 });
@@ -837,7 +932,50 @@ describe('Cooldown', () => {
             ]
         });
     });
+
+    test('fromInterval 0.7 to 0.4 in 60s', () => {
+        expect(Cooldown.fromInterval({
+            duration: 60,
+            steps: [
+                {duration: 10, power: 0.7},
+                {duration: 10, power: 0.64},
+                {duration: 10, power: 0.58},
+                {duration: 10, power: 0.52},
+                {duration: 10, power: 0.46},
+                {duration: 10, power: 0.4},
+            ]
+        })).toStrictEqual({
+            element: 'Cooldown',
+            Duration: 60,
+            PowerLow: 0.7,
+            PowerHigh: 0.4,
+        });
+    });
 });
+
+
+// describe('ZWO', () => {
+//     //
+//     // `<SteadyState Duration="10" Power="0.50" />` ->
+//     // {body: [{element: 'SteadyState', Duration: 10, Power: 0.50},]} ->
+//     // {intervals: [{duration: 10, steps: [{duration: 10, power: 0.50}]}]}
+
+//     test('text zwo TO js zwo', () => {
+//         const input = `<SteadyState Duration="10" Power="0.50" />`;
+//         const res = {element: 'SteadyState', Duration: 10, Power: 0.50};
+
+//         expect(zwo.elements.SteadyState.read());
+//     });
+
+//     test('zwo js object TO interval', () => {
+//         const input = {element: 'SteadyState', Duration: 10, Power: 0.50};
+//         const res = {duration: 10, steps: [{duration: 10, power: 0.50}]};
+
+//         expect(zwo.elements.SteadyState.toInterval());
+//     });
+// });
+
+
 
 // describe('', () => {
 //     test('', () => {

@@ -864,19 +864,27 @@ class LibrarySwitchGroup extends SwitchGroup {
         this.effect = 'ui:library-switch-set';
     }
     config() {
-        this.$workouts   = document.querySelector('#workouts');    // tab 0
-        this.$rideReport = document.querySelector('#ride-report'); // tab 1
+        this.$workouts = document.querySelector('#workouts');      // tab 0
+        this.$editor = document.querySelector('#workout-editor');  // tab 1
+        this.$rideReport = document.querySelector('#ride-report'); // tab 2
 
         this.renderEffect(this.state);
     }
     renderEffect(state) {
-        if(equals(state, 1)) {
+        if(equals(state, 2)) {
             this.$rideReport.classList.add('active');
             this.$workouts.classList.remove('active');
+            this.$editor.classList.remove('active');
+        }
+        if(equals(state, 1)) {
+            this.$editor.classList.add('active');
+            this.$workouts.classList.remove('active');
+            this.$rideReport.classList.remove('active');
         }
         if(equals(state, 0)) {
             this.$workouts.classList.add('active');
             this.$rideReport.classList.remove('active');
+            this.$editor.classList.remove('active');
         }
         return;
     }

@@ -82,8 +82,12 @@ header, footer, section, article, nav {
     cursor: pointer;
 }
 
-input, button {
+input, button, textarea {
     font-family: var(--ssr-font-family);
+}
+
+input {
+    color: #fff;
 }
 
 .btn {
@@ -870,6 +874,7 @@ div.graph--bar-group {
     line-height: var(--number-input-line-height);
     font-size: var(--number-input-value-font-size);
     text-align: center;
+    color: var(--dark);
     border: 1px solid var(--white-opacity-01);
 }
 
@@ -1116,7 +1121,7 @@ div.graph--bar-group {
 
 .library--switch--group {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     justify-items: center;
     align-items: center;
 }
@@ -1150,6 +1155,10 @@ div.graph--bar-group {
     display: none;
 }
 
+#workout-editor {
+    display: none;
+}
+
 #workouts.active {
     display: block;
 }
@@ -1157,6 +1166,131 @@ div.graph--bar-group {
 #ride-report.active {
     display: block;
 }
+
+#workout-editor.active {
+    display: block;
+}
+
+/* CLEAR */
+.workout {
+    /* display: none!important; */
+}
+.fixed-bottom {
+    /* display: none!important; */
+}
+.workout-loader {
+    /* display: none!important; */
+}
+/* CLEAR END */
+
+/* Editor */
+.editor-cont {
+    font-size: 1rem;
+    width: 100%;
+}
+.editor--table {}
+.editor--meta {
+    display: grid;
+    background-color: var(--chrome);
+    padding: 0.5em 0;
+}
+.editor--form--group {
+    display: grid;
+    align-items: center;
+}
+.editor--input {
+    font-size: 1.3em;
+    line-height: 1.3em;
+    margin: 1em 1em;
+    color: #fff;
+    background-color: var(--dark);
+    background-color: var(--chrome);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid var(--yellow);
+}
+.editor--label {
+    text-align: left;
+    margin: 1em 1.3em 0;
+    line-height: 1.3em;
+
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+.editor--label--textarea {
+    align-self: start;
+    margin-top: 1.5em;
+}
+.editor--name {}
+.editor--head {
+    margin: 0 0 1em 0;
+    background-color: var(--chrome);
+}
+.editor--body {}
+.editor--row {
+    display: grid;
+    grid-template-columns: 10% repeat(6, 15%);
+}
+.editor--th {
+    font-size: 1em;
+    /* text-transform: uppercase; */
+    font-weight: bold;
+    padding: 0.5em 0.5em;
+    cursor: default;
+}
+.editor--td {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3em;
+    width: 100%;
+    padding: 0.5em 0.5em;
+    line-height: 1.3em;
+    text-align: center;
+    background-color: var(--dark);
+    border: none;
+}
+.editor--td.power, .editor--td.ramp {
+    font-size: 1.4em;
+    font-weight: bold;
+}
+.editor--header {
+    font-size: 1em;
+    padding: 1.5em 1em 1em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    background-color: var(--chrome);
+}
+.editor--static {
+    cursor: default;
+}
+.editor--controls {
+}
+.editor--icon {
+    margin: 1em 2em;
+    cursor: pointer;
+}
+.editor--save {
+    fill: var(--gray);
+    cursor: not-allowed;
+}
+.editor--radio {
+    display: none;
+    width: 1em;
+    height: 1em;
+    cursor: pointer;
+}
+.editor--radio.selected {
+    display: block;
+}
+.editor--add {
+}
+.editor--remove {
+}
+
 
 /* Workout List */
 #workouts-page {
@@ -1172,6 +1306,7 @@ div.graph--bar-group {
 
     text-align: center;
 }
+
 
 .workout {
     display: block;

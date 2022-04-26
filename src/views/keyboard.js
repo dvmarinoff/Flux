@@ -10,13 +10,18 @@ function Keyboard() {
     const isKeyL     = (code) => code === 'KeyL';
     const isKeySpace = (code) => code === 'Space';
 
-    window.addEventListener('keydown', onKeydown);
+    window.addEventListener('keydown', onKeydown.bind(this));
 
     function onKeydown(e) {
         let keyCode = e.keyCode;
         let code = e.code;
 
-        if (e.isComposing || keyCode === 229 || e.ctrlKey || e.shiftKey || e.altKey) {
+        if (e.isComposing ||
+            keyCode === 229 ||
+            e.ctrlKey ||
+            e.shiftKey ||
+            e.altKey ||
+            exists(e.target.form)) {
             return;
         }
 
