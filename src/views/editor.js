@@ -461,7 +461,6 @@ function RowView(args = {}) {
     function onSelect(e) {
         model.switchSelect();
         const selected = model.getSelect();
-        console.log(`onSelect: `, selected);
 
         if(selected) {
             select();
@@ -636,7 +635,6 @@ class WorkoutEditor extends HTMLElement {
 
         rowModels.forEach(rowModel => {
             const rowView = RowView({model: rowModel});
-            console.log(rowModel.get());
             this.rows.set(this.rows.size, rowView);
             this.$body.insertAdjacentHTML('beforeend', rowView.build());
             const $row = this.$body.lastChild;
