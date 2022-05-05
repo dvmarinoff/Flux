@@ -464,7 +464,9 @@ function SteadyState(args = {}) {
             step = Step(element);
         }
         else if(exists(powerLow) || exists(powerHigh)) {
-            element.Power = Math.max(...[powerLow, powerHigh].filter(exists));
+            element.Power = [powerLow, powerHigh]
+                .filter(exists)
+                .reduce((acc, x, _, { length }) => acc + x / length, 0);
             element.PowerLow = undefined;
             element.PowerHigh = undefined;
             step = Step(element);

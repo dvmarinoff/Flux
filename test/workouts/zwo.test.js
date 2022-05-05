@@ -561,7 +561,7 @@ describe('SteadyState', () => {
             duration: 300,
             steps: [{
                 duration: 300,
-                power: 0.88,
+                power: 0.81,
             }]
         });
     });
@@ -571,7 +571,7 @@ describe('SteadyState', () => {
             duration: 300,
             steps: [{
                 duration: 300,
-                power: 0.88,
+                power: 0.81,
             }]
         });
     });
