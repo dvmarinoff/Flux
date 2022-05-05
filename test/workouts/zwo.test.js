@@ -53,7 +53,7 @@ describe('Zwo', () => {
                 {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
                 {duration: 40, steps: [{duration: 40, power: 1.21, slope: 4.8}]},
                 {duration: 20, steps: [{duration: 20, power: 0.7, slope: 0.0}]},
-                {duration: 10, steps: [{duration: 10, cadence: 90}]},
+                {duration: 10, steps: [{duration: 10, power: 0, slope: 0, cadence: 90}]},
             ],
         };
 
@@ -285,7 +285,7 @@ describe('Body', () => {
             {duration: 15, steps: [{duration: 15, power: 0.90,}]},
             {duration: 10, steps: [{duration: 10, power: 0.70, slope: 2.1, cadence: 90}]},
             {duration: 15, steps: [{duration: 15, power: 0.92, cadence: 80}]},
-            {duration: 10, steps: [{duration: 10, cadence: 90}]},
+            {duration: 10, steps: [{duration: 10, power: 0, slope: 0, cadence: 90}]},
         ]);
     });
 
@@ -439,12 +439,22 @@ describe('SteadyState', () => {
           `<workout>
                <SteadyState Duration="300" Power="0.88" Cadence="90" Slope="4.8" />
                <SteadyState Duration="300" Power="240" />
+               <SteadyState Duration="300" />
+               <SteadyState Duration="300" PowerLow="0.88" PowerHigh="0.88" />
+               <SteadyState Duration="300" Power="0.88" PowerLow="0.88" PowerHigh="0.88" />
+               <SteadyState Duration="300" PowerLow="0.74" PowerHigh="0.88" />
+               <SteadyState Duration="300" PowerLow="0.88" PowerHigh="0.74" />
            </workout>`;
 
     const doc   = parser.parseFromString(xml, 'text/xml');
     const els   = doc.querySelectorAll('SteadyState');
     const el    = els[0];
     const elAbs = els[1];
+    const elNoTargets = els[2];
+    const elLowHighSame = els[3];
+    const elAll = els[4];
+    const elLowHigh = els[5];
+    const elLowHighReversed = els[6];
 
     test('getName', () => {
         expect(SteadyState.getName()).toBe('SteadyState');
@@ -524,6 +534,48 @@ describe('SteadyState', () => {
             Slope: 4.8
         });
     });
+
+    test('readToInterval no targets', () => {
+        expect(SteadyState.readToInterval({el: elNoTargets})).toStrictEqual({
+            duration: 300,
+            steps: [{
+                duration: 300,
+                power: 0,
+                slope: 0,
+            }]
+        });
+    });
+
+    test('readToInterval powerLow equals PowerHigh', () => {
+        expect(SteadyState.readToInterval({el: elLowHighSame})).toStrictEqual({
+            duration: 300,
+            steps: [{
+                duration: 300,
+                power: 0.88,
+            }]
+        });
+    });
+
+    test('readToInterval powerLow < PowerHigh', () => {
+        expect(SteadyState.readToInterval({el: elLowHigh})).toStrictEqual({
+            duration: 300,
+            steps: [{
+                duration: 300,
+                power: 0.88,
+            }]
+        });
+    });
+
+    test('readToInterval powerLow > PowerHigh', () => {
+        expect(SteadyState.readToInterval({el: elLowHigh})).toStrictEqual({
+            duration: 300,
+            steps: [{
+                duration: 300,
+                power: 0.88,
+            }]
+        });
+    });
+
 });
 
 describe('IntervalsT', () => {

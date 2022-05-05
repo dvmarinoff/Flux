@@ -59,7 +59,7 @@ function attributesToStep(args = {}) {
     const toName = existance(args.toName, ((x) => x));
 
     return Object.keys(tag).reduce(function(acc, key) {
-        if(filter(key)) {
+        if(filter(key) && exists(tag[key])) {
             const name  = toName(key);
             const value = tag[key];
             acc[name] = value;
@@ -443,6 +443,47 @@ function Ramp(args = {}) {
     return Warmup(spec);
 }
 
+function SteadyState(args = {}) {
+
+    const spec = Object.assign({
+        name:         'SteadyState',
+        tagOpen:      '<SteadyState',
+        tagClose:     ' />',
+        toInterval:   toInterval,
+    }, args.spec);
+
+    function toInterval(element) {
+        const duration  = element.Duration;
+        const power     = element.Power;
+        const powerLow  = element.PowerLow;
+        const powerHigh = element.PowerHigh;
+
+        let step = {};
+
+        if(exists(power)) {
+            step = Step(element);
+        }
+        else if(exists(powerLow) || exists(powerHigh)) {
+            element.Power = Math.max(...[powerLow, powerHigh].filter(exists));
+            element.PowerLow = undefined;
+            element.PowerHigh = undefined;
+            step = Step(element);
+        }
+        else {
+            element.Power = 0;
+            element.Slope = 0;
+            step = Step(element);
+        }
+
+        return {
+            duration: duration,
+            steps: [step],
+        };
+    }
+
+    return Element(spec);
+}
+
 function readContent(el) {
     if(exists(el)) {
         let value = el.textContent;
@@ -670,7 +711,8 @@ const Attrs = {
 
 const Elements = {
     Warmup:      Warmup(),
-    SteadyState: Element({name: 'SteadyState', tagOpen: '<SteadyState', tagClose: ' />'}),
+    // SteadyState: Element({name: 'SteadyState', tagOpen: '<SteadyState', tagClose: ' />'}),
+    SteadyState: SteadyState(),
     IntervalsT:  IntervalsT(),
     FreeRide:    FreeRide(),
     Ramp:        Ramp(),
