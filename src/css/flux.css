@@ -1185,9 +1185,16 @@ div.graph--bar-group {
 
 /* Editor */
 .editor-cont {
+    --editor-max-width: 48em;
     font-size: 1rem;
     width: 100%;
 }
+.editor--row, .editor--form--group {
+    max-width: var(--editor-max-width);
+    width: 100%;
+    margin: 0 auto;
+}
+
 .editor--table {}
 .editor--meta {
     display: grid;
@@ -2047,6 +2054,10 @@ and (min-height: 850px) {
         font-size: 1.2rem;
     }
 
+    .editor-cont {
+        font-size: 1.2rem;
+    }
+
     .fixed-bottom {
         font-size: 1.4rem;
     }
@@ -2117,6 +2128,10 @@ and (min-height: 1200px) {
     #workouts-page {
         font-size: 1.6rem;
     }
+
+    .editor-cont {
+        font-size: 1.6rem;
+    }
 }
 
 @media only screen
@@ -2153,6 +2168,10 @@ and (min-height: 1600px) {
     }
 
     #workouts-page {
+        font-size: 2.4rem;
+    }
+
+    .editor-cont {
         font-size: 2.4rem;
     }
 
