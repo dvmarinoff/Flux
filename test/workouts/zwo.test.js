@@ -240,12 +240,12 @@ describe('Head', () => {
             <sporttype>bike</sporttype>
             <tags></tags>`;
 
-        expect(zwo.head.write({
+        expect(removeWhiteSpace(zwo.head.write({
             author: 'Flux',
             name: 'Test Workout',
             description: "Description of test workout",
             category: "Sweet Spot",
-        })).toStrictEqual(xml);
+        }))).toStrictEqual(removeWhiteSpace(xml));
     });
 });
 

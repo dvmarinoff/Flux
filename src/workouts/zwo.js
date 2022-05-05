@@ -499,8 +499,6 @@ function Head(args = {}) {
             Elements.Author.write({content: author}),
             Elements.Name.write({content: name}),
             Elements.Category.write({content: category}),
-            Elements.Name.write({content: name}),
-            Elements.Category.write({content: category}),
             Elements.SubCategory.write({content: subcategory}),
             Elements.Description.write({content: description}),
             Elements.SportType.write({content: sportType}),
