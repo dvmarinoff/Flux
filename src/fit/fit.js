@@ -134,9 +134,15 @@ function Header() {
     function read(byte) {
         const header_type  = nthBitToBool(byte, 7) ? 'timestamp'  : 'normal';
         const type         = nthBitToBool(byte, 6) ? 'definition' : 'data';
+        const developer    = nthBitToBool(byte, 5);
         const local_number = getLocalNumber(byte); // bits 0-3, value 0-15
 
-        return { type, header_type, local_number };
+        return {
+            header_type,
+            type,
+            developer,
+            local_number,
+        };
     }
 
     return Object.freeze({
@@ -148,11 +154,12 @@ function Header() {
 }
 
 function Definition(args = {}) {
-    const headerLength       = 1;
-    const fixedContentLength = 6;
-    const fieldLength        = 3;
-    const architecture       = 0;
-    const type               = 'definition';
+    const headerLength        = 1;
+    const fixedContentLength  = 6;
+    const fieldLength         = 3;
+    const architecture        = 0;
+    const numberOfFieldsIndex = 5;
+    const type                = 'definition';
 
     function numberToMessage(number) {
         const res = messages.get(number)?.message;
@@ -170,28 +177,58 @@ function Definition(args = {}) {
         return res;
     }
 
-    function getLength(numberOfFields) {
-        return fixedContentLength + (numberOfFields * fieldLength);
+    function getLength(view, start = 0) {
+        const numberOfFields    = readNumberOfFields(view, start);
+        const numberOfDevFields = readNumberOfDevFields(view, start);
+
+        return fixedContentLength +
+               (numberOfFields * fieldLength) +
+               (numberOfDevFields > 0 ? 1 : 0) +
+               (numberOfDevFields * fieldLength);
     }
 
     function getDataMsgLength(fields) {
         return headerLength + fields.reduce((acc, x) => acc + x.size, 0);
     }
 
+    function readNumberOfFields(view, start = 0) {
+        return view.getUint8(start + numberOfFieldsIndex, true);
+    }
+
+    function readNumberOfDevFields(view, start = 0) {
+        const header = fit.header.read(view.getUint8(start, true));
+        if(header.developer) {
+            const numberOfFields = readNumberOfFields(view, start);
+            const index = start + fixedContentLength + (numberOfFields * fieldLength);
+
+            return view.getUint8(index, true);
+        }
+        return 0;
+    }
+
     function read(view, start = 0) {
-        const header         = view.getUint8(start, true);
-        const local_number   = header & 0b00001111;
-        const architecture   = view.getUint8(start+2, true);
-        const littleEndian   = !architecture;
-        const messageNumber  = view.getUint16(start+3, littleEndian);
-        const message        = numberToMessage(messageNumber);
-        const numberOfFields = view.getUint8(start+5, littleEndian);
-        const length         = getLength(numberOfFields);
+        const header            = fit.header.read(view.getUint8(start, true));
+        const local_number      = header.local_number;
+        const architecture      = view.getUint8(start+2, true);
+        const littleEndian      = !architecture;
+        const messageNumber     = view.getUint16(start+3, littleEndian);
+        const message           = numberToMessage(messageNumber);
+        const numberOfFields    = readNumberOfFields(view, start);
+        const numberOfDevFields = readNumberOfDevFields(view, start);
+        const length            = getLength(view, start);
 
         let fields = [];
         let i = start + fixedContentLength;
 
         for(let f=0; f < numberOfFields; f++) {
+            let fieldView = new DataView(view.buffer.slice(i, i + fieldLength));
+            fields.push(fit.fieldDefinition.read(fieldView, message));
+            i += fieldLength;
+        }
+
+        i+=1;
+
+        for(let df=0; df < numberOfDevFields; df++) {
             let fieldView = new DataView(view.buffer.slice(i, i + fieldLength));
             fields.push(fit.fieldDefinition.read(fieldView, message));
             i += fieldLength;
@@ -311,6 +348,10 @@ function Data() {
     }
 
     function read(definition, view, start = 0) {
+        // if(!exists(definition)) {
+        //     // return {};
+        //     return { type, message: 'unknown', local_number: 255, fields: {} };
+        // }
         const header       = view.getUint8(start, true);
         const local_number = header & 0b00001111;
         const message      = definition.message;
@@ -495,7 +536,6 @@ function Activity() {
                         definitions[header.local_number] = definition;
                         records.push(definition);
                     }
-
                     dataMsg = fit.data.read(definition, view, i);
                     records.push(dataMsg);
                     i += definition.data_msg_length;

@@ -28,7 +28,9 @@ const global_message_definitions = [
             ['device_type', 1, {field: 'device_type', number:   1, base_type: 2}],
             ['hardware_version', 6, {field: 'hardware_version', number:   6, base_type: 2}],
             ['battery_status', 11, {field: 'battery_status', number:  11, base_type: 2}],
-        ]
+            ['descriptor', 19, {field: 'descriptor', number:  19, base_type: 7}],
+            ['product_name', 27, {field: 'product_name', number:  27, base_type: 7}],
+        ],
     }],
     ['record', 20, {
         message: 'record',
