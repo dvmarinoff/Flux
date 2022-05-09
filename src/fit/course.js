@@ -1,4 +1,4 @@
-import { exists, equals, toFixed, } from '../functions.js';
+import { exists, equals, first, toFixed, } from '../functions.js';
 import { fit } from './fit.js';
 import { fields } from './fields.js';
 import { appTypes } from './profiles.js';
@@ -40,6 +40,11 @@ function isDataRecord(x) {
     return equals(x.type, 'data') && equals(x.message, 'record');
 }
 
+function hasAltitude(x) {
+    return exists(x.fields.altitude);
+
+}
+
 function isCourseDataMessage(x) {
     return equals(x.type, 'data') && equals(x.message, 'course');
 }
@@ -61,7 +66,17 @@ function read(view, fileName) {
     let x = 0;
 
     const dataRecords = course.filter(isDataRecord);
+    const altitudeRecords = dataRecords.filter(hasAltitude);
+
+    let prevAltitude = first(altitudeRecords).fields.altitude;
+
     const points = dataRecords.reduce((acc, m, i, xs) => {
+        if(!exists(m.fields.altitude)) {
+            m.fields.altitude = prevAltitude;
+            console.log(prevAltitude);
+        } else {
+            prevAltitude = m.fields.altitude;
+        }
         const altitude     = fields.altitude.decode(m.fields.altitude);
         const altitudeNext = fields.altitude.decode(xs[i+1]?.fields?.altitude ??
                                                     m.fields.altitude);
@@ -69,7 +84,6 @@ function read(view, fileName) {
         const distance = fields.distance.decode(m.fields.distance);
         const distanceNext = fields.distance.decode(xs[i+1]?.fields?.distance ??
                                                     m.fields.distance);
-
 
         const rise  = altitudeNext - altitude;
         const r     = distanceNext - distance;
