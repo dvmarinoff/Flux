@@ -102,4 +102,5 @@ Keep in mind it is in active development and will change and break on daily base
 
 ## Manual
 
-- [How to use the connection settings](https://github.com/dvmarinoff/Flux/discussions/91)
+- [How-To: Using the connection settings](https://github.com/dvmarinoff/Flux/discussions/91)
+- [How-To: Using Flux and another app concurrently](https://github.com/dvmarinoff/Flux/discussions/101)
