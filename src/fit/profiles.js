@@ -198,7 +198,39 @@ const global_message_definitions = [
             ['software_version', 0, {field: 'software_version', number: 0, base_type: 132}], // uint16
             ['hardware_version', 1, {field: 'hardware_version', number: 1, base_type: 1}],   // uint8
         ],
-    }]
+    }],
+
+    ['field_description', 206, {
+        message: 'field_description',
+        global_number: 206,
+        fields: [
+            ['developer_data_index', 0, {field: 'developer_data_index', number: 0, base_type: 2}],
+            ['field_definition_number', 1, {field: 'field_definition_number', number: 1, base_type: 2}],
+            ['fit_base_type_id', 2, {field: 'fit_base_type_id', number: 2, base_type: 2}], // 'fit_base_type'
+            ['field_name', 3, {field: 'field_name', number: 3, base_type: 7}],
+            ['array', 4, {field: 'array', number: 4, base_type: 2}],
+            ['components', 5, {field: 'components', number: 5, base_type: 7}],
+            ['scale', 6, {field: 'scale', number: 6, base_type: 2}],
+            ['offset', 7, {field: 'offset', number: 7, base_type: 1}],
+            ['units', 8, {field: 'units', number: 8, base_type: 7}],
+            ['bits', 9, {field: 'bits', number: 9, base_type: 7}],
+            ['accumulate', 10, {field: 'accumulate', number: 10, base_type: 7}],
+            ['fit_base_unit_id', 13, {field: 'fit_base_unit_id', number: 13, base_type: 132}], // 'fit_base_unit'
+            ['native_mesg_num', 14, {field: 'native_mesg_num', number: 14, base_type: 132}], // 'mesg_num'
+            ['native_field_num', 15, {field: 'native_field_num', number: 15, base_type: 2}],
+        ],
+    }],
+    ['developer_data_id', 207, {
+        message: 'developer_data_id',
+        global_number: 207,
+        fields: [
+            ['developer_id', 0, {field: 'developer_id', number: 0, base_type: 13}],
+            ['application_id', 1, {field: 'application_id', number: 1, base_type: 13}],
+            ['manufacturer_id', 2, {field: 'manufacturer_id', number: 2, base_type: 132}], // 'manufacturer'
+            ['developer_data_index', 3, {field: 'developer_data_index', number: 3, base_type: 2}],
+            ['application_version', 4, {field: 'application_version', number: 4, base_type: 134}],
+        ],
+    }],
 ];
 
 const messages = new Map();
@@ -273,7 +305,10 @@ const appTypes = {
     'device_index':    {basetype: 2, values: false}, // Creator of the file is always device index 0
     'battery_status':  {basetype: 2,
                         values: {new: 1, good: 2, ok: 3, low: 4, critical: 5, charging: 6, unknown: 7}},
-    'course_point': {basetype: 0, values: {generic: 0, summit: 1, valley: 2, water: 3, food: 4, danger: 5, left: 6, right: 7, straight: 8, first_aid: 9, fourth_category: 10, third_category: 11, second_category: 12, first_category: 13, hors_category: 14, sprint: 15, left_fork: 16, right_fork: 17, middle_fork: 18, slight_left: 19, sharp_left: 20, slight_right: 21, sharp_right: 22, u_turn: 23, segment_start: 24, segment_end: 25}},
+    'course_point': {basetype: 0,
+                     values: {generic: 0, summit: 1, valley: 2, water: 3, food: 4, danger: 5, left: 6, right: 7, straight: 8, first_aid: 9, fourth_category: 10, third_category: 11, second_category: 12, first_category: 13, hors_category: 14, sprint: 15, left_fork: 16, right_fork: 17, middle_fork: 18, slight_left: 19, sharp_left: 20, slight_right: 21, sharp_right: 22, u_turn: 23, segment_start: 24, segment_end: 25}},
+    'fit_base_unit': {basetype: 132,
+                      values: {other: 0, kilogram: 1, pound: 2,}},
 };
 
 export {
@@ -281,3 +316,4 @@ export {
     basetypes,
     appTypes,
 }
+
