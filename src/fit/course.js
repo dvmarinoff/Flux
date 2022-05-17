@@ -42,7 +42,10 @@ function isDataRecord(x) {
 
 function hasAltitude(x) {
     return exists(x.fields.altitude);
+}
 
+function hasDistance(x) {
+    return exists(x.fields.distance);
 }
 
 function isCourseDataMessage(x) {
@@ -65,7 +68,7 @@ function read(view, fileName) {
     let distanceTotal = 0;
     let x = 0;
 
-    const dataRecords = course.filter(isDataRecord);
+    const dataRecords = course.filter(r => isDataRecord(r) && hasDistance(r));
     const altitudeRecords = dataRecords.filter(hasAltitude);
 
     let prevAltitude = first(altitudeRecords).fields.altitude;
@@ -77,6 +80,7 @@ function read(view, fileName) {
         } else {
             prevAltitude = m.fields.altitude;
         }
+
         const altitude     = fields.altitude.decode(m.fields.altitude);
         const altitudeNext = fields.altitude.decode(xs[i+1]?.fields?.altitude ??
                                                     m.fields.altitude);
