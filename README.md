@@ -104,3 +104,18 @@ Keep in mind it is in active development and will change and break on daily base
 
 - [How-To: Using the connection settings](https://github.com/dvmarinoff/Flux/discussions/91)
 - [How-To: Using Flux and another app concurrently](https://github.com/dvmarinoff/Flux/discussions/101)
+
+<!-- sponsors -->
+## Sponsers 💖
+
+While Flux is free software and will always be, the project would benefit immensely from some funding. Raising a monthly budget we help cover the development and runnig costs for servers, databases, domains, storage, and others.
+
+You can support the development of Flux via [Github Sponsers](https://github.com/sponsors/dvmarinoff).
+
+### Backers
+<div>
+    <a href="https://github.com/TClin76" target="_blank">
+        <img style="display: inline-block;" src="https://avatars.githubusercontent.com/u/96434118?v=4" width="64" height="64" />
+    </a>
+</div>
+<!-- sponsors -->
