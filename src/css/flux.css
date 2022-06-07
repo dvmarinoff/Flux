@@ -2188,7 +2188,7 @@ and (min-width: 500px) {
     #home-page-wrapper {
         display: grid;
         grid-template-columns: 50px 1fr 1fr;
-        grid-template-rows: 2fr 1fr 50px;
+        grid-template-rows: 1.5fr 1fr 1fr 50px;
     }
 
     page-group {
@@ -2215,62 +2215,74 @@ and (min-width: 500px) {
     }
 
     .data-tiles {
-        font-size: 1.4rem;
+        font-size: 1rem;
 
         grid-area: 1 / 2 / 2 / 4;
 
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        /* grid-template-columns: repeat(5, 1fr); */
+        grid-template-columns: 1fr 1fr 1.2fr 1fr 1fr;
         grid-template-rows: repeat(2, 1fr);
 
         justify-content: center;
         justify-items: center;
         align-items: center;
 
-        --data-tile--heading-margin: 0 auto 0.5em;
+        --data-tile--heading-margin: 0 auto 0.3em;
     }
 
     #data-tile--power-avg {
-        display: none;
+        /* display: none; */
+        display: block;
+        grid-area: 1 / 1 / 1 / 1;
     }
     #data-tile--power {
-        grid-area: 1 / 1 / 1 / 2;
+        /* grid-area: 1 / 1 / 1 / 2; */
+        grid-area: 1 / 2 / 1 / 2;
     }
     #data-tile--interval-time {
-        grid-area: 1 / 2 / 1 / 3;
+        /* grid-area: 1 / 2 / 1 / 3; */
+        grid-area: 1 / 3 / 1 / 3;
     }
     #data-tile--heart-rate {
-        grid-area: 1 / 3 / 1 / 4;
+        /* grid-area: 1 / 3 / 1 / 4; */
+        grid-area: 1 / 4 / 1 / 4;
     }
     #data-tile--slope {
-        display: none;
+        /* display: none; */
+        /* grid-area: 2 / 1 / 2 / 1; */
+        display: block;
+        grid-area: 2 / 1 / 2 / 1;
     }
     #data-tile--target {
-        grid-area: 2 / 1 / 2 / 2;
+        grid-area: 2 / 2 / 2 / 2;
     }
     #data-tile--elapsed-time {
-        grid-area: 2 / 2 / 2 / 3;
+        grid-area: 2 / 3 / 2 / 3;
     }
     #data-tile--cadence {
-        grid-area: 2 / 3 / 2 / 4;
+        grid-area: 2 / 4 / 2 / 4;
     }
     #data-tile--speed {
-        display: none;
+        /* display: none; */
+        grid-area: 1 / 5 / 1 / 5;
     }
     #data-tile--distance {
-        display: none;
+        /* display: none; */
+        grid-area: 2 / 5 / 2 / 5;
     }
 
     #graph-power {
-        display: none;
-    }
-
-    #graph-workout {
+        /* display: none; */
         grid-area: 2 / 2 / 3 / 4;
     }
 
+    #graph-workout {
+        grid-area: 3 / 2 / 3 / 4;
+    }
+
     #targets {
-        grid-area: 3 / 2 / 4 / 4;
+        grid-area: 4 / 2 / 4 / 4;
         --mode-selector-margin: 1em auto;
         --mode-selector-padding: 0 1em;
         padding: 0 0em;
@@ -2349,18 +2361,18 @@ and (min-width: 500px) {
         display: none;
     }
 
-    #data-tile--power-avg.active {
-        display: none;
-    }
-    #data-tile--slope.active {
-        display: none;
-    }
-    #data-tile--speed.active {
-        display: none;
-    }
-    #data-tile--distance.active {
-        display: none;
-    }
+    /* #data-tile--power-avg.active { */
+    /*     display: none; */
+    /* } */
+    /* #data-tile--slope.active { */
+    /*     display: none; */
+    /* } */
+    /* #data-tile--speed.active { */
+    /*     display: none; */
+    /* } */
+    /* #data-tile--distance.active { */
+    /*     display: none; */
+    /* } */
 }
 
 /* DOCK MOCK (wide and very short) */
