@@ -117,5 +117,8 @@ You can support the development of Flux via [Github Sponsers](https://github.com
     <a href="https://github.com/TClin76" target="_blank">
         <img style="display: inline-block;" src="https://avatars.githubusercontent.com/u/96434118?v=4" width="64" height="64" />
     </a>
+    <a href="https://github.com/fvolcic" target="_blank">
+        <img style="display: inline-block;" src="https://avatars.githubusercontent.com/u/59806465?s=64&v=4" width="64" height="64" />
+    </a>
 </div>
 <!-- sponsors -->
