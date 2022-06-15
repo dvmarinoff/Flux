@@ -1,4 +1,28 @@
-/* RESET */
+/* Reset */
+/* Defaults */
+/* Atomics */
+/* Dynamics */
+/* Variables */
+/* Color */
+/* Theme */
+/* Page */
+/* Home Page */
+    /* Data Tiles */
+    /* Graphs */
+    /* Target Controls */
+/* Fixed Bottom */
+    /* Watch */
+    /* Menu */
+/* Workout Page */
+    /* Workout List */
+    /* Ride Report */
+    /* Editor */
+/* Settings Page */
+    /* App Connections */
+    /* About */
+/* Media Queries */
+
+/* Reset */
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -49,8 +73,9 @@ input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+/* END Reset */
 
-/* DEFAULTS */
+/* Defaults */
 html {
     font-size: 10px;
     text-align: center;
@@ -65,21 +90,6 @@ body {
 
 header, footer, section, article, nav {
     display: block;
-}
-
-.h1, .h2, .h3, h4, .h5, .t1, .t2, .t3, .t4, .t5, .t6, .a, .text, button, .btn, input, svg, a {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.a {
-    color: #bbb;
-    text-transform: uppercase;
-    cursor: pointer;
 }
 
 input, button, textarea {
@@ -159,6 +169,23 @@ input {
     width: 120px;
     z-index: 1;
 }
+/* END Defaults */
+
+/* Atomics */
+.h1, .h2, .h3, h4, .h5, .t1, .t2, .t3, .t4, .t5, .t6, .a, .text, button, .btn, input, svg, a {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.a {
+    color: #bbb;
+    text-transform: uppercase;
+    cursor: pointer;
+}
 
 .line {
     display: block;
@@ -169,9 +196,7 @@ input {
     background-color: var(--white-opacity-01);
 }
 
-
-
-/* CLEARFIX */
+/* Clearfix */
 .cf:before, .cf:after {
     content: " ";
     display: table;
@@ -183,6 +208,14 @@ input {
     *zoom: 1;
     /*For IE 6/7 only*/
 }
+/* End Clearfix */
+/* End Atomics */
+
+/* Dynamics */
+.hide {
+    visibility: hidden;
+}
+/* End */
 
 /* Variables */
 :root {
@@ -219,6 +252,7 @@ body {
     --white-opacity-01:  rgba(255,255,255, 0.1);
     --white-opacity-03:  rgba(255,255,255, 0.3);
 }
+/* END Variables */
 
 /* Color */
 .zone-one {
@@ -332,35 +366,26 @@ body {
 .dark-bg {
     background-color: var(--dark);
 }
-
-
+/* End Color */
 
 /* Theme */
 /* Dark Theme */
-body.dark-theme {
+body {
     color: var(--white);
     background-color: var(--dark);
 }
-.dark-theme .connections-header {
+.connections-header {
     background-color: var(--chrome);
 }
 
-.dark-theme .controls {
-    background-color: var(--dark);
-}
-.dark-theme .menu-cont {
-    background-color: var(--dark);
-}
-.dark-theme #progress-active {
+#progress-active {
     background-color: var(--white-opacity-03);
 }
-.dark-theme .radio {
+.radio {
     fill: var(--white);
 }
-.dark-theme .workout {
-    border-bottom: 1px solid var(--white-opacity-01);
-}
-.dark-theme .mode.active {
+
+.mode.active { */
     color: #fff;
 }
 
@@ -379,11 +404,7 @@ body.dark-theme {
 .control-icon {
     fill: #fff;
 }
-
-.hide {
-    visibility: hidden;
-}
-
+/* Dark Theme */
 
 /* Page */
 .wrapper {
@@ -427,8 +448,9 @@ body.dark-theme {
 #workouts-page .page--header {
     margin-bottom: 40px;
 }
+/* End Page */
 
-/* HOME PAGE */
+/* Home Page */
 #home-page {
     min-height: 100vh;
     padding: 0;
@@ -667,6 +689,7 @@ body.dark-theme {
     width: auto;
     min-width: 1.5em;
 }
+/* END Data Tiles */
 
 /* Graphs */
 .graph {
@@ -678,7 +701,6 @@ body.dark-theme {
     position: relative;
     height: var(--graph-total-height);
     width: 100%;
-    /* overflow: hidden; */
 }
 #graph-power {
     overflow: hidden;
@@ -690,9 +712,6 @@ div.graph--bar-group {
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: flex-end;
-    /* height: var(--graph-height); */
-    /* height: 8em; */
-    /* min-height: 100%; */
     padding: 0;
 }
 #graph--info--cont {
@@ -707,16 +726,6 @@ div.graph--bar-group {
     border-radius: 0.2em;
     z-index: 1;
 }
-
-/* #graph--info--cont::before { */
-/*     content: ""; */
-/*     position: absolute; */
-/*     top: 100%; */
-/*     left: calc(50% - 1px); */
-/*     width: 1px; */
-/*     height: 1000px; */
-/*     background-color: var(--white); */
-/* } */
 
 #workout-list svg.graph--bar-group {
     height: var(--graph-height);
@@ -754,6 +763,7 @@ div.graph--bar-group {
     bottom: 0px;
     padding: 0;
 }
+
 .graph--bar {
     position: relative;
     display: flex;
@@ -764,6 +774,7 @@ div.graph--bar-group {
     width: 1px;
 
 }
+
 .graph--info {
     display: none;
     position: absolute;
@@ -774,21 +785,27 @@ div.graph--bar-group {
     border-radius: 2px;
     z-index: 1;
 }
+
 .graph--bar:hover .graph--info {
     display: block;
 }
+
 .graph--info--power {
     min-width: 48px;
 }
+
 .graph--info--slope {
     min-width: 48px;
 }
+
 .graph--info--cadence {
     min-width: 48px;
 }
+
 .graph--info--time {
     color: var(--gray);
 }
+
 .graph--bar-distance {
 }
 
@@ -801,6 +818,7 @@ div.graph--bar-group {
     height: var(--graph-height);
     padding: 0;
 }
+
 .workout-list--graph-cont {
     display: flex;
     flex-direction: row;
@@ -822,6 +840,7 @@ div.graph--bar-group {
     width: 0px;
     height: var(--graph-height);
 }
+
 #progress-active {
     display: flex;
     justify-content: start;
@@ -833,10 +852,9 @@ div.graph--bar-group {
     height: var(--graph-height);
     z-index: 1;
 }
+/* END Graphs */
 
-
-
-/* Targets */
+/* Target Controls */
 #targets {
     font-size: 1rem;
     padding: 0 1em;
@@ -853,12 +871,33 @@ div.graph--bar-group {
     --number-input-font-size: 1.2em;
     --number-input-value-font-size: 1.4em;
 }
+
 .targets--cont {
     margin: 0 auto;
     max-width: var(--inner-max-width);
 }
 
-/* Number btn*/
+.mode-selector {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    max-width: 100%;
+    margin: var(--mode-selector-margin);
+    font-size: 1em;
+    text-transform: uppercase;
+}
+
+.mode {
+    padding: var(--mode-selector-padding);
+    color: var(--gray);
+    cursor: pointer;
+}
+
+.mode.active {
+    font-weight: bold;
+}
+
 .number-input {
     display: flex;
     justify-content: center;
@@ -893,29 +932,10 @@ div.graph--bar-group {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
 }
+/* END Target Controls */
+/* END Home Page */
 
-.mode-selector {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    max-width: 100%;
-    margin: var(--mode-selector-margin);
-    font-size: 1em;
-    text-transform: uppercase;
-}
-
-.mode {
-    padding: var(--mode-selector-padding);
-    color: var(--gray);
-    cursor: pointer;
-}
-
-.mode.active {
-    font-weight: bold;
-}
-
-/* App Menu */
+/* Fixed Bottom */
 .fixed-bottom {
     font-size: 1rem;
 
@@ -923,7 +943,6 @@ div.graph--bar-group {
     --menu-height: 5em;
     --fb-total-height: 10em;
     --size--icon--global: 2.4em;
-    /* --size--icon--menu--btn: 1.6em; */
     --size--icon--menu--btn: 2em;
 
     position: fixed;
@@ -934,15 +953,68 @@ div.graph--bar-group {
     z-index: 3;
 }
 
-.menu {
-    height: var(--menu-height);
-}
-
-.controls {
+.fixed-bottom--cont {
     height: var(--controls-height);
     width: 100%;
     border-top: 1px solid var(--white-opacity-01);
     z-index: 1;
+}
+
+/* Watch */
+.watch {
+    display: block;
+    padding: 0.5em 0 0.5em;
+    width: 100%;
+    text-align: right;
+}
+
+.watch .btn {
+    margin: 0px 2px;
+}
+
+.control--btn {
+    display: inline-block;
+    margin: 0px 0.8em;
+}
+
+.control--btn--icon {
+    width: var(--size--icon--global);
+    height: var(--size--icon--global);
+    fill: #fff;
+    cursor: pointer;
+}
+
+#workout-name {
+    font-size: 1.2em;
+    font-family: var(--ssb-font-family);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    display: block;
+    margin: 0 0.8em;
+    float: left;
+    text-align: left;
+    max-width: 50%;
+}
+
+#watch-pause, #watch-lap, #watch-stop, #activity-save {
+    display: none;
+
+}
+/* END Watch */
+
+/* Menu */
+.tab.active {
+    display: block;
+}
+
+.tab {
+    display: none;
+}
+
+.menu {
+    height: var(--menu-height);
 }
 
 .menu--row {
@@ -991,73 +1063,92 @@ div.graph--bar-group {
 .menu--btn.active .menu--btn--icon--fill {
     fill: var(--white);
 }
+/* END Menu */
+/* END Fixed Bottom */
 
-.watch {
+/* #dark-mode { */
+/*     display: inline-block; */
+/*     margin: 20px auto 20px; */
+/*     width: 105px; */
+/* } */
+
+
+/* Workout Page */
+#workouts-page {
+    font-size: 1rem;
+
+    --workout--name-font-size: 1.4em;
+    --workout--type-font-size: 1.4em;
+    --workout--duration-font-size: 1.4em;
+    --workout--description-font-size: 1.4em;
+    --inner-max-width: 47em;
+    --size--icon--global: 2.4em;
+    --list--graph--height: 8em;
+
+    text-align: center;
+}
+
+/* Workout List */
+.workout {
     display: block;
-    padding: 0.5em 0 0.5em;
-    width: 100%;
-    text-align: right;
+    padding: 1.5em 1.5em;
+    border-bottom: 1px solid var(--white-opacity-01);
 }
 
-.watch .btn {
-    margin: 0px 2px;
-}
-
-.control--btn {
-    display: inline-block;
-    margin: 0px 0.8em;
-}
-
-.control--btn--icon {
-    width: var(--size--icon--global);
-    height: var(--size--icon--global);
-    fill: #fff;
+.workout--short-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    align-content: center;
+    max-width: var(--inner-max-width);
+    margin: 0 auto;
+    text-align: left;
     cursor: pointer;
 }
 
-#workout-name {
-    font-size: 1.2em;
-    font-family: var(--ssb-font-family);
+.workout--name {
+    font-size: var(--workout--name-font-size);
+    width: 50%;
+}
+
+.workout--type {
+    font-size: var(--workout--type-font-size);
+    width: 20%;
+    min-width: 100px;
     font-weight: bold;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+}
 
-    display: block;
-    margin: 0 0.8em;
-    float: left;
+.workout--duration {
+    font-size: var(--workout--duration-font-size);
+    width: 15%;
+    min-width: 60px;
+    color: var(--gray);
+}
+
+.workout--full-info {
+    display: none;
+}
+
+.workout--description {
+    font-size: var(--workout--description-font-size);
+    max-width: var(--inner-max-width);
+    margin: 0 auto;
+    line-height: 1.4em;
+    padding: 1.5em 0 0.5em;
     text-align: left;
-    max-width: 50%;
 }
-
-#watch-pause, #watch-lap, #watch-stop, #activity-save {
-    display: none;
-
+.radio {
+    width: var(--size--icon--global);
+    height: var(--size--icon--global);
 }
-
-.tab.active {
-    display: block;
-}
-.tab {
-    display: none;
-}
-
-#dark-mode {
-    display: inline-block;
-    margin: 20px auto 20px;
-    width: 105px;
-}
-
-
-/* #start-work-interval { */
-/*     padding: 0; */
-/* } */
+/* END Workout List */
 
 /* Ride Report */
 #power-in-zone {
 
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    /* grid-template-rows: repeat(3, 1fr); */
     justify-items: center;
     align-items: center;
     max-width: var(--inner-max-width);
@@ -1170,18 +1261,7 @@ div.graph--bar-group {
 #workout-editor.active {
     display: block;
 }
-
-/* CLEAR */
-.workout {
-    /* display: none!important; */
-}
-.fixed-bottom {
-    /* display: none!important; */
-}
-.workout-loader {
-    /* display: none!important; */
-}
-/* CLEAR END */
+/* END Ride Report */
 
 /* Editor */
 .editor-cont {
@@ -1189,22 +1269,24 @@ div.graph--bar-group {
     font-size: 1rem;
     width: 100%;
 }
+
 .editor--row, .editor--form--group {
     max-width: var(--editor-max-width);
     width: 100%;
     margin: 0 auto;
 }
 
-.editor--table {}
 .editor--meta {
     display: grid;
     background-color: var(--chrome);
     padding: 0.5em 0;
 }
+
 .editor--form--group {
     display: grid;
     align-items: center;
 }
+
 .editor--input {
     font-size: 1.3em;
     line-height: 1.3em;
@@ -1217,6 +1299,7 @@ div.graph--bar-group {
     border-right: none;
     border-bottom: 1px solid var(--yellow);
 }
+
 .editor--label {
     text-align: left;
     margin: 1em 1.3em 0;
@@ -1226,27 +1309,29 @@ div.graph--bar-group {
     letter-spacing: 1px;
     font-weight: bold;
 }
+
 .editor--label--textarea {
     align-self: start;
     margin-top: 1.5em;
 }
-.editor--name {}
+
 .editor--head {
     margin: 0 0 1em 0;
     background-color: var(--chrome);
 }
-.editor--body {}
+
 .editor--row {
     display: grid;
     grid-template-columns: 10% repeat(6, 15%);
 }
+
 .editor--th {
     font-size: 1em;
-    /* text-transform: uppercase; */
     font-weight: bold;
     padding: 0.5em 0.5em;
     cursor: default;
 }
+
 .editor--td {
     display: flex;
     align-items: center;
@@ -1259,10 +1344,12 @@ div.graph--bar-group {
     background-color: var(--dark);
     border: none;
 }
+
 .editor--td.power, .editor--td.ramp {
     font-size: 1.4em;
     font-weight: bold;
 }
+
 .editor--header {
     font-size: 1em;
     padding: 1.5em 1em 1em;
@@ -1271,152 +1358,33 @@ div.graph--bar-group {
     font-weight: bold;
     background-color: var(--chrome);
 }
+
 .editor--static {
     cursor: default;
 }
-.editor--controls {
-}
+
 .editor--icon {
     margin: 1em 2em;
     cursor: pointer;
 }
+
 .editor--save {
     fill: var(--gray);
     cursor: not-allowed;
 }
+
 .editor--radio {
     display: none;
     width: 1em;
     height: 1em;
     cursor: pointer;
 }
+
 .editor--radio.selected {
     display: block;
 }
-.editor--add {
-}
-.editor--remove {
-}
-
-
-/* Workout List */
-#workouts-page {
-    font-size: 1rem;
-
-    --workout--name-font-size: 1.4em;
-    --workout--type-font-size: 1.4em;
-    --workout--duration-font-size: 1.4em;
-    --workout--description-font-size: 1.4em;
-    --inner-max-width: 47em;
-    --size--icon--global: 2.4em;
-    --list--graph--height: 8em;
-
-    text-align: center;
-}
-
-
-.workout {
-    display: block;
-    padding: 1.5em 1.5em;
-}
-
-.workout--short-info {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    align-content: center;
-    max-width: var(--inner-max-width);
-    margin: 0 auto;
-    text-align: left;
-    cursor: pointer;
-}
-
-.workout--name {
-    font-size: var(--workout--name-font-size);
-    width: 50%;
-}
-
-.workout--type {
-    font-size: var(--workout--type-font-size);
-    width: 20%;
-    min-width: 100px;
-    font-weight: bold;
-}
-
-.workout--duration {
-    font-size: var(--workout--duration-font-size);
-    width: 15%;
-    min-width: 60px;
-    color: var(--gray);
-}
-
-.workout--full-info {
-    display: none;
-}
-
-.workout--description {
-    font-size: var(--workout--description-font-size);
-    max-width: var(--inner-max-width);
-    margin: 0 auto;
-    line-height: 1.4em;
-    padding: 1.5em 0 0.5em;
-    text-align: left;
-}
-.radio {
-    width: var(--size--icon--global);
-    height: var(--size--icon--global);
-}
-
-/* Device Chooser popup */
-#device-chooser {
-    display: none;
-    position: absolute;
-    top: 43px;
-    left: 10px;
-    right: 10px;
-    height: 320px;
-    padding: 5px 0px 48px;
-    color: #444;
-    background: var(--white);
-    box-shadow: 1px 2px 4px 0px rgba(0,0,0, 0.2);
-    border-radius: 3px;
-    border: 1px solid #ddd;
-    z-index: 4;
-}
-.device-chooser-item {
-    display: flex;
-    align-items: center;
-    text-align: left;
-    margin: 0 10px 6px;
-    padding: 0 10px;
-    height: 48px;
-    border-bottom: 1px solid #ddd;
-}
-.device-connection-type {
-    width: 50px;
-}
-.device-number {
-    min-width: 120px;
-}
-.device-type {}
-.device-chooser-bootom-bar {
-    position: absolute;
-    height: 48px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.device-chooser-bootom-bar .status {
-    margin: 0 20px;
-}
-.chooser-btns {
-    margin: 0 20px;
-}
+/* END Editor */
+/* END Workouts Page */
 
 /* Settings Page */
 #settings-page {
@@ -1497,8 +1465,6 @@ div.graph--bar-group {
     cursor: pointer;
 }
 
-
-
 .settings-btn-row {
     display: flex;
     align-items: center;
@@ -1519,7 +1485,6 @@ div.graph--bar-group {
 
     width: 12em;
     height: 4em;
-    /* padding: 0.4em 1em; */
 
     text-transform: uppercase;
     font-weight: bold;
@@ -1555,6 +1520,7 @@ div.graph--bar-group {
 .row-border {
     border-top: 1px solid var(--white-opacity-01);
 }
+
 .border-top {
     border-top: 1px solid var(--white-opacity-01);
 }
@@ -1567,13 +1533,11 @@ div.graph--bar-group {
     --size--icon: 2.7em;
     border-bottom: 1px solid var(--white-opacity-01);
 }
+
 .device-card--cont {
     max-width: var(--settings-row-max-width);
     margin: 0 auto;
     padding: 0.2em 0 0.8em 0;
-}
-
-.device-card--header {
 }
 
 .device-card--header--label {
@@ -1622,21 +1586,18 @@ div.graph--bar-group {
     margin: 0 auto;
     padding: 0.2em 0 0.8em 0;
 }
-.simulation--header {
-}
+
 .simulation-header--label {
     font-size: 1.1em;
     line-height: 3em;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
 .simulation--switch {
     text-transform: uppercase;
     font-weight: bold;
     cursor: pointer;
-}
-
-.connection-icon-switch {
 }
 
 .connection-icon-switch--icon {
@@ -1666,7 +1627,7 @@ div.graph--bar-group {
     color: #fff;
 }
 
-/* APP CONNECTIONS */
+/* App Connections */
 .app-connections {
     margin: 3em auto;
 }
@@ -1694,7 +1655,7 @@ div.graph--bar-group {
 .app-connection--content {
 }
 
-/* ABOUT */
+/* About */
 #about {
     font-size: 1em;
     margin: 10px auto 0;
@@ -1717,9 +1678,10 @@ div.graph--bar-group {
 .license {
     letter-spacing: 1px;
 }
+/* END Settings Page */
 
 
-
+/* Media Queries */
 /* IPHONE 5/SE */
 @media all
 and (max-width: 340px)
@@ -2646,3 +2608,4 @@ and (min-width: 1900px) {
         --data-tile-small--heading-font-size: 0.8em;
     }
 }
+/* END Media Queries */
