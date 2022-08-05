@@ -18,6 +18,7 @@
     /* Ride Report */
     /* Editor */
 /* Settings Page */
+    /* ANT Device Request */
     /* App Connections */
     /* About */
 /* Media Queries */
@@ -385,7 +386,7 @@ body {
     fill: var(--white);
 }
 
-.mode.active { */
+.mode.active {
     color: #fff;
 }
 
@@ -477,7 +478,8 @@ body {
     grid-row: 1;
 }
 
-.connection-switch {
+.connection-switch,
+.protocol-switch {
     display: flex;
     align-items: center;
     align-content: center;
@@ -517,6 +519,48 @@ body {
     line-height: 1em;
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+.protocol-switch.on {
+    color: var(--white);
+}
+
+.protocol-switch.loading {
+    color: var(--gray);
+}
+
+.protocol-switch.off {
+    color: var(--gray);
+}
+
+.protocol-switch.on .protocol-btn--icon {
+    fill: var(--white);
+}
+
+.protocol-switch.loading .protocol-btn--icon {
+    fill: var(--gray);
+}
+
+.protocol-switch.off .protocol-btn--icon {
+    fill: var(--gray);
+}
+
+.protocol-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.protocol-btn--icon {
+    fill: var(--white);
+    width: var(--size--icon--global);
+    height: var(--size--icon--global);
+}
+
+.protocol-btn--label {
+    margin-left: 10px;
+    font-weight: bold;
 }
 
 /* Data Tiles */
@@ -1493,30 +1537,6 @@ div.graph--bar-group {
     cursor: pointer;
 }
 
-.protocol-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-.protocol-btn--icon {
-    fill: var(--white);
-    width: var(--size--icon--global);
-    height: var(--size--icon--global);
-}
-.protocol-btn--label {
-    margin-left: 10px;
-}
-
-.protocol-btn.disabled .protocol-btn--label {
-    color: var(--gray);
-}
-
-.protocol-btn.disabled .protocol-btn--icon {
-    fill: var(--gray);
-}
-
 .row-border {
     border-top: 1px solid var(--white-opacity-01);
 }
@@ -1626,6 +1646,87 @@ div.graph--bar-group {
 .source-switch.active {
     color: #fff;
 }
+
+/* ANT Device Request */
+#ant-device-request {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+#ant-device-request.active {
+    display: block;
+}
+.device-request--wrapper {
+    display: inline-block;
+
+    font-size: 1rem;
+    --grid-template-columns--device-request--list: 1fr 1fr 1fr;
+
+    max-width: 100%;
+    width: 48em;
+    background-color: var(--chrome);
+    box-shadow: 1px 2px 4px 0px rgba(0,0,0, 0.2);
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.device-request--list {
+    min-height: 100px;
+}
+.device-request--item {
+    display: grid;
+    grid-template-columns: var(--grid-template-columns--device-request--list);
+    height: 3em;
+    align-items: center;
+    cursor: pointer;
+}
+.device-request--item.active {
+    background-color: var(--black-opacity-01);
+}
+.device-request--item--protocol {
+    font-size: 1.2em;
+}
+.device-request--item--number {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.device-request--item--type {
+    font-size: 1.2em;
+}
+.device-request--item--type {
+}
+.device-request--controls {
+    display: grid;
+    grid-template-columns: 60px 1fr 11em 11em;
+    align-items: center;
+    padding: 1em 1em;
+    border-top: 1px solid var(--black-opacity-01);
+}
+.device-request--status {
+    justify-self: flex-start;
+}
+.device-request--controls button {
+    margin: 0 1em;
+    height: 3em;
+    width: 9em;
+    justify-self: flex-end;
+
+    font-size: 1em;
+    text-transform: uppercase;
+    font-family: var(--ss-font-family);
+    color: #fff;
+    background-color: var(--chrome);
+    border: 1px solid var(--white-opacity-01);
+    border-radius: 3px;
+    cursor: pointer;
+}
+.device-request--cancel {
+}
+.device-request--pair {
+}
+/* END ANT Device Request */
 
 /* App Connections */
 .app-connections {

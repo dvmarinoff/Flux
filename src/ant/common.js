@@ -171,4 +171,3 @@ const common = {
 };
 
 export { DataPage, common };
-

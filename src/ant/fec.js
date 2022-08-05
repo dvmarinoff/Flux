@@ -1,5 +1,5 @@
 import { equals, existance, curry2, xor,
-         nthBit, nthBitToBool, toNumber } from '../functions.js';
+         nthBit, nthBitToBool } from '../functions.js';
 import { format } from '../utils.js';
 import { DataPage } from './common.js';
 
@@ -403,8 +403,8 @@ function Capabilities() {
         const virtualSpeed = existance(args.virtualSpeed, defaults.virtualSpeed);
 
         return hrDataSourceToNumber(hrDataSource) +
-               (toNumber(distance) << 2) +
-               (toNumber(virtualSpeed) << 3);
+               (+(distance) << 2) +
+               (+(virtualSpeed) << 3);
     }
 
     function decode(bitField) {
@@ -730,17 +730,37 @@ function DataPage26(args = {}) {
     });
 }
 
-const fec = {
-    dataPage48: DataPage48(),
-    dataPage49: DataPage49(),
-    dataPage50: DataPage50(),
-    dataPage51: DataPage51(),
-    dataPage55: DataPage55(),
+function FEC() {
+    const pages = {
+        dataPage48: DataPage48(),
+        dataPage49: DataPage49(),
+        dataPage50: DataPage50(),
+        dataPage51: DataPage51(),
+        dataPage55: DataPage55(),
 
-    dataPage16: DataPage16(),
-    dataPage25: DataPage25(),
-    // dataPage26: DataPage26(),
-};
+        dataPage16: DataPage16(),
+        dataPage25: DataPage25(),
+        // dataPage26: DataPage26(),
+    };
+
+    function decode(dataview) {
+        const dataPage = dataview.getUint8(0, true);
+        if(equals(dataPage, 48)) return pages.dataPage48.decode(dataview);
+        if(equals(dataPage, 49)) return pages.dataPage49.decode(dataview);
+        if(equals(dataPage, 50)) return pages.dataPage50.decode(dataview);
+        if(equals(dataPage, 51)) return pages.dataPage51.decode(dataview);
+        if(equals(dataPage, 55)) return pages.dataPage55.decode(dataview);
+        if(equals(dataPage, 16)) return pages.dataPage16.decode(dataview);
+        if(equals(dataPage, 25)) return pages.dataPage25.decode(dataview);
+        return dataview;
+    }
+
+    return {
+        ...pages,
+        decode,
+    };
+}
+
+const fec = FEC();
 
 export { fec };
-

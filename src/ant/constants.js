@@ -33,8 +33,8 @@ const ids = {
     burstAdvData:     114, // 0x72
 
     // channel
-    channelEvent:     64, // 0x40
     channelResponse:  64, // 0x40
+    channelEvent:     64, // 0x40
 
     // requested response
     channelStatus:    82, // 0x52

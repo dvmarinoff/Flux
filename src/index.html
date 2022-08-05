@@ -386,6 +386,24 @@
             </div>
 
             <div id="settings-page" class="page" page="settings">
+
+                <!-- ant-device-request -->
+                <ant-device-request id="ant-device-request">
+                    <div class="device-request--wrapper">
+                        <div id="device-request--list" class="device-request--list">
+                        </div> <!-- end device-request--list -->
+                        <div class="device-request--controls">
+                            <div id="device-request--status"
+                                 class="device-request--status">Searching ...</div>
+                            <div></div>
+                            <button id="device-request--cancel"
+                                    class="device-request--cancel">Cancel</button>
+                            <button id="device-request--pair"
+                                    class="device-request--pair">Pair</button>
+                        </div> <!-- end device-request--controls -->
+                    </div> <!-- end device-request--wrapper -->
+                </ant-device-request> <!-- end ant-device-request -->
+
                 <header class="page--header">
                     <h2 class="page--heading">Settings</h2>
                 </header>
@@ -460,15 +478,15 @@
                         <span class="protocol-btn--label">BLE</span>
                     </div>
 
-                    <div class="protocol-btn flat-btn settings-switch-btn-cont disabled">
-                        <svg class="protocol-btn--icon icon" xmlns="http://www.w3.org/2000/svg"
-                             height="24"
-                             viewBox="0 0 24 24"
-                             width="24">
-                            <path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6zm6-6h4v3h-4zM6 7h5v5H6zm6 4h4v6h-4z"/>
-                            <path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"/>
-                        </svg>
-                        <span class="protocol-btn--label">ANT+</span>
+                    <div class="protocol-btn flat-btn settings-switch-btn-cont">
+                        <protocol-switch for="ant:driver" id="switch-controllable" class="protocol-switch ant-switch off">
+                            <svg class="protocol-btn--icon icon" xmlns="http://www.w3.org/2000/svg"
+                                 height="24" viewBox="0 0 24 24" width="24">
+                                <path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6zm6-6h4v3h-4zM6 7h5v5H6zm6 4h4v6h-4z"/>
+                                <path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"/>
+                            </svg>
+                            <span class="connection-switch--label protocol-btn--label">ANT+</span>
+                        </protocol-switch>
                     </div>
                 </div>
 
@@ -715,6 +733,41 @@
                                     </source-switch>
                                 </div>
                             </div>
+
+                            <!-- ant hrm -->
+                            <div class="device-card--body--row">
+                                <connection-switch for="ant:hrm"
+                                                   id="switch-hrm"
+                                                   indicatorClass="connection-icon-switch--indicator"
+                                                   class="connection-icon-switch">
+                                    <svg class="connection-icon-switch--icon icon" xmlns="http://www.w3.org/2000/svg"
+                                         height="24"
+                                         viewBox="0 0 24 24"
+                                         width="24">
+                                        <path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6zm6-6h4v3h-4zM6 7h5v5H6zm6 4h4v6h-4z"/>
+                                        <path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"/>
+                                    </svg>
+                                    <div class="connection-icon-switch--indicator off"></div>
+                                </connection-switch>
+                                <div class="device-card--tile">
+                                    <h3 class="device-card--tile--header">Name</h3>
+                                    <data-view class="device-card--tile--value"
+                                               prop="ant:hrm:name">--</data-view>
+                                </div>
+                                <div class="device-card--tile"></div>
+                                <div class="device-card--tile"></div>
+                                <div class="device-card--tile"></div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                for="heartRate"
+                                                use="ant:hrm">
+                                        <h3 class="device-card--tile--header">Heart Rate</h3>
+                                        <heart-rate-value id="ant-heartRate"
+                                                          class="data-view device-card--tile--value">--</heart-rate-value>
+                                    </source-switch>
+                                </div>
+                            </div> <!-- end device-card--body--row -->
+                            <!-- end ant hrm -->
                         </div>
                     </div>
                 </div> <!--end ant hrm settings -->

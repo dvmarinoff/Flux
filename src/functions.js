@@ -558,6 +558,21 @@ function xor(view, start = 0, end = view.byteLength) {
     return cs;
 }
 
+function setUint24LE(dataview, index, value) {
+    dataview.setUint8(index,    value        & 0xFF, true); // LSB
+    dataview.setUint8(index+1, (value >> 8 ) & 0xFF, true);
+    dataview.setUint8(index+2,  value >> 16        , true); // MSB
+    return dataview;
+}
+
+function getUint24LE(dataview, index) {
+    const LSB = dataview.getUint8(index,   true); // LSB
+    const MB  = dataview.getUint8(index+1, true);
+    const MSB = dataview.getUint8(index+2, true); // MSB
+
+    return (MSB << 16) + (MB << 8) + LSB;
+}
+
 export {
     // values
     equals,
@@ -618,5 +633,7 @@ export {
     nthBit,
     nthBitToBool,
     xor,
+    setUint24LE,
+    getUint24LE,
 };
 
