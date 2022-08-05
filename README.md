@@ -13,7 +13,7 @@ Flux is an App for executing structured workouts on a smart trainer.
 The web version is free to use and open source. It is developed as a static PWA, has zero dependancies and is completly independant to run.
 Everything happens in your Browser and stays in there. It uses Web Bluetooth, Web Serial, Web Components, IndexDB, Local Storage, WakeLock API.
 
-_Status_: I am working on ANT+ support, the latest code is moved to a separate project [WebANT](https://github.com/dvmarinoff/WebANT).
+_Status_: Currently working on creating a backend API and iOS app.
 
 ## Screenshots
 
@@ -88,7 +88,7 @@ The following table is copied from [DC Rainmaker Trainer Guide](https://www.dcra
 
 ### ANT+
 
-Support for ANT+ is experimental at the moment. It is being rewritten right now and the code is moved to [WebANT](https://github.com/dvmarinoff/WebANT), which has a separate demo. When it becomes stable enough will be merged here. It currently has support for MacOS, Linux and Android, Windows 10 is a possibility.
+Support for ANT+ is experimental at the moment. It is being rewritten right now and the code is moved to [WebANT](https://github.com/dvmarinoff/WebANT), which has a separate demo. When it becomes stable enough will be merged here. It currently has support for Ubuntu(Linux), and partially for MacOS, and Android. Windows 10 may be possible in the future.
 
 
 The current development setup is using Suunto movestick mini, Garmin Fenix 5 watch broadcasting heart rate,
