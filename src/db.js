@@ -1,5 +1,6 @@
 import { xf, exists, equals } from '../functions.js';
 import { models } from './models/models.js';
+import { Sound } from './sound.js';
 // import { trainerMock } from './simulation-scripts.js';
 
 let db = {
@@ -36,6 +37,7 @@ let db = {
     weight: models.weight.default,
     theme: models.theme.default,
     measurement: models.measurement.default,
+    volume: models.volume.default,
 
     // UI options
     powerSmoothing: 0,
@@ -206,6 +208,19 @@ xf.reg('ui:measurement-switch', (_, db) => {
     models.measurement.backup(db.measurement);
 });
 
+xf.reg('ui:volume-mute', (_, db) => {
+    db.volume = models.volume.mute();
+    models.volume.backup(db.volume);
+});
+xf.reg('ui:volume-down', (_, db) => {
+    db.volume = models.volume.dec(db.volume);
+    models.volume.backup(db.volume);
+});
+xf.reg(`ui:volume-up`, (_, db) => {
+    db.volume = models.volume.inc(db.volume);
+    models.volume.backup(db.volume);
+});
+
 // Workouts
 xf.reg('workout', (workout, db) => {
     db.workout = models.workout.set(workout);
@@ -276,6 +291,7 @@ xf.reg('app:start', async function(_, db) {
     db.weight = models.weight.set(models.weight.restore());
     db.theme = models.theme.set(models.theme.restore());
     db.measurement = models.measurement.set(models.measurement.restore());
+    db.volume = models.volume.set(models.volume.restore());
     db.dataTileSwitch = models.dataTileSwitch.set(models.dataTileSwitch.restore()),
 
     db.sources = models.sources.set(models.sources.restore());
@@ -283,9 +299,13 @@ xf.reg('app:start', async function(_, db) {
     db.workouts = models.workouts.restore();
     db.workout = models.workout.restore(db);
 
+
     await models.session.start();
     await models.session.restore(db);
     xf.dispatch('workout:restore');
+
+    const sound = Sound({volume: db.volume});
+    sound.start();
 
     // TRAINER MOCK
     // trainerMock.init();

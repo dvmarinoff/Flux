@@ -70,9 +70,7 @@ class Watch {
         }
     }
     startWorkout() {
-        const self         = this;
-
-
+        const self       = this;
         let intervalTime = 0;
         let stepTime     = 0;
 
@@ -106,7 +104,7 @@ class Watch {
             xf.dispatch('workout:started');
         }
         if(self.isStarted()) {
-            self.start();
+            self.pause();
         }
     }
     resume() {
@@ -158,6 +156,9 @@ class Watch {
             lapTime  += 1;
         }
 
+        if(equals(lapTime, 4) && stepTime > 0) {
+            xf.dispatch('watch:beep');
+        }
         xf.dispatch('watch:elapsed',  elapsed);
         xf.dispatch('watch:lapTime',  lapTime);
         xf.dispatch('watch:stepTime', stepTime);

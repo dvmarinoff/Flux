@@ -182,6 +182,28 @@ class Target extends Model {
     }
 }
 
+class Volume extends Target {
+    postInit(args = {}) {
+    }
+    postInit(args = {}) {
+        const self = this;
+        const storageModel = {
+            key: self.prop,
+            fallback: self.defaultValue(),
+            parse: parseInt,
+        };
+        self.min = existance(args.min, 0);
+        self.max = existance(args.max, 100);
+        self.step = existance(args.max, 10);
+        self.storage = new args.storage(storageModel);
+    }
+    defaultValue() { return 100; }
+    mute() {
+        const self = this;
+        return self.set(self.min);
+    }
+}
+
 class PowerTarget extends Target {
     postInit(args = {}) {
         this.min = existance(args.min, 0);
@@ -987,6 +1009,7 @@ const page = new Page({prop: 'page'});
 const ftp = new FTP({prop: 'ftp', storage: LocalStorageItem});
 const weight = new Weight({prop: 'weight', storage: LocalStorageItem});
 const theme = new Theme({prop: 'theme', storage: LocalStorageItem});
+const volume = new Volume({prop: 'volume', storage: LocalStorageItem});
 const measurement = new Measurement({prop: 'measurement', storage: LocalStorageItem});
 const dataTileSwitch = new DataTileSwitch({prop: 'dataTileSwitch', storage: LocalStorageItem});
 
@@ -1024,6 +1047,7 @@ let models = {
     page,
     ftp,
     weight,
+    volume,
     theme,
     measurement,
     dataTileSwitch,

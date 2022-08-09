@@ -1598,13 +1598,12 @@ div.graph--bar-group {
 
 .simulation {
     --settings-row-max-width: 60em;
-    margin: 4em auto 4em;
+    margin: 0em auto 2em;
 }
 
 .simulation--cont {
     max-width: var(--settings-row-max-width);
     margin: 0 auto;
-    padding: 0.2em 0 0.8em 0;
 }
 
 .simulation-header--label {
@@ -1615,9 +1614,56 @@ div.graph--bar-group {
 }
 
 .simulation--switch {
+    display: block;
+    margin: 2.4em auto 0;
     text-transform: uppercase;
     font-weight: bold;
     cursor: pointer;
+}
+
+
+.sound {
+    --settings-row-max-width: 60em;
+    margin: 4em auto 0em;
+}
+
+.sound--cont {
+    max-width: var(--settings-row-max-width);
+    margin: 0 auto;
+    padding: 0.2em 0 0.8em 0;
+}
+
+.sound-header--label {
+    font-size: 1.1em;
+    line-height: 3em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sound--row {
+    display: flex;
+    vertical-align: baseline;
+    justify-content: center;
+    max-width: var(--inner-max-width);
+    margin: 1.4em auto 0.6em;
+}
+
+.sound--row--item {
+    max-width: 25%;
+    width: 7rem;
+    height: 3rem;
+    line-height: 3rem;
+    margin: 1rem 0rem;
+}
+
+.sound--control {
+    cursor: pointer;
+}
+
+.sound--volume {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 3rem;
 }
 
 .connection-icon-switch--icon {
@@ -1730,7 +1776,7 @@ div.graph--bar-group {
 
 /* App Connections */
 .app-connections {
-    margin: 3em auto;
+    margin: 1.4em auto;
 }
 
 .app-connection {
