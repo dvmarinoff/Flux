@@ -87,50 +87,6 @@ class DataView extends HTMLElement {
 customElements.define('data-view', DataView);
 
 
-
-class SoundControl extends DataView {
-    postInit() {
-        this.volume = 100;
-        this.selectors = {
-            mute:    '#sound--mute',
-            down:    '#sound--down',
-            up:      '#sound--up',
-            volume:  '#sound--volume',
-        };
-    }
-    getDefaults() {
-        return { prop: 'db:volume', };
-    }
-    config() {
-        this.$mute   = this.querySelector(this.selectors.mute);
-        this.$down   = this.querySelector(this.selectors.down);
-        this.$up     = this.querySelector(this.selectors.up);
-        this.$volume = this.querySelector(this.selectors.volume);
-    }
-    subs() {
-        this.$mute.addEventListener(`pointerup`, this.onMute.bind(this), this.signal);
-        this.$down.addEventListener(`pointerup`, this.onDown.bind(this), this.signal);
-        this.$up.addEventListener(`pointerup`, this.onUp.bind(this), this.signal);
-        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
-    }
-    onMute() {
-        xf.dispatch(`ui:volume-mute`);
-    }
-    onDown() {
-        xf.dispatch(`ui:volume-down`);
-    }
-    onUp() {
-        xf.dispatch(`ui:volume-up`);
-    }
-    render() {
-        this.$volume.textContent = `${this.state}%`;
-    }
-}
-
-customElements.define('sound-control', SoundControl);
-
-
-
 class TimerTime extends DataView {
     getDefaults() {
         return {
@@ -284,6 +240,29 @@ class DistanceValue extends DataView {
 }
 
 customElements.define('distance-value', DistanceValue);
+
+
+class AltitudeValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:altitude',
+        };
+    }
+}
+
+customElements.define('altitude-value', AltitudeValue);
+
+
+class AscentValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:ascent',
+        };
+    }
+}
+
+customElements.define('ascent-value', AscentValue);
+
 
 class CadenceValue extends DataView {
     getDefaults() {
@@ -1030,6 +1009,48 @@ class DockModeBtn extends DataView {
 }
 
 customElements.define('dock-mode-btn', DockModeBtn);
+
+
+class SoundControl extends DataView {
+    postInit() {
+        this.volume = 100;
+        this.selectors = {
+            mute:    '#sound--mute',
+            down:    '#sound--down',
+            up:      '#sound--up',
+            volume:  '#sound--volume',
+        };
+    }
+    getDefaults() {
+        return { prop: 'db:volume', };
+    }
+    config() {
+        this.$mute   = this.querySelector(this.selectors.mute);
+        this.$down   = this.querySelector(this.selectors.down);
+        this.$up     = this.querySelector(this.selectors.up);
+        this.$volume = this.querySelector(this.selectors.volume);
+    }
+    subs() {
+        this.$mute.addEventListener(`pointerup`, this.onMute.bind(this), this.signal);
+        this.$down.addEventListener(`pointerup`, this.onDown.bind(this), this.signal);
+        this.$up.addEventListener(`pointerup`, this.onUp.bind(this), this.signal);
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    onMute() {
+        xf.dispatch(`ui:volume-mute`);
+    }
+    onDown() {
+        xf.dispatch(`ui:volume-down`);
+    }
+    onUp() {
+        xf.dispatch(`ui:volume-up`);
+    }
+    render() {
+        this.$volume.textContent = `${this.state}%`;
+    }
+}
+
+customElements.define('sound-control', SoundControl);
 
 export {
     DataView,

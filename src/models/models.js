@@ -850,6 +850,7 @@ class VirtualState extends MetaProp {
         this.speed           = this.getDefaults().speed;
         this.altitude        = this.getDefaults().altitude;
         this.distance        = this.getDefaults().distance;
+        this.ascent          = this.getDefaults().ascent;
 
         this.slope           = this.getDefaults().slope;
         this.riderWeight     = this.getDefaults().riderWeight;
@@ -875,6 +876,7 @@ class VirtualState extends MetaProp {
             speed: 0,
             altitude: 0,
             distance: 0,
+            ascent: 0,
 
             prop: 'power',
             source: 'power',
@@ -915,11 +917,12 @@ class VirtualState extends MetaProp {
             return;
         };
 
-        const { speed, distance, altitude, } = this.cycling.virtualSpeedCF({
+        const { speed, distance, altitude, ascent } = this.cycling.virtualSpeedCF({
             power:    db.power,
             slope:    db.slopeTarget / 100,
             distance: db.distance,
             altitude: db.altitude,
+            ascent:   db.ascent,
             mass:     this.mass,
             speed:    this.speed,
             dt:       isNaN(dt) ? 1/4 : dt,
@@ -930,6 +933,7 @@ class VirtualState extends MetaProp {
         xf.dispatch('speedVirtual', (speed * 3.6));
         xf.dispatch('distance', distance);
         xf.dispatch('altitude', altitude);
+        xf.dispatch('ascent', ascent);
     }
 }
 
@@ -958,11 +962,12 @@ class SpeedState extends VirtualState {
         const dt  = (now - this.lastUpdate) / 1000;
         this.lastUpdate = now;
 
-        const { distance, altitude } = this.cycling.trainerSpeed({
+        const { distance, altitude, ascent } = this.cycling.trainerSpeed({
             slope:     db.slopeTarget / 100,
             speed:     db.speed / 3.6,
             distance:  db.distance,
             altitude:  db.altitude,
+            ascent:    db.ascent,
             speedPrev: this.speedPrev,
             mass:      this.mass,
             dt:        isNaN(dt) ? 1/4 : dt,
@@ -972,6 +977,7 @@ class SpeedState extends VirtualState {
 
         xf.dispatch('distance', distance);
         xf.dispatch('altitude', altitude);
+        xf.dispatch('ascent', ascent);
     }
 }
 

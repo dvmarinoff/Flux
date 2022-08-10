@@ -14,6 +14,7 @@ let db = {
     speedVirtual: models.virtualState.speed,
     altitude: models.virtualState.altitude,
     distance: models.virtualState.distance,
+    ascent: models.virtualState.ascent,
 
     power1s: models.power1s.default,
     powerLap: models.powerLap.default,
@@ -53,8 +54,6 @@ let db = {
     lap: [],
     laps: [],
     lapStartTime: false,
-    gpsData: [],
-    gps: false,
 
     // Watch
     elapsed: 0,
@@ -118,6 +117,10 @@ xf.reg('speedVirtual', (speedVirtual, db) => {
 
 xf.reg('altitude', (altitude, db) => {
     db.altitude = altitude;
+});
+
+xf.reg('ascent', (ascent, db) => {
+    db.ascent = ascent;
 });
 
 xf.reg('distance', (distance, db) => {

@@ -319,6 +319,7 @@ function Model(args = { use: {}}) {
         let speed            = args.speed ?? 0; // m/s
         let distance         = args.distance ?? 0; // m
         let altitude         = args.altitude ?? 0; // m
+        let ascent           = args.ascent ?? 0; // m
 
         const cosBeta = CosBeta(slope);
         const sinBeta = SinBeta(slope, cosBeta);
@@ -367,10 +368,17 @@ function Model(args = { use: {}}) {
         const da = dx * sinBeta;
         distance += dx;
         altitude += da;
+        ascent += da > 0 ? da : 0;
 
         if(altitude < 0) altitude = 0;
 
-        return { acceleration, speed, distance, altitude };
+        return {
+            acceleration,
+            speed,
+            distance,
+            altitude,
+            ascent,
+        };
     }
 
     function trainerSpeed(args = {}) {
@@ -380,6 +388,7 @@ function Model(args = { use: {}}) {
         let speed            = args.speed ?? 0; // m/s
         let distance         = args.distance ?? 0; // m
         let altitude         = args.altitude ?? 0; // m
+        let ascent           = args.ascent ?? 0; // m
 
         const cosBeta = CosBeta(slope);
         const sinBeta = SinBeta(slope, cosBeta);
@@ -389,10 +398,16 @@ function Model(args = { use: {}}) {
         const da = dx * sinBeta;
         distance += dx;
         altitude += da;
+        ascent += da > 0 ? da : 0;
 
         if(altitude < 0) altitude = 0;
 
-        return { acceleration, distance, altitude };
+        return {
+            acceleration,
+            distance,
+            altitude,
+            ascent,
+        };
     }
 
     return Object.freeze({
