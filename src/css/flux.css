@@ -786,6 +786,19 @@ div.graph--bar-group {
     z-index: 1;
 }
 
+.elevation--value {
+    position: absolute;
+    top: 0.4em;
+    font-size: 1.6em;
+    font-weight: bold;
+}
+.ascent--value {
+    right: 0.3em;
+}
+.altitude--value {
+    left: 0.3em;
+}
+
 .graph--msg {
     font-size: 1em;
     line-height: 1.4em;

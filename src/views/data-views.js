@@ -56,7 +56,7 @@ class DataView extends HTMLElement {
     }
     disconnectedCallback() {
         this.abortController.abort();
-        this.unsub();
+        this.unsubs();
     }
     unsubs() {}
     getValue(propValue) {
@@ -248,6 +248,9 @@ class AltitudeValue extends DataView {
             prop: 'db:altitude',
         };
     }
+    transform(state) {
+        return (state).toFixed(1);
+    }
 }
 
 customElements.define('altitude-value', AltitudeValue);
@@ -258,6 +261,9 @@ class AscentValue extends DataView {
         return {
             prop: 'db:ascent',
         };
+    }
+    transform(state) {
+        return (state).toFixed(1);
     }
 }
 

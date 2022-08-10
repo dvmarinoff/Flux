@@ -274,7 +274,7 @@ function Segment(points, prop) {
         const value = point[prop];
         if(value > acc.max) acc.max = value;
         if(value < acc.min) acc.min = value;
-        if(equals(i, 0)) acc.min = value; acc.start = value;
+        if(equals(i, 0)) { acc.min = value; acc.start = value; };
         if(equals(i, points.length-1)) acc.end = value;
         return acc;
     }, {min: 0, max: 0, start: 0, end: 0,});
@@ -286,7 +286,6 @@ function scale(value, max = 100) {
 
 function courseToGraph(course, viewPort) {
     const altitudeSpec  = Segment(course.points, 'y');
-
 
     const distanceTotal = course.meta.distance;
     const aspectRatio   = viewPort.aspectRatio;
@@ -321,7 +320,11 @@ function courseToGraph(course, viewPort) {
 
     }, ``);
 
-    return `<div id="graph--info--cont"></div><svg class="graph--bar-group" width="100%" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
+    const display =
+          `<altitude-value class="elevation--value altitude--value">${altitudeSpec.start ?? '--'}</altitude-value>
+        <ascent-value class="elevation--value ascent--value">0.0</ascent-value>`;
+
+    return `${display}<div id="graph--info--cont"></div><svg class="graph--bar-group" width="100%" height="100%" viewBox="0 0 ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMax meet">${track}</svg>`;
 }
 
 export {
