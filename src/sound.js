@@ -22,8 +22,6 @@ function Sound(args) {
     let oscillator;
     let abortController;
 
-    console.log(volume);
-
     function start() {
         abortController = new AbortController();
         let signal = { signal: abortController.signal };
@@ -62,7 +60,6 @@ function Sound(args) {
     }
 
     function stop() {
-        console.log(':sound :stop');
         abortController.abort();
     }
 
@@ -77,21 +74,23 @@ function Sound(args) {
         const low = 0;
         const time = audioContext.currentTime;
 
-        gainNode.gain.setTargetAtTime(low, time, 0);
+        gainNode.gain.setTargetAtTime(low,  time, 0);
         gainNode.gain.setTargetAtTime(high, time+0.84, 0.001);
-        gainNode.gain.setTargetAtTime(low, time+1.00, 0.001);
+        gainNode.gain.setTargetAtTime(low,  time+1.00, 0.001);
         gainNode.gain.setTargetAtTime(high, time+1.84, 0.001);
-        gainNode.gain.setTargetAtTime(low, time+2.00, 0.005);
+        gainNode.gain.setTargetAtTime(low,  time+2.00, 0.001);
         gainNode.gain.setTargetAtTime(high, time+2.84, 0.001);
-        gainNode.gain.setTargetAtTime(low, time+3.00, 0.001);
+        gainNode.gain.setTargetAtTime(low,  time+3.00, 0.001);
         gainNode.gain.setTargetAtTime(high, time+3.84, 0.001);
-        gainNode.gain.setTargetAtTime(low, time+4.00, 0.01);
+        gainNode.gain.setTargetAtTime(low,  time+4.00, 0.001);
 
         oscillator.frequency.setValueAtTime(notes[5].c, time);
         oscillator.frequency.setValueAtTime(notes[5].a, time+3.74);
+
         oscillator.connect(gainNode).connect(audioContext.destination);
+
         oscillator.start(time);
-        oscillator.stop(time + 4.01);
+        oscillator.stop(time + 4.015);
     }
 
     return Object.freeze({

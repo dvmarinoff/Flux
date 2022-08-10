@@ -184,8 +184,6 @@ class Target extends Model {
 
 class Volume extends Target {
     postInit(args = {}) {
-    }
-    postInit(args = {}) {
         const self = this;
         const storageModel = {
             key: self.prop,
