@@ -63,6 +63,8 @@ function Sound(args) {
         abortController.abort();
     }
 
+    // one standart triange wave,
+    // gain is turned up and down to produce beeps,
     function interval() {
         const options = {
             type: 'triangle',
@@ -90,7 +92,67 @@ function Sound(args) {
         oscillator.connect(gainNode).connect(audioContext.destination);
 
         oscillator.start(time);
-        oscillator.stop(time + 4.015);
+        oscillator.stop(time + 4.15);
+    }
+
+    // 2 canceling sine waves,
+    // and gain is turned up and down on the first one to produce beeps
+    function customWaveInterval() {
+        const n     = 2;
+        const waves = [
+            {real: new Float32Array(n), imag: new Float32Array(n)},
+            {real: new Float32Array(n), imag: new Float32Array(n)},
+        ];
+
+        waves[0].real[0] = 0;
+        waves[0].imag[0] = 0;
+        waves[0].real[1] = 1;
+        waves[0].imag[1] = 0;
+
+        waves[1].real[0] = 0;
+        waves[1].imag[0] = 0;
+        waves[1].real[1] = -1;
+        waves[1].imag[1] = 0;
+
+        const wave1 = audioContext.createPeriodicWave(waves[0].real, waves[0].imag);
+        const wave2 = audioContext.createPeriodicWave(waves[1].real, waves[1].imag);
+
+        let osc1 = new OscillatorNode(audioContext, {});
+        let osc2 = new OscillatorNode(audioContext, {});
+        osc1.setPeriodicWave(wave1);
+        osc2.setPeriodicWave(wave2);
+
+        const gainNode1 = audioContext.createGain();
+        const gainNode2 = audioContext.createGain();
+
+        const high = 1;
+        const low  = 0;
+        const fade = 0.015;
+        const time = audioContext.currentTime;
+
+        gainNode1.gain.setTargetAtTime(low,  time+0.84, fade);
+        gainNode1.gain.setTargetAtTime(high, time+1.00, fade);
+        gainNode1.gain.setTargetAtTime(low,  time+1.84, fade);
+        gainNode1.gain.setTargetAtTime(high, time+2.00, fade);
+        gainNode1.gain.setTargetAtTime(low,  time+2.84, fade);
+        gainNode1.gain.setTargetAtTime(high, time+3.00, fade);
+        gainNode1.gain.setTargetAtTime(low,  time+3.84, fade);
+        gainNode1.gain.setTargetAtTime(low,  time+4.00, fade);
+        gainNode2.gain.setTargetAtTime(low,  time+4.00, fade);
+
+        osc1.frequency.setValueAtTime(notes[4].c, time);
+        osc1.frequency.setValueAtTime(notes[4].a, time+3.84);
+        osc2.frequency.setValueAtTime(notes[4].c, time);
+        osc2.frequency.setValueAtTime(notes[4].a, time+3.84);
+
+        osc1.connect(gainNode1).connect(audioContext.destination);
+        osc2.connect(gainNode2).connect(audioContext.destination);
+
+        osc1.start(time);
+        osc1.stop(time + 4.15);
+
+        osc2.start(time);
+        osc2.stop(time + 4.15);
     }
 
     return Object.freeze({
