@@ -1611,7 +1611,7 @@ div.graph--bar-group {
 
 .simulation {
     --settings-row-max-width: 60em;
-    margin: 0em auto 2em;
+    margin: 0em auto 4em;
 }
 
 .simulation--cont {
@@ -1628,7 +1628,7 @@ div.graph--bar-group {
 
 .simulation--switch {
     display: block;
-    margin: 2.4em auto 0;
+    margin: 1em auto 1em;
     text-transform: uppercase;
     font-weight: bold;
     cursor: pointer;
@@ -1637,13 +1637,13 @@ div.graph--bar-group {
 
 .sound {
     --settings-row-max-width: 60em;
-    margin: 4em auto 0em;
+    margin: 4em auto 4em;
 }
 
 .sound--cont {
     max-width: var(--settings-row-max-width);
     margin: 0 auto;
-    padding: 0.2em 0 0.8em 0;
+    padding: 0em 0 0em 0;
 }
 
 .sound-header--label {
@@ -1658,7 +1658,7 @@ div.graph--bar-group {
     vertical-align: baseline;
     justify-content: center;
     max-width: var(--inner-max-width);
-    margin: 1.4em auto 0.6em;
+    margin: 0em auto;
 }
 
 .sound--row--item {
