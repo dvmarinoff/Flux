@@ -16,8 +16,7 @@ const notes = [
 
 function Sound(args) {
     let vibrate = false;
-    let sound = false;
-    let volume = args.volume ?? 0;
+    let volume  = args.volume ?? 0;
     let audioContext;
     let oscillator;
     let abortController;
@@ -25,10 +24,6 @@ function Sound(args) {
     function start() {
         abortController = new AbortController();
         let signal = { signal: abortController.signal };
-
-        xf.sub(`db:sound`, x => {
-            sound = x;
-        }, signal);
 
         xf.sub(`db:volume`, x => {
             volume = x;

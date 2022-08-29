@@ -195,7 +195,7 @@ class Volume extends Target {
         self.step = existance(args.max, 10);
         self.storage = new args.storage(storageModel);
     }
-    defaultValue() { return 100; }
+    defaultValue() { return 0; }
     mute() {
         const self = this;
         return self.set(self.min);
