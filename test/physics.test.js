@@ -246,7 +246,7 @@ describe('Model', () => {
                     state = fn({ power, slope, dt, ...state, });
                     t++;
                 }
-                console.log(`${record.speed}km/h, ${power}W, dt: ${dt}, t: ${t}`);
+                // console.log(`${record.speed}km/h, ${power}W, dt: ${dt}, t: ${t}`);
 
                 expect(t).toBeLessThan(2000);
             };

@@ -28,7 +28,7 @@ class LocalStorageMock {
 
 describe('LocalStorageItem', () => {
 
-    global.localStorage = new LocalStorageMock();
+    // global.localStorage = new LocalStorageMock();
 
     global.console = {
         log: jest.fn(),

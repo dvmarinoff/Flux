@@ -105,15 +105,35 @@ describe('reads message header', () => {
         let lapData              = fit.header.read(4);  // 0b00000100
 
         test('reads type', () => {
-            expect(header).toEqual({type: 'definition', header_type: 'normal', local_number: 0});
+            expect(header).toEqual({
+                type: 'definition',
+                header_type: 'normal',
+                developer: false,
+                local_number: 0,
+            });
         });
 
         test('header of definition', () => {
-            expect(deviceInfoDefinition).toEqual({type: 'definition', header_type: 'normal', local_number: 1});
+            expect(deviceInfoDefinition).toEqual({
+                type: 'definition',
+                header_type: 'normal',
+                developer: false,
+                local_number: 1,
+            });
         });
         test('header of data', () => {
-            expect(eventData).toEqual({type: 'data', header_type: 'normal', local_number: 2});
-            expect(lapData).toEqual({type: 'data', header_type: 'normal', local_number: 4});
+            expect(eventData).toEqual({
+                type: 'data',
+                header_type: 'normal',
+                developer: false,
+                local_number: 2,
+            });
+            expect(lapData).toEqual({
+                type: 'data',
+                header_type: 'normal',
+                developer: false,
+                local_number: 4,
+            });
         });
 
     });
@@ -123,11 +143,21 @@ describe('reads message header', () => {
         let header1 = fit.header.read(1); // 0b00000001
 
         test('reads type', () => {
-            expect(header).toEqual({type: 'data', header_type: 'normal', local_number: 0});
+            expect(header).toEqual({
+                type: 'data',
+                header_type: 'normal',
+                developer: false,
+                local_number: 0,
+            });
         });
 
         test('reads local message number', () => {
-            expect(header1).toEqual({type: 'data', header_type: 'normal', local_number: 1});
+            expect(header1).toEqual({
+                type: 'data',
+                header_type: 'normal',
+                developer: false,
+                local_number: 1,
+            });
         });
     });
 });

@@ -128,6 +128,7 @@ function Header() {
         let header = setLocalNumber(0b00000000, args.local_number);
         if(equals(args.type, 'definition')) header |= 0b01000000;
         if(equals(args.type, 'data'))       header |= 0b00000000;
+        if(equals(args.developer, true))    header |= 0b00100000;
         return header;
     }
 
