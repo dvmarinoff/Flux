@@ -66,12 +66,11 @@ function CommonPage70(args = {}) {
     const length = data.length;
 
     function encode(args = {}) {
-
-        const slaveSerialNumber = args.slaveSerialNumber;
-        const descriptor = args.descriptor;
-        const requestedTransmission = args.requestedTransmission;
-        const requestedPageNumber = args.requestedPageNumber;
-        const commandType = args.commandType;
+        const slaveSerialNumber     = args.slaveSerialNumber ?? 0xFF;
+        const descriptor            = args.descriptor ?? 0xFFFF;
+        const requestedTransmission = args.requestedTransmission ?? 0b00000001;
+        const requestedPageNumber   = args.requestedPageNumber ?? 0x47;
+        const commandType           = args.commandType ?? 0x01;
 
         const buffer = new ArrayBuffer(length);
         const view   = new DataView(buffer);
@@ -87,13 +86,15 @@ function CommonPage70(args = {}) {
     }
 
     function decode(dataview) {
-        const slaveSerialNumber = dataview.getUint16(1, true);
-        const descriptor = dataview.getUint16(3, true);
-        const requestedTransmission = dataview.getUint8(5, true);
-        const requestedPageNumber = dataview.getUint8(6, true);
-        const commandType = dataview.getUint9(7, true);
+        const dataPage              = dataview.getUint8( 0, true);
+        const slaveSerialNumber     = dataview.getUint16(1, true);
+        const descriptor            = dataview.getUint16(3, true);
+        const requestedTransmission = dataview.getUint8( 5, true);
+        const requestedPageNumber   = dataview.getUint8( 6, true);
+        const commandType           = dataview.getUint8( 7, true);
 
         return {
+            dataPage,
             slaveSerialNumber,
             descriptor,
             requestedTransmission,
@@ -124,9 +125,9 @@ function CommonPage71(args = {}) {
 
     function encode(args = {}) {
         const lastCommandId = args.lastCommandId;
-        const sequenceNumber = args.sequenceNumber;
-        const status = args.status;
-        const data = args.data;
+        const sequenceNumber = args.sequenceNumber ?? 0;
+        const status = args.status ?? 255;
+        const data = args.data ?? 0;
 
         const buffer = new ArrayBuffer(length);
         const view   = new DataView(buffer);
@@ -141,10 +142,10 @@ function CommonPage71(args = {}) {
     }
 
     function decode(dataview) {
-        const dataPage       = dataview.getUint8(0, true);
-        const lastCommandId  = dataview.getUint8(1, true);
-        const sequenceNumber = dataview.getUint8(2, true);
-        const status         = dataview.getUint8(3, true);
+        const dataPage       = dataview.getUint8( 0, true);
+        const lastCommandId  = dataview.getUint8( 1, true);
+        const sequenceNumber = dataview.getUint8( 2, true);
+        const status         = dataview.getUint8( 3, true);
         const data           = dataview.getUint32(4, true);
 
         return {
@@ -166,8 +167,8 @@ function CommonPage71(args = {}) {
 }
 
 const common = {
-    commonPage70: CommonPage70,
-    commonPage71: CommonPage71,
+    commonPage70: CommonPage70(),
+    commonPage71: CommonPage71(),
 };
 
 export { DataPage, common };

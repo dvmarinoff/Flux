@@ -2,6 +2,7 @@ import { uuids } from '../uuids.js';
 import { BLEService } from '../service.js';
 
 import { message } from '../../ant/message.js';
+import { common } from '../../ant/common.js';
 import { fec } from '../../ant/fec.js';
 import { equals, isObject, exists, existance, delay, dataviewToArray } from '../../functions.js';
 
@@ -28,6 +29,8 @@ function FEC2() {
     }
 
     function decode(dataview) {
+        // console.log(dataviewToArray(dataview));
+
         const msg = message.acknowledgedData.decode(dataview, dataPageDecoder);
 
         if(isObject(msg.payload)) {
@@ -69,6 +72,20 @@ function slopeTarget(grade, channel = 5) {
         }),
     }).buffer;
 }
+
+function lastCommandStatus() {
+    return message.acknowledgedData.encode({
+        channelNumber: 5,
+        payload: common.commonPage70.encode({
+            slaveSerialNumber: 0xFF,
+            descriptor: 0xFFFF,
+            requestedTransmission: 0b00000001,
+            requestedPageNumber: 0x47,
+            commandType: 0x01,
+        }),
+    }).buffer;
+}
+
 
 function userConfig(args = {}) {
     const defaults = {
@@ -147,6 +164,12 @@ class FEC extends BLEService {
     async setUserWeight(kg = 75) {
         const self = this;
         await self.userConfig({userWeight: kg});
+    }
+    async lastCommandStatus() {
+        const self = this;
+        const buffer = lastCommandStatus();
+        console.log(':tx :fec :command-status');
+        return await self.write('fec3', buffer);
     }
 }
 
