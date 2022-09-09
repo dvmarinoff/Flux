@@ -137,6 +137,16 @@ describe('Data Page 51 - Track Resistance', () => {
             expect(dataviewToArray(msg)).toEqual([51, 0,0,0,0, 176,79, 80]);
         });
 
+        test('grade 200', () => {
+            const msg = fec.dataPage51.encode({grade: 200});
+            expect(dataviewToArray(msg)).toEqual([51, 0,0,0,0, 64,156, 80]);
+        });
+
+        test('grade -200', () => {
+            const msg = fec.dataPage51.encode({grade: -200});
+            expect(dataviewToArray(msg)).toEqual([51, 0,0,0,0, 0,0, 80]);
+        });
+
         test('crr', () => {
             const msg = fec.dataPage51.encode({crr: 0.00321});
             expect(dataviewToArray(msg)).toEqual([51, 0,0,0,0, 32,78, 64]);

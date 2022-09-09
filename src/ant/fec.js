@@ -171,7 +171,7 @@ function DataPage51(args = {}) {
 
     const definitions = {
         grade: {
-            resolution: 0.01, unit: '%', min: 0, max: 400, invalid: 0xFFFF, default: 0, offset: 200
+            resolution: 0.01, unit: '%', min: -200, max: 200, invalid: 0xFFFF, default: 0, offset: 200
         },
         crr: {
             resolution: 0.00005, unit: '', min: 0, max: 0.0127, invalid: 0xFF, default: 0.004
