@@ -1,4 +1,4 @@
-import { xf, exists, equals } from '../functions.js';
+import { xf, exists, equals } from './functions.js';
 import { models } from './models/models.js';
 import { Sound } from './sound.js';
 // import { trainerMock } from './simulation-scripts.js';
