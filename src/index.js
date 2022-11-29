@@ -5,11 +5,18 @@ import './connectionManager.js';
 import './watch.js';
 import './course.js';
 import './lock.js';
+import { inject } from '@vercel/analytics';
 
 function startServiceWorker() {
     if('serviceWorker' in navigator) {
         try {
-            const reg = navigator.serviceWorker.register('./sw.js');
+            // const reg = navigator.serviceWorker.register('./sw.js');
+
+            const reg = navigator.serviceWorker.register(
+                new URL('./sw.js', import.meta.url),
+                {type: 'module'}
+            );
+
             console.log(`SW: register success.`);
             console.log('Cache Version: Flux-v003');
         } catch(err) {
@@ -17,7 +24,6 @@ function startServiceWorker() {
         }
     };
 }
-
 
 function start() {
     console.log('start app.');
