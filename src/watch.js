@@ -2,7 +2,8 @@ import { equals, exists, existance, first, last, xf, avg, max } from './function
 import { kphToMps, mpsToKph, timeDiff } from './utils.js';
 import { models } from './models/models.js';
 
-const timer = new Worker('./timer.js');
+// const timer = new Worker('./timer.js');
+const timer = new Worker(new URL('./timer.js', import.meta.url));
 
 class Watch {
     constructor(args) {

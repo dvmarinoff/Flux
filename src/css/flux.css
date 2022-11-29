@@ -206,7 +206,7 @@ input {
     clear: both;
 }
 .cf {
-    *zoom: 1;
+    /* *zoom: 1; */
     /*For IE 6/7 only*/
 }
 /* End Clearfix */

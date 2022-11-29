@@ -10,17 +10,17 @@
     "background_color": "#28272D",
     "icons": [
         {
-            "src": "/images/logo/logo-36dpi-192px.png",
+            "src": "./images/logo/logo-36dpi-192px.png",
             "type": "image/png",
             "sizes": "192x192"
         },
         {
-            "src": "/images/logo/logo-96dpi-512px.png",
+            "src": "./images/logo/logo-96dpi-512px.png",
             "type": "image/png",
             "sizes": "512x512"
         },
         {
-            "src": "/images/logo/logo-96dpi-512px.png",
+            "src": "./images/logo/logo-96dpi-512px.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "maskable"
