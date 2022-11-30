@@ -96,7 +96,7 @@ Tacx Heart Rate monitor, Tacx Flux S trainer, and X240 laptop with Ubuntu 20.04.
 
 ## The Demo
 You can check a pre-release demo of the web version at
-[Latest Version on master](https://flux-three.vercel.app/), or [Latest development vesion](https://flux-devel.vercel.app/)
+[Latest Version on master](https://flux-web.vercel.app/), or [Latest development vesion](https://flux-dev.vercel.app/)
 
 Keep in mind it is in active development and will change and break on daily bases, that's until the first stable version is released.
 
