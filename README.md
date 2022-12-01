@@ -35,13 +35,11 @@ _Status_: Currently working on creating a backend API and iOS app.
 
 **TL;DR:** Use Google Chrome on Android, Windows 10, Mac (M1 or Intel) and Ubuntu, but not iOS or Apple TV.
 
-A fully featured web version will be released soon, and followed with desktop apps later.
-The Web version is running directly in the browser and relies on some of the latest web platform technologies.
-Browser support for the web version is the following:
+The Web version is running directly in the browser and relies on some of the latest web technologies. Browsers like Firefox and Safari don't have support for them. On iOS Safari is the only allowed browser, and even Chrome for iOS is just Safari with a Chrome skin. Browser support for the web version is the following:
 
-| Chrome | Edge | Opera | Chrome Android | Samsung Internet | Firefox | Opera Android | Safari | Safari iOS |
-|--------|------|-------|----------------|------------------|---------|---------------|--------|------------|
-| yes    | yes  | yes   | yes            | yes              | no      | no            | no     | no         |
+| Chrome | Edge | Opera | Chrome Android | Samsung Internet | Firefox | Safari | Safari iOS | Chrome iOS |
+|--------|------|-------|----------------|------------------|---------|--------|------------|------------|
+| yes    | yes  | yes   | yes            | yes              | no      | no     | no         | no         |
 
 
 ### Linux
@@ -52,8 +50,6 @@ On Chrome, Edge and Opera for Linux you might need to turn on the experimental p
 - Edge: `edge://flags/#enable-experimental-web-platform-features`
 
 - Opera: `opera://flags/#enable-experimental-web-platform-features`
-
-NOTE: Opera support on Linux is a bit shaky at moment. Expect updates.
 
 ### iOS
 For iOS you can try [WebBLE](https://apps.apple.com/us/app/webble/id1193531073) which is:

@@ -1058,6 +1058,45 @@ class SoundControl extends DataView {
 
 customElements.define('sound-control', SoundControl);
 
+
+class CompatibilityCheck extends HTMLElement {
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
+
+        if(!self.compatible()) {
+            self.show();
+        }
+    }
+    disconnectedCallback() {
+        this.abortController.abort();
+    }
+    compatible() {
+        return 'bluetooth' in navigator;
+    }
+    show() {
+        const self = this;
+        this.innerHTML =
+        `<div id="compatibility--cont">
+             <p>This browser is NOT supported. Please open the app with </p>
+             <a href="https://www.google.com/chrome/" target="_blank">Chrome</a> or
+             <a href="https://www.microsoft.com/edge" target="_blank">Edge</a>
+             <p>For more information visit the project <a href="https://github.com/dvmarinoff/Flux" target="_blank">Page.</a></p>
+         </div>`;
+    }
+    hide() {
+        const self = this;
+        this.innerHTML = '';
+    }
+}
+
+
+customElements.define('compatibility-check', CompatibilityCheck);
+
 export {
     DataView,
 

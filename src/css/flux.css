@@ -465,6 +465,20 @@ body {
     height: 100vh;
 }
 
+#compatibility--cont {
+    font-size: 1.4em;
+    width: 100%;
+    padding: 1em 0.5em;
+    line-height: 1.5em;
+    background-color: var(--red);
+    border-bottom: 1px solid var(--dark);
+    z-index: 1;
+}
+
+#compatibility--cont a {
+    color: var(--yellow);
+}
+
 /* Switch btn */
 .connections-header {
     font-size: 1.1rem;
