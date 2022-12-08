@@ -201,7 +201,7 @@ function IndoorBikeData(dataview) {
         if(distancePresent(flags)) {
             data['distance'] = readDistance(dataview);
         }
-        if(speedPresent(flags)) {
+        if(powerPresent(flags)) {
             data['power'] = readPower(dataview);
         }
         if(heartRatePresent(flags)) {
