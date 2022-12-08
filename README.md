@@ -110,6 +110,9 @@ You can support the development of Flux via [Github Sponsers](https://github.com
 
 ### Backers
 <div>
+    <a href="https://github.com/KlausMu" target="_blank">
+        <img style="display: inline-block;" src="https://avatars.githubusercontent.com/u/14290221?v=4" width="64" height="64" />
+    </a>
     <a href="https://github.com/TClin76" target="_blank">
         <img style="display: inline-block;" src="https://avatars.githubusercontent.com/u/96434118?v=4" width="64" height="64" />
     </a>
