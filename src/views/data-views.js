@@ -805,12 +805,13 @@ class SwitchGroup extends HTMLElement {
         this.abortController.abort();
     }
     eventOwner(e) {
-        const pathLength = e.path.length;
+        const path = e.composedPath();
+        const pathLength = path.length;
 
         for(let i = 0; i < pathLength; i++) {
-            if(exists(e.path[i].hasAttribute) &&
-               e.path[i].hasAttribute('index')) {
-                return e.path[i];
+            if(exists(path[i].hasAttribute) &&
+               path[i].hasAttribute('index')) {
+                return path[i];
             }
         }
 
