@@ -37,11 +37,16 @@ function Data(args = {}) {
 
 function FileId(args = {}) {
     const defaults = {
-        time_created: Date.now(),
-        manufacturer: 255,
-        product:      0,
-        number:       0,
-        type:         4
+        time_created:  Date.now(),
+        // manufacturer: 255, // development
+        // product:      0,
+        // product:       2697, // fenix 5
+	      // serial_number: 3946496495,
+        manufacturer:  1,    // garmin
+        product:       3570, // edge 1030
+	      serial_number: 3313379353,
+        number:        0,
+        type:          4
     };
 
     const encoders = {
@@ -49,6 +54,17 @@ function FileId(args = {}) {
     };
 
     return Data({values: args, definition: lmd.fileId, encoders, defaults});
+}
+
+function FileCreator(args = {}) {
+    const defaults = {
+        software_version: 29, // edge 1039
+        // software_version: 2500, // fenix 5
+    };
+
+    const encoders = {};
+
+    return Data({values: args, definition: lmd.file_creator, encoders, defaults});
 }
 
 function DeviceInfo(args = {}) {
@@ -232,6 +248,8 @@ function encode(args = {}) {
         FileHeader(),
         lmd.fileId,
         FileId({time_created: summary.start_time}),
+        lmd.file_creator,
+        FileCreator(),
         lmd.event,
         Event({timestamp: summary.start_time}),
         lmd.record,

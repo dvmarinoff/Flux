@@ -4,14 +4,25 @@ const localMessageDefinitions = {
         type: 'definition',
         message: 'file_id',
         local_number: 0,
-        length: 6+15,
-        data_msg_length: 1+11,
+        length: 6+15+3,
+        data_msg_length: 1+11+4,
         fields: [
-            {field: 'time_created', number: 4, size: 4, base_type: 134},
-            {field: 'manufacturer', number: 1, size: 2, base_type: 132},
-            {field: 'product',      number: 2, size: 2, base_type: 132},
-            {field: 'number',       number: 5, size: 2, base_type: 132},
-            {field: 'type',         number: 0, size: 1, base_type: 0},
+            {field: 'time_created',  number: 4, size: 4, base_type: 134},
+            {field: 'manufacturer',  number: 1, size: 2, base_type: 132},
+            {field: 'product',       number: 2, size: 2, base_type: 132},
+            {field: 'serial_number', number: 3, size: 4, base_type: 140},
+            {field: 'number',        number: 5, size: 2, base_type: 132},
+            {field: 'type',          number: 0, size: 1, base_type: 0},
+        ]
+    },
+    file_creator: {
+        type: 'definition',
+        message: 'file_creator',
+        local_number: 7,
+        length: 6+3,
+        data_msg_length: 1+2,
+        fields: [
+            {field: 'software_version',  number: 0, size: 2, base_type: 132},
         ]
     },
     record: {
