@@ -38,10 +38,6 @@ function Data(args = {}) {
 function FileId(args = {}) {
     const defaults = {
         time_created:  Date.now(),
-        // manufacturer: 255, // development
-        // product:      0,
-        // product:       2697, // fenix 5
-	      // serial_number: 3946496495,
         manufacturer:  1,    // garmin
         product:       3570, // edge 1030
 	      serial_number: 3313379353,
@@ -59,7 +55,6 @@ function FileId(args = {}) {
 function FileCreator(args = {}) {
     const defaults = {
         software_version: 29, // edge 1039
-        // software_version: 2500, // fenix 5
     };
 
     const encoders = {};
