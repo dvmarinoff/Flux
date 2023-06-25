@@ -2,7 +2,7 @@
     "name": "Flux",
     "short_name": "Flux",
     "description": "Cycling Structured Training",
-    "start_url": "/Flux",
+    "start_url": "/",
     "display": "standalone",
     "orientation": "portrait",
     "scope": "/",
