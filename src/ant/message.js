@@ -558,7 +558,7 @@ function RequestMessage(args = {}) {
         // 0x00 – Request Advanced Burst Capabilities
         // 0x01 – Request Advanced Burst Current Configuration
 
-        const param = channelNumber;
+        let param = channelNumber;
         if(subMessageId) param = subMessageId;
 
         const buffer = new ArrayBuffer(length);
