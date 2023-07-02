@@ -4,7 +4,7 @@ const resources = [
     'index.html',
     'css/flux.css',
 
-    'images/connections/garmin-connect.jpg',
+    'images/connections/garmin-connect.png',
     'images/logo/logo-36dpi-192px.png',
     'images/logo/logo-96dpi-512px.png',
     'favicon-16.png',
