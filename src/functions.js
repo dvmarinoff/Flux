@@ -565,7 +565,7 @@ function setUint24LE(dataview, index, value) {
     return dataview;
 }
 
-function getUint24LE(dataview, index) {
+function getUint24LE(dataview, index = 0) {
     const LSB = dataview.getUint8(index,   true); // LSB
     const MB  = dataview.getUint8(index+1, true);
     const MSB = dataview.getUint8(index+2, true); // MSB

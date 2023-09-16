@@ -101,6 +101,12 @@ input {
     color: #fff;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 .btn {
     color: #fff;
     background-color: var(--chrome);

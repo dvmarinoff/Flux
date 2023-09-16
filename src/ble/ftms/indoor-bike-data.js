@@ -2,13 +2,13 @@
 // 4.9 Indoor Bike Data (characteristic)
 //
 
-import { nthBitToBool }  from '../../functions.js';
+import { nthBitToBool, getUint24LE }  from '../../functions.js';
 
 const flags = {
     InstantaneousSpeed:    { flagBit:  0, present: 0 },
     MoreData:              { flagBit:  0, present: 0 },
-    InstantaneousCandence: { flagBit:  2, present: 1 }, // bit 1, present 0
     AverageSpeed:          { flagBit:  1, present: 1 }, // bit 2, present 1
+    InstantaneousCandence: { flagBit:  2, present: 1 }, // bit 1, present 0
     AverageCandence:       { flagBit:  3, present: 1 },
     TotalDistance:         { flagBit:  4, present: 1 },
     ResistanceLevel:       { flagBit:  5, present: 1 },
@@ -142,7 +142,7 @@ function readCadence(dataview) {
 
 function readDistance(dataview) {
     const flags = dataview.getUint16(0, true);
-    const distance = dataview.getUint16(distanceIndex(flags), true);
+    const distance = getUint24LE(dataview, distanceIndex(flags));
     return (distance * fields.TotalDistance.resolution);
 }
 
@@ -180,11 +180,19 @@ function readHeartRate(dataview) {
 //
 //                               5432109876543210
 // flags,          66, 0x42,   0b0000000001000100
-// inst speed,   3000, 0x0bb8,
+// inst speed,   1450, 0x0bb8,
 // inst cadence,  160, 0xa0,
 // inst power,    180, 0xb4,
 //
 // (0x) 42-00- b8-0b- a0-00 b4-00
+//
+// Stages SB20:
+//                               7654-3210
+// flags,          17, 0x11,   0b0001-0001
+// total distance, 319,
+//
+// (0x) 11-00- 63-01-00
+//
 
 function IndoorBikeData(dataview) {
 
