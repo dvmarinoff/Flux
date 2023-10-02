@@ -1217,6 +1217,13 @@ div.graph--bar-group {
     width: var(--size--icon--global);
     height: var(--size--icon--global);
 }
+
+.workout-loader--note {
+    font-size: var(--workout--description-font-size);
+    line-height: 1.4em;
+    margin: 0 2em 2em 2em;
+    color: var(--gray);
+}
 /* END Workout List */
 
 /* Ride Report */
