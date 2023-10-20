@@ -63,7 +63,7 @@ function KeyboardControls() {
     // Modes Inc/Dec
     xf.sub('key:up', e => {
         if(mode === 'erg') {
-            xf.dispatch('ui:power-target-inc');
+            xf.dispatch('ui:power-target-inc-10');
         }
         if(mode === 'resistance') {
             xf.dispatch('ui:resistance-target-inc');
@@ -74,7 +74,7 @@ function KeyboardControls() {
     });
     xf.sub('key:down', e => {
         if(mode === 'erg') {
-            xf.dispatch('ui:power-target-dec');
+            xf.dispatch('ui:power-target-dec-10');
         }
         if(mode === 'resistance') {
             xf.dispatch('ui:resistance-target-dec');

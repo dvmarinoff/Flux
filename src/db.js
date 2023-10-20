@@ -163,11 +163,17 @@ xf.reg('ui:library-switch-set', (index, db) => {
 xf.reg('ui:power-target-set', (powerTarget, db) => {
     db.powerTarget = models.powerTarget.set(powerTarget);
 });
-xf.reg('ui:power-target-inc', (_, db) => {
-    db.powerTarget = models.powerTarget.inc(db.powerTarget);
+xf.reg('ui:power-target-inc-1', (_, db) => {
+    db.powerTarget = models.powerTarget.inc(db.powerTarget, 1);
 });
-xf.reg(`ui:power-target-dec`, (_, db) => {
-    db.powerTarget = models.powerTarget.dec(db.powerTarget);
+xf.reg(`ui:power-target-inc-10`, (_, db) => {
+    db.powerTarget = models.powerTarget.inc(db.powerTarget, 10);
+});
+xf.reg(`ui:power-target-dec-1`, (_, db) => {
+    db.powerTarget = models.powerTarget.dec(db.powerTarget, 1);
+});
+xf.reg(`ui:power-target-dec-10`, (_, db) => {
+    db.powerTarget = models.powerTarget.dec(db.powerTarget, 10);
 });
 xf.reg('ui:cadence-target-set', (cadenceTarget, db) => {
     db.cadenceTarget = models.cadenceTarget.set(cadenceTarget);

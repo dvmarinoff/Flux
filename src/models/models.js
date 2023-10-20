@@ -170,14 +170,16 @@ class Target extends Model {
         return clamp(self.min, self.max, self.parse(value));
     }
     parse(value) { return parseInt(value); }
-    inc(value) {
+    inc(value, change) {
         const self = this;
-        const x = value + self.step;
+        const step = existance(change, self.step);
+        const x = value + step;
         return self.set(x);
     }
-    dec(value) {
+    dec(value, change) {
         const self = this;
-        const x = value - self.step;
+        const step = existance(change, self.step);
+        const x = value - step;
         return self.set(x);
     }
 }

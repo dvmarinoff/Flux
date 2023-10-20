@@ -431,22 +431,22 @@ class SlopeTarget extends DataView {
 customElements.define('slope-target', SlopeTarget);
 
 
-class PowerTargetControl extends DataView {
+class ResistanceTargetControl extends DataView {
     postInit() {
         const self = this;
         this.state = 0;
     }
     setDefaults() {
-        this.prop = 'db:powerTarget';
+        this.prop = 'db:resistanceTarget';
         this.selectors = {
-            input: '#power-target-input',
-            inc:   '#power-target-inc',
-            dec:   '#power-target-dec',
+            input: '#resistance-target-input',
+            inc:   '#resistance-target-inc',
+            dec:   '#resistance-target-dec',
         };
         this.effects = {
-            inc: 'power-target-inc',
-            dec: 'power-target-dec',
-            set: 'power-target-set',
+            inc: 'resistance-target-inc',
+            dec: 'resistance-target-dec',
+            set: 'resistance-target-set',
         };
         this.parse = parseInt;
     }
@@ -457,6 +457,7 @@ class PowerTargetControl extends DataView {
         this.$dec   = document.querySelector(this.selectors.dec);
     }
     subs() {
+        console.log("subscribing")
         this.$input.addEventListener('change', this.onChange.bind(this), this.signal);
         this.$inc.addEventListener('pointerup', this.onInc.bind(this), this.signal);
         this.$dec.addEventListener('pointerup', this.onDec.bind(this), this.signal);
@@ -478,30 +479,63 @@ class PowerTargetControl extends DataView {
     }
 }
 
-customElements.define('power-target-control', PowerTargetControl);
-
-
-class ResistanceTargetControl extends PowerTargetControl {
-    setDefaults() {
-        this.prop = 'db:resistanceTarget';
-        this.selectors = {
-            input: '#resistance-target-input',
-            inc:   '#resistance-target-inc',
-            dec:   '#resistance-target-dec',
-        };
-        this.effects = {
-            inc: 'resistance-target-inc',
-            dec: 'resistance-target-dec',
-            set: 'resistance-target-set',
-        };
-        this.parse = parseInt;
-    }
-}
-
 customElements.define('resistance-target-control', ResistanceTargetControl);
 
 
-class SlopeTargetControl extends PowerTargetControl {
+class PowerTargetControl extends ResistanceTargetControl {
+    setDefaults() {
+        this.prop = 'db:powerTarget';
+        this.selectors = {
+            input: '#power-target-input',
+            inc10: '#power-target-inc-10',
+            inc1:  '#power-target-inc-1',
+            dec10: '#power-target-dec-10',
+            dec1:  '#power-target-dec-1',
+        };
+        this.effects = {
+            inc10: 'power-target-inc-10',
+            inc1:  'power-target-inc-1',
+            dec10: 'power-target-dec-10',
+            dec1:  'power-target-dec-1',
+            set:   'power-target-set',
+        };
+    }
+    config() {
+        this.setDefaults();
+        this.$input = document.querySelector(this.selectors.input);
+        this.$inc10 = document.querySelector(this.selectors.inc10);
+        this.$inc1  = document.querySelector(this.selectors.inc1);
+        this.$dec10 = document.querySelector(this.selectors.dec10);
+        this.$dec1  = document.querySelector(this.selectors.dec1);
+    }
+    subs() {
+        console.log("subscribing-pwr")
+        this.$input.addEventListener('change', this.onChange.bind(this), this.signal);
+        this.$inc10.addEventListener('pointerup', this.onInc10.bind(this), this.signal);
+        this.$inc1.addEventListener('pointerup', this.onInc1.bind(this), this.signal);
+        this.$dec10.addEventListener('pointerup', this.onDec10.bind(this), this.signal);
+        this.$dec1.addEventListener('pointerup', this.onDec1.bind(this), this.signal);
+
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    onInc10(e) {
+        xf.dispatch(`ui:${this.effects.inc10}`);
+    }
+    onInc1(e) {
+        xf.dispatch(`ui:${this.effects.inc1}`);
+    }
+    onDec10(e) {
+        xf.dispatch(`ui:${this.effects.dec10}`);
+    }
+    onDec1(e) {
+        xf.dispatch(`ui:${this.effects.dec1}`);
+    }
+}
+
+customElements.define('power-target-control', PowerTargetControl);
+
+
+class SlopeTargetControl extends ResistanceTargetControl {
     setDefaults() {
         this.prop = 'db:slopeTarget';
         this.selectors = {
