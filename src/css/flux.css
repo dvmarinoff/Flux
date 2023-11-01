@@ -87,6 +87,13 @@ body {
     width: 100%;
     height: 100%;
     line-height: 1.4em;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 header, footer, section, article, nav {
@@ -102,8 +109,9 @@ input {
 }
 
 input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+input::-webkit-inner-spin-button,
+input[type="number"] {
+    -webkit-appearance: none !important;
     margin: 0;
 }
 
@@ -179,7 +187,11 @@ input::-webkit-inner-spin-button {
 /* END Defaults */
 
 /* Atomics */
-.h1, .h2, .h3, h4, .h5, .t1, .t2, .t3, .t4, .t5, .t6, .a, .text, button, .btn, input, svg, a {
+.h1, .h2, .h3, h4, .h5, .t1, .t2, .t3, .t4, .t5, .t6,
+.a, .text, button, .btn,
+input, svg, a,
+.flat-btn,
+.settings-switch-bnt {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
