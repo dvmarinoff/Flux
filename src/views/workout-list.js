@@ -17,6 +17,12 @@ const radioOn = `
             <circle class="circle" cx="12" cy="12" r="5"/>
         </svg>`;
 
+const removeBtn = `
+        <svg class="workout--remove control--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+            <path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"/>
+        </svg>
+`;
+
 function workoutTemplate(workout) {
     let duration = '';
     if(workout.meta.duration) {
@@ -35,6 +41,7 @@ function workoutTemplate(workout) {
                 <div class="workout--full-info">
                     <div class="workout-list--graph-cont">${workout.graph}</div>
                     <div class="workout--description">${workout.meta.description}</div>
+                    <div class="workout--actions">${removeBtn}</div>
                 </div>
             </li>`;
 }
@@ -136,6 +143,7 @@ class WorkoutListItem extends HTMLLIElement {
         this.summary = this.querySelector('.workout--short-info');
         this.description = this.querySelector('.workout--full-info');
         this.selectBtn = this.querySelector('.workout--select');
+        this.removeBtn = this.querySelector('.workout--remove');
         this.indicator = this.selectBtn;
         this.id = this.getAttribute('id');
 
@@ -156,6 +164,8 @@ class WorkoutListItem extends HTMLLIElement {
         xf.sub('db:workout', this.onWorkout.bind(this), this.signal);
         this.summary.addEventListener('pointerup', this.toggleExpand.bind(this), this.signal);
         this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this), this.signal);
+
+        this.removeBtn.addEventListener('pointerup', this.onRemove.bind(this), this.signal);
 
         this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
         this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
@@ -204,6 +214,10 @@ class WorkoutListItem extends HTMLLIElement {
     onRadio(e) {
         e.stopPropagation();
         xf.dispatch('ui:workout:select', this.id);
+    }
+    onRemove(e) {
+        console.log(`:ui :workout :remove :id '${this.id}'`);
+        xf.dispatch('ui:workout:remove', this.id);
     }
     onUpdate(value) {
         if(!equals(value, this.state)) {

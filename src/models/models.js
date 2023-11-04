@@ -479,6 +479,8 @@ class Workout extends Model {
 }
 
 class Workouts extends Model {
+    name = 'workouts';
+
     init(args) {
         const self = this;
         self.workoutModel = args.workoutModel;
@@ -494,9 +496,16 @@ class Workouts extends Model {
         const self = this;
         return exists(value);
     }
-    restore() {
+    async restore(db) {
         const self = this;
-        return self.default;
+        const workouts = await idb.getAll(`${self.name}`) ?? [];
+
+        if(empty(workouts)) {
+            return self.default;
+        } else {
+            // TODO: reverse
+            return workouts.concat(self.default);
+        }
     }
     get(workouts, id) {
         for(let workout of workouts) {
@@ -510,16 +519,31 @@ class Workouts extends Model {
     add(workouts, workout) {
         const self = this;
         workouts.push(Object.assign(workout, {id: uuid()}));
+        self.save(workout);
         return workouts;
+    }
+    save(workout) {
+        const self = this;
+        console.log(`:models :workouts :save`);
+        idb.put(self.name, idb.setId(workout));
+    }
+    remove(workouts, id) {
+        const self = this;
+        if(!exists(id)) {
+            console.error(`:models :workouts :remove 'called without workout id!'`);
+            return workouts;
+        }
+        if(empty(workout)) {
+            console.error(`:models :workouts :remove 'called with empty id!'`);
+            return workouts;
+        }
+        idb.remove(self.name, id);
+        return workouts.filter((w) => w.id !== id);
     }
 }
 
 function Session(args = {}) {
     let name = 'session';
-
-    async function start() {
-        await idb.open('store', 1, 'session');
-    }
 
     function backup(db) {
         idb.put('session', idb.setId(dbToSession(db), 0));
@@ -595,7 +619,6 @@ function Session(args = {}) {
     }
 
     return Object.freeze({
-        start,
         backup,
         restore,
         sessionToDb,

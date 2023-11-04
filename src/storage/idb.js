@@ -2,7 +2,7 @@
 // IDB
 //
 
-import { xf, exists } from '../functions.js';
+import { exists, existance, empty, } from '../functions.js';
 import { uuid } from './uuid.js';
 
 function promisify(request) {
@@ -23,8 +23,18 @@ function IDB(args = {}) {
         db = idb;
     }
 
-    function open(name, version, storeName) {
-        console.log(`:idb :open :db '${name}' :store-name '${storeName}' ...`);
+    async function start(database = '', version = 1, stores = []) {
+        if(!exists(database)) {
+            throw new Error(`:idb idb.start() needs database name!`);
+        };
+        if(empty(database)) {
+            throw new Error(`:idb idb.start() called with empty name!`);
+        };
+        await open(database, version, stores);
+    }
+
+    function open(name, version, storeNames) {
+        console.log(`:idb :open :db '${name}' :store-name '${storeNames}' ...`);
         let openReq = window.indexedDB.open(name, version);
 
         return new Promise((resolve, reject) => {
@@ -32,7 +42,7 @@ function IDB(args = {}) {
                 setDB(openReq.result);
 
                 switch(e.oldVersion) {
-                case 0: createStore(storeName);
+                case 0: createStores(storeNames);
                 case 1: update();
                 }
             };
@@ -68,9 +78,9 @@ function IDB(args = {}) {
         }
     }
 
-    function createStores(storeNames, keyPaths) {
+    function createStores(storeNames, keyPaths = []) {
         storeNames.forEach((storeName, i) => {
-            createStore(storeName, keyPaths[i]);
+            createStore(storeName, existance(keyPaths[i], 'id'));
         });
     }
 
@@ -133,6 +143,7 @@ function IDB(args = {}) {
     }
 
     return Object.freeze({
+        start,
         open,
         createStore,
         deleteStore,
