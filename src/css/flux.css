@@ -946,8 +946,10 @@ div.graph--bar-group {
     font-size: 1rem;
     padding: 0 1em;
     --inner-max-width: 300px;
-    --mode-selector-margin: 1.8em auto;
+    --mode-selector-height: 3rem;
+    --mode-selector-margin: 0.8em auto;
     --mode-selector-padding: 0 1em;
+    --mode-width: 100%;
 
     --number-input-height: 3rem;
     --number-input-total-width: 100%;
@@ -970,12 +972,16 @@ div.graph--bar-group {
     justify-content: space-evenly;
     align-items: center;
     max-width: 100%;
+    height: var(--mode-selector-height);
     margin: var(--mode-selector-margin);
     font-size: 1em;
     text-transform: uppercase;
 }
 
 .mode {
+    width: var(--mode-width);
+    height: var(--mode-selector-height);
+    line-height: var(--mode-selector-height);
     padding: var(--mode-selector-padding);
     color: var(--gray);
     cursor: pointer;
