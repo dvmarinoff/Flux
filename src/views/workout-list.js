@@ -44,7 +44,9 @@ function workoutTemplate(workout) {
                         <div class="workout--description">${workout.meta.description}</div>
                     </div>
                 </div>
-                <div class="workout--actions">${removeBtn}</div>
+                <div class="workout--actions">
+                    <span class="workout--remove">Delete</span>
+                </div>
             </li>`;
 }
 
@@ -188,6 +190,8 @@ class WorkoutListItem extends HTMLLIElement {
         this.swipeX = this.unify(e).clientX;
     }
     onSwipe(e) {
+        e.preventDefault();
+
         if(this.swiping) {
             let dx = this.unify(e).clientX - this.swipeX;
             this.infoCont.style.setProperty('left', dx);
@@ -198,7 +202,7 @@ class WorkoutListItem extends HTMLLIElement {
         let dx = this.unify(e).clientX - this.swipeX;
         let sign = Math.sign(dx);
         if(sign < 0) {
-            this.infoCont.style.setProperty('left', '-26%');
+            this.infoCont.style.setProperty('left', '-8em');
             this.swiped = true;
         } else {
             this.infoCont.style.setProperty('left', '0');

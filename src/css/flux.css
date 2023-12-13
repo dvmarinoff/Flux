@@ -1205,15 +1205,16 @@ div.graph--bar-group {
     top: 0;
     right: 0;
     bottom: 0;
-    width: 100%;
+    width: 8em;
     background-color: var(--red);
     z-index: 0;
 }
 
 .workout--remove {
-    margin: 1.5em 3.5em 1.5em 1.5em;
-    justify-self: end;
+    font-size: 1.4em;
+    justify-self: center;
     align-self: center;
+    cursor: pointer;
 }
 
 .workout--short-info {
