@@ -303,6 +303,7 @@ xf.reg('app:start', async function(_, db) {
 
     db.sources = models.sources.set(models.sources.restore());
 
+    // TODO: remove IndexedDB > store > session
     await idb.start('db', 1, ['session', 'workouts']);
     db.workouts = await models.workouts.restore();
     db.workout = models.workout.restore(db);

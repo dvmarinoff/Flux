@@ -32,17 +32,19 @@ function workoutTemplate(workout) {
         duration = `${(workout.meta.distance / 1000).toFixed(2)} km`;
     }
     return `<li is="workout-item" class='workout cf' id="${workout.id}" metric="ftp">
-                <div class="workout--short-info">
-                    <div class="workout--name">${workout.meta.name}</div>
-                    <div class="workout--type">${workout.meta.category}</div>
-                    <div class="workout--duration">${duration}</div>
-                    <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
+                <div class="workout--info">
+                    <div class="workout--short-info">
+                        <div class="workout--name">${workout.meta.name}</div>
+                        <div class="workout--type">${workout.meta.category}</div>
+                        <div class="workout--duration">${duration}</div>
+                        <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
+                    </div>
+                    <div class="workout--full-info">
+                        <div class="workout-list--graph-cont">${workout.graph}</div>
+                        <div class="workout--description">${workout.meta.description}</div>
+                    </div>
                 </div>
-                <div class="workout--full-info">
-                    <div class="workout-list--graph-cont">${workout.graph}</div>
-                    <div class="workout--description">${workout.meta.description}</div>
-                    <div class="workout--actions">${removeBtn}</div>
-                </div>
+                <div class="workout--actions">${removeBtn}</div>
             </li>`;
 }
 
@@ -140,6 +142,7 @@ class WorkoutListItem extends HTMLLIElement {
     postInit() { return; }
     connectedCallback() {
         const self = this;
+        this.infoCont = this.querySelector('.workout--info');
         this.summary = this.querySelector('.workout--short-info');
         this.description = this.querySelector('.workout--full-info');
         this.selectBtn = this.querySelector('.workout--select');
@@ -161,6 +164,10 @@ class WorkoutListItem extends HTMLLIElement {
         this.dom.cont = this.querySelector('.workout-list--graph-cont');
         this.viewPort = this.getViewPort();
 
+        this.infoCont.addEventListener('pointerdown', this.onSwipeStart.bind(this), this.signal);
+        this.infoCont.addEventListener('pointermove', this.onSwipe.bind(this), this.signal);
+        this.infoCont.addEventListener('pointerup', this.onSwipeEnd.bind(this), this.signal);
+
         xf.sub('db:workout', this.onWorkout.bind(this), this.signal);
         this.summary.addEventListener('pointerup', this.toggleExpand.bind(this), this.signal);
         this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this), this.signal);
@@ -170,6 +177,33 @@ class WorkoutListItem extends HTMLLIElement {
         this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
         this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
         window.addEventListener('resize', this.debounced.onWindowResize.bind(this), this.signal);
+
+        this.swiping = false;
+        this.swiped = false;
+        this.swipeX = 0;
+    }
+    unify(e) { return e.changedTouches ? e.changedTouches[0] : e; };
+    onSwipeStart(e) {
+        this.swiping = true;
+        this.swipeX = this.unify(e).clientX;
+    }
+    onSwipe(e) {
+        if(this.swiping) {
+            let dx = this.unify(e).clientX - this.swipeX;
+            this.infoCont.style.setProperty('left', dx);
+        }
+    }
+    onSwipeEnd(e) {
+        this.swiping = false;
+        let dx = this.unify(e).clientX - this.swipeX;
+        let sign = Math.sign(dx);
+        if(sign < 0) {
+            this.infoCont.style.setProperty('left', '-26%');
+            this.swiped = true;
+        } else {
+            this.infoCont.style.setProperty('left', '0');
+            this.swiped = false;
+        }
     }
     disconnectedCallback() {
         this.abortController.abort();

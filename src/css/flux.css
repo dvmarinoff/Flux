@@ -1184,8 +1184,36 @@ div.graph--bar-group {
 /* Workout List */
 .workout {
     display: block;
-    padding: 1.5em 1.5em;
+    position: relative;
     border-bottom: 1px solid var(--white-opacity-01);
+
+
+    transition: transform .5s ease-out;
+    overflow-x: hidden;
+}
+
+.workout--info {
+    position: relative;
+    padding: 1.5em 1.5em;
+    background-color: var(--dark);
+    z-index: 1;
+}
+
+.workout--actions {
+    position: absolute;
+    display: grid;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--red);
+    z-index: 0;
+}
+
+.workout--remove {
+    margin: 1.5em 3.5em 1.5em 1.5em;
+    justify-self: end;
+    align-self: center;
 }
 
 .workout--short-info {

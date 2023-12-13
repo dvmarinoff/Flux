@@ -43,7 +43,7 @@ function IDB(args = {}) {
 
                 switch(e.oldVersion) {
                 case 0: createStores(storeNames);
-                case 1: update();
+                case 1: update(storeNames);
                 }
             };
             openReq.onerror = function() {
@@ -84,8 +84,10 @@ function IDB(args = {}) {
         });
     }
 
-    function update() {
+    async function update(storeNames) {
         console.log(`:idb :update`);
+        // create IndexedDB > db > session, workouts
+        await createStores(storeNames);
     }
 
     function transaction(storeName, method, param = undefined, type = 'readonly') {
