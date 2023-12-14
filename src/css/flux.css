@@ -1184,18 +1184,65 @@ div.graph--bar-group {
 /* Workout List */
 .workout {
     display: block;
-    padding: 1.5em 1.5em;
+    position: relative;
     border-bottom: 1px solid var(--white-opacity-01);
+}
+
+.workout--info {
+    position: relative;
+    padding: 0em 1.5em;
+    background-color: var(--dark);
+    z-index: 1;
+}
+
+.options-show {
+    transform: translateX(-8rem);
+}
+
+.options-hide {
+    transform: translateX(0);
+}
+
+.workout--actions {
+    position: absolute;
+    display: grid;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 8em;
+    background-color: var(--red);
+    z-index: 0;
+}
+
+.workout--remove {
+    font-size: 1.4em;
+    justify-self: center;
+    align-self: center;
+    cursor: pointer;
+}
+
+.workout--options {
+    margin-left: 1em;
 }
 
 .workout--short-info {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
     align-items: center;
     align-content: center;
     max-width: var(--inner-max-width);
     margin: 0 auto;
+}
+
+.workout--summary {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    align-content: center;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5em 0;
     text-align: left;
     cursor: pointer;
 }

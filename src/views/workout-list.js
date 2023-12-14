@@ -17,6 +17,17 @@ const radioOn = `
             <circle class="circle" cx="12" cy="12" r="5"/>
         </svg>`;
 
+const removeBtn = `
+        <svg class="workout--remove control--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+            <path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"/>
+        </svg>
+`;
+
+const options = `
+        <svg class="workout--options-btn control--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+            <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/>
+        </svg>`;
+
 function workoutTemplate(workout) {
     let duration = '';
     if(workout.meta.duration) {
@@ -26,15 +37,24 @@ function workoutTemplate(workout) {
         duration = `${(workout.meta.distance / 1000).toFixed(2)} km`;
     }
     return `<li is="workout-item" class='workout cf' id="${workout.id}" metric="ftp">
-                <div class="workout--short-info">
-                    <div class="workout--name">${workout.meta.name}</div>
-                    <div class="workout--type">${workout.meta.category}</div>
-                    <div class="workout--duration">${duration}</div>
-                    <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}</div>
+                <div class="workout--info">
+                    <div class="workout--short-info">
+                        <div class="workout--summary">
+                            <div class="workout--name">${workout.meta.name}</div>
+                            <div class="workout--type">${workout.meta.category}</div>
+                            <div class="workout--duration">${duration}</div>
+                            <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}
+                            </div>
+                        </div>
+                        <div class="workout--options">${options}</div>
+                    </div>
+                    <div class="workout--full-info">
+                        <div class="workout-list--graph-cont">${workout.graph}</div>
+                        <div class="workout--description">${workout.meta.description}</div>
+                    </div>
                 </div>
-                <div class="workout--full-info">
-                    <div class="workout-list--graph-cont">${workout.graph}</div>
-                    <div class="workout--description">${workout.meta.description}</div>
+                <div class="workout--actions">
+                    <span class="workout--remove">Delete</span>
                 </div>
             </li>`;
 }
@@ -129,13 +149,17 @@ class WorkoutListItem extends HTMLLIElement {
         this.postInit();
         this.isExpanded = false;
         this.isSelected = false;
+        this.optionsActive = false;
     }
     postInit() { return; }
     connectedCallback() {
         const self = this;
-        this.summary = this.querySelector('.workout--short-info');
+        this.infoCont = this.querySelector('.workout--info');
+        this.summary = this.querySelector('.workout--summary');
         this.description = this.querySelector('.workout--full-info');
         this.selectBtn = this.querySelector('.workout--select');
+        this.optionsBtn = this.querySelector('.workout--options');
+        this.removeBtn = this.querySelector('.workout--remove');
         this.indicator = this.selectBtn;
         this.id = this.getAttribute('id');
 
@@ -153,13 +177,18 @@ class WorkoutListItem extends HTMLLIElement {
         this.dom.cont = this.querySelector('.workout-list--graph-cont');
         this.viewPort = this.getViewPort();
 
+
         xf.sub('db:workout', this.onWorkout.bind(this), this.signal);
         this.summary.addEventListener('pointerup', this.toggleExpand.bind(this), this.signal);
+        this.optionsBtn.addEventListener('pointerup', this.toggleOptions.bind(this), this.signal);
         this.selectBtn.addEventListener('pointerup', this.onRadio.bind(this), this.signal);
+
+        this.removeBtn.addEventListener('pointerup', this.onRemove.bind(this), this.signal);
 
         this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
         this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
         window.addEventListener('resize', this.debounced.onWindowResize.bind(this), this.signal);
+
     }
     disconnectedCallback() {
         this.abortController.abort();
@@ -197,6 +226,23 @@ class WorkoutListItem extends HTMLLIElement {
         this.indicator.innerHTML = radioOff;
         this.isSelected = false;
     }
+    toggleOptions() {
+        if(this.optionsActive) {
+            this.hideOptions();
+        } else {
+            this.showOptions();
+        }
+    }
+    showOptions() {
+        this.infoCont.classList.remove('options-hide');
+        this.infoCont.classList.add('options-show');
+        this.optionsActive = true;
+    }
+    hideOptions() {
+        this.infoCont.classList.remove('options-show');
+        this.infoCont.classList.add('options-hide');
+        this.optionsActive = false;
+    }
     onWorkout(workout) {
         this.workout = workout;
         this.toggleSelect(workout.id);
@@ -204,6 +250,10 @@ class WorkoutListItem extends HTMLLIElement {
     onRadio(e) {
         e.stopPropagation();
         xf.dispatch('ui:workout:select', this.id);
+    }
+    onRemove(e) {
+        console.log(`:ui :workout :remove :id '${this.id}'`);
+        xf.dispatch('ui:workout:remove', this.id);
     }
     onUpdate(value) {
         if(!equals(value, this.state)) {

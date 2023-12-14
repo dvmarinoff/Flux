@@ -1,6 +1,7 @@
 import { xf, exists, equals } from './functions.js';
 import { models } from './models/models.js';
 import { Sound } from './sound.js';
+import { idb } from './storage/idb.js';
 // import { trainerMock } from './simulation-scripts.js';
 
 let db = {
@@ -231,6 +232,9 @@ xf.reg('workout', (workout, db) => {
 xf.reg('ui:workout:select', (id, db) => {
     db.workout = models.workouts.get(db.workouts, id);
 });
+xf.reg('ui:workout:remove', (id, db) => {
+    db.workouts = models.workouts.remove(db.workouts, id);
+});
 xf.reg('ui:workout:upload', async function(file, db) {
     const { result, name } = await models.workout.readFromFile(file);
     const workout = models.workout.parse(result, name);
@@ -299,11 +303,13 @@ xf.reg('app:start', async function(_, db) {
 
     db.sources = models.sources.set(models.sources.restore());
 
-    db.workouts = models.workouts.restore();
+    // IndexedDB Schema Version 1
+    // await idb.start('store', 1, ['session']);
+    // IndexedDB Schema Version 2
+    await idb.start('store', 2, ['session', 'workouts']);
+    db.workouts = await models.workouts.restore();
     db.workout = models.workout.restore(db);
 
-
-    await models.session.start();
     await models.session.restore(db);
     xf.dispatch('workout:restore');
 

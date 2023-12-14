@@ -2,7 +2,7 @@
 // IDB
 //
 
-import { xf, exists } from '../functions.js';
+import { exists, existance, empty, } from '../functions.js';
 import { uuid } from './uuid.js';
 
 function promisify(request) {
@@ -23,17 +23,30 @@ function IDB(args = {}) {
         db = idb;
     }
 
-    function open(name, version, storeName) {
-        console.log(`:idb :open :db '${name}' :store-name '${storeName}' ...`);
+    async function start(database = '', version = 1, stores = []) {
+        if(!exists(database)) {
+            throw new Error(`:idb idb.start() needs database name!`);
+        };
+        if(empty(database)) {
+            throw new Error(`:idb idb.start() called with empty name!`);
+        };
+        await open(database, version, stores);
+    }
+
+    function open(name, version, storeNames) {
+        console.log(`:idb :open :db '${name}' :store-name '${storeNames}' ...`);
         let openReq = window.indexedDB.open(name, version);
 
         return new Promise((resolve, reject) => {
             openReq.onupgradeneeded = function(e) {
                 setDB(openReq.result);
+                console.log(`:idb :version ${db.version}`);
 
                 switch(e.oldVersion) {
-                case 0: createStore(storeName);
-                case 1: update();
+                // switch(db.version) {
+                case 0: createStores(storeNames);
+                case 1: update(storeNames);
+                case 2: latest(storeNames);
                 }
             };
             openReq.onerror = function() {
@@ -42,6 +55,7 @@ function IDB(args = {}) {
             };
             openReq.onsuccess = function() {
                 setDB(openReq.result);
+                console.log(`:idb :version ${db.version}`);
                 return resolve(openReq.result);
             };
         });
@@ -64,21 +78,29 @@ function IDB(args = {}) {
             db.createObjectStore(name, {keyPath: keyPath});
             console.log(`:idb :create-store '${name}'`);
         } else {
-            console.error(`:idb :error :createStore 'trying to create store with existing name: ${name}'`);
+            console.warn(`:idb :error :createStore 'trying to create store with existing name: ${name}'`);
         }
     }
 
-    function createStores(storeNames, keyPaths) {
+    function createStores(storeNames, keyPaths = []) {
         storeNames.forEach((storeName, i) => {
-            createStore(storeName, keyPaths[i]);
+            createStore(storeName, existance(keyPaths[i], 'id'));
         });
     }
 
-    function update() {
-        console.log(`:idb :update`);
+    async function update(storeNames) {
+        console.log(`:idb :update :stores ${storeNames}`);
+        // create IndexedDB > db > session, workouts
+        await createStores(storeNames);
+    }
+
+    function latest(storeNames) {
+        console.log(`:idb :latest :stores ${storeNames}`);
     }
 
     function transaction(storeName, method, param = undefined, type = 'readonly') {
+        if(!db.objectStoreNames.contains(storeName)) return undefined;
+
         let transaction = db.transaction(storeName, type);
         let store = transaction.objectStore(storeName);
         let req;
@@ -133,6 +155,7 @@ function IDB(args = {}) {
     }
 
     return Object.freeze({
+        start,
         open,
         createStore,
         deleteStore,
