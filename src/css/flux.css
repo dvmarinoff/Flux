@@ -1195,6 +1195,14 @@ div.graph--bar-group {
     z-index: 1;
 }
 
+.options-show {
+    transform: translateX(-8rem);
+}
+
+.options-hide {
+    transform: translateX(0);
+}
+
 .workout--actions {
     position: absolute;
     display: grid;

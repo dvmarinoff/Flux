@@ -234,11 +234,13 @@ class WorkoutListItem extends HTMLLIElement {
         }
     }
     showOptions() {
-        this.infoCont.style.setProperty('left', '-8em');
+        this.infoCont.classList.remove('options-hide');
+        this.infoCont.classList.add('options-show');
         this.optionsActive = true;
     }
     hideOptions() {
-        this.infoCont.style.setProperty('left', '0');
+        this.infoCont.classList.remove('options-show');
+        this.infoCont.classList.add('options-hide');
         this.optionsActive = false;
     }
     onWorkout(workout) {
