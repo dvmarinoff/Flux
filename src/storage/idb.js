@@ -40,10 +40,13 @@ function IDB(args = {}) {
         return new Promise((resolve, reject) => {
             openReq.onupgradeneeded = function(e) {
                 setDB(openReq.result);
+                console.log(`:idb :version ${db.version}`);
 
                 switch(e.oldVersion) {
+                // switch(db.version) {
                 case 0: createStores(storeNames);
                 case 1: update(storeNames);
+                case 2: latest(storeNames);
                 }
             };
             openReq.onerror = function() {
@@ -52,6 +55,7 @@ function IDB(args = {}) {
             };
             openReq.onsuccess = function() {
                 setDB(openReq.result);
+                console.log(`:idb :version ${db.version}`);
                 return resolve(openReq.result);
             };
         });
@@ -74,7 +78,7 @@ function IDB(args = {}) {
             db.createObjectStore(name, {keyPath: keyPath});
             console.log(`:idb :create-store '${name}'`);
         } else {
-            console.error(`:idb :error :createStore 'trying to create store with existing name: ${name}'`);
+            console.warn(`:idb :error :createStore 'trying to create store with existing name: ${name}'`);
         }
     }
 
@@ -85,12 +89,18 @@ function IDB(args = {}) {
     }
 
     async function update(storeNames) {
-        console.log(`:idb :update`);
+        console.log(`:idb :update :stores ${storeNames}`);
         // create IndexedDB > db > session, workouts
         await createStores(storeNames);
     }
 
+    function latest(storeNames) {
+        console.log(`:idb :latest :stores ${storeNames}`);
+    }
+
     function transaction(storeName, method, param = undefined, type = 'readonly') {
+        if(!db.objectStoreNames.contains(storeName)) return undefined;
+
         let transaction = db.transaction(storeName, type);
         let store = transaction.objectStore(storeName);
         let req;
