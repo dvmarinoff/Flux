@@ -1223,6 +1223,7 @@ div.graph--bar-group {
     align-items: center;
     align-content: center;
     max-width: var(--inner-max-width);
+    margin: 0 auto;
 }
 
 .workout--summary {

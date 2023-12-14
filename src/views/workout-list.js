@@ -23,15 +23,9 @@ const removeBtn = `
         </svg>
 `;
 
-const forward = `
-        <svg class="workout--forward control--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-            <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/>
-        </svg>
-`;
-
-const backward = `
-        <svg class="workout--backward control--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-            <path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/>
+const options = `
+        <svg class="workout--options-btn control--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+            <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/>
         </svg>`;
 
 function workoutTemplate(workout) {
@@ -52,7 +46,7 @@ function workoutTemplate(workout) {
                             <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}
                             </div>
                         </div>
-                        <div class="workout--options">${forward}</div>
+                        <div class="workout--options">${options}</div>
                     </div>
                     <div class="workout--full-info">
                         <div class="workout-list--graph-cont">${workout.graph}</div>
