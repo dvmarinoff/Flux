@@ -503,8 +503,7 @@ class Workouts extends Model {
         if(empty(workouts)) {
             return self.default;
         } else {
-            // TODO: reverse
-            return workouts.concat(self.default);
+            return self.default.concat(workouts);
         }
     }
     get(workouts, id) {
