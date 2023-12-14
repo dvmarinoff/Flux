@@ -42,14 +42,18 @@ class WakeLock {
     async lockScreen() {
         let self = this;
         if(self.isLocable && self.isVisible) {
-            let lock = await navigator.wakeLock.request('screen');
-            self.isLocked = true;
+            try {
+                let lock = await navigator.wakeLock.request('screen');
+                self.isLocked = true;
 
-            lock.addEventListener('release', e => {
-                self.isLocked = false;
-                xf.dispatch('lock:release');
-                console.log(`Wake lock released.`);
-            });
+                lock.addEventListener('release', e => {
+                    self.isLocked = false;
+                    xf.dispatch('lock:release');
+                    console.log(`Wake lock released.`);
+                });
+            } catch(e) {
+                console.warn(`wake-lock: not-supported:`, e);
+            }
         }
     }
 }
