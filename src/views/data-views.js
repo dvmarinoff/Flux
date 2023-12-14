@@ -1086,6 +1086,7 @@ class CompatibilityCheck extends HTMLElement {
              <p>This browser is NOT supported. Please open the app with </p>
              <a href="https://www.google.com/chrome/" target="_blank">Chrome</a> or
              <a href="https://www.microsoft.com/edge" target="_blank">Edge</a>
+             <p>Please note that <b>iOS</b> is NOT supported at all, regardless of browser.</p>
              <p>For more information visit the project <a href="https://github.com/dvmarinoff/Flux" target="_blank">Page.</a></p>
          </div>`;
     }
