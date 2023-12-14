@@ -1186,15 +1186,11 @@ div.graph--bar-group {
     display: block;
     position: relative;
     border-bottom: 1px solid var(--white-opacity-01);
-
-
-    transition: transform .5s ease-out;
-    overflow-x: hidden;
 }
 
 .workout--info {
     position: relative;
-    padding: 1.5em 1.5em;
+    padding: 0em 1.5em;
     background-color: var(--dark);
     z-index: 1;
 }
@@ -1217,14 +1213,27 @@ div.graph--bar-group {
     cursor: pointer;
 }
 
+.workout--options {
+    margin-left: 1em;
+}
+
 .workout--short-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    max-width: var(--inner-max-width);
+}
+
+.workout--summary {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
     align-content: center;
-    max-width: var(--inner-max-width);
+    width: 100%;
     margin: 0 auto;
+    padding: 1.5em 0;
     text-align: left;
     cursor: pointer;
 }
