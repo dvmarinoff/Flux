@@ -151,6 +151,7 @@ function Session(args = {}) {
         avg_heart_rate:     0,
         max_heart_rate:     0,
         total_distance:     0, // meters
+        total_calories:     0,
     };
 
     let encoders = {
@@ -230,13 +231,16 @@ function decode(args = {}) {
 }
 
 function encode(args = {}) {
-    const records      = existance(args.records);
-    const laps         = existance(args.laps);
-    const now          = existance(args.now, Date.now());
-    const time_created = now;
-    const timestamp    = now;
-    const num_laps     = laps.length;
-    const summary      = Summary({records: records});
+    const records        = existance(args.records);
+    const laps           = existance(args.laps);
+    const now            = existance(args.now, Date.now());
+    const time_created   = now;
+    const timestamp      = now;
+    const num_laps       = laps.length;
+    const summary        = Summary({records: records});
+    const total_calories = summary.avg_power * records.length / 1000;
+
+    console.log(`:activity :total-calories ${total_calories}`);
 
     // records and laps to FITjs
     const fitjs = [
@@ -257,7 +261,7 @@ function encode(args = {}) {
                  start_time:    l.startTime,
                  message_index: i})),
         lmd.session,
-        Session(Object.assign({timestamp, num_laps}, summary)),
+        Session(Object.assign({timestamp, num_laps, total_calories,}, summary)),
         lmd.activity,
         Activity({timestamp})
     ];

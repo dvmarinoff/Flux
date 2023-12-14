@@ -78,8 +78,8 @@ const localMessageDefinitions = {
         type: 'definition',
         message: 'session',
         local_number: 5,
-        length: 6+(18*3),
-        data_msg_length: 1+40,
+        length: 6+(19*3),
+        data_msg_length: 1+42,
         fields: [
             {field: 'timestamp',          number: 253, size: 4, base_type: 134},
             {field: 'start_time',         number:   2, size: 4, base_type: 134},
@@ -101,6 +101,7 @@ const localMessageDefinitions = {
             {field: 'avg_heart_rate',     number:   16, size: 1, base_type: 2},
             {field: 'max_heart_rate',     number:   17, size: 1, base_type: 2},
             {field: 'total_distance',     number:    9, size: 4, base_type: 134},
+            {field: 'total_calories',     number:   11, size: 2, base_type: 132},
         ]
     },
     activity: {
