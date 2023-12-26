@@ -11,10 +11,11 @@ import { uuid } from '../storage/uuid.js';
 import { workouts as workoutsFile }  from '../workouts/workouts.js';
 import { zwo } from '../workouts/zwo.js';
 import { fileHandler } from '../file.js';
-import { activity } from '../fit/activity.js';
-import { course } from '../fit/course.js';
-import { fit } from '../fit/fit.js';
 import { Model as Cycling } from '../physics.js';
+
+// import { activity } from '../fit/activity.js';
+import { course } from '../fit_old/course.js';
+import { fit } from '../fit/fit.js';
 
 class Model {
     constructor(args = {}) {
@@ -112,6 +113,33 @@ class Speed extends Model {
     }
 }
 
+class SmO2 extends Model {
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 100);
+        this.zones = {
+            one: 30,
+            two: 70,
+            three: 100,
+        };
+    }
+    defaultValue() { return 0; }
+    defaultIsValid(value) {
+        return inRange(self.min, self.max, value);
+    }
+}
+
+class THb extends Model {
+    postInit(args = {}) {
+        this.min = existance(args.min, 0);
+        this.max = existance(args.max, 400);
+    }
+    defaultValue() { return 0; }
+    defaultIsValid(value) {
+        return inRange(self.min, self.max, value);
+    }
+}
+
 class Sources extends Model {
     postInit(args = {}) {
         const self = this;
@@ -145,6 +173,7 @@ class Sources extends Model {
             control:      'ble:controllable',
             heartRate:    'ble:hrm',
             virtualState: 'power',
+            smo2:         'ble:smo2',
         };
         return sources;
     }
@@ -426,7 +455,7 @@ class DataTileSwitch extends Model {
             fallback: self.defaultValue(),
         };
         self.storage = new args.storage(storageModel);
-        this.values = [0,1];
+        this.values = [0, 1, 2];
     }
     defaultValue() { return 0; }
     defaultIsValid(value) { return this.values.includes(value); }
@@ -463,9 +492,23 @@ class Workout extends Model {
         const now = new Date();
         return `workout-${dateToDashString(now)}.fit`;
     }
+    toFitRecords(db) {
+        return db.records;
+    }
+    toFitLaps(db) {
+        return db.laps;
+    }
     encode(db) {
-        const fitjsActivity = activity.encode({records: db.records, laps: db.laps});
-        return fit.activity.encode(fitjsActivity);
+        const self = this;
+        // const fitjsActivity = activity.encode({records: db.records, laps: db.laps});
+        // return fit.activity.encode(fitjsActivity);
+        const records = self.toFitRecords(db);
+        const laps = self.toFitLaps(db);
+
+        return fit.localActivity.encode({
+            records,
+            laps,
+        });
     }
     download(activity) {
         const self = this;
@@ -1020,6 +1063,8 @@ const power = new Power({prop: 'power'});
 const cadence = new Cadence({prop: 'cadence'});
 const heartRate = new HeartRate({prop: 'heartRate'});
 const speed = new Speed({prop: 'speed'});
+const smo2 = new SmO2({prop: 'smo2'});
+const thb = new THb({prop: 'thb'});
 const sources = new Sources({prop: 'sources', storage: LocalStorageItem});
 
 const virtualState = new VirtualState();
@@ -1052,6 +1097,8 @@ let models = {
     heartRate,
     cadence,
     speed,
+    smo2,
+    thb,
     sources,
 
     virtualState,

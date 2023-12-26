@@ -11,6 +11,8 @@ let db = {
     cadence: models.cadence.default,
     speed: models.speed.default,
     sources: models.sources.default,
+    smo2: models.smo2.default,
+    thb: models.thb.default,
 
     speedVirtual: models.virtualState.speed,
     altitude: models.virtualState.altitude,
@@ -94,6 +96,14 @@ xf.reg(models.cadence.prop, (cadence, db) => {
 
 xf.reg(models.speed.prop, (speed, db) => {
     db.speed = speed;
+});
+
+xf.reg(models.smo2.prop, (smo2, db) => {
+    db.smo2 = smo2;
+});
+
+xf.reg(models.thb.prop, (thb, db) => {
+    db.thb = thb;
 });
 
 xf.reg(models.sources.prop, (sources, db) => {

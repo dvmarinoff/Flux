@@ -334,6 +334,51 @@ class HeartRateValue extends DataView {
 customElements.define('heart-rate-value', HeartRateValue);
 
 
+class SmO2Value extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:smo2',
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+
+    // this.style = 'color: #2A5F97';
+    // this.style = 'color: #278B65';
+    // this.style = 'color: #D72A1C';
+    transform(state) {
+        if(state < models.smo2.zones.one) {
+            this.style = 'color: #328AFF';
+        } else if(state < models.smo2.zones.two) {
+            this.style = 'color: #56C057';
+        } else {
+            this.style = 'color: #FE340B';
+        }
+        return toFixed(state, 1);
+    }
+}
+
+customElements.define('smo2-value', SmO2Value);
+
+
+class THbValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:thb',
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    transform(state) {
+        return toFixed(state, 2);
+    }
+}
+
+customElements.define('thb-value', THbValue);
+
+
 class WorkoutName extends DataView {
     getDefaults() {
         return {
@@ -866,6 +911,8 @@ class DataTileSwitchGroup extends SwitchGroup {
         this.$distance = document.querySelector('#data-tile--distance');  // tab 0
         this.$powerAvg = document.querySelector('#data-tile--power-avg'); // tab 1
         this.$slope    = document.querySelector('#data-tile--slope');     // tab 1
+        this.$smo2     = document.querySelector('#data-tile--smo2');      // tab 2
+        this.$thb      = document.querySelector('#data-tile--thb');       // tab 2
 
         this.renderEffect(this.state);
     }
@@ -873,14 +920,29 @@ class DataTileSwitchGroup extends SwitchGroup {
         if(equals(state, 0)) {
             this.$speed.classList.add('active');
             this.$distance.classList.add('active');
+
+            this.$smo2.classList.remove('active');
+            this.$thb.classList.remove('active');
             this.$powerAvg.classList.remove('active');
             this.$slope.classList.remove('active');
         }
         if(equals(state, 1)) {
-            this.$speed.classList.remove('active');
-            this.$distance.classList.remove('active');
             this.$powerAvg.classList.add('active');
             this.$slope.classList.add('active');
+
+            this.$speed.classList.remove('active');
+            this.$distance.classList.remove('active');
+            this.$smo2.classList.remove('active');
+            this.$thb.classList.remove('active');
+        }
+        if(equals(state, 2)) {
+            this.$smo2.classList.add('active');
+            this.$thb.classList.add('active');
+
+            this.$speed.classList.remove('active');
+            this.$distance.classList.remove('active');
+            this.$powerAvg.classList.remove('active');
+            this.$slope.classList.remove('active');
         }
         return;
     }
@@ -1110,6 +1172,8 @@ export {
     SpeedValue,
     DistanceValue,
     HeartRateValue,
+    SmO2Value,
+    THbValue,
     PowerAvg,
     PowerValue,
     MeasurementUnit,

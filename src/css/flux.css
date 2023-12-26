@@ -651,6 +651,14 @@ body {
     grid-area: 3 / 4 / 3 / 7;
     display: none;
 }
+#data-tile--smo2 {
+    grid-area: 3 / 1 / 3 / 4;
+    display: none;
+}
+#data-tile--thb {
+    grid-area: 3 / 4 / 3 / 7;
+    display: none;
+}
 
 
 #data-tile--power-avg.active {
@@ -663,6 +671,14 @@ body {
     display: block;
 }
 #data-tile--distance.active {
+    display: block;
+}
+
+#data-tile--smo2.active {
+    display: block;
+}
+
+#data-tile--thb.active {
     display: block;
 }
 
@@ -2013,6 +2029,15 @@ and (min-height: 600px) {
     }
     #data-tile--distance {
         grid-area: 2 / 5 / 2 / 5;
+    }
+
+    #data-tile--smo2.active {
+        grid-area: 3 / 1 / 3 / 4;
+        display: none;
+    }
+    #data-tile--thb.active {
+        grid-area: 3 / 4 / 3 / 7;
+        display: none;
     }
 
     .data-tile-small--unit {

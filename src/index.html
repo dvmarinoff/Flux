@@ -123,11 +123,30 @@
                                 </div>
                             </div>
 
+                            <div class="data-tile--small" id="data-tile--smo2">
+                                <h2 class="data-tile-small--heading">SmO2</h2>
+                                <div class="data-tile-small--value-cont">
+                                    <smo2-value id="smo2-value"
+                                                class="data-tile-small--value">--</smo2-value>
+                                </div>
+                            </div>
+
+                            <div class="data-tile--small" id="data-tile--thb">
+                                <h2 class="data-tile-small--heading">Thb</h2>
+                                <div class="data-tile-small--value-cont">
+                                    <thb-value id="thb-value"
+                                               class="data-tile-small--value">--</thb-value>
+                                </div>
+                            </div>
+
                             <data-tile-switch-group class="data-tile--switch--group">
                                 <div class="data-tile--switch switch-item switch-0 active" index="0">
                                     <div class="data-tile--switch--icon"></div>
                                 </div>
                                 <div class="data-tile--switch switch-item switch-1" index="1">
+                                    <div class="data-tile--switch--icon"></div>
+                                </div>
+                                <div class="data-tile--switch switch-item switch-2" index="2">
                                     <div class="data-tile--switch--icon"></div>
                                 </div>
                             </data-tile-switch-group>
@@ -779,6 +798,50 @@
                         </div>
                     </div>
                 </div> <!--end ant hrm settings -->
+
+                <!-- moxy-monitor settings -->
+                <div class="device-card">
+                    <div class="device-card--cont">
+                        <div class="device-card--header">
+                            <div class="device-card--header--label">Moxy</div>
+                        </div>
+                        <div class="device-card--body">
+                            <div class="device-card--body--row">
+                                <connection-switch for="ble:moxy"
+                                                   class="connection-icon-switch"
+                                                   indicatorClass="connection-icon-switch--indicator">
+                                    <svg class="connection-icon-switch--icon icon" xmlns="http://www.w3.org/2000/svg"
+                                        height="24" viewBox="0 0 24 24" width="24">
+                                        <path d="M0 0h24v24H0V0z" fill="none"/>
+                                        <path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z"/>
+                                    </svg>
+                                    <div class="connection-icon-switch--indicator off"></div>
+                                </connection-switch>
+                                <div class="device-card--tile">
+                                    <h3 class="device-card--tile--header">Name</h3>
+                                    <data-view class="data-view device-card--tile--value"
+                                               prop="ble:moxy:name">--</data-view>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="moxy"
+                                                   use="ble:moxy">
+                                        <h3 class="device-card--tile--header">SmO2</h3>
+                                        <smo2-value class="data-view device-card--tile--value">--</smo2-value>
+                                    </source-switch>
+                                </div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="thb"
+                                                   use="ble:moxy">
+                                        <h3 class="device-card--tile--header">THb</h3>
+                                        <thb-value class="data-view device-card--tile--value">--</thb-value>
+                                    </source-switch>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end moxy-monitor settings -->
 
                 <div class="sound">
                     <div class="sound--cont">

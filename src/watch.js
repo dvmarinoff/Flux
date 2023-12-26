@@ -328,6 +328,10 @@ xf.reg('watch:elapsed', (x, db) => {
         distance:   db.distance,
         grade:      db.slopeTarget,
         altitude:   db.altitude,
+        device_index:                 0,
+        saturated_hemoglobin_percent: db.smo2,
+        total_hemoglobin_conc:        db.thb,
+
     };
 
     db.records.push(record);
@@ -346,7 +350,7 @@ xf.reg('watch:lap', (x, db) => {
     if(elapsed > 0) {
         db.laps.push({
             timestamp:        timeEnd,
-            startTime:        timeStart,
+            start_time:       timeStart,
             totalElapsedTime: elapsed,
             avgPower:         db.powerLap,
             maxPower:         max(db.lap, 'power'),
