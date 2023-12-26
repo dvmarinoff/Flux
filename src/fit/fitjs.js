@@ -49,25 +49,45 @@ function FitRecord() {
         return view;
     }
 
-    // DataView, Int, Map -> FitRecord
-    function decode(view, i = 0, definitions = new Map()) {
+    // DataView, Int, Map, Bool -> FitRecord
+    function decode(view, i = 0, definitions = new Map(), unfinished = false) {
         const header = recordHeader.decode(view.getUint8(i, true));
+
+        if(i > view.byteLength) {
+            return {};
+        }
+
+        if(unfinished) {
+            // TODO: handle unfinished files
+        }
 
         if(CRC.isCRC(view, i)) {
             return CRC.decode(view, i);
         }
+
         if(fileHeader.isFileHeader(view, i)) {
-            return fileHeader.decode(view, i);
+            const fileHeaderJS = fileHeader.decode(view, i);
+            const byteLength = view.byteLength;
+            const dataSize = fileHeaderJS.dataSize;
+            const headerLength = fileHeaderJS.length;
+            unfinished = byteLength !== (dataSize + headerLength + CRC.size);
+
+            console.log(`:fit :decode :headerLength ${headerLength} :dataSize ${dataSize} :byteLength ${byteLength} :unfinished ${unfinished}`);
+
+            return fileHeaderJS;
         }
+
         if(recordHeader.isDefinition(header)) {
             const definition = definitionRecord.decode(view, i);
             definitions.set(header.localMessageType, definition);
             return definition;
         }
+
         if(recordHeader.isData(header)) {
             const definition = definitions.get(header.localMessageType);
             return dataRecord.decode(definition, view, i);
         }
+
         return {};
     }
 
@@ -110,83 +130,27 @@ function FITjsParser() {
         // - RGT uses the same local_number 0 for all definitions
         // - Zwift often produces unfinished files with broken file headers
 
-        // read fileHeader
-        // compare dataview and declared file length
-        // reduce the dataview to FITjs definition and data msgs
-        // handle unfinished files
-        // handle same local msg number
-
         // config
         const architecture = true;
         // end config
 
-        const fileHeaderJS = fileHeader.decode(dataview, 0);
         const byteLength = dataview.byteLength;
-        const dataSize = fileHeaderJS.dataSize;
-        const headerLength = fileHeaderJS.length;
-        const isFileFinished = byteLength === (dataSize + headerLength + 2);
-
-        console.log(`:headerLegth ${headerLength} :dataSize ${dataSize} :byteLength ${byteLength} :isFileFinished ${isFileFinished}`);
-
-        let i = headerLength;
 
         // state
-        let records = [fileHeaderJS];
+        let i = 0;
+        let records = [];
+        let record;
         let definitions = new Map();
-        let definition = {};
-        let data = {};
-        let currentDefinition = {};
-        let byte;
-        let currentRecordHeader;
-        let crc = 0;
         // end state
 
         while(i < byteLength) {
-            // DataView, Int, Map -> FitRecord
-            var record = fitRecord.decode(dataview, i, definitions);
-            records.push(record);
-            i += record.length;
-
-            /*
             try {
-                byte = dataview.getUint8(i, architecture);
-                currentRecordHeader = recordHeader.decode(byte);
-
-                // TODO: handle unfinished files
-                if(CRC.isCRC(dataview, i)) {
-                    console.log(`crc ${i} + 2 = ${i + 2}`);
-                    crc = CRC.decode(dataview, i);
-                    console.log(crc);
-                    records.push(crc);
-                    break;
-                }
-
-                if(recordHeader.isDefinition(currentRecordHeader)) {
-                    definition = definitionRecord.decode(dataview, i);
-                    definitions.set(currentRecordHeader.localMessageType, definition);
-                    records.push(definition);
-
-                    console.log(`definition ${definition.name} ${i} + ${definition.length} = ${i + definition.length}`);
-                    console.log(definition);
-
-                    i += definition.length;
-                }
-
-                if(recordHeader.isData(currentRecordHeader)) {
-                    currentDefinition = definitions.get(currentRecordHeader.localMessageType);
-                    data = dataRecord.decode(currentDefinition, dataview, i);
-                    records.push(data);
-
-                    console.log(`data ${data.name} ${i} + ${currentDefinition.data_record_length} = ${i + currentDefinition.data_record_length}`);
-                    console.log(data);
-
-                    i += currentDefinition.data_record_length;
-                }
+                record = fitRecord.decode(dataview, i, definitions);
+                records.push(record);
+                i += record?.length ?? 0;
             } catch(e) {
-                console.error(`:fit could not parse at ${i}/${byteLength}`);
-                break;
+                console.error(`:fit :decode :at ${i}/${byteLength} `, e);
             }
-            */
         }
 
         return records;
