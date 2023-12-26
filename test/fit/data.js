@@ -258,6 +258,318 @@ const footer = [
     6,  19,36,144,57,  19,36,144,57,  1,0,  0,  26,  1,  0,
 ];
 
+const minimalFITjs = [
+    // header
+    {
+        type: 'header',
+        length: 12,
+        headerSize: 12,
+        protocolVersion: '1.0',
+        profileVersion: '1.00',
+        dataSize: 368,
+        dataType: '.FIT'
+    },
+
+    // file id definition message
+    {
+        type: 'definition',
+        architecture: 0,
+        name: 'file_id',
+        local_number: 0,
+        length: 21,
+        data_record_length: 12,
+        fields: [
+            { number: 4, size: 4, base_type: 'uint32' },
+            { number: 1, size: 2, base_type: 'uint16' },
+            { number: 2, size: 2, base_type: 'uint16' },
+            { number: 5, size: 2, base_type: 'uint16' },
+            { number: 0, size: 1, base_type: 'enum' }
+        ]
+    },
+
+    // file id data message
+    {
+        type: 'data',
+        name: 'file_id',
+        local_number: 0,
+        length: 12,
+        fields: {
+            time_created: 1623549578000,
+            manufacturer: 260,
+            product: 0,
+            number: 0,
+            type: 4
+        }
+    },
+
+    // event definition message
+    {
+        type: 'definition',
+        architecture: 0,
+        name: 'event',
+        local_number: 2,
+        length: 24,
+        data_record_length: 14,
+        fields: [
+            { number: 253, size: 4, base_type: 'uint32' },
+            { number: 3,   size: 4, base_type: 'uint32' },
+            { number: 2,   size: 2, base_type: 'uint16' },
+            { number: 0,   size: 1, base_type: 'enum' },
+            { number: 1,   size: 1, base_type: 'enum' },
+            { number: 4,   size: 1, base_type: 'uint8' }
+        ]
+    },
+
+    // event data message
+    {
+        type: 'data',
+        name: 'event',
+        local_number: 2,
+        length: 14,
+        fields: {
+            timestamp: 1596813331000,
+            data: 0,
+            data16: 0,
+            event: 0,
+            event_type: 0,
+            event_group: 0
+        }
+    },
+
+    // record definition message
+    {
+        type: 'definition',
+        architecture: 0,
+        name: 'record',
+        local_number: 3,
+        length: 24,
+        data_record_length: 15,
+        fields: [
+            { number: 253, size: 4, base_type: 'uint32' },
+            { number: 7,   size: 2, base_type: 'uint16' },
+            { number: 4,   size: 1, base_type: 'uint8' },
+            { number: 6,   size: 2, base_type: 'uint16' },
+            { number: 3,   size: 1, base_type: 'uint8' },
+            { number: 5,   size: 4, base_type: 'uint32' }
+        ]
+    },
+
+    // record data message
+    {
+        type: 'data',
+        name: 'record',
+        local_number: 3,
+        length: 15,
+        fields: {
+            timestamp: 1596813328000,
+            power: 287,
+            cadence: 83,
+            speed: 8.908,
+            heart_rate: 150,
+            distance: 1.03
+        }
+    },
+    {
+        type: 'data',
+        name: 'record',
+        local_number: 3,
+        length: 15,
+        fields: {
+            timestamp: 1596813329000,
+            power: 291,
+            cadence: 85,
+            speed: 9.159,
+            heart_rate: 150,
+            distance: 10.94
+        }
+    },
+    {
+        type: 'data',
+        name: 'record',
+        local_number: 3,
+        length: 15,
+        fields: {
+            timestamp: 1596813330000,
+            power: 290,
+            cadence: 86,
+            speed: 9.379,
+            heart_rate: 150,
+            distance: 20.14
+        }
+    },
+    {
+        type: 'data',
+        name: 'record',
+        local_number: 3,
+        length: 15,
+        fields: {
+            timestamp: 1596813331000,
+            power: 300,
+            cadence: 86,
+            speed: 9.589,
+            heart_rate: 150,
+            distance: 29.41
+        }
+    },
+
+    // event data message
+    {
+        type: 'data',
+        name: 'event',
+        local_number: 2,
+        length: 14,
+        fields: {
+            timestamp: 1596813331000,
+            data: 0,
+            data16: 0,
+            event: 0,
+            event_type: 4,
+            event_group: 0
+        }
+    },
+
+    // lap definition message
+    {
+        type: 'definition',
+        architecture: 0,
+        name: 'lap',
+        local_number: 4,
+        length: 33,
+        data_record_length: 23,
+        fields: [
+            { number: 253, size: 4, base_type: 'uint32' },
+            { number: 2,   size: 4, base_type: 'uint32' },
+            { number: 7,   size: 4, base_type: 'uint32' },
+            { number: 8,   size: 4, base_type: 'uint32' },
+            { number: 254, size: 2, base_type: 'uint16' },
+            { number: 0,   size: 1, base_type: 'enum' },
+            { number: 1,   size: 1, base_type: 'enum' },
+            { number: 26,  size: 1, base_type: 'uint8' },
+            { number: 24,  size: 1, base_type: 'uint8' }
+        ]
+    },
+
+    // lap data message
+    {
+        type: 'data',
+        name: 'lap',
+        local_number: 4,
+        length: 23,
+        fields: {
+            timestamp: 1596813331000,
+            start_time: 1596813328000,
+            total_elapsed_time: 0.003,
+            total_timer_time: 0.003,
+            message_index: 0,
+            event: 9,
+            event_type: 1,
+            event_group: 0,
+            lap_trigger: 0
+        }
+    },
+
+    // session definition message
+    {
+        type: 'definition',
+        architecture: 0,
+        name: 'session',
+        local_number: 5,
+        length: 60,
+        data_record_length: 41,
+        fields: [
+            { number: 253, size: 4, base_type: 'uint32' },
+            { number: 2,   size: 4, base_type: 'uint32' },
+            { number: 7,   size: 4, base_type: 'uint32' },
+            { number: 8,   size: 4, base_type: 'uint32' },
+            { number: 254, size: 2, base_type: 'uint16' },
+            { number: 25,  size: 2, base_type: 'uint16' },
+            { number: 26,  size: 2, base_type: 'uint16' },
+            { number: 5,   size: 1, base_type: 'enum' },
+            { number: 6,   size: 1, base_type: 'enum' },
+            { number: 20,  size: 2, base_type: 'uint16' },
+            { number: 21,  size: 2, base_type: 'uint16' },
+            { number: 18,  size: 1, base_type: 'uint8' },
+            { number: 19,  size: 1, base_type: 'uint8' },
+            { number: 14,  size: 2, base_type: 'uint16' },
+            { number: 15,  size: 2, base_type: 'uint16' },
+            { number: 16,  size: 1, base_type: 'uint8' },
+            { number: 17,  size: 1, base_type: 'uint8' },
+            { number: 9,   size: 4, base_type: 'uint32' }
+        ]
+    },
+
+    // session data message
+    {
+        type: 'data',
+        name: 'session',
+        local_number: 5,
+        length: 41,
+        fields: {
+            timestamp: 1596813331000,
+            start_time: 1596813328000,
+            total_elapsed_time: 0.003,
+            total_timer_time: 0.003,
+            message_index: 0,
+            first_lap_index: 0,
+            num_laps: 1,
+            sport: 2,
+            sub_sport: 58,
+            avg_power: 292,
+            max_power: 300,
+            avg_cadence: 85,
+            max_cadence: 86,
+            avg_speed: 9.258,
+            max_speed: 9.589,
+            avg_heart_rate: 150,
+            max_heart_rate: 150,
+            total_distance: 29.41
+        }
+    },
+
+    // activity definition message
+    {
+        type: 'definition',
+        architecture: 0,
+        name: 'activity',
+        local_number: 6,
+        length: 27,
+        data_record_length: 15,
+        fields: [
+            { number: 253, size: 4, base_type: 'uint32' },
+            { number: 5,   size: 4, base_type: 'uint32' },
+            { number: 1,   size: 2, base_type: 'uint16' },
+            { number: 2,   size: 1, base_type: 'enum' },
+            { number: 3,   size: 1, base_type: 'enum' },
+            { number: 4,   size: 1, base_type: 'enum' },
+            { number: 6,   size: 1, base_type: 'uint8' }
+        ]
+    },
+
+    // activity data message
+    {
+        type: 'data',
+        name: 'activity',
+        local_number: 6,
+        length: 15,
+        fields: {
+            timestamp: 1596813331000,
+            local_timestamp: 1596813331000,
+            num_sessions: 1,
+            type: 0,
+            event: 26,
+            event_type: 1,
+            event_group: 0
+        }
+    },
+
+    // crc
+    {
+        type: 'crc',
+        length: 2,
+        crc: 17634
+    }
+];
+
 const minimal = [
     // header
     12,  16,  100,0,  112,1,0,0,  46,70,73,84,
@@ -285,7 +597,7 @@ const minimal = [
     2,  19,36,144,57,  0,0,0,0,  0,0,  0, 4, 0,
     // lap definition message
     68, 0, 0, 19,0, 9,  253,4,134, 2,4,134, 7,4,134, 8,4,134, 254,2,132, 0,1,0, 1,1,0, 26,1,2, 24,1,2,
-    // lap
+    // lap data message
     4,  19,36,144,57,  16,36,144,57,  3,0,0,0,  3,0,0,0,  0,0, 9, 1, 0, 0,
     // session definition message
     69, 0, 0, 18,0, 18,  253,4,134, 2,4,134, 7,4,134, 8,4,134, 254,2,132, 25,2,132, 26,2,132,
@@ -306,6 +618,7 @@ const minimal = [
 const data = {
     activity,
     activity3R,
+    minimalFITjs,
     minimal,
 };
 

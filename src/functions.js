@@ -26,12 +26,25 @@ function existance(value, fallback) {
     throw new Error(`existance needs a fallback value `, value);
 }
 
+function expect(x, msg = '') {
+    const err = (msg) => { throw msg; };
+    return exists(x) ? x : err(msg);
+}
+
 function isFunction(x) {
     return equals(typeof x, 'function');
 }
 
 function isArray(x) {
     return Array.isArray(x);
+}
+
+function isArrayBuffer(x) {
+    return x instanceof ArrayBuffer;
+}
+
+function isDataView(x) {
+    return x instanceof DataView;
 }
 
 function isObject(x) {
@@ -254,6 +267,23 @@ function curry2(fn) {
         }
     };
 }
+
+const nth = curry2(function(offset, xs) {
+    let i = (offset < 0) ? (xs.length + offset) : (offset);
+    if(isString(xs)) {
+        return xs.charAt(i);
+    }
+    return xs[i];
+});
+
+const f = {
+    '_': {'@@functional/placeholder': true},
+    'q': function(value) { return function() {return value;}; },
+    'I': (x) => x,
+    'true': (x) => true,
+    'false': (x) => false,
+    'equals': curry2(equals),
+};
 
 //
 // Copied from lodash.js
@@ -545,6 +575,14 @@ function nthBit(field, bit) {
     return (field >> bit) & 1;
 };
 
+function setBit(i, n) {
+    return n |= (1 << i);
+}
+
+function getBits(start, end, value) {
+    return (value >> start) & ((1 << (end - start)) - 1);
+}
+
 function nthBitToBool(field, bit) {
     return toBool(nthBit(field, bit));
 }
@@ -581,7 +619,10 @@ export {
     isFunction,
     exists,
     existance,
+    expect,
     isArray,
+    isArrayBuffer,
+    isDataView,
     isObject,
     isString,
     isCollection,
@@ -612,8 +653,10 @@ export {
     compose,
     pipe,
     repeat,
+    nth,
     curry2,
     debounce,
+    f,
 
     // async
     delay,
@@ -631,6 +674,8 @@ export {
 
     // bits
     nthBit,
+    setBit,
+    getBits,
     nthBitToBool,
     xor,
     setUint24LE,
