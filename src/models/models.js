@@ -12,9 +12,6 @@ import { workouts as workoutsFile }  from '../workouts/workouts.js';
 import { zwo } from '../workouts/zwo.js';
 import { fileHandler } from '../file.js';
 import { Model as Cycling } from '../physics.js';
-
-// import { activity } from '../fit/activity.js';
-import { course } from '../fit_old/course.js';
 import { fit } from '../fit/fit.js';
 
 class Model {
@@ -482,7 +479,7 @@ class Workout extends Model {
     parse(result, name = '') {
         if(isArray(result) || isObject(result)) {
             const view = new DataView(result);
-            const courseJS = course.read(view, name);
+            const courseJS = fit.localCourse.decode(view, name);
             return courseJS;
         }
         return zwo.readToInterval(result);
@@ -500,8 +497,6 @@ class Workout extends Model {
     }
     encode(db) {
         const self = this;
-        // const fitjsActivity = activity.encode({records: db.records, laps: db.laps});
-        // return fit.activity.encode(fitjsActivity);
         const records = self.toFitRecords(db);
         const laps = self.toFitLaps(db);
 

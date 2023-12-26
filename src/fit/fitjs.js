@@ -98,7 +98,7 @@ function FitRecord() {
 }
 
 function FITjsParser() {
-    const fitRecord = FitRecord();
+    // const fitRecord = FitRecord();
 
     // [FITjs] -> Dataview
     function encode(fitJS) {
@@ -162,10 +162,12 @@ function FITjsParser() {
     });
 }
 
+const fitRecord = FitRecord();
 const FITjs = FITjsParser();
 
 export {
     FITjs,
     FitRecord,
+    fitRecord,
 };
 

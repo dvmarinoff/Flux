@@ -9,7 +9,10 @@ import { fieldDefinition } from './field-definition.js';
 import { definitionRecord } from './definition-record.js';
 import { dataRecord } from './data-record.js';
 import { profiles } from './profiles/profiles.js';
+import { fitRecord, FITjs } from './fitjs.js';
+
 import { localActivity } from './local-activity.js';
+import { localCourse } from './local-course.js';
 
 function FIT(args = {}) {
 
@@ -21,7 +24,12 @@ function FIT(args = {}) {
         fieldDefinition,
         CRC,
         profiles,
+        fitRecord,
+        FITjs,
+
+        // remove those from the general library
         localActivity,
+        localCourse,
     };
 }
 
