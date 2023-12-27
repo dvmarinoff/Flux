@@ -573,7 +573,11 @@
                                     </source-switch>
                                 </div>
                             </div>
-                            <div class="device-card--body--row second ant-supported">
+                            <!-- end ble controllable -->
+
+                            <!-- ant controllable -->
+                            <div class="device-card--body--row second ant-not-supported"
+                                 id="ant-controllable-settings">
                                 <connection-switch for="ant:controllable"
                                                    indicatorClass="connection-icon-switch--indicator"
                                                    class="connection-icon-switch">
@@ -617,12 +621,13 @@
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                    for="heartRate"
-                                                   use="ble:controllable">
+                                                   use="ant:controllable">
                                         <h3 class="device-card--tile--header">Heart Rate</h3>
                                         <heart-rate-value class="data-view device-card--tile--value">--</heart-rate-value>
                                     </source-switch>
                                 </div>
                             </div>
+                            <!-- end ant controllable -->
                         </div>
                     </div>
                 </div> <!-- end controlable settings -->
@@ -762,7 +767,9 @@
                             </div>
 
                             <!-- ant hrm -->
-                            <div class="device-card--body--row">
+                            <div class="device-card--body--row ant-not-supported"
+                                 id="ant-hrm-settings"
+                            >
                                 <connection-switch for="ant:hrm"
                                                    id="switch-hrm"
                                                    indicatorClass="connection-icon-switch--indicator"

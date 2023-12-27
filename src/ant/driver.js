@@ -67,12 +67,24 @@ function Driver(args = {}) {
 
     function init() {
         const os = getOS();
-        const result = setup(os);
+        const res = setup(os);
 
-        if(equals(result.result, ':success')) {
-            console.log(`:ant :driver :enable '${result.driver}'`);
-            xf.dispatch(`ant:driver:enable`);
-            start();
+        const antControllable = document.querySelector('#ant-controllable-settings');
+        const antHrm = document.querySelector('#ant-hrm-settings');
+
+        if(equals(res.result, ':success')) {
+            // Currently only Android has stable support for Web Serial API
+            if(equals(os, 'android')) {
+                console.log(`:ant :driver :enable '${res.driver}'`);
+                xf.dispatch(`ant:driver:enable`);
+                antControllable.classList.remove('ant-not-supported');
+                antHrm.classList.remove('ant-not-supported');
+                start();
+            } else {
+                xf.dispatch(`ant:driver:disable`);
+                console.warn(`:ant :driver :disable`);
+                console.warn(`The platform ${os} does NOT have stable support for serial driver! Expect updates!`);
+            }
         } else {
             xf.dispatch(`ant:driver:disable`);
             console.log(`:ant :driver :disable`);

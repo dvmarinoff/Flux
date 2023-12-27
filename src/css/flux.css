@@ -1692,8 +1692,8 @@ div.graph--bar-group {
     padding: 0 5px 0 0;
 }
 
-.device-card--body--row.ant-supported {
-    display: none;
+.ant-not-supported {
+    display: none!important;
 }
 
 .device-card--body--row.second {
