@@ -13,6 +13,8 @@ let db = {
     sources: models.sources.default,
     smo2: models.smo2.default,
     thb: models.thb.default,
+    position_lat: 0,
+    position_long: 0,
 
     speedVirtual: models.virtualState.speed,
     altitude: models.virtualState.altitude,
@@ -271,6 +273,11 @@ xf.reg('activity:save:success', (e, db) => {
 
 xf.reg('course:index', (index, db) => {
     db.courseIndex = index;
+});
+
+xf.reg('course:position', (position, db) => {
+    db.position_lat = position.position_lat;
+    db.position_long = position.position_long;
 });
 
 // Wake Lock

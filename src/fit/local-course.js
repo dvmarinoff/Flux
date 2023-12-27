@@ -65,7 +65,6 @@ function decode(view, fileName) {
     let x = 0;
 
     const dataRecords = courseJS.filter(r => isDataRecord(r) && hasDistance(r));
-    console.log(dataRecords);
     const altitudeRecords = dataRecords.filter(hasAltitude);
 
     let prevAltitude = first(altitudeRecords).fields.altitude;
@@ -89,7 +88,15 @@ function decode(view, fileName) {
         const run   = equals(r, 0) ? 0 : Math.sqrt(Math.abs(r**2 - rise**2));
         const slope = equals(run, 0) ? 0 : 100 * (rise/run);
 
-        acc.push({x, y: altitude, r, slope, distance,});
+        acc.push({
+            x,
+            y: altitude,
+            r,
+            slope,
+            distance,
+            position_lat: m.fields.position_lat,
+            position_long: m.fields.position_long,
+        });
         x += run;
         distanceTotal = distance;
         return acc;

@@ -480,6 +480,7 @@ class Workout extends Model {
         if(isArray(result) || isObject(result)) {
             const view = new DataView(result);
             const courseJS = fit.localCourse.decode(view, name);
+            console.log(courseJS);
             return courseJS;
         }
         return zwo.readToInterval(result);
@@ -631,6 +632,8 @@ function Session(args = {}) {
             lap: db.lap,
             distance: db.distance,
             altitude: db.altitude,
+            position_lat: db.position_lat,
+            position_long: db.position_long,
 
             // Report
             powerInZone: db.powerInZone,

@@ -16,10 +16,12 @@ function Course() {
     let distance = 0;
     let index = 0;
     let maxIndex = 0;
+    let maxPointIndex = 0;
     let courseDistance = 0;
     let r = 0;
     let slope = 0;
     let course;
+    let pointIndex = 0;
 
     let segmentStart = 0;
     let segment = {};
@@ -35,6 +37,37 @@ function Course() {
     }
     function onDistance(value) {
         if(!started) return;
+
+        while((pointIndex % maxPointIndex) < course.points.length) {
+            if((value % courseDistance) > course.points[pointIndex].distance) {
+                // console.log(`< ${pointIndex}/${value} : ${pointIndex} ${course.points[pointIndex].distance}`);
+                pointIndex += 1;
+            } else {
+                var p0 = course.points[pointIndex-1]?.distance ?? 0;
+                var p1 = course.points[pointIndex].distance;
+
+                var p0d = Math.abs(p0 - value);
+                var p1d = Math.abs(p1 - value);
+
+                // console.log(`>= ${pointIndex}/${value} : ${p0} ~${p0d}, ${p1} ~${p1d}`);
+
+                if(p0d < p1d) {
+                    xf.dispatch('course:position', {
+                        position_lat: course.points[pointIndex-1].position_lat,
+                        position_long: course.points[pointIndex-1].position_long,
+                    });
+                    pointIndex = Math.max(pointIndex - 1, 0);
+                } else {
+                    xf.dispatch('course:position', {
+                        position_lat: course.points[pointIndex].position_lat,
+                        position_long: course.points[pointIndex].position_long,
+                    });
+                }
+
+                break;
+            }
+        }
+
 
         distance = (parseFloat(value) % courseDistance);
 
@@ -80,6 +113,7 @@ function Course() {
     }
     function setCourse(course) {
         maxIndex = course.pointsSimplified.length-1;
+        maxPointIndex = course.points.length-1;
         courseDistance = course.meta.distance;
     }
     function setSegment(index) {
