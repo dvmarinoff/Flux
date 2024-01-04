@@ -122,6 +122,11 @@ function FitTimestamp() {
         return (fitTimestamp * 1000) + garmin_epoch;
     }
 
+    // JSTimestamp, JSTimestamp -> FitTimestamp
+    function elapsed(start, end) {
+        return (apply(end) - apply(start));
+    }
+
     function encode(field, value, view, i, architecture) {
         return setView(field.base_type, apply(value), view, i, architecture);
     }
@@ -135,6 +140,7 @@ function FitTimestamp() {
         isTimestamp,
         apply,
         remove,
+        elapsed,
         encode,
         decode,
     });

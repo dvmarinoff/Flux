@@ -10,6 +10,7 @@ import { CRC } from './crc.js';
 import { fileHeader } from './file-header.js';
 import { definitionRecord } from './definition-record.js';
 import { dataRecord } from './data-record.js';
+import { type } from './common.js';
 import { FITjs } from './fitjs.js';
 
 function LocalActivity(args = {}) {
@@ -41,7 +42,12 @@ function LocalActivity(args = {}) {
             // data file_id
             dataRecord.toFITjs(
                 definitions.file_id,
-                FileId({time_created})
+                FileId({
+                    time_created,
+                    manufacturer:  1,    // garmin
+                    product:       3570, // edge 1030
+                    serial_number: 3313379353,
+                })
             ),
 
             // definition file_creator
@@ -49,7 +55,9 @@ function LocalActivity(args = {}) {
             // data file_creator
             dataRecord.toFITjs(
                 definitions.file_creator,
-                FileCreator({})
+                FileCreator({
+                    software_version: 29, // edge 1030
+                })
             ),
 
             // definition record
@@ -65,7 +73,7 @@ function LocalActivity(args = {}) {
             ...laps.map((lap, message_index) =>
                 dataRecord.toFITjs(
                     definitions.lap,
-                    Lap({...lap, message_index, timestamp})),
+                    Lap({...lap, message_index})),
             ),
 
             // definition session
@@ -133,7 +141,7 @@ function FileId(args = {}) {
 
 function FileCreator(args = {}) {
     return {
-        software_version: 29 ?? 0, // edge 1030
+        software_version: 0,
     };
 }
 
@@ -146,7 +154,7 @@ function Lap(args = {}) {
     const timestamp = expect(args.timestamp, 'Lap needs timestamp.');
     const message_index = args.message_index ?? 0;
     const total_elapsed_time = args.total_elapsed_time ??
-          (timestamp - start_time) / 1000;
+          type.timestamp.elapsed(start_time, timestamp);
     const total_timer_time = args.total_timer_time ?? total_elapsed_time;
 
     return {
@@ -180,7 +188,7 @@ function Session(args = {}) {
     const start_time = args.start_time ?? first(records).timestamp;
     const timestamp = args.timestamp ?? last(records).timestamp;
     const total_elapsed_time = args.total_elapsed_time ??
-          (timestamp - start_time) / 1000;
+          type.timestamp.elapsed(start_time, timestamp);
     const total_timer_time = args.total_timer_time ?? total_elapsed_time;
     const message_index = args.message_index ?? 0;
     const num_laps = args.laps?.length ?? 1;
@@ -215,6 +223,7 @@ function Session(args = {}) {
     }, defaultStats);
 
     stats.total_calories = stats.avg_power * total_timer_time / 1000;
+    // stats.avg_speed = avg_speed * 0.277778
 
     return {
         timestamp,
