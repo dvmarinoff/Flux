@@ -9,6 +9,7 @@ const productMessageDefinitions = [
         'time_created',
         'manufacturer',
         'product',
+        'serial_number',
         'number',
         'type',
     ], 0],

@@ -133,11 +133,11 @@ function FileId(args = {}) {
         time_created: args.time_created ?? Date.now(),
         manufacturer: args.manufacturer ?? 255,
         product: args.product ?? 0,
+	      serial_number: args.serial_number ?? 0,
         number: 0,
         type: 4,
     };
 }
-
 
 function FileCreator(args = {}) {
     return {
