@@ -327,7 +327,7 @@ function Model(args = { use: {}}) {
         const c1bl = c1bearingLoss;
         const c2bl = c2bearingLoss;
         // set to zero for no pke modeling, one for full pke modeling
-        const pkefactor = 0.25;
+        const pkefactor = 1;
 
         const c0ke      = -0.5 * (mass + wheelInertia) * Math.pow(speedPrev, 2) * pkefactor / dt;
         const c2ke      =  0.5 * (mass + wheelInertia) * pkefactor / dt;

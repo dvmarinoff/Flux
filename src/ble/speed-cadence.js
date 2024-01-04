@@ -37,7 +37,7 @@ function onData(data) {
         xf.dispatch('cadence', data.cadence);
     };
     if(exists(data.speed) && models.sources.isSource('speed', self.id)) {
-        xf.dispatch(`speed`, data.speed);
+        xf.dispatch(`speed`, models.speed.kmhToMps(data.speed));
     };
 }
 

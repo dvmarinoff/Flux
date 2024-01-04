@@ -108,6 +108,18 @@ class Speed extends Model {
         return (Number.isInteger(value) || Number.isFloat(value)) &&
                 inRange(self.min, self.max, value);
     }
+    kmhToMps(kmh) {
+        return kmh / 3.6;
+    }
+    mpsToKmh(mps) {
+        return mps * 3.6;
+    }
+    mpsToMph(mps) {
+        return mps * 2.23693629;
+    }
+    kmhToMph(kmh) {
+        return kmh * 0.621371192;
+    }
 }
 
 class SmO2 extends Model {
@@ -993,7 +1005,8 @@ class VirtualState extends MetaProp {
 
         this.speed = speed;
 
-        xf.dispatch('speedVirtual', (speed * 3.6));
+        // xf.dispatch('speedVirtual', (speed * 3.6));
+        xf.dispatch('speedVirtual', speed);
         xf.dispatch('distance', distance);
         xf.dispatch('altitude', altitude);
         xf.dispatch('ascent', ascent);
@@ -1027,7 +1040,8 @@ class SpeedState extends VirtualState {
 
         const { distance, altitude, ascent } = this.cycling.trainerSpeed({
             slope:     db.slopeTarget / 100,
-            speed:     db.speed / 3.6,
+            // speed:     db.speed / 3.6,
+            speed:     db.speed,
             distance:  db.distance,
             altitude:  db.altitude,
             ascent:    db.ascent,
@@ -1036,7 +1050,8 @@ class SpeedState extends VirtualState {
             dt:        isNaN(dt) ? 1/4 : dt,
         });
 
-        this.speedPrev = speed / 3.6;
+        // this.speedPrev = speed / 3.6;
+        this.speedPrev = speed;
 
         xf.dispatch('distance', distance);
         xf.dispatch('altitude', altitude);

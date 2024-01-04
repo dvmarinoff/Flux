@@ -89,7 +89,7 @@ class Controllable extends Device {
             const service = await self.getService(uuids.fitnessMachine);
             const ftms = new FitnessMachineService({
                 onStatus: onFitnessMachineStatus,
-                onData:   onIndoorBikeData.bind(self),
+                onData:   onData.bind(self),
                 service,
                 ble,
             });
@@ -101,7 +101,7 @@ class Controllable extends Device {
             const service = await self.getService(uuids.fec);
             const fec = new FEC({
                 controllable: self,
-                onData: onIndoorBikeData.bind(self),
+                onData: onData.bind(self),
                 service,
                 ble,
             });
@@ -113,7 +113,7 @@ class Controllable extends Device {
             const service = await self.getService(uuids.cyclingPower);
             const wcps = new WahooCyclingPower({
                 controllable: self,
-                onData: onIndoorBikeData.bind(self),
+                onData: onData.bind(self),
                 service,
                 ble,
             });
@@ -153,7 +153,7 @@ class Controllable extends Device {
     }
 }
 
-function onIndoorBikeData(value) {
+function onData(value) {
     const self = this;
 
     if(exists(value.power) && models.sources.isSource('power', self.id)) {
@@ -163,7 +163,7 @@ function onIndoorBikeData(value) {
         xf.dispatch(`cadence`, value.cadence);
     };
     if(exists(value.speed) && models.sources.isSource('speed', self.id)) {
-        xf.dispatch(`speed`, value.speed);
+        xf.dispatch(`speed`, models.speed.kmhToMps(value.speed));
     };
     if(exists(value.heartRate) && models.sources.isSource('heartRate', self.id)
        && !equals(value.heartRate, 255)) {

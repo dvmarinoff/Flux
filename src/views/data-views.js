@@ -139,14 +139,11 @@ class SpeedValue extends DataView {
     onMeasurement(measurement) {
         this.measurement = measurement;
     }
-    kmhToMph(kmh) {
-        return 0.621371 * kmh;
-    };
     format(value, measurement = 'metric') {
         if(equals(measurement, 'imperial')) {
-            value = `${this.kmhToMph(value).toFixed(1)}`;
+            value = `${models.speed.mpsToMph(value).toFixed(1)}`;
         } else {
-            value = `${(value).toFixed(1)}`;
+            value = `${(models.speed.mpsToKmh(value)).toFixed(1)}`;
         }
         return value;
     }

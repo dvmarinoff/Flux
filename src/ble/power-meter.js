@@ -30,7 +30,7 @@ class PowerMeter extends Device {
         const service = await self.getService(uuids.cyclingPower);
 
         const cps = new CyclingPowerService({
-            onData:    onPowerData.bind(self),
+            onData:    onData.bind(self),
             onControl: onCyclingPowerControlPoint.bind(self),
             service,
             ble,
@@ -40,7 +40,7 @@ class PowerMeter extends Device {
     }
 }
 
-function onPowerData(data) {
+function onData(data) {
     const self = this;
     if(exists(data.power)   && models.sources.isSource('power', self.id)) {
         xf.dispatch('power', data.power);
@@ -49,7 +49,7 @@ function onPowerData(data) {
         xf.dispatch('cadence', data.cadence);
     }
     if(exists(data.speed)   && models.sources.isSource('speed', self.id)) {
-        xf.dispatch('speed', data.speed);
+        xf.dispatch('speed', models.speed.kmhToMps(data.speed));
     }
     if(exists(data.offsetIndicator)) {
         xf.dispatch(`${self.id}:offsetIndicator`, data.offsetIndicator);
