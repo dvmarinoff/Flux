@@ -141,7 +141,7 @@ function FileId(args = {}) {
 
 function FileCreator(args = {}) {
     return {
-        software_version: 0,
+        software_version: args.software_version ?? 0,
     };
 }
 
