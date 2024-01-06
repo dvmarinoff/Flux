@@ -134,14 +134,17 @@ function last(xs) {
 function map(coll, fn) {
     if(isArray(coll)) return coll.map(fn);
     if(isObject(coll)) {
-        return Object.fromEntries(
-            Object.entries(coll).map(([k, v], i) => [k, (fn(v, k, i))]));
+        for (let prop in coll) {
+            coll[prop] = fn(coll[prop]);
+        }
+        return coll;
     }
     if(isString(coll)) {
         return coll.split('').map(fn).join('');
     }
     throw new Error(`map called with unkown collection `, coll);
 }
+
 
 function traverse(obj, fn = ((x) => x), acc = []) {
 
