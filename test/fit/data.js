@@ -1,625 +1,584 @@
+// App Data Input
 
-const activity = [
-    {type: "header", protocolVersion: "1.0", profileVersion: "1.00", dataRecordsLength: 161521, length: 12, crc: false},
-    {type: "definition",
-     message: "file_id",
-     architecture: 0,
-     local_number: 0,
-     length: 24,
-     data_msg_length: 16,
-     fields: [
-         {field: 'time_created', number: 4, size: 4, base_type: 134},
-         {field: 'manufacturer', number: 1, size: 2, base_type: 132},
-         {field: 'product',      number: 2, size: 2, base_type: 132},
-         {field: 'number',       number: 5, size: 2, base_type: 132},
-         {field: 'type',         number: 0, size: 1, base_type: 0},
-     ]},
-    {type: "data",
-     message: "file_id",
-     local_number: 0,
-     fields: {
-         manufacturer: 260, number: 0, product: 0, serial_number: 0, time_created: 992483978, type: 4,
-    }},
-    {type: "definition",
-     message: "device_info",
-     architecture: 0,
-     local_number: 1,
-     length: 39,
-     data_msg_length: 25,
-     fields: [
-         {field: "timestamp", number: 253, size: 4, base_type: 134},
-         {field: "serial_number", number: 3, size: 4, base_type: 140},
-         {field: "cum_operating_time", number: 7, size: 4, base_type: 134},
-         {field: "manufacturer", number: 2, size: 2, base_type: 132},
-         {field: "product", number: 4, size: 2, base_type: 132},
-         {field: "software_version", number: 5, size: 2, base_type: 132},
-         {field: "battery_voltage", number: 10, size: 2, base_type: 132},
-         {field: "device_index", number: 0, size: 1, base_type: 2},
-         {field: "device_type", number: 1, size: 1, base_type: 2},
-         {field: "hardware_version", number: 6, size: 1, base_type: 2},
-         {field: "battery_status", number: 11, size: 1, base_type: 2},
-     ]},
-    {type: "data",
-     message: "device_info",
-     local_number: 1,
-     fields: {
-         battery_status: 0, battery_voltage: 0, cum_operating_time: 0, device_index: 0,
-         device_type: 0, hardware_version: 0, manufacturer: 260, product: 0,
-         serial_number: 3825981698, software_version: 562, timestamp: 789516505,
-     }},
-    {type: "definition",
-     message: "record",
-     architecture: 0,
-     local_number: 3,
-     length: 51,
-     data_msg_length: 37,
-     fields: [
-         {field: "timestamp", number: 253, size: 4, base_type: 134},
-         {field: "position_lat", number: 0, size: 4, base_type: 133},
-         {field: "position_long", number: 1, size: 4, base_type: 133},
-         {field: "distance", number: 5, size: 4, base_type: 134},
-         {field: "time_from_course", number: 11, size: 4, base_type: 133},
-         {field: "compressed_speed_distance", number: 8, size: 3, base_type: 13},
-         {field: "heart_rate", number: 3, size: 1, base_type: 2},
-         {field: "altitude", number: 2, size: 2, base_type: 132},
-         {field: "speed", number: 6, size: 2, base_type: 132},
-         {field: "power", number: 7, size: 2, base_type: 132},
-         {field: "grade", number: 9, size: 2, base_type: 131},
-         {field: "cadence", number: 4, size: 1, base_type: 2},
-         {field: "resistance", number: 10, size: 1, base_type: 2},
-         {field: "cycle_length", number: 12, size: 1, base_type: 2},
-         {field: "temperature", number: 13, size: 1, base_type: 1},
-     ]},
-    {type: "definition",
-     message: "event",
-     architecture: 0,
-     local_number: 2,
-     length: 24,
-     data_msg_length: 14,
-     fields: [
-         {field: 'timestamp',   number: 253, size: 4, base_type: 134},
-         {field: 'data',        number:   3, size: 4, base_type: 134},
-         {field: 'data16',      number:   2, size: 2, base_type: 132},
-         {field: 'event',       number:   0, size: 1, base_type: 0},
-         {field: 'event_type',  number:   1, size: 1, base_type: 0},
-         {field: 'event_group', number:   4, size: 1, base_type: 2},
-     ]},
-    {type: "data",
-     message: "event",
-     local_number: 2,
-     fields: {
-        timestamp: 992484147, data: 0, data16: 0, event: 0, event_group: 0, event_type: 0,
-    }},
-    {type: "data",
-     message: "record",
-     local_number: 3,
-     fields: {
-        timestamp: 965747728, power: 287, cadence: 83, speed: 8908, heart_rate: 150, distance: 103, altitude: 2565,
-        position_lat: -138807946, position_long: 1992069714, compressed_speed_distance: 255, cycle_length: 255,
-        grade: 32767, resistance: 255, temperature: 127, time_from_course: 2147483647}},
-
-    {type: "data", message: "record", local_number: 3, fields: {
-        timestamp: 965747729, power: 291, cadence: 85, speed: 9159, heart_rate: 150, distance: 1094, altitude: 2565,
-        position_lat: -138808926, position_long: 1992070093, compressed_speed_distance: 255, cycle_length: 255,
-        grade: 32767, resistance: 255, temperature: 127, time_from_course: 2147483647}},
-
-    {type: "data", message: "record", local_number: 3, fields: {
-        timestamp: 965747730, power: 290, cadence: 85, speed: 9379, heart_rate: 150, distance: 2014, altitude: 2565,
-        position_lat: -138809856, position_long:  1992070426, compressed_speed_distance: 255, cycle_length: 255,
-        grade: 32767, resistance: 255, temperature: 127, time_from_course: 2147483647}},
-
-    {type: "data", message: "record", local_number: 3, fields: {
-        timestamp: 965747731, power: 300, cadence: 86, speed: 9589, heart_rate: 150, distance: 2941, altitude: 2565,
-        position_lat: -138810762, position_long: 1992070836, compressed_speed_distance: 255, cycle_length: 255,
-        grade: 32767, resistance: 255, temperature: 127, time_from_course: 2147483647}},
+// Records
+const records = [
+    {
+        timestamp: 1669140869000,  // 1038075269, 133, 197, 223, 61,
+        position_lat: -128450465,  // sint32, semicircles, 95, 0, 88, 248,
+        position_long: 1978610201, // sint32, semicircles,  25, 50, 239, 117,
+        altitude: 87,              // uint16, scale 5, offset 500, m, 2935, 119, 11,
+        heart_rate: 90,            // uint8, bpm, 90
+        cadence: 70,               // uint8, rpm, 70
+        distance: 7.66,            // uint32, scale 100, m, 766, 254, 2, 0, 0,
+        speed: 6.717,              // uint16, scale 1000, m/s, 6717, 61, 26,
+        power: 160,                // uint16, w, 160, 0,
+        grade: 0,                  // sint16, scale 100, %, 0, 0,
+        device_index: 0,           // uint8, 0
+    },
+    {
+        timestamp: 1669140870000,  // 1038075270, 134, 197, 223, 61,
+        position_lat: -128449747,  // sint32, semicircles, 45, 3, 88, 248,
+        position_long: 1978610154, // sint32, semicircles, 234, 49, 239, 117,
+        altitude: 87,              // uint16, scale 5, offset 500, m, 2935, 119, 11,
+        heart_rate: 91,            // uint8, bpm,
+        cadence: 71,               // uint8, rpm
+        distance: 14.36,           // uint32, scale 100, m, 156, 5, 0, 0,
+        speed: 6.781,              // uint16, scale 1000, m/s, 6781, 125, 26,
+        power: 161,                // uint16, w, 161, 0,
+        grade: 0,                  // sint16, scale 100, %, 0, 0,
+        device_index: 0,           // uint8, 0
+    },
+    {
+        timestamp: 1669140871000,  // 1038075271, 135, 197, 223, 61,
+        position_lat: -128449037,  // sint32, semicircles, 243, 5, 88, 248,
+        position_long: 1978609898, // sint32, semicircles, 234, 48, 239, 117,
+        altitude: 87,              // uint16, scale 5, offset 500, m, 2935, 119, 11,
+        heart_rate: 92,            // uint8, bpm
+        cadence: 72,               // uint8, rpm
+        distance:	21.34,           // uint32, scale 100, m, 86, 8, 0, 0,
+        speed: 7.08,               // uint16, scale 1000, m/s, 7080, 168, 27,
+        power: 162,                // uint16, w, 162, 0,
+        grade: 0,                  // sint16, scale 100, %, 0, 0,
+        device_index: 0,           // uint8, 0
+    },
+    {
+        timestamp: 1669140872000,  // 1038075272, 136, 197, 223, 61,
+        position_lat: -128448324,  // sint32, semicircles, 188, 8, 88, 248,
+        position_long: 1978609588, // sint32, semicircles, 180, 47, 239, 117,
+        altitude: 87,              // uint16, scale 5, offset 500, m, 2935, 119, 11,
+        heart_rate: 93,            // uint8, bpm
+        cadence: 73,               // uint8, rpm
+        distance:	28.56,           // uint32, scale 100, m, 40, 11, 0, 0,
+        speed: 7.498,              // uint16, scale 1000, m/s, 7498, 74, 29,
+        power: 163,                // uint16, w, 163, 0,
+        grade: 0,                  // sint16, scale 100, %, 0, 0,
+        device_index: 0,           // uint8, 0
+    },
 ];
 
-const activity3R = [
-    //
-    // just the first 4 records from 3R_Sand_and_Sequoias_Race_C_.fit, as FITjs
-    //
-    {type: "header", protocolVersion: "1.0", profileVersion: "1.00", dataRecordsLength: 161521,
-     fileType: ".FIT", length: 12, crc: false},
-    {type: "definition",
-     message: "file_id",
-     architecture: 0,
-     local_number: 0,
-     length: 24,
-     data_msg_length: 16,
-     fields: [
-         {field: "serial_number", number: 3, size: 4, base_type: 140},
-         {field: "time_created", number: 4, size: 4, base_type: 134},
-         {field: "manufacturer", number: 1, size: 2, base_type: 132},
-         {field: "product", number: 2, size: 2, base_type: 132},
-         {field: "number", number: 5, size: 2, base_type: 132},
-         {field: "type", number: 0, size: 1, base_type: 0},
-     ]},
-    {type: "data",
-     message: "file_id",
-     local_number: 0,
-     fields: {
-         manufacturer: 260, number: 0, product: 0, serial_number: 0, time_created: 965747493, type: 4,
-     }},
-    {type: "definition",
-     message: "device_info",
-     architecture: 0,
-     local_number: 1,
-     length: 39,
-     data_msg_length: 25,
-     fields: [
-         {field: "timestamp", number: 253, size: 4, base_type: 134},
-         {field: "serial_number", number: 3, size: 4, base_type: 140},
-         {field: "cum_operating_time", number: 7, size: 4, base_type: 134},
-         {field: "manufacturer", number: 2, size: 2, base_type: 132},
-         {field: "product", number: 4, size: 2, base_type: 132},
-         {field: "software_version", number: 5, size: 2, base_type: 132},
-         {field: "battery_voltage", number: 10, size: 2, base_type: 132},
-         {field: "device_index", number: 0, size: 1, base_type: 2},
-         {field: "device_type", number: 1, size: 1, base_type: 2},
-         {field: "hardware_version", number: 6, size: 1, base_type: 2},
-         {field: "battery_status", number: 11, size: 1, base_type: 2},
-     ]},
-    {type: "data",
-     message: "device_info",
-     local_number: 1,
-     fields: {
-         battery_status: 0, battery_voltage: 0, cum_operating_time: 0, device_index: 0,
-         device_type: 0, hardware_version: 0, manufacturer: 260, product: 0,
-         serial_number: 3825981698, software_version: 562, timestamp: 789516505,
-     }},
-    {type: "definition",
-     message: "record",
-     architecture: 0,
-     local_number: 3,
-     length: 51,
-     data_msg_length: 37,
-     fields: [
-         {field: "timestamp", number: 253, size: 4, base_type: 134},
-         {field: "position_lat", number: 0, size: 4, base_type: 133},
-         {field: "position_long", number: 1, size: 4, base_type: 133},
-         {field: "distance", number: 5, size: 4, base_type: 134},
-         {field: "time_from_course", number: 11, size: 4, base_type: 133},
-         {field: "compressed_speed_distance", number: 8, size: 3, base_type: 13},
-         {field: "heart_rate", number: 3, size: 1, base_type: 2},
-         {field: "altitude", number: 2, size: 2, base_type: 132},
-         {field: "speed", number: 6, size: 2, base_type: 132},
-         {field: "power", number: 7, size: 2, base_type: 132},
-         {field: "grade", number: 9, size: 2, base_type: 131},
-         {field: "cadence", number: 4, size: 1, base_type: 2},
-         {field: "resistance", number: 10, size: 1, base_type: 2},
-         {field: "cycle_length", number: 12, size: 1, base_type: 2},
-         {field: "temperature", number: 13, size: 1, base_type: 1},
-     ]},
-    {type: "definition",
-     message: "event",
-     architecture: 0,
-     local_number: 2,
-     length: 24,
-     data_msg_length: 14,
-     fields: [
-         {field: "timestamp", number: 253, size: 4, base_type: 134},
-         {field: "data", number: 3, size: 4, base_type: 134},
-         {field: "data16", number: 2, size: 2, base_type: 132},
-         {field: "event", number: 0, size: 1, base_type: 0},
-         {field: "event_type", number: 1, size: 1, base_type: 0},
-         {field: "event_group", number: 4, size: 1, base_type: 2},
-     ]},
-    {type: "data",
-     message: "event",
-     local_number: 2,
-     fields: {
-         data: 0, data16: 0, event: 0, event_group: 0, event_type: 0, timestamp: 965747716,
-     }},
-    {type: "data",
-     message: "record",
-     local_number: 3,
-     fields: {
-         altitude: 2565, cadence: 83, compressed_speed_distance: 255, cycle_length: 255, distance: 103,
-         grade: 32767, heart_rate: 150, position_lat: -138807946, position_long: 1992069714, power: 287,
-         resistance: 255, speed: 8908, temperature: 127, time_from_course: 2147483647, timestamp: 965747728,
-     }},
-    {type: "data", message: "record", local_number: 3,
-     fields: {
-         altitude: 2565, cadence: 85, compressed_speed_distance: 255, cycle_length: 255, distance: 1094,
-         grade: 32767, heart_rate: 150, position_lat: -138808926, position_long: 1992070093, power: 291,
-         resistance: 255, speed: 9159, temperature: 127, time_from_course: 2147483647, timestamp: 965747729,
-     }},
-    {type: "data", message: "record", local_number: 3,
-     fields: {
-         altitude: 2565, cadence: 86, compressed_speed_distance: 255, cycle_length: 255, distance: 2014,
-         grade: 32767, heart_rate: 150, position_lat: -138809856, position_long: 1992070426, power: 290,
-         resistance: 255, speed: 9379, temperature: 127, time_from_course: 2147483647, timestamp: 965747730,
-     }},
-    {type: "data", message: "record", local_number: 3,
-     fields: {
-         altitude: 2565, cadence: 86, compressed_speed_distance: 255, cycle_length: 255, distance: 2941,
-         grade: 32767, heart_rate: 150, position_lat: -138810762, position_long: 1992070836, power: 300,
-         resistance: 255, speed: 9589, temperature: 127, time_from_course: 2147483647, timestamp: 965747731,
-     }},
+// Laps
+const laps = [
+    {
+        start_time: 1669140869000, // start time
+        timestamp: 1669140872000,  // end time
+    },
 ];
 
-const footer = [
-    // event
-    2,  19,36,144,57,  0,0,0,0,  0,0,  0, 4, 0,
-    // lap definition
-    68, 0, 0, 19,0, 9,  253,4,134, 2,4,134, 7,4,134, 8,4,134, 254,2,132, 0,1,0, 1,1,0, 26,1,2, 24,1,2,
-    // lap
-    4,  19,36,144,57,  16,36,144,57,  3,0,0,0,  3,0,0,0,  0,0, 9, 1, 0, 0,
-    // session definition
-    69, 0, 0, 18,0, 18,  253,4,134, 2,4,134, 7,4,134, 8,4,134, 254,2,132, 25,2,132, 26,2,132,
-    5,1,0, 6,1,0, 20,2,132, 21,2,132, 18,1,2, 19,1,2, 14,2,132, 15,2,132, 16,1,2, 17,1,2, 9,4,134,
-    // session
-    5,  19,36,144,57,  16,36,144,57,  3,0,0,0,  3,0,0,0,
-    0,0,  0,0,  1,0,  2,  58,
-    36,1,  44,1,  84, 86,  42,36,  117,37,  150, 150,  125,11,0,0,
-    // activity definition
-    70, 0, 0, 34,0, 7,  253,4,134, 5,4,134, 1,2,132, 2,1,0, 3,1,0, 4,1,0, 6,1,2,
-    // activity
-    6,  19,36,144,57,  19,36,144,57,  1,0,  0,  26,  1,  0,
-];
+const appData = {records, laps};
+// END App Data
 
-const minimalFITjs = [
+
+
+// Expected FITjs
+function FITjs(args = {}) {
+    const headerCRC = args.crc ? 40815 : 0;
+    const fileCRC   = args.crc ? 14083 : undefined;
+
+    return [
+        // file header
+        {
+            type: 'header',
+            length: 14,
+            headerSize: 14,
+            protocolVersion: '2.0',
+            profileVersion: '21.40',
+            dataSize: 383,
+            dataType: '.FIT',
+            crc: headerCRC,
+        },
+        // definition file_id
+        {
+            type: 'definition',
+            name: 'file_id',
+            architecture: 0,
+            local_number: 0,
+            length: 21,
+            data_record_length: 12,
+            fields: [
+                {number: 4, size: 4, base_type: 'uint32'},
+                {number: 1, size: 2, base_type: 'uint16'},
+                {number: 2, size: 2, base_type: 'uint16'},
+                {number: 5, size: 2, base_type: 'uint16'},
+                {number: 0, size: 1, base_type: 'enum'},
+            ]
+        },
+        // data file_id
+        {
+            type: 'data',
+            name: 'file_id',
+            local_number: 0,
+            length: 12,
+            fields: {
+                time_created: 1669140872000,
+                manufacturer: 255,
+                product:      0,
+                number:       0,
+                type:         4,
+            },
+        },
+        // definition record
+        {
+            type: 'definition',
+            name: 'record',
+            architecture: 0,
+            local_number: 3,
+            length: 39,
+            data_record_length: 28,
+            fields: [
+                {number: 253, size: 4, base_type: 'uint32'}, // timestamp
+                {number:   0, size: 4, base_type: 'sint32'}, // position_lat
+                {number:   1, size: 4, base_type: 'sint32'}, // position_long
+                {number:   2, size: 2, base_type: 'uint16'}, // altitude
+                {number:   3, size: 1, base_type: 'uint8'},  // heart_rate
+                {number:   4, size: 1, base_type: 'uint8'},  // cadence
+                {number:   5, size: 4, base_type: 'uint32'}, // distance
+                {number:   6, size: 2, base_type: 'uint16'}, // speed
+                {number:   7, size: 2, base_type: 'uint16'}, // power
+                {number:   9, size: 2, base_type: 'sint16'}, // grade
+                {number:  62, size: 1, base_type: 'uint8'},  // device_index
+            ]
+        },
+        // data record messages
+        {
+            type: 'data',
+            name: 'record',
+            local_number: 3,
+            length: 28,
+            fields: {
+                timestamp: 1669140869000,  //
+                position_lat: -128450465,  // sint32, semicircles
+                position_long: 1978610201, // sint32, semicircles
+                altitude: 87,              // uint16, scale 5, offset 500, m
+                heart_rate: 90,            // uint8, bpm
+                cadence: 70,               // uint8, rpm
+                distance: 7.66,            // uint32, scale 100, m
+                speed: 6.717,              // uint16, scale 1000, m/s
+                power: 160,                // uint16, w
+                grade: 0,                  // sint16, scale 100, %
+                device_index: 0,           // uint8, 0
+            }
+        },
+        {
+            type: 'data',
+            name: 'record',
+            local_number: 3,
+            length: 28,
+            fields: {
+                timestamp: 1669140870000,  //
+                position_lat: -128449747,  // sint32, semicircles
+                position_long: 1978610154, // sint32, semicircles
+                altitude: 87,              // uint16, scale 5, offset 500, m
+                heart_rate: 91,            // uint8, bpm
+                cadence: 71,               // uint8, rpm
+                distance: 14.36,           // uint32, scale 100, m
+                speed: 6.781,              // uint16, scale 1000, m/s
+                power: 161,                // uint16, w
+                grade: 0,                  // sint16, scale 100, %
+                device_index: 0,           // uint8, 0
+            }
+        },
+        {
+            type: 'data',
+            name: 'record',
+            local_number: 3,
+            length: 28,
+            fields: {
+                timestamp: 1669140871000,  //
+                position_lat: -128449037,  // sint32, semicircles
+                position_long: 1978609898, // sint32, semicircles
+                altitude: 87,              // uint16, scale 5, offset 500, m
+                heart_rate: 92,            // uint8, bpm
+                cadence: 72,               // uint8, rpm
+                distance:	21.34,           // uint32, scale 100, m
+                speed: 7.08,               // uint16, scale 1000, m/s
+                power: 162,                // uint16, w
+                grade: 0,                  // sint16, scale 100, %
+                device_index: 0,           // uint8, 0
+            }
+        },
+        {
+            type: 'data',
+            name: 'record',
+            local_number: 3,
+            length: 28,
+            fields: {
+                timestamp: 1669140872000,  //
+                position_lat: -128448324,  // sint32, semicircles
+                position_long: 1978609588, // sint32, semicircles
+                altitude: 87,              // uint16, scale 5, offset 500, m
+                heart_rate: 93,            // uint8, bpm
+                cadence: 73,               // uint8, rpm
+                distance:	28.56,           // uint32, scale 100, m
+                speed: 7.498,              // uint16, scale 1000, m/s
+                power: 163,                // uint16, w
+                grade: 0,                  // sint16, scale 100, %
+                device_index: 0,           // uint8, 0
+            }
+        },
+        // definition lap
+        {
+            type: 'definition',
+            name: 'lap',
+            architecture: 0,
+            local_number: 4,
+            length: 27,
+            data_record_length: 21,
+            fields: [
+                {number: 253, size: 4, base_type: 'uint32'}, // timestamp
+                {number: 2,   size: 4, base_type: 'uint32'}, // start_time
+                {number: 7,   size: 4, base_type: 'uint32'}, // total_elapsed_time
+                {number: 8,   size: 4, base_type: 'uint32'}, // total_timer_time
+                {number: 254, size: 2, base_type: 'uint16'}, // message_index
+                {number: 0,   size: 1, base_type: 'enum'},   // event
+                {number: 1,   size: 1, base_type: 'enum'},   // event_type
+            ]
+        },
+        // data lap
+        {
+            type: 'data',
+            name: 'lap',
+            local_number: 4,
+            length: 21,
+            fields: {
+                timestamp:  1669140872000,
+                start_time: 1669140869000,
+                total_elapsed_time: 3,
+                total_timer_time: 3,
+                message_index: 0,
+                event: 9,
+                event_type: 1,
+            },
+        },
+        // definition session
+        {
+            type: 'definition',
+            architecture: 0,
+            name: 'session',
+            local_number: 5,
+            length: 63,
+            data_record_length: 43,
+            fields: [
+                {number: 253, size: 4, base_type: 'uint32'}, // timestamp
+                {number: 2,   size: 4, base_type: 'uint32'}, // start_time
+                {number: 7,   size: 4, base_type: 'uint32'}, // total_elapsed_time
+                {number: 8,   size: 4, base_type: 'uint32'}, // total_timer_time
+                {number: 254, size: 2, base_type: 'uint16'}, // message_index
+                {number: 5,   size: 1, base_type: 'enum'},   // sport
+                {number: 6,   size: 1, base_type: 'enum'},   // sub_sport
+                {number: 9,   size: 4, base_type: 'uint32'}, // total_distance
+                {number: 11,  size: 2, base_type: 'uint16'}, // total_calories
+                {number: 14,  size: 2, base_type: 'uint16'}, // avg_speed
+                {number: 15,  size: 2, base_type: 'uint16'}, // max_speed
+                {number: 16,  size: 1, base_type: 'uint8'},  // avg_heart_rate
+                {number: 17,  size: 1, base_type: 'uint8'},  // max_heart_rate
+                {number: 18,  size: 1, base_type: 'uint8'},  // avg_cadence
+                {number: 19,  size: 1, base_type: 'uint8'},  // max_cadence
+                {number: 20,  size: 2, base_type: 'uint16'}, // avg_power
+                {number: 21,  size: 2, base_type: 'uint16'}, // max_power
+                {number: 25,  size: 2, base_type: 'uint16'}, // first_lap_index
+                {number: 26,  size: 2, base_type: 'uint16'}, // num_laps
+            ]
+        },
+        // data session
+        {
+            type: 'data',
+            name: 'session',
+            local_number: 5,
+            length: 43,
+            fields: {
+                timestamp:  1669140872000,
+                start_time: 1669140869000,
+                total_elapsed_time: 3,
+                total_timer_time: 3,
+                message_index: 0,
+                sport: 2,
+                sub_sport: 58,
+                total_distance: 28.56,
+                total_calories: 0, // 0.4845
+                avg_speed: 7.019,
+                max_speed: 7.498,
+                avg_heart_rate: 91, // 91.5
+                max_heart_rate: 93,
+                avg_cadence: 71, // 71.5
+                max_cadence: 73,
+                avg_power: 161, // 161.5
+                max_power: 163,
+                first_lap_index: 0,
+                num_laps: 1,
+            }
+        },
+        // definition activity
+        {
+            type: 'definition',
+            architecture: 0,
+            name: 'activity',
+            local_number: 6,
+            length: 27,
+            data_record_length: 18,
+            fields: [
+                {number: 253, size: 4, base_type: 'uint32'}, // timestamp
+                {number: 0,   size: 4, base_type: 'uint32'}, // total_timer_time
+                {number: 1,   size: 2, base_type: 'uint16'}, // num_sessions
+                {number: 2,   size: 1, base_type: 'enum'},   // type
+                {number: 3,   size: 1, base_type: 'enum'},   // event
+                {number: 4,   size: 1, base_type: 'enum'},   // event_type
+                {number: 5,   size: 4, base_type: 'uint32'}, // local_timestamp
+            ]
+        },
+        // data activity
+        {
+            type: 'data',
+            name: 'activity',
+            local_number: 6,
+            length: 18,
+            fields: {
+                timestamp: 1669140872000,
+                total_timer_time: 3,
+                num_sessions: 1,
+                type: 0,
+                event: 26,
+                event_type: 1,
+                local_timestamp: 1669140872000,
+            }
+        },
+        // crc
+        {
+            type: 'crc',
+            length: 2,
+            crc: fileCRC,
+        }
+    ];
+};
+// END expected FITjs
+
+
+
+// Expected FIT binary
+const fitBinary = [
     // header
-    {
-        type: 'header',
-        length: 12,
-        headerSize: 12,
-        protocolVersion: '1.0',
-        profileVersion: '1.00',
-        dataSize: 368,
-        dataType: '.FIT'
-    },
+    [
+        14,           // header length
+        32,           // profile version
+        92,8,         // protocol version
+        127,1,0,0,    // data size (without header and crc)
+        46,70,73,84,  // data type (ASCII for ".FIT")
+        111, 159,     // header crc
+    ],
+    // definition file_id
+    [
+        0b01000000,  // header, 64, 0b01000000
+        0,           // reserved
+        0,           // architecture
+        0, 0,        // global number
+        5,           // number of fields
+        4, 4, 134,   // time_created
+        1, 2, 132,   // manufacturer
+        2, 2, 132,   // product
+        5, 2, 132,   // number
+        0, 1, 0,     // type
+    ],
+    // data file_id
+    [
+        0b00000000,        // header, 0, 0b00000000
+        136, 197, 223, 61, // time_created
+        255, 0,            // manufacturer
+        0, 0,              // product
+        0, 0,              // number
+        4,                 // type
+    ],
+    // definition record
+    [
+        0b01000011,  // header, 69, 0b01000101
+        0,           // reserved
+        0,           // architecture
+        20, 0,       // global number
+        11,          // number of fields
+        253, 4, 134, // timestamp
+          0, 4, 133, // position_lat
+          1, 4, 133, // position_long
+          2, 2, 132, // altitude 935
+          3, 1,   2, // heart_rate
+          4, 1,   2, // cadence
+          5, 4, 134, // distance 10000
+          6, 2, 132, // speed 6000
+          7, 2, 132, // power
+          9, 2, 131, // grade 140
+         62, 1,   2, // device_index
+    ],
+    // data record
+    [
+        0b0000011,         // header
+        133, 197, 223, 61, // timestamp
+        95, 0, 88, 248,    // position_lat
+        25, 50, 239, 117,  // position_long
+        119, 11,           // altitude 2935
+        90,                // heart_rate
+        70,                // cadence
+        254, 2, 0, 0,      // distance
+        61, 26,            // speed
+        160, 0,            // power
+        0, 0,              // grade
+        0,                 // device_index
+    ],
+    [
+        0b0000011,         // header
+        134, 197, 223, 61, // timestamp
+        45, 3, 88, 248,    // position_lat
+        234, 49, 239, 117, // position_long
+        119, 11,           // altitude 2935
+        91,                // heart_rate
+        71,                // cadence
+        156, 5, 0, 0,      // distance
+        125, 26,           // speed
+        161, 0,            // power
+        0, 0,              // grade
+        0,                 // device_index
+    ],
+    [
+        0b0000011,         // header
+        135, 197, 223, 61, // timestamp
+        243, 5, 88, 248,   // position_lat
+        234, 48, 239, 117, // position_long
+        119, 11,           // altitude 2935
+        92,                // heart_rate
+        72,                // cadence
+        86, 8, 0, 0,       // distance
+        168, 27,           // speed
+        162, 0,            // power
+        0, 0,              // grade
+        0,                 // device_index
+    ],
+    [
+        0b0000011,         // header
+        136, 197, 223, 61, // timestamp
+        188, 8, 88, 248,   // position_lat
+        180, 47, 239, 117, // position_long
+        119, 11,           // altitude 2935
+        93,                // heart_rate
+        73,                // cadence
+        40, 11, 0, 0,      // distance
+        74, 29,            // speed
+        163, 0,            // power
+        0, 0,              // grade
+        0,                 // device_index
+    ],
+    // definition lap
+    [
+        0b01000100,  // header, 68, 0b01000100
+        0,           // reserved
+        0,           // architecture
+        19, 0,       // global number
+        7,           // number of fields
+        253, 4, 134, // timestamp
+          2, 4, 134, // start_time
+          7, 4, 134, // total_elapsed_time
+          8, 4, 134, // total_timer_time
+        254, 2, 132, // message_index
+          0, 1,   0, // event
+          1, 1,   0, // event_type
+    ],
+    // data lap
+    [
+        0b00000100,        // header, 68, 0b00001000
+        136, 197, 223, 61, // timestamp
+        133, 197, 223, 61, // start_time
+        184, 11, 0, 0,     // total_elapsed_time
+        184, 11, 0, 0,     // total_timer_time
+        0, 0,              // message_index
+        9,                 // event
+        1,                 // event_type
+    ],
 
-    // file id definition message
-    {
-        type: 'definition',
-        architecture: 0,
-        name: 'file_id',
-        local_number: 0,
-        length: 21,
-        data_record_length: 12,
-        fields: [
-            { number: 4, size: 4, base_type: 'uint32' },
-            { number: 1, size: 2, base_type: 'uint16' },
-            { number: 2, size: 2, base_type: 'uint16' },
-            { number: 5, size: 2, base_type: 'uint16' },
-            { number: 0, size: 1, base_type: 'enum' }
-        ]
-    },
-
-    // file id data message
-    {
-        type: 'data',
-        name: 'file_id',
-        local_number: 0,
-        length: 12,
-        fields: {
-            time_created: 1623549578000,
-            manufacturer: 260,
-            product: 0,
-            number: 0,
-            type: 4
-        }
-    },
-
-    // event definition message
-    {
-        type: 'definition',
-        architecture: 0,
-        name: 'event',
-        local_number: 2,
-        length: 24,
-        data_record_length: 14,
-        fields: [
-            { number: 253, size: 4, base_type: 'uint32' },
-            { number: 3,   size: 4, base_type: 'uint32' },
-            { number: 2,   size: 2, base_type: 'uint16' },
-            { number: 0,   size: 1, base_type: 'enum' },
-            { number: 1,   size: 1, base_type: 'enum' },
-            { number: 4,   size: 1, base_type: 'uint8' }
-        ]
-    },
-
-    // event data message
-    {
-        type: 'data',
-        name: 'event',
-        local_number: 2,
-        length: 14,
-        fields: {
-            timestamp: 1596813331000,
-            data: 0,
-            data16: 0,
-            event: 0,
-            event_type: 0,
-            event_group: 0
-        }
-    },
-
-    // record definition message
-    {
-        type: 'definition',
-        architecture: 0,
-        name: 'record',
-        local_number: 3,
-        length: 24,
-        data_record_length: 15,
-        fields: [
-            { number: 253, size: 4, base_type: 'uint32' },
-            { number: 7,   size: 2, base_type: 'uint16' },
-            { number: 4,   size: 1, base_type: 'uint8' },
-            { number: 6,   size: 2, base_type: 'uint16' },
-            { number: 3,   size: 1, base_type: 'uint8' },
-            { number: 5,   size: 4, base_type: 'uint32' }
-        ]
-    },
-
-    // record data message
-    {
-        type: 'data',
-        name: 'record',
-        local_number: 3,
-        length: 15,
-        fields: {
-            timestamp: 1596813328000,
-            power: 287,
-            cadence: 83,
-            speed: 8.908,
-            heart_rate: 150,
-            distance: 1.03
-        }
-    },
-    {
-        type: 'data',
-        name: 'record',
-        local_number: 3,
-        length: 15,
-        fields: {
-            timestamp: 1596813329000,
-            power: 291,
-            cadence: 85,
-            speed: 9.159,
-            heart_rate: 150,
-            distance: 10.94
-        }
-    },
-    {
-        type: 'data',
-        name: 'record',
-        local_number: 3,
-        length: 15,
-        fields: {
-            timestamp: 1596813330000,
-            power: 290,
-            cadence: 86,
-            speed: 9.379,
-            heart_rate: 150,
-            distance: 20.14
-        }
-    },
-    {
-        type: 'data',
-        name: 'record',
-        local_number: 3,
-        length: 15,
-        fields: {
-            timestamp: 1596813331000,
-            power: 300,
-            cadence: 86,
-            speed: 9.589,
-            heart_rate: 150,
-            distance: 29.41
-        }
-    },
-
-    // event data message
-    {
-        type: 'data',
-        name: 'event',
-        local_number: 2,
-        length: 14,
-        fields: {
-            timestamp: 1596813331000,
-            data: 0,
-            data16: 0,
-            event: 0,
-            event_type: 4,
-            event_group: 0
-        }
-    },
-
-    // lap definition message
-    {
-        type: 'definition',
-        architecture: 0,
-        name: 'lap',
-        local_number: 4,
-        length: 33,
-        data_record_length: 23,
-        fields: [
-            { number: 253, size: 4, base_type: 'uint32' },
-            { number: 2,   size: 4, base_type: 'uint32' },
-            { number: 7,   size: 4, base_type: 'uint32' },
-            { number: 8,   size: 4, base_type: 'uint32' },
-            { number: 254, size: 2, base_type: 'uint16' },
-            { number: 0,   size: 1, base_type: 'enum' },
-            { number: 1,   size: 1, base_type: 'enum' },
-            { number: 26,  size: 1, base_type: 'uint8' },
-            { number: 24,  size: 1, base_type: 'uint8' }
-        ]
-    },
-
-    // lap data message
-    {
-        type: 'data',
-        name: 'lap',
-        local_number: 4,
-        length: 23,
-        fields: {
-            timestamp: 1596813331000,
-            start_time: 1596813328000,
-            total_elapsed_time: 0.003,
-            total_timer_time: 0.003,
-            message_index: 0,
-            event: 9,
-            event_type: 1,
-            event_group: 0,
-            lap_trigger: 0
-        }
-    },
-
-    // session definition message
-    {
-        type: 'definition',
-        architecture: 0,
-        name: 'session',
-        local_number: 5,
-        length: 60,
-        data_record_length: 41,
-        fields: [
-            { number: 253, size: 4, base_type: 'uint32' },
-            { number: 2,   size: 4, base_type: 'uint32' },
-            { number: 7,   size: 4, base_type: 'uint32' },
-            { number: 8,   size: 4, base_type: 'uint32' },
-            { number: 254, size: 2, base_type: 'uint16' },
-            { number: 25,  size: 2, base_type: 'uint16' },
-            { number: 26,  size: 2, base_type: 'uint16' },
-            { number: 5,   size: 1, base_type: 'enum' },
-            { number: 6,   size: 1, base_type: 'enum' },
-            { number: 20,  size: 2, base_type: 'uint16' },
-            { number: 21,  size: 2, base_type: 'uint16' },
-            { number: 18,  size: 1, base_type: 'uint8' },
-            { number: 19,  size: 1, base_type: 'uint8' },
-            { number: 14,  size: 2, base_type: 'uint16' },
-            { number: 15,  size: 2, base_type: 'uint16' },
-            { number: 16,  size: 1, base_type: 'uint8' },
-            { number: 17,  size: 1, base_type: 'uint8' },
-            { number: 9,   size: 4, base_type: 'uint32' }
-        ]
-    },
-
-    // session data message
-    {
-        type: 'data',
-        name: 'session',
-        local_number: 5,
-        length: 41,
-        fields: {
-            timestamp: 1596813331000,
-            start_time: 1596813328000,
-            total_elapsed_time: 0.003,
-            total_timer_time: 0.003,
-            message_index: 0,
-            first_lap_index: 0,
-            num_laps: 1,
-            sport: 2,
-            sub_sport: 58,
-            avg_power: 292,
-            max_power: 300,
-            avg_cadence: 85,
-            max_cadence: 86,
-            avg_speed: 9.258,
-            max_speed: 9.589,
-            avg_heart_rate: 150,
-            max_heart_rate: 150,
-            total_distance: 29.41
-        }
-    },
-
-    // activity definition message
-    {
-        type: 'definition',
-        architecture: 0,
-        name: 'activity',
-        local_number: 6,
-        length: 27,
-        data_record_length: 15,
-        fields: [
-            { number: 253, size: 4, base_type: 'uint32' },
-            { number: 5,   size: 4, base_type: 'uint32' },
-            { number: 1,   size: 2, base_type: 'uint16' },
-            { number: 2,   size: 1, base_type: 'enum' },
-            { number: 3,   size: 1, base_type: 'enum' },
-            { number: 4,   size: 1, base_type: 'enum' },
-            { number: 6,   size: 1, base_type: 'uint8' }
-        ]
-    },
-
-    // activity data message
-    {
-        type: 'data',
-        name: 'activity',
-        local_number: 6,
-        length: 15,
-        fields: {
-            timestamp: 1596813331000,
-            local_timestamp: 1596813331000,
-            num_sessions: 1,
-            type: 0,
-            event: 26,
-            event_type: 1,
-            event_group: 0
-        }
-    },
-
-    // crc
-    {
-        type: 'crc',
-        length: 2,
-        crc: 17634
-    }
+    // definition session
+    [
+        0b01000101,  // header, 69, 0b01000101
+        0,           // reserved
+        0,           // architecture
+        18, 0,       // global number
+        19,          // number of fields
+        253, 4, 134, // timestamp
+          2, 4, 134, // start_time
+          7, 4, 134, // total_elapsed_time
+          8, 4, 134, // total_timer_time
+        254, 2, 132, // message_index
+          5, 1,   0, // sport
+          6, 1,   0, // sub_sport
+          9, 4, 134, // total_distance
+         11, 2, 132, // total_calories
+         14, 2, 132, // avg_speed
+         15, 2, 132, // max_speed
+         16, 1,   2, // avg_heart_rate
+         17, 1,   2, // max_heart_rate
+         18, 1,   2, // avg_cadence
+         19, 1,   2, // max_cadence
+         20, 2, 132, // avg_power
+         21, 2, 132, // max_power
+         25, 2, 132, // first_lap_index
+         26, 2, 132, // num_laps
+    ],
+    // data session
+    [
+        0b00000101,        // header, 5, 0b00000101
+        136, 197, 223, 61, // timestamp
+        133, 197, 223, 61, // start_time
+        184, 11, 0, 0,     // total_elapsed_time
+        184, 11, 0, 0,     // total_timer_time
+        0, 0,              // message_index
+        2,                 // sport
+        58,                // sub_sport
+        40, 11, 0, 0,      // total_distance
+        0, 0,              // total_calories
+        107, 27,           // avg_speed
+        74, 29,            // max_speed
+        91,                // avg_heart_rate
+        93,                // max_heart_rate
+        71,                // avg_cadence
+        73,                // max_cadence
+        161, 0,            // avg_power
+        163, 0,            // max_power
+        0, 0,              // first_lap_index
+        1, 0,              // num_laps
+    ],
+    // definition activity
+    [
+        0b01000110,  // header, 70, 0b01000110
+        0,           // reserved
+        0,           // architecture
+        34, 0,       // global number
+        7,           // number of fields
+        253, 4, 134, // timestamp
+          0, 4, 134, // total_timer_time
+          1, 2, 132, // num sessions
+          2, 1,   0, // type
+          3, 1,   0, // event
+          4, 1,   0, // event_type
+          5, 4, 134, // local_timestamp
+    ],
+    // data activity
+    [
+        0b00000110,        // header, 6, 0b00000110
+        136, 197, 223, 61, // timestamp
+        184,  11,   0,  0, // total_timer_time
+        1, 0,              // num sessions
+        0,                 // type
+        26,                // event
+        1,                 // stop
+        136, 197, 223, 61, // local_timestamp
+    ],
+    // crc, needs to be computed last evetytime when encoding to binary
+    [
+        3,
+        55,
+    ],
 ];
 
-const minimal = [
-    // header
-    12,  16,  100,0,  112,1,0,0,  46,70,73,84,
-    // file id definition message
-    64, 0, 0, 0,0, 5,  4,4,134,  1,2,132,  2,2,132,  5,2,132,  0,1,0,
-    // file id data message
-    0, 138, 26, 40, 59, 4, 1, 0, 0, 0, 0, 4,
-    // device info definition message
-    // ...
-    // device info data message
-    // ...
-    // event definition message
-    66, 0, 0, 21,0, 6,  253,4,134, 3,4,134, 2,2,132, 0,1,0, 1,1,0, 4,1,2,
-    // event data message
-    2,  19,36,144,57,  0,0,0,0,  0,0,  0, 0, 0,
-    // record definition message
-    //                   timestamp,  power, cadence, speed,   hr,   distance
-    67, 0, 0, 20,0, 6,  253,4,134, 7,2,132, 4,1,2, 6,2,132, 3,1,2, 5,4,134,
-    // record data message
-    3, 16,36,144,57, 31,1, 83, 204,34, 150, 103,0,0,0,
-    3, 17,36,144,57, 35,1, 85, 199,35, 150, 70,4,0,0,
-    3, 18,36,144,57, 34,1, 86, 163,36, 150, 222,7,0,0,
-    3, 19,36,144,57, 44,1, 86, 117,37, 150, 125,11,0,0,
-    // event data message
-    2,  19,36,144,57,  0,0,0,0,  0,0,  0, 4, 0,
-    // lap definition message
-    68, 0, 0, 19,0, 9,  253,4,134, 2,4,134, 7,4,134, 8,4,134, 254,2,132, 0,1,0, 1,1,0, 26,1,2, 24,1,2,
-    // lap data message
-    4,  19,36,144,57,  16,36,144,57,  3,0,0,0,  3,0,0,0,  0,0, 9, 1, 0, 0,
-    // session definition message
-    69, 0, 0, 18,0, 18,  253,4,134, 2,4,134, 7,4,134, 8,4,134, 254,2,132, 25,2,132, 26,2,132,
-    5,1,0, 6,1,0, 20,2,132, 21,2,132, 18,1,2, 19,1,2, 14,2,132, 15,2,132, 16,1,2, 17,1,2, 9,4,134,
-    // session data message
-    5,  19,36,144,57,  16,36,144,57,  3,0,0,0,  3,0,0,0,
-    0,0,  0,0,  1,0,  2,  58,
-    36,1,  44,1,  85, 86,  42,36,  117,37,  150, 150,  125,11,0,0,
-    // activity definition message
-    70, 0, 0, 34,0, 7,  253,4,134, 5,4,134, 1,2,132, 2,1,0, 3,1,0, 4,1,0, 6,1,2,
-    // activity data message
-    6,  19,36,144,57,  19,36,144,57,  1,0,  0,  26,  1,  0,
-    // crc
-    // 112, 130
-    226, 68
-];
+const flatFitBinary = fitBinary.flat();
+// END Expected FIT binary
 
-const data = {
-    activity,
-    activity3R,
-    minimalFITjs,
-    minimal,
+export {
+    appData,
+    FITjs,
+    fitBinary,
+    flatFitBinary,
 };
 
-export { data };

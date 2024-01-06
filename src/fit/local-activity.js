@@ -28,9 +28,9 @@ function LocalActivity(args = {}) {
         const records = args.records ?? [];
         const laps = args.laps ?? [];
 
-        const now = last(args.records)?.timestamp ?? Date.now();
-        const time_created = now;
-        const timestamp = now;
+        const time_created = last(args.records)?.timestamp ?? Date.now();
+        const timestamp = time_created;
+        const activity_start_time = first(records).timestamp;
 
         // structure: FITjs
         const structure = [
@@ -94,7 +94,10 @@ function LocalActivity(args = {}) {
             // data activity
             dataRecord.toFITjs(
                 definitions.activity,
-                Activity({timestamp,})
+                Activity({
+                    timestamp,
+                    activity_start_time,
+                })
             ),
             // crc, needs to be computed last evetytime when encoding to binary
             CRC.toFITjs(),
@@ -169,12 +172,18 @@ function Lap(args = {}) {
 }
 
 function Activity(args = {}) {
+    const total_timer_time = type.timestamp.elapsed(
+        args.activity_start_time, args.timestamp
+    );
+
     return {
         timestamp: expect(args.timestamp, 'Activity needs timestamp.'),
+        total_timer_time,
         num_sessions: 1,
         type: profiles.types.activity.values.manual,
         event: profiles.types.event.values.activity,
         event_type: profiles.types.event_type.values.stop,
+        local_timestamp: args.timestamp,
     };
 }
 // END Special Data Messages
@@ -222,8 +231,10 @@ function Session(args = {}) {
         return acc;
     }, defaultStats);
 
-    stats.total_calories = stats.avg_power * total_timer_time / 1000;
-    // stats.avg_speed = avg_speed * 0.277778
+    stats.total_calories = Math.floor(stats.avg_power * total_timer_time / 1000);
+    stats.avg_power = Math.floor(stats.avg_power);
+    stats.avg_cadence = Math.floor(stats.avg_cadence);
+    stats.avg_heart_rate = Math.floor(stats.avg_heart_rate);
 
     return {
         timestamp,

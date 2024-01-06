@@ -69,10 +69,12 @@ const productMessageDefinitions = [
     ], 5],
     ['activity', [
         'timestamp',
+        'total_timer_time',
         'num_sessions',
         'type',
         'event',
         'event_type',
+        'local_timestamp',
     ], 6],
     ['course', [
         'name',

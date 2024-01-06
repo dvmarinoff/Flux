@@ -26,7 +26,7 @@ function CRCFactory(args = {}) {
         ];
 
         let crc = 0;
-        for (let i = start; i < end; i++) {
+        for (let i = start; i <= end; i++) {
             const byte = file.getUint8(i, true);
             let tmp = crcTable[crc & 0xF];
             crc = (crc >> 4) & 0x0FFF;
@@ -69,6 +69,45 @@ function CRCFactory(args = {}) {
         };
     }
 
+    // Uint16 -> [Uint8]
+    function toArray(crc) {
+        return [crc & 0xFF, crc >> 8];
+    }
+
+    // [Uint8] -> Uint16
+    function fromArray(array) {
+        return array[0] + array[1] << 8;
+    }
+
+    // Dataview -> {number: Uint16, array: [Uint8]}
+    function getHeaderCRC(dataview) {
+        const number = dataview.getUint16(12, true);
+        const array = [
+            dataview.getUint8(12, true),
+            dataview.getUint8(13, true)
+        ];
+
+        return {
+            number,
+            array,
+        };
+    }
+
+    // Dataview -> {number: Uint16, array: [Uint8]}
+    function getFileCRC(dataview) {
+        const byteLength = dataview.byteLength;
+        const number = dataview.getUint16(byteLength - size, true);
+        const array = [
+            dataview.getUint8(byteLength -  size,      true),
+            dataview.getUint8(byteLength - (size - 1), true)
+        ];
+
+        return {
+            number,
+            array,
+        };
+    }
+
     return Object.freeze({
         size,
         calculateCRC,
@@ -77,6 +116,10 @@ function CRCFactory(args = {}) {
         encode,
         decode,
         toFITjs,
+        toArray,
+        fromArray,
+        getHeaderCRC,
+        getFileCRC,
     });
 }
 

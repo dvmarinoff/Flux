@@ -41,7 +41,7 @@ function FitRecord() {
             return dataRecord.encode(definition, recordJS, view, i);
         }
         if(isCRC(recordJS)) {
-            const crc = CRC.calculateCRC(view, 0, i);
+            const crc = CRC.calculateCRC(view, 0, i-1);
             return CRC.encode(crc, view, i);
         }
 
