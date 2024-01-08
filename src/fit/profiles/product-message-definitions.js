@@ -74,7 +74,7 @@ const productMessageDefinitions = [
         'type',
         'event',
         'event_type',
-        'local_timestamp',
+        // 'local_timestamp',
     ], 6],
     ['course', [
         'name',

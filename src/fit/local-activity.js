@@ -30,7 +30,7 @@ function LocalActivity(args = {}) {
 
         const time_created = last(args.records)?.timestamp ?? Date.now();
         const timestamp = time_created;
-        const activity_start_time = first(records).timestamp;
+        const activity_start_time = first(laps).start_time;
 
         // structure: FITjs
         const structure = [
@@ -183,7 +183,7 @@ function Activity(args = {}) {
         type: profiles.types.activity.values.manual,
         event: profiles.types.event.values.activity,
         event_type: profiles.types.event_type.values.stop,
-        local_timestamp: args.timestamp,
+        // local_timestamp: args.timestamp,
     };
 }
 // END Special Data Messages

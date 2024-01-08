@@ -61,6 +61,7 @@ function DefinitionRecord(args = {}) {
     //     length: Int,
     //     data_record_length: Int,
     //     fields: [{number: Int, size: Int, base_type: BaseType}]
+    //     dev_fields?: [{number: Int, size: Int, base_type: BaseType}]?
     // }
     // -> DataView
     function encode(definition, view, i = 0) {
@@ -89,13 +90,14 @@ function DefinitionRecord(args = {}) {
         // if developer fields are defined
         // write # developer fields
         // write developer fields definitions
-        if('developerFields' in definition) {
+        if('dev_fields' in definition) {
 
-            const numberOfDeveloperFields = definition.developerFields.length;
+            const numberOfDeveloperFields = definition.dev_fields.length;
 
             view.setUint8(i, numberOfDeveloperFields, true);
+            i += 1;
 
-            definition.developerFields.forEach((field) => {
+            definition.dev_fields.forEach((field) => {
                 fieldDefinition.encode(field, view, i);
                 i += fieldLength;
             });
@@ -114,7 +116,8 @@ function DefinitionRecord(args = {}) {
     //     local_number: Int,
     //     length: Int,
     //     data_record_length: Int,
-    //     fields: [{number: Int, size: Int, base_type: BaseTypes}]
+    //     fields:      [{number: Int, size: Int, base_type: BaseTypes}],
+    //     dev_fields?: [{number: Int, size: Int, base_type: BaseTypes}]?
     // }
     function decode(view, start = 0) {
         const header            = recordHeader.decode(view.getUint8(start, true));
@@ -125,24 +128,28 @@ function DefinitionRecord(args = {}) {
         const messageName       = numberToMessageName(messageNumber);
         const numberOfFields    = readNumberOfFields(view, start);
         const numberOfDevFields = readNumberOfDevFields(view, start);
-        const length            = getDefinitionRecordLength(view, start);
 
-        let fields = [];
+        // i  is the dataview index
+        // f  is the current field index
+        // df is the current developer field index
         let i = start + fixedContentLength;
+        let fields = [];
 
         for(let f=0; f < numberOfFields; f++) {
             fields.push(fieldDefinition.decode(messageName, view, i,));
             i += fieldLength;
         }
 
-        i+=1;
+        i+=1; // add the 'number of dev fields' field
 
+        let dev_fields = [];
         for(let df=0; df < numberOfDevFields; df++) {
-            fields.push(fieldDefinition.decode(messageName, view, i,));
+            dev_fields.push(fieldDefinition.decode(messageName, view, i,));
             i += fieldLength;
         }
 
-        const data_record_length = getDataRecordLength(fields);
+        const length             = getDefinitionRecordLength(view, start);
+        const data_record_length = getDataRecordLength(fields.concat(dev_fields));
 
         return {
             type: _type,
@@ -152,6 +159,7 @@ function DefinitionRecord(args = {}) {
             length,
             data_record_length,
             fields,
+            dev_fields,
         };
     }
 

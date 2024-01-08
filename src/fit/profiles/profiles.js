@@ -4,7 +4,7 @@
 // merge, shape, and export, data from the global and product profile json files
 //
 
-import { equals } from '../../functions.js';
+import { exists, equals } from '../../functions.js';
 
 import { BaseType, BaseTypeDefinitions, } from './base-types.js';
 import global_message_definitions from './global-message-definitions.json';
@@ -39,7 +39,11 @@ function Profiles(args = {}) {
     //     accumulate: String
     // }
     function numberToField(messageName, fieldNumber) {
-        const messageFields = messages[messageName].fields;
+        const message = messages[messageName];
+        if(!exists(message)) {
+            return Field(`field_${fieldNumber}`);
+        }
+        const messageFields = message.fields;
         for(let fieldName in messageFields) {
             if(equals(messageFields[fieldName], fieldNumber)) return Field(fieldName);
         }

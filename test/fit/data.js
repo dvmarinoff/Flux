@@ -322,7 +322,7 @@ function FITjs(args = {}) {
                 {number: 2,   size: 1, base_type: 'enum'},   // type
                 {number: 3,   size: 1, base_type: 'enum'},   // event
                 {number: 4,   size: 1, base_type: 'enum'},   // event_type
-                {number: 5,   size: 4, base_type: 'uint32'}, // local_timestamp
+                // {number: 5,   size: 4, base_type: 'uint32'}, // local_timestamp
             ]
         },
         // data activity
@@ -338,7 +338,7 @@ function FITjs(args = {}) {
                 type: 0,
                 event: 26,
                 event_type: 1,
-                local_timestamp: 1669140872000,
+                // local_timestamp: 1669140872000,
             }
         },
         // crc
@@ -552,7 +552,7 @@ const fitBinary = [
           2, 1,   0, // type
           3, 1,   0, // event
           4, 1,   0, // event_type
-          5, 4, 134, // local_timestamp
+          // 5, 4, 134, // local_timestamp
     ],
     // data activity
     [
@@ -563,7 +563,7 @@ const fitBinary = [
         0,                 // type
         26,                // event
         1,                 // stop
-        136, 197, 223, 61, // local_timestamp
+        // 136, 197, 223, 61, // local_timestamp
     ],
     // crc, needs to be computed last evetytime when encoding to binary
     [

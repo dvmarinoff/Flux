@@ -92,9 +92,15 @@ function RecordHeader() {
     }
 
     function isDeveloper(header) {
-        if(isNumber(header)) return (equals(nthBit(header, 6), 1) && equals(nthBit(header, 5), 1)) ? true : false;
-        if(isObject(header)) return (equals(header.messageTypeSpecific, 'developer')
-                                     && equals(header.messageType, RecordType.data)) ? true : false;
+        if(isNumber(header)) return (
+            isDefinition(header) &&
+            equals(nthBit(header, 5), 1)
+        ) ? true : false;
+        if(isObject(header)) return (
+            equals(header.messageTypeSpecific, 'developer') &&
+            equals(header.messageType, RecordType.definition)
+        ) ? true : false;
+
         return false;
     }
 
