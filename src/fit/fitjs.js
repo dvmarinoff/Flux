@@ -52,7 +52,6 @@ function FitRecord() {
     // DataView, Int, Map, Bool -> FitRecord
     function decode(view, i = 0, definitions = new Map(), unfinished = false) {
         const header = recordHeader.decode(view.getUint8(i, true));
-        // console.log(view.getUint8(i, true));
 
         if(i > view.byteLength) {
             return {};
@@ -86,9 +85,6 @@ function FitRecord() {
 
         if(recordHeader.isData(header)) {
             const definition = definitions.get(header.localMessageType);
-            // console.log(`record: decode: isData: definitions:`, definitions);
-            // console.log(`record: decode: isData: definition:`, definition);
-            console.log(`record: decode: isData: header: `, header);
             return dataRecord.decode(definition, view, i);
         }
 

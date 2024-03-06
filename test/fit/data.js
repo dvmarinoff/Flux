@@ -82,7 +82,7 @@ function FITjs(args = {}) {
             headerSize: 14,
             protocolVersion: '2.0',
             profileVersion: '21.40',
-            dataSize: 383,
+            dataSize: 376,
             dataType: '.FIT',
             crc: headerCRC,
         },
@@ -313,8 +313,8 @@ function FITjs(args = {}) {
             architecture: 0,
             name: 'activity',
             local_number: 6,
-            length: 27,
-            data_record_length: 18,
+            length: 24,
+            data_record_length: 14,
             fields: [
                 {number: 253, size: 4, base_type: 'uint32'}, // timestamp
                 {number: 0,   size: 4, base_type: 'uint32'}, // total_timer_time
@@ -330,7 +330,7 @@ function FITjs(args = {}) {
             type: 'data',
             name: 'activity',
             local_number: 6,
-            length: 18,
+            length: 14,
             fields: {
                 timestamp: 1669140872000,
                 total_timer_time: 3,
@@ -545,7 +545,7 @@ const fitBinary = [
         0,           // reserved
         0,           // architecture
         34, 0,       // global number
-        7,           // number of fields
+        6,           // number of fields
         253, 4, 134, // timestamp
           0, 4, 134, // total_timer_time
           1, 2, 132, // num sessions
