@@ -198,6 +198,7 @@ function DefinitionRecord(args = {}) {
             length,
             data_record_length: 1,
             fields: [],
+            dev_fields: [],
         });
     }
 
