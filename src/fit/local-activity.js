@@ -2,7 +2,7 @@
 // Local Activity Encoder
 //
 
-import { first, last, f, expect, } from '../functions.js';
+import { first, last, expect, } from '../functions.js';
 
 import { profiles } from './profiles/profiles.js';
 import productMessageDefinitions from './profiles/product-message-definitions.js';

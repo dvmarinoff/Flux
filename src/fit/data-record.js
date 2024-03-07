@@ -1,4 +1,4 @@
-import { equals, f, } from '../functions.js';
+import { equals, } from '../functions.js';
 
 import {
     HeaderType, RecordType,

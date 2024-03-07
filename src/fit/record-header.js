@@ -1,5 +1,5 @@
 import {
-    equals, isNumber, isObject, f, nthBit, setBit,
+    equals, isNumber, isObject, nthBit, setBit,
 } from '../functions.js';
 
 import {
@@ -32,14 +32,14 @@ function RecordHeader() {
 
     const bits = {
         // 0 normal header, 1 Compressed Timestamp Header
-        'headerType':          {size: 1, default: 0, present: f.true, parser: headerType},
+        'headerType':          {size: 1, default: 0, present: ((_) => true), parser: headerType},
         // 0 data message, 1 definition message
-        'messageType':         {size: 1, default: 0, present: f.true, parser: messageType},
+        'messageType':         {size: 1, default: 0, present: ((_) => true), parser: messageType},
         // if definition message and set to 1 the message contains extended definitions for developer data
-        'messageTypeSpecific': {size: 1, default: 0, present: f.true, parser: identityParser},
-        'reserved':            {size: 1, default: 0, present: f.true, parser: identityParser},
+        'messageTypeSpecific': {size: 1, default: 0, present: ((_) => true), parser: identityParser},
+        'reserved':            {size: 1, default: 0, present: ((_) => true), parser: identityParser},
         // local message type/number
-        'localMessageType':    {size: 4, default: 0, present: f.true, parser: identityParser},
+        'localMessageType':    {size: 4, default: 0, present: ((_) => true), parser: identityParser},
     };
 
     const order = [

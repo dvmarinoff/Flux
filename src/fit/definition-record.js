@@ -1,4 +1,4 @@
-import { nth, f, } from '../functions.js';
+import { nth, } from '../functions.js';
 
 import {
     HeaderType, RecordType,

@@ -1,4 +1,3 @@
-import { f } from '../functions.js';
 import { profiles } from './profiles/profiles.js';
 
 function FieldDefinition(args = {}) {

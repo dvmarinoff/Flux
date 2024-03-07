@@ -1,4 +1,4 @@
-import { equals, isDataView, f, } from '../functions.js';
+import { equals, isDataView, } from '../functions.js';
 import { RecordType } from './common.js';
 
 function CRCFactory(args = {}) {

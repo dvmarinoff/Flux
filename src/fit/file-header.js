@@ -1,4 +1,4 @@
-import { exists, equals, f, } from '../functions.js';
+import { exists, equals, } from '../functions.js';
 
 import {
     HeaderType, RecordType,
@@ -62,13 +62,13 @@ function FileHeader(args = {}) {
         // Indicates the length of this file header including header size.
         // Minimum size is 12. This may be increased in future to add additional
         // optional information
-        headerSize:      { size: 1, type: 'Uint8',  default: 14,      present: f.true, parser: identityParser,},
-        protocolVersion: { size: 1, type: 'Uint8',  default: '2.0',   present: f.true, parser: protocolVersion,},
-        profileVersion:  { size: 2, type: 'Uint16', default: '21.40', present: f.true, parser: profileVersion,},
+        headerSize:      { size: 1, type: 'Uint8',  default: 14,      present: ((_) => true), parser: identityParser,},
+        protocolVersion: { size: 1, type: 'Uint8',  default: '2.0',   present: ((_) => true), parser: protocolVersion,},
+        profileVersion:  { size: 2, type: 'Uint16', default: '21.40', present: ((_) => true), parser: profileVersion,},
         // Length of the Data Records section in bytesDoes not include Header or CRC
-        dataSize:        { size: 4, type: 'Uint32', default: 0,       present: f.true, parser: identityParser,},
+        dataSize:        { size: 4, type: 'Uint32', default: 0,       present: ((_) => true), parser: identityParser,},
         // ASCII values for ".FIT", [46, 70, 73, 84], 1414088238
-        dataType:        { size: 4, type: 'Uint32', default: '.FIT',  present: f.true, parser: dataType,},
+        dataType:        { size: 4, type: 'Uint32', default: '.FIT',  present: ((_) => true), parser: dataType,},
         // Contains the value of the CRC of Bytes 0 through 11 or may be set to 0x0000. Optional.
         crc:             { size: 2, type: 'Uint16', default: 0x0000,  present: crcPresent, parser: headerCRC,},
     };

@@ -1,4 +1,4 @@
-import { equals, f } from '../functions.js';
+import { equals, } from '../functions.js';
 
 const HeaderType = {
     normal:    'normal',
@@ -75,8 +75,8 @@ function setView(
 
 function ValueParser(args = {}) {
     return Object.freeze({
-        encode: args.encode ?? f.I,
-        decode: args.decode ?? f.I,
+        encode: args.encode ?? ((x) => x),
+        decode: args.decode ?? ((x) => x),
     });
 }
 

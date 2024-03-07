@@ -2,7 +2,7 @@
 // FITjs
 //
 
-import { equals, first, f, dataviewToArray } from '../functions.js';
+import { equals, first, dataviewToArray } from '../functions.js';
 
 import { CRC } from './crc.js';
 import { HeaderType, RecordType } from './common.js';
