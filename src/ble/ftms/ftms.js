@@ -1,130 +1,103 @@
-import { uuids } from '../uuids.js';
-import { BLEService } from '../service.js';
-import { indoorBikeData } from './indoor-bike-data.js';
-import { control } from './control-point.js';
-import { status } from './fitness-machine-status.js';
-import { feature } from './fitness-machine-feature.js';
-import { supported } from './supported-ranges.js';
-import { existance } from '../../functions.js';
+//
+// Fitness Machine Service
+//
 
-class FitnessMachineService extends BLEService {
-    uuid = uuids.fitnessMachine;
+import { exists, expect, } from '../../functions.js';
+import { uuids, } from '../web-ble.js';
+import { ControlMode, } from '../enums.js';
+import { Service } from '../service.js';
+import { Characteristic } from '../characteristic.js';
+import { indoorBikeData as indoorBikeDataParser } from './indoor-bike-data.js';
+import { control as controlParser } from './control-point.js';
 
-    postInit(args = {}) {
-        this.protocol  = 'ftms';
-        this.wait      = 500;
-        this.onData    = existance(args.onData,    this.defaultOnData);
-        this.onStatus  = existance(args.onStatus,  this.defaultOnStatus);
-        this.onControl = existance(args.onControl, this.defaultOnControlPoint);
+function FTMS(args = {}) {
 
-        this.characteristics = {
-            fitnessMachineFeature: {
-                uuid: uuids.fitnessMachineFeature,
-                supported: false,
-                characteristic: undefined
-            },
-            supportedPowerRange: {
-                uuid: uuids.supportedPowerRange,
-                supported: false,
-                characteristic: undefined,
-            },
-            supportedResistanceLevelRange: {
-                uuid: uuids.supportedResistanceLevelRange,
-                supported: false,
-                characteristic: undefined,
-            },
-            fitnessMachineStatus: {
-                uuid: uuids.fitnessMachineStatus,
-                supported: false,
-                characteristic: undefined,
-            },
-            fitnessMachineControlPoint: {
-                uuid: uuids.fitnessMachineControlPoint,
-                supported: false,
-                characteristic: undefined,
-            },
-            indoorBikeData: {
-                uuid: uuids.indoorBikeData,
-                supported: false,
-                characteristic: undefined,
-            },
-        };
+    // config
+    const onData = args.onData;
+    console.log(`ftms: onData: `, onData);
+
+    // BluetoothRemoteGATTService{
+    //     device: BluetoothDevice,
+    //     uuid: String,
+    //     isPrimary: Bool,
+    // }
+    const gattService = expect(
+        args.service, 'FTMS needs BluetoothRemoteGATTService!'
+    );
+    // end config
+
+    // Service
+    function onControlResponse(msg) {
+        const control = service.characteristics.control;
+        // it's important to release the control characteristic for writes
+        // but that can happen only when a response has been received from
+        // the control point characteristic
+        control.release();
     }
-    async postStart() {
-        const self = this;
 
-        self.features = await self.getFeatures();
+    async function protocol() {
+        const control = service.characteristics.control;
 
-        if(self.supported('fitnessMachineStatus')) {
-            await self.sub('fitnessMachineStatus', status.decode, self.onStatus);
-        }
+        const res = await control.write(
+            controlParser.requestControl.encode()
+        );
 
-        if(self.supported('indoorBikeData')) {
-            await self.sub('indoorBikeData', indoorBikeData.decode, self.onData);
-        }
-
-        if(self.supported('fitnessMachineControlPoint')) {
-            await self.sub('fitnessMachineControlPoint', control.response.decode, self.onControl);
-
-            await self.requestControl();
-        }
-
-        return;
+        return res;
     }
-    async getFeatures(service) {
-        const self = this;
-        const features = self.read('fitnessMachineFeature', feature.decode);
 
-        console.log(':rx :fitnessMachineFeature ', JSON.stringify(features));
+    const spec = {
+        measurement: {
+            uuid: uuids.indoorBikeData,
+            notify: {callback: onData, parser: indoorBikeDataParser},
+        },
+        control: {
+            uuid: uuids.fitnessMachineControlPoint,
+            notify: {callback: onControlResponse, parser: controlParser.response},
+        },
+    };
 
-        return features;
-    }
-    async requestControl() {
-        const self = this;
-        const buffer = control.requestControl.encode();
+    const service = Service({service: gattService, spec, protocol, });
+    // end sevice
 
-        return await self.write('fitnessMachineControlPoint', buffer);
-    }
-    async reset() {
-        const self = this;
-        const buffer = control.reset.encode();
+    // methods
+    // this service has special write methods
 
-        return await self.write('fitnessMachineControlPoint', buffer);
-    }
-    async setTargetPower(value) {
-        const self = this;
-        const buffer = control.powerTarget.encode({power: value});
+    // {WindSpeed: Float, Grade: Float, Crr: Float, WindResistance: Float} -> Bool
+    async function setSimulation(args = {}) {
+        const control = service.characteristics.control;
 
-        return await self.write('fitnessMachineControlPoint', buffer);
-    }
-    async setTargetResistance(value) {
-        const self = this;
-        const buffer = control.resistanceTarget.encode({resistance: value});
+        if(!exists(control) || !control.isReady()) return false;
 
-        return await self.write('fitnessMachineControlPoint', buffer);
-    }
-    async setTargetSlope(value) {
-        const self = this;
-        const buffer = control.simulationParameters.encode({grade: value});;
+        control.block();
 
-        return await self.write('fitnessMachineControlPoint', buffer);
-    }
-    async setWheelCircumference(value) {
-        const self = this;
-        const buffer = control.wheelCircumference.encode({circumference: value});;
+        const res = await control.write(
+            controlParser.simulationParameters.encode(args)
+        );
 
-        return await self.write('fitnessMachineControlPoint', buffer);
+        return res;
     }
-    defaultOnData(decoded) {
-        console.log(':rx :ftms :indoorBikeData ', JSON.stringify(decoded));
+
+    // {power: Int} -> Bool
+    async function setPowerTarget(args = {}) {
+        const control = service.characteristics.control;
+
+        if(!exists(control)) return false;
+
+        const res = await control.writeWithRetry(
+            controlParser.powerTarget.encode(args),
+            4, 500,
+        );
+        return res;
     }
-    defaultOnControlPoint(decoded) {
-        control.response.toString(decoded);
-    }
-    defaultOnStatus(decoded) {
-        status.toString(decoded);
-    }
+    // end methods
+
+    // expose public methods and properties
+    return Object.freeze({
+        ...service, // FTMS will have all the public methods and properties of Service
+        protocol,
+        setSimulation,
+        setPowerTarget,
+    });
 }
 
-export { FitnessMachineService };
-
+export default FTMS;

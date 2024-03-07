@@ -1,237 +1,178 @@
-import { first, equals, exists } from '../functions.js';
-import { uuids } from './uuids.js';
+import { exists, empty, } from '../functions.js';
 
-////
-// private
-////
-const _type = 'web-ble';
-
-const _hrm = {
-    filters: [{services: [uuids.heartRate]}],
-    optionalServices: [uuids.deviceInformation]
+const services = {
+    fitnessMachine:      '00001826-0000-1000-8000-00805f9b34fb',
+    cyclingPower:        '00001818-0000-1000-8000-00805f9b34fb',
+    heartRate:           '0000180d-0000-1000-8000-00805f9b34fb',
+    speedCadence:        '00001816-0000-1000-8000-00805f9b34fb',
+    fec:                 '6e40fec1-b5a3-f393-e0a9-e50e24dcca9e',
+    wahooFitnessMachine: 'a026ee0b-0a7d-4ab3-97fa-f1500f9feb8b',
+    raceController:      '00000001-19ca-4651-86e5-fa29dcdd09d1',
+    moxySmO2:            '6404d801-4cb9-11e8-b566-0800200c9a66',
 };
 
-const _controllable = {
-    filters: [
-        {services: [uuids.fitnessMachine]},
-        {services: [uuids.fec]},
-        {services: [uuids.wahooFitnessMachine]},
-        {services: [uuids.cyclingPower]},
-    ],
-    optionalServices: [uuids.deviceInformation, ]
+const characteristics = {
+    // Fitness Machine
+    indoorBikeData:                '00002ad2-0000-1000-8000-00805f9b34fb',
+    fitnessMachineControlPoint:    '00002ad9-0000-1000-8000-00805f9b34fb',
+    fitnessMachineFeature:         '00002acc-0000-1000-8000-00805f9b34fb',
+    supportedResistanceLevelRange: '00002ad6-0000-1000-8000-00805f9b34fb',
+    supportedPowerRange:           '00002ad8-0000-1000-8000-00805f9b34fb',
+    fitnessMachineStatus:          '00002ada-0000-1000-8000-00805f9b34fb',
+
+    // Cycling Power
+    cyclingPowerMeasurement:       '00002a63-0000-1000-8000-00805f9b34fb',
+    cyclingPowerFeature:           '00002a65-0000-1000-8000-00805f9b34fb',
+    cyclingPowerControlPoint:      '00002a66-0000-1000-8000-00805f9b34fb',
+    wahooTrainer:                  'a026e005-0a7d-4ab3-97fa-f1500f9feb8b',
+
+    // Heart Rate
+    heartRateMeasurement:          '00002a37-0000-1000-8000-00805f9b34fb',
+
+    // Cycling Speed and Cadence
+    speedCadenceMeasurement:       '00002a5b-0000-1000-8000-00805f9b34fb',
+    speedCadenceFeature:           '00002a5c-0000-1000-8000-00805f9b34fb',
+    speedCadenceControlPoint:      '00002a55-0000-1000-8000-00805f9b34fb',
+
+    // Battery
+    batteryLevel:                  '00002a19-0000-1000-8000-00805f9b34fb',
+
+    // Device Information
+    manufacturerNameString:        '00002a29-0000-1000-8000-00805f9b34fb',
+    modelNumberString:             '00002a24-0000-1000-8000-00805f9b34fb',
+    firmwareRevisionString:        '00002a26-0000-1000-8000-00805f9b34fb',
+
+    // FEC over BLE
+    fec2:                          '6e40fec2-b5a3-f393-e0a9-e50e24dcca9e',
+    fec3:                          '6e40fec3-b5a3-f393-e0a9-e50e24dcca9e',
+
+    // Wahoo Fitness Machine
+    wahooFitnessMachineControlPoint:   'a026e037-0a7d-4ab3-97fa-f1500f9feb8b',
+
+    // Race Controller (Zwift)
+    raceControllerMeasurement:    '00000002-19ca-4651-86e5-fa29dcdd09d1',
+    raceControllerControlPoint:   '00000003-19ca-4651-86e5-fa29dcdd09d1',
+    raceControllerResponse:       '00000004-19ca-4651-86e5-fa29dcdd09d1',
+
+    // SmO2 Moxy
+    moxySmO2SensorData:            '6404d804-4cb9-11e8-b566-0800200c9a66',
+    moxySmO2DeviceControl:         '6404d810-4cb9-11e8-b566-0800200c9a66',
+    moxySmO2ControlPoint:          '6404d811-4cd9-11e8-b566-0800200c9a66',
+
+    // others
+    sensorLocation:                    '00002a5d-0000-1000-8000-00805f9b34fb',
+    clientCharacteristicConfiguration: '00002902-0000-1000-8000-00805f9b34fb',
 };
 
-const _power = {
-    filters: [{services: [uuids.cyclingPower]}],
-    optionalServices: [uuids.deviceInformation]
-};
+const uuids = { ...services, ...characteristics };
 
-const _speedCadence = {
-    filters: [{services: [uuids.speedCadence]}],
-    optionalServices: [uuids.deviceInformation]
-};
+function Filters() {
 
-const _moxy = {
-    filters: [{services: [uuids.moxySmO2]}],
-    optionalServices: [uuids.deviceInformation]
-};
-
-const _all = {acceptAllDevices: true};
-
-function filterIn(coll, prop, value) {
-    return first(coll.filter(x => x[prop] === value));
-}
-
-function filterByValue(obj, value) {
-    return Object.entries(obj).filter(kv => kv[1] === value);
-}
-
-function findByValue(obj, value) {
-    return first(first(filterByValue(obj, value)));
-}
-
-function filterDevice(devices, id) {
-    return filterIn(devices, id);
-}
-
-function includesDevice(devices, id) {
-    return devices.map(device => device.id).includes(device => equals(device.id, id));
-}
-
-
-const _ = { filterDevice, includesDevice };
-
-////
-// public
-////
-
-class WebBLE {
-    requestFilters = {
-        hrm:          _hrm,
-        controllable: _controllable,
-        speedCadence: _speedCadence,
-        power:        _power,
-        moxy:         _moxy,
-        all:          _all
-    };
-    constructor(args) {}
-    get type() { return _type; }
-    async connect(filter) {
-        const self = this;
-        const device = await self.request(filter);
-        const server = await self.gattConnect(device);
-        const services = await self.getPrimaryServices(server);
+    function controllable() {
         return {
-            device,
-            server,
-            services
+            filters: [
+                {services: [uuids.fitnessMachine]},
+                {services: [uuids.fec]},
+                {services: [uuids.wahooFitnessMachine]},
+                {services: [uuids.cyclingPower]},
+            ],
+            optionalServices: []
         };
     }
-    async disconnect(device) {
-        const self = this;
-        await self.gattDisconnect(device);
-        return device;
+
+    function powerMeter() {
+        return {
+            filters: [{services: [uuids.cyclingPower]}],
+            optionalServices: []
+        };
     }
-    isConnected(device) {
-        if(!exists(device.gatt)) return false;
-        return device.gatt.connected;
+
+    function speedCadenceSensor() {
+        return {
+            filters: [{services: [uuids.speedCadence]}],
+            optionalServices: []
+        };
     }
-    async watchAdvertisements(id) {
+
+    function hrm() {
+        return {
+            filters: [{services: [uuids.heartRate]}],
+            optionalServices: []
+        };
+    }
+
+    function all() {
+        return {acceptAllDevices: true};
+    }
+
+    async function generic(args = {}) {
         const devices = await navigator.bluetooth.getDevices();
-        const device = first(devices.filter(d => d.id === id));
 
-        let resolve;
-        const p = new Promise(function(res, rej) {
-            resolve = res;
-        });
-
-        const abortController = new AbortController();
-        device.addEventListener('advertisementreceived', onAdvertisementReceived.bind(this), {once: true});
-
-        async function onAdvertisementReceived(e) {
-            abortController.abort();
-            console.log(e);
-            resolve(e.device);
-        }
-
-        await device.watchAdvertisements({signal: abortController.signal});
-
-        return p;
-    }
-    async sub(characteristic, handler) {
-        const self = this;
-        await self.startNotifications(characteristic, handler);
-        return characteristic;
-    }
-    async unsub(characteristic, handler) {
-        const self = this;
-        await self.stopNotifications(characteristic, handler);
-        return characteristic;
-    }
-    async request(filter) {
-        return await navigator.bluetooth.requestDevice(filter);
-    }
-    async getDevices() {
-        const self = this;
-        return await navigator.bluetooth.getDevices();
-    }
-    async isPaired(device) {
-        const self = this;
-        const devices = await self.getDevices();
-        return includesDevice(devices, device.id);
-    }
-    async getPairedDevice(deviceId) {
-        const self = this;
-        const devices = await self.getDevices();
-        return filterDevice(devices, deviceId);
-    }
-    async gattConnect(device) {
-        const self = this;
-        const server = await device.gatt.connect();
-        return server;
-    }
-    async gattDisconnect(device) {
-        const self = this;
-        return await device.gatt.disconnect();
-    }
-    async getPrimaryServices(server) {
-        const self = this;
-        const services = await server.getPrimaryServices();
-        return services;
-    }
-    async getService(server, uuid) {
-        const self = this;
-        const service = await server.getPrimaryService(uuid);
-        return service;
-    }
-    async getCharacteristic(service, uuid) {
-        const self = this;
-        const characteristic = await service.getCharacteristic(uuid);
-        return characteristic;
-    }
-    async getCharacteristics(service) {
-        const self = this;
-        const characteristics = await service.getCharacteristics();
-        return characteristics;
-    }
-    async getDescriptors(characteristic) {
-        const self = this;
-        const descriptors = await characteristic.getDescriptors();
-        return descriptors;
-    }
-    async getDescriptor(characteristic, uuid) {
-        const self = this;
-        const descriptor = await characteristic.getDescriptor(uuid);
-        return descriptor;
-    }
-    async startNotifications(characteristic, handler) {
-        const self = this;
-        await characteristic.startNotifications();
-        characteristic.addEventListener('characteristicvaluechanged', handler);
-        console.log(`Notifications started on ${findByValue(uuids, characteristic.uuid)}: ${characteristic.uuid}.`);
-        return characteristic;
-    }
-    async stopNotifications(characteristic, handler) {
-        let self = this;
-        await characteristic.stopNotifications();
-        characteristic.removeEventListener('characteristicvaluechanged', handler);
-        console.log(`Notifications stopped on ${findByValue(uuids, characteristic.uuid)}: ${characteristic.uuid}.`);
-        return characteristic;
-    }
-    async writeCharacteristic(characteristic, value) {
-        const self = this;
-        let res = undefined;
-        try{
-            if(exists(characteristic.writeValueWithResponse)) {
-                res = await characteristic.writeValueWithResponse(value);
-            } else {
-                res = await characteristic.writeValue(value);
+        let exclusionFilters = devices.reduce((acc, device) => {
+            if(device?.gatt?.connected ?? false) {
+                acc.push({name: device?.name ?? 'unknown'});
             }
-        } catch(e) {
-            console.error(`characteristic.writeValue:`, e);
-        }
-        return res;
+            return acc;
+        }, []);
+        // NOTE: guard against empty exclusion filter, they cause an error
+        exclusionFilters = empty(exclusionFilters) ? undefined : exclusionFilters;
+
+        return {
+            filters: [
+                {services: [uuids.fitnessMachine]},
+                {services: [uuids.fec]},
+                {services: [uuids.wahooFitnessMachine]},
+                {services: [uuids.cyclingPower]},
+                {services: [uuids.speedCadence]},
+                {services: [uuids.heartRate]},
+                {services: [uuids.raceController]},
+            ],
+            exclusionFilters,
+        };
     }
-    async readCharacteristic(characteristic) {
-        const self = this;
-        let value = new DataView(new Uint8Array([0]).buffer); // ????
-        try{
-            value = await characteristic.readValue();
-        } catch(e) {
-            console.error(`characteristic.readValue: ${e}`);
-        }
-        return value;
-    }
-    isSupported() {
-        if(!exists(navigator)) throw new Error(`Trying to use web-bluetooth in non-browser env!`);
-        return 'bluetooth' in navigator;
-    }
-    isSwitchedOn() {
-        return navigator.bluetooth.getAvailability();
-    }
+
+    return Object.freeze({
+        hrm,
+        controllable,
+        powerMeter,
+        speedCadenceSensor,
+        all,
+        generic,
+    });
 }
 
-const ble = new WebBLE();
+function WebBLE() {
+    const filters = Filters();
 
-export { ble, _ };
+    function isAvailable() {
+        // TODO: comment when not working on the iOS connect functionality.
+        // This allows the iOS connection to show up in Chrome not just Safari
+        // if(dev) {
+        //     console.warn(`BLE Bridge mode ACTIVE!`);
+        //     console.warn(`app will use BLE Bridge connection ONLY!`);
+        //     return false;
+        // }
+        // END comment
+        if(exists(navigator)) {
+            return 'bluetooth' in navigator;
+        }
+        return false;
+    }
 
+    function uuidToName(uuid) {
+        return Object.entries(uuids).find(kv => kv[1] === uuid)[0];
+    }
+
+    return Object.freeze({
+        filters,
+        isAvailable,
+        uuidToName,
+    });
+}
+
+const webBle = WebBLE();
+
+export {
+    webBle,
+    uuids,
+};

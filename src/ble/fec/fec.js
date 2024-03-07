@@ -1,177 +1,153 @@
-import { uuids } from '../uuids.js';
-import { BLEService } from '../service.js';
+//
+// FEC over BLE
+//
+import { exists, expect, compose2, wait } from '../../functions.js';
+import { uuids, } from '../web-ble.js';
+import { ControlMode, } from '../enums.js';
+import { Service } from '../service.js';
+import { Characteristic } from '../characteristic.js';
+import { message as fecParser } from './message.js';
+import messages from './messages.js';
+import { userData } from '../userData.js';
 
-import { message } from '../../ant/message.js';
-import { common } from '../../ant/common.js';
-import { fec } from '../../ant/fec.js';
-import { equals, isObject, exists, existance, delay, dataviewToArray } from '../../functions.js';
+function FEC(args = {}) {
 
-function FEC2() {
+    // config
+    const onData = args.onData;
+    const txRate = 1000;
 
-    function dataPageDecoder(dataview) {
-        const pageNumber = dataview.getUint8(0, true);
+    // BluetoothRemoteGATTService{
+    //     device: BluetoothDevice,
+    //     uuid: String,
+    //     isPrimary: Bool,
+    // }
+    const gattService = expect(
+        args.service, 'FEC needs BluetoothRemoteGATTService!'
+    );
+    // end config
 
-        if(equals(pageNumber, fec.dataPage16.number)) {
-            return fec.dataPage16.decode(dataview);
+    //
+    // service
+    //
+
+    // takes decoded msg from onData and returns it,
+    // while releasing the block on write if the received message is a response message
+    // that's needed because all messages are being received on the same characteristic
+    //
+    // ANTMessageData{} -> ANTMessageData{}
+    function onFEC2(msg) {
+        if(msg.dataPage === messages.dataPage71.number) {
+            let control = service.characteristics.control;
+            control.release();
         }
-        if(equals(pageNumber, fec.dataPage25.number)) {
-            return fec.dataPage25.decode(dataview);
-        }
-        // manufacturer specific data pages (page numbers 240 - 255)
-        // transmit additional parameters to calculate total resistance in SIM mode
-        // not interoperable, should only be used to supplement
-        // 240 -> [240, 0, 0, 0, 0, 0, 0, 0]
-        // 249 -> [249, 0, 0, 0, 218, 178, 4, 0]
-        //  80 -> [80, 255, 255, 1, 89, 0, 84, 11]
-        // ? 81 missing in transmission
-
-        return dataviewToArray(dataview);
+        return msg;
     }
 
-    function decode(dataview) {
-        // console.log(dataviewToArray(dataview));
+    function onControlResponse(msg) {
+        console.log(`ble: fec: on-control-response: `, msg);
+        let control = service.characteristics.control;
+        control.release();
+    }
 
-        const msg = message.acknowledgedData.decode(dataview, dataPageDecoder);
+    async function protocol() {
+        let control = service.characteristics.control;
 
-        if(isObject(msg.payload)) {
-            return msg.payload;
-        }
-        return {};
+        await wait(txRate);
+        console.log(`${userData.userWeight()} ${userData.bikeWeight()}`);
+        let resUserData = await setUserData({
+            userWeight: userData.userWeight(),
+            bikeWeight: userData.bikeWeight()
+        });
+        await wait(txRate);
+        let resWind = await setWindResistance();
+
+        return resUserData && resWind;
+    }
+
+    const spec = {
+        measurement: {
+            uuid: uuids.fec2,
+            notify: {callback: compose2(onData, onFEC2), parser: fecParser},
+        },
+        control: {
+            uuid: uuids.fec3,
+        },
+    };
+
+    const service = Service({spec, protocol, service: gattService,});
+    // end service
+
+    //
+    // methods
+    //
+
+    // {WindSpeed: Float, Grade: Float, Crr: Float, WindResistance: Float} -> Bool
+    async function setSimulation(args = {}) {
+        let control = service.characteristics.control;
+
+        if(!exists(control) || !control.isReady()) return false;
+
+        control.block();
+
+        let res = await control.write(
+            fecParser.encode({dataPage: 51, payload: args}),
+        );
+
+        return res;
+    }
+
+    // {power: Int} -> Bool
+    async function setPowerTarget(args = {}) {
+        let control = service.characteristics.control;
+        console.log(`ftms: set-power-target: `, args);
+
+        if(!exists(control)) return false;
+
+        const res = await control.writeWithRetry(
+            fecParser.encode({dataPage: 49, payload: args}),
+            4, 500,
+        );
+        return res;
+    }
+
+    // {userWeight: Int, bikeWeight: Int}
+    async function setUserData(args = {}) {
+        const control = service.characteristics.control;
+        // TODO: validate the input
+        const data = {
+            userWeight: args.userWeight ?? userData.userWeight(),
+            bikeWeight: args.bikeWeight ?? userData.bikeWeight()
+        };
+        const res = await control.write(
+            fecParser.encode({dataPage: 55, payload: data})
+        );
+        return res;
+    }
+
+    // {userWeight: Int, bikeWeight: Int}
+    async function setWindResistance(args = {}) {
+        const control = service.characteristics.control;
+        const res = await control.write(fecParser.encode({dataPage: 50, payload: args}));
+        return res;
+    }
+
+    // {userWeight: Int, bikeWeight: Int}
+    async function setRoadFeel(args = {}) {
+        const control = service.characteristics.control;
+        const res = await control.write(fecParser.encode({dataPage: 252, payload: args}));
+        return res;
     }
 
     return Object.freeze({
-        decode,
+        ...service, // FEC will have all the public methods and properties of Service
+        protocol,
+        setSimulation,
+        setPowerTarget,
+        setUserData,
+        setWindResistance,
+        setRoadFeel,
     });
 }
 
-const fec2 = FEC2();
-
-function powerTarget(power, channel = 5) {
-    return message.acknowledgedData.encode({
-        channelNumber: channel,
-        payload: fec.dataPage49.encode({
-            power,
-        }),
-    }).buffer;
-}
-
-function resistanceTarget(resistance, channel = 5) {
-    return message.acknowledgedData.encode({
-        channelNumber: channel,
-        payload: fec.dataPage48.encode({
-            resistance,
-        }),
-    }).buffer;
-}
-
-function slopeTarget(grade, channel = 5) {
-    return message.acknowledgedData.encode({
-        channelNumber: channel,
-        payload: fec.dataPage51.encode({
-            grade,
-        }),
-    }).buffer;
-}
-
-function lastCommandStatus() {
-    return message.acknowledgedData.encode({
-        channelNumber: 5,
-        payload: common.commonPage70.encode({
-            slaveSerialNumber: 0xFF,
-            descriptor: 0xFFFF,
-            requestedTransmission: 0b00000001,
-            requestedPageNumber: 0x47,
-            commandType: 0x01,
-        }),
-    }).buffer;
-}
-
-
-function userConfig(args = {}) {
-    const defaults = {
-        channel: 5,
-        userWeight: 75,
-        bikeWeight: 9,
-    };
-
-    const userWeight = existance(args.userWeight, defaults.userWeight);
-    const bikeWeight = existance(args.bikeWeight, defaults.bikeWeight);
-    const channel    = existance(args.channel, defaults.channel);
-
-    console.log(`:tx :fec :userConfig ${userWeight} ${bikeWeight}`);
-
-    return message.acknowledgedData.encode({
-        channelNumber: channel,
-        payload: fec.dataPage55.encode({userWeight, bikeWeight}),
-    }).buffer;
-}
-
-class FEC extends BLEService {
-    uuid = uuids.fec;
-
-    postInit(args = {}) {
-        this.protocol  = 'fec';
-        this.wait      = 500;
-        this.onData    = existance(args.onData,    ((x) => x));
-        this.onControl = existance(args.onControl, ((x) => x));
-        this.controllable = args.controllable;
-        this.userWeight = args.controllable.userWeight;
-
-        this.characteristics = {
-            fec2: {
-                uuid: uuids.fec2,
-                supported: false,
-                characteristic: undefined
-            },
-            fec3: {
-                uuid: uuids.fec3,
-                supported: false,
-                characteristic: undefined
-            },
-        };
-    }
-    async postStart() {
-        const self = this;
-
-        await self.sub('fec2', fec2.decode, self.onData);
-
-        await delay(4000);
-        self.userConfig({userWeight: self.userWeight});
-    }
-    async setTargetPower(value) {
-        const self = this;
-        const buffer = powerTarget(value);
-        console.log(`:tx :fec :power ${value}`);
-        return await self.write('fec3', buffer);
-    }
-    async setTargetResistance(value) {
-        const self = this;
-        const buffer = resistanceTarget(value);
-        console.log(`:tx :fec :resistance ${value}`);
-        return await self.write('fec3', buffer);
-    }
-    async setTargetSlope(value) {
-        const self = this;
-        const buffer = slopeTarget(value);
-        console.log(`:tx :fec :slope ${value}`);
-        return await self.write('fec3', buffer);
-    }
-    async userConfig(value) {
-        const self = this;
-        const buffer = userConfig(value);
-        return await self.write('fec3', buffer);
-    }
-    async setUserWeight(kg = 75) {
-        const self = this;
-        await self.userConfig({userWeight: kg});
-    }
-    async lastCommandStatus() {
-        const self = this;
-        const buffer = lastCommandStatus();
-        console.log(':tx :fec :command-status');
-        return await self.write('fec3', buffer);
-    }
-}
-
-export { FEC };
+export default FEC;
 

@@ -15,22 +15,6 @@ function isUndefined(x) {
     return Object.is(x, undefined);
 }
 
-function exists(x) {
-    if(isNull(x) || isUndefined(x)) { return false; }
-    return true;
-}
-
-function existance(value, fallback) {
-    if(exists(value))    return value;
-    if(exists(fallback)) return fallback;
-    throw new Error(`existance needs a fallback value `, value);
-}
-
-function expect(x, msg = '') {
-    const err = (msg) => { throw msg; };
-    return exists(x) ? x : err(msg);
-}
-
 function isFunction(x) {
     return equals(typeof x, 'function');
 }
@@ -66,6 +50,22 @@ function isNumber(x) {
 
 function isAtomic(x) {
     return isNumber(x) || isString(x);
+}
+
+function exists(x) {
+    if(isNull(x) || isUndefined(x)) { return false; }
+    return true;
+}
+
+function existance(value, fallback) {
+    if(exists(value))    return value;
+    if(exists(fallback)) return fallback;
+    throw new Error(`existance needs a fallback value `, value);
+}
+
+function expect(x, msg = '') {
+    const err = (msg) => { throw msg; };
+    return exists(x) ? x : err(msg);
 }
 
 function validate(predicates = [], value, fallback = undefined) {

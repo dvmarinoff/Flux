@@ -1,234 +1,103 @@
 //
+// FTMS spec
 // 4.9 Indoor Bike Data (characteristic)
 //
 
-import { nthBitToBool, getUint24LE }  from '../../functions.js';
-
-const flags = {
-    InstantaneousSpeed:    { flagBit:  0, present: 0 },
-    MoreData:              { flagBit:  0, present: 0 },
-    AverageSpeed:          { flagBit:  1, present: 1 }, // bit 2, present 1
-    InstantaneousCandence: { flagBit:  2, present: 1 }, // bit 1, present 0
-    AverageCandence:       { flagBit:  3, present: 1 },
-    TotalDistance:         { flagBit:  4, present: 1 },
-    ResistanceLevel:       { flagBit:  5, present: 1 },
-    InstantaneousPower:    { flagBit:  6, present: 1 },
-    AveragePower:          { flagBit:  7, present: 1 },
-    ExpendedEnergy:        { flagBit:  8, present: 1 },
-    HeartRate:             { flagBit:  9, present: 1 },
-    MetabolicEquivalent:   { flagBit: 10, present: 1 },
-    ElapsedTime:           { flagBit: 11, present: 1 },
-    RemainingTime:         { flagBit: 12, present: 1 }
-    // Reserved:              { flagBit: 13-15, present: null }
-};
+const speedPresent               = (flags) => ((flags >>  0) & 1) === 0;
+const avgSpeedPresent            = (flags) => ((flags >>  1) & 1) === 1;
+const cadencePresent             = (flags) => ((flags >>  2) & 1) === 1;
+const avgCadencePresent          = (flags) => ((flags >>  3) & 1) === 1;
+const distancePresent            = (flags) => ((flags >>  4) & 1) === 1;
+const resistancePresent          = (flags) => ((flags >>  5) & 1) === 1;
+const powerPresent               = (flags) => ((flags >>  6) & 1) === 1;
+const avgPowerPresent            = (flags) => ((flags >>  7) & 1) === 1;
+const expandedEnergyPresent      = (flags) => ((flags >>  8) & 1) === 1;
+const heartRatePresent           = (flags) => ((flags >>  9) & 1) === 1;
+const metabolicEquivalentPresent = (flags) => ((flags >> 10) & 1) === 1;
+const elapsedTimePresent         = (flags) => ((flags >> 11) & 1) === 1;
+const remainingTimePresent       = (flags) => ((flags >> 12) & 1) === 1;
 
 const fields = {
-    Flags:                 { type: 'Uint16', size: 2, resolution: 1,    unit: 'bit'     },
-    InstantaneousSpeed:    { type: 'Uint16', size: 2, resolution: 0.01, unit: 'kph'     },
-    AverageSpeed:          { type: 'Uint16', size: 2, resolution: 0.01, unit: 'kph'     },
-    InstantaneousCandence: { type: 'Uint16', size: 2, resolution: 0.5,  unit: 'rpm'     },
-    AverageCandence:       { type: 'Uint16', size: 2, resolution: 0.5,  unit: 'rpm'     },
-    TotalDistance:         { type: 'Uint24', size: 3, resolution: 1,    unit: 'm'       },
-    ResistanceLevel:       { type: 'Uint16', size: 2, resolution: 1,    unit: 'unitless'},
-    InstantaneousPower:    { type: 'Uint16', size: 2, resolution: 1,    unit: 'W'       },
-    AveragePower:          { type: 'Uint16', size: 2, resolution: 1,    unit: 'W'       },
-    TotalEnergy:           { type: 'Int16',  size: 2, resolution: 1,    unit: 'kcal'    },
-    EnergyPerHour:         { type: 'Int16',  size: 2, resolution: 1,    unit: 'kcal'    },
-    EnergyPerMinute:       { type: 'Uint8',  size: 1, resolution: 1,    unit: 'kcal'    },
-    HeartRate:             { type: 'Uint16', size: 2, resolution: 1,    unit: 'bpm'     },
-    MetabolicEquivalent:   { type: 'Uint8',  size: 1, resolution: 1,    unit: 'me'      },
-    ElapsedTime:           { type: 'Uint16', size: 2, resolution: 1,    unit: 's'       },
-    RemainingTime:         { type: 'Uint16', size: 2, resolution: 1,    unit: 's'       }
+    Flags:                 {resolution: 1,    unit: 'bit',      size: 2, type: 'Uint16', present: (_ => true),                                   },
+    InstantaneousSpeed:    {resolution: 0.01, unit: 'kph',      size: 2, type: 'Uint16', present: speedPresent,               short: 'speed',    },
+    AverageSpeed:          {resolution: 0.01, unit: 'kph',      size: 2, type: 'Uint16', present: avgSpeedPresent,                               },
+    InstantaneousCandence: {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: cadencePresent,             short: 'cadence',  },
+    AverageCandence:       {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: avgCadencePresent,                             },
+    TotalDistance:         {resolution: 1,    unit: 'm',        size: 3, type: 'Uint24', present: distancePresent,                               },
+    ResistanceLevel:       {resolution: 1,    unit: 'unitless', size: 2, type: 'Uint16', present: resistancePresent,                             },
+    InstantaneousPower:    {resolution: 1,    unit: 'W',        size: 2, type: 'Uint16', present: powerPresent,               short: 'power',    },
+    AveragePower:          {resolution: 1,    unit: 'W',        size: 2, type: 'Uint16', present: avgPowerPresent,                               },
+    TotalEnergy:           {resolution: 1,    unit: 'kcal',     size: 2, type: 'Int16',  present: expandedEnergyPresent,                         },
+    EnergyPerHour:         {resolution: 1,    unit: 'kcal',     size: 2, type: 'Int16',  present: expandedEnergyPresent,                         },
+    EnergyPerMinute:       {resolution: 1,    unit: 'kcal',     size: 1, type: 'Uint8',  present: expandedEnergyPresent,                         },
+    HeartRate:             {resolution: 1,    unit: 'bpm',      size: 1, type: 'Uint8',  present: heartRatePresent,           short: 'heartRate',},
+    MetabolicEquivalent:   {resolution: 1,    unit: 'me',       size: 1, type: 'Uint8',  present: metabolicEquivalentPresent,                    },
+    ElapsedTime:           {resolution: 1,    unit: 's',        size: 2, type: 'Uint16', present: elapsedTimePresent,                            },
+    RemainingTime:         {resolution: 1,    unit: 's',        size: 2, type: 'Uint16', present: remainingTimePresent,                          },
 };
 
-const speedPresent               = (flags) => !(nthBitToBool(flags, 0));
-const avgSpeedPresent            = (flags) =>   nthBitToBool(flags, 1);
-const cadencePresent             = (flags) =>   nthBitToBool(flags, 2);
-const avgCadencePresent          = (flags) =>   nthBitToBool(flags, 3);
-const distancePresent            = (flags) =>   nthBitToBool(flags, 4);
-const resistancePresent          = (flags) =>   nthBitToBool(flags, 5);
-const powerPresent               = (flags) =>   nthBitToBool(flags, 6);
-const avgPowerPresent            = (flags) =>   nthBitToBool(flags, 7);
-const expandedEnergyPresent      = (flags) =>   nthBitToBool(flags, 8);
-const heartRatePresent           = (flags) =>   nthBitToBool(flags, 9);
-const metabolicEquivalentPresent = (flags) =>   nthBitToBool(flags, 10);
-const elapsedTimePresent         = (flags) =>   nthBitToBool(flags, 11);
-const remainingTimePresent       = (flags) =>   nthBitToBool(flags, 12);
+const order = [
+    'Flags',
+    'InstantaneousSpeed',
+    'AverageSpeed',
+    'InstantaneousCandence',
+    'AverageCandence',
+    'TotalDistance',
+    'ResistanceLevel',
+    'InstantaneousPower',
+    'AveragePower',
+    'TotalEnergy',
+    'EnergyPerHour',
+    'EnergyPerMinute',
+    'HeartRate',
+    'MetabolicEquivalent',
+    'ElapsedTime',
+    'RemainingTime',
+];
 
-function speedIndex(flags) {
-    let i = fields.Flags.size;
-    return i;
-}
+function IndoorBikeData(args = {}) {
+    const architecture = true;
 
-function cadenceIndex(flags) {
-    let i = fields.Flags.size;
-    if(speedPresent(flags))    i += fields.InstantaneousSpeed.size;
-    if(avgSpeedPresent(flags)) i += fields.AverageSpeed.size;
-    return i;
-}
-
-function distanceIndex(flags) {
-    let i = fields.Flags.size;
-    if(speedPresent(flags))      i += fields.InstantaneousSpeed.size;
-    if(avgSpeedPresent(flags))   i += fields.AverageSpeed.size;
-    if(cadencePresent(flags))    i += fields.InstantaneousCandence.size;
-    if(avgCadencePresent(flags)) i += fields.AverageCandence.size;
-    return i;
-}
-
-function powerIndex(flags) {
-    let i = fields.Flags.size;
-    if(speedPresent(flags))      i += fields.InstantaneousSpeed.size;
-    if(avgSpeedPresent(flags))   i += fields.AverageSpeed.size;
-    if(cadencePresent(flags))    i += fields.InstantaneousCandence.size;
-    if(avgCadencePresent(flags)) i += fields.AverageCandence.size;
-    if(distancePresent(flags))   i += fields.TotalDistance.size;
-    if(resistancePresent(flags)) i += fields.ResistanceLevel.size;
-    return i;
-}
-
-function energyPerHourIndex(flags) {
-    let i = fields.Flags.size;
-    if(speedPresent(flags))          i += fields.InstantaneousSpeed.size;
-    if(avgSpeedPresent(flags))       i += fields.AverageSpeed.size;
-    if(cadencePresent(flags))        i += fields.InstantaneousCandence.size;
-    if(avgCadencePresent(flags))     i += fields.AverageCandence.size;
-    if(distancePresent(flags))       i += fields.TotalDistance.size;
-    if(resistancePresent(flags))     i += fields.ResistanceLevel.size;
-    if(powerPresent(flags))          i += fields.InstantaneousPower.size;
-    if(avgPowerPresent(flags))       i += fields.AvaragePower.size;
-    return i;
-}
-
-function energyPerMinuteIndex(flags) {
-    let i = fields.Flags.size;
-    if(speedPresent(flags))          i += fields.InstantaneousSpeed.size;
-    if(avgSpeedPresent(flags))       i += fields.AverageSpeed.size;
-    if(cadencePresent(flags))        i += fields.InstantaneousCandence.size;
-    if(avgCadencePresent(flags))     i += fields.AverageCandence.size;
-    if(distancePresent(flags))       i += fields.TotalDistance.size;
-    if(resistancePresent(flags))     i += fields.ResistanceLevel.size;
-    if(powerPresent(flags))          i += fields.InstantaneousPower.size;
-    if(avgPowerPresent(flags))       i += fields.AvaragePower.size;
-    if(expandedEnergyPresent(flags)) i += fields.EnergyPerHour.size;
-    return i;
-}
-
-function heartRateIndex(flags) {
-    let i = fields.Flags.size;
-    if(speedPresent(flags))          i += fields.InstantaneousSpeed.size;
-    if(avgSpeedPresent(flags))       i += fields.AverageSpeed.size;
-    if(cadencePresent(flags))        i += fields.InstantaneousCandence.size;
-    if(avgCadencePresent(flags))     i += fields.AverageCandence.size;
-    if(distancePresent(flags))       i += fields.TotalDistance.size;
-    if(resistancePresent(flags))     i += fields.ResistanceLevel.size;
-    if(powerPresent(flags))          i += fields.InstantaneousPower.size;
-    if(avgPowerPresent(flags))       i += fields.AvaragePower.size;
-    if(expandedEnergyPresent(flags)) i += fields.EnergyPerHour.size + fields.EnergyPerMinute.size;
-    return i;
-}
-
-function readSpeed(dataview) {
-    const flags = dataview.getUint16(0, true);
-    const speed = dataview.getUint16(speedIndex(flags), true);
-    return (speed * fields.InstantaneousSpeed.resolution);
-}
-
-function readCadence(dataview) {
-    const flags = dataview.getUint16(0, true);
-    const cadence = dataview.getUint16(cadenceIndex(flags), true);
-    return (cadence * fields.InstantaneousCandence.resolution);
-}
-
-function readDistance(dataview) {
-    const flags = dataview.getUint16(0, true);
-    const distance = getUint24LE(dataview, distanceIndex(flags));
-    return (distance * fields.TotalDistance.resolution);
-}
-
-function readPower(dataview) {
-    const flags = dataview.getUint16(0, true);
-    return dataview.getUint16(powerIndex(flags), true);
-}
-
-function readHeartRate(dataview) {
-    const flags = dataview.getUint16(0, true);
-    return dataview.getUint8(heartRateIndex(flags), true);
-}
-
-// Example:
-//
-// Tacx Flux S:
-//(0x) 44-00-18-01-14-00-06-00
-//(10) [68, 0, 24, 1, 20, 0, 6, 0]
-//
-//    "Instantanious Speed: 2.8 km/h
-//     Instantanious Cadence: 10.0 per min
-//     Instantanious Power: 6 W"
-//
-//              21098 76543210
-// flags  68, 0b00000 01000100
-//
-// Schwinn 800IC:
-// (0x) 44-02-AA-05-2E-00-18-00-46
-// (10) [68, 2, 170, 5, 46, 0, 24, 0, 70]
-//
-//    "Instantanious Speed: 14.5 km/h
-//     Instantanious Cadence: 23.0 per min
-//     Instantanious Power: 24 W
-//     Heart Rate: 70 bpm"
-//
-//                               5432109876543210
-// flags,          66, 0x42,   0b0000000001000100
-// inst speed,   1450, 0x0bb8,
-// inst cadence,  160, 0xa0,
-// inst power,    180, 0xb4,
-//
-// (0x) 42-00- b8-0b- a0-00 b4-00
-//
-// Stages SB20:
-//                               7654-3210
-// flags,          17, 0x11,   0b0001-0001
-// total distance, 319,
-//
-// (0x) 11-00- 63-01-00
-//
-
-function IndoorBikeData(dataview) {
-
-    function decode(dataview) {
-        const flags = dataview.getUint16(0, true);
-        let data = {};
-
-        if(speedPresent(flags)) {
-            data['speed'] = readSpeed(dataview);
-        }
-        if(cadencePresent(flags)) {
-            data['cadence'] = readCadence(dataview);
-        }
-        if(distancePresent(flags)) {
-            data['distance'] = readDistance(dataview);
-        }
-        if(powerPresent(flags)) {
-            data['power'] = readPower(dataview);
-        }
-        if(heartRatePresent(flags)) {
-            data['heartRate'] = readHeartRate(dataview);
-        }
-
-        return data;
+    function getField(field, dataview, i) {
+        return dataview[`get${field.type}`](i, architecture) * field.resolution;
     }
 
-    function encode() {
+    // Dataview -> {'<field-name>': {value: Number, unit: String}}
+    function decode(dataview) {
+        const byteLength = dataview.byteLength;
+
+        return order.reduce(function(acc, fieldName) {
+            const field = fields[fieldName];
+
+            if((acc.i + field.size) > byteLength) return acc;
+
+            if(field.present(acc.flags)) {
+                const value = getField(field, dataview, acc.i);
+                const unit  = field.unit;
+                const name  = field.short ?? fieldName;
+
+                if(acc.i === 0) {
+                    acc.flags = value;
+                } else {
+                    // acc.data[name] = {value, unit,};
+                    acc.data[name] = value;
+                }
+                acc.i += field.size;
+            };
+
+            return acc;
+        }, {i: 0, flags: 0, data: {}}).data;
     }
 
     return Object.freeze({
-        encode,
+        getField,
         decode,
     });
 }
 
 const indoorBikeData = IndoorBikeData();
 
-export { indoorBikeData };
-
+export {
+    IndoorBikeData,
+    indoorBikeData,
+};

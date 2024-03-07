@@ -1,134 +1,175 @@
-import { uuids } from '../uuids.js';
-import { BLEService } from '../service.js';
-import { Measurement } from '../cps/cycling-power-measurement.js';
-import { equals, existance, delay } from '../../functions.js';
-import { control } from './control.js';
+//
+// Wahoo Cycling Power Service
+//
 
-class WahooCyclingPower extends BLEService {
-    uuid = uuids.cyclingPower;
+import { exists, expect, f, wait, } from '../../functions.js';
+import { Characteristic } from '../characteristic.js';
+import { Service } from '../service.js';
+import {
+    cyclingPowerMeasurement as cyclingPowerMeasurementParser
+} from '../cps/cycling-power-measurement.js';
+import { control as controlParser} from './control-point.js';
+import { uuids,} from '../web-ble.js';
+import { ControlMode, } from '../enums.js';
+import { userData } from '../userData.js';
 
-    postInit(args = {}) {
-        this.protocol     = 'wcps';
-        this.wait         = 1000;
-        this.onData       = existance(args.onData,    this.defaultOnData);
-        this.onControl    = existance(args.onControl, this.defaultOnControlPoint);
-        this.controllable = args.controllable;
-        this.userWeight   = args.controllable.userWeight;
-        this.bikeWeight   = 10;
+function WCPS(args = {}) {
 
-        this.characteristics = {
-            wahooTrainer: {
-                uuid: uuids.wahooTrainer,
-                supported: false,
-                characteristic: undefined
-            },
-            cyclingPowerMeasurement: {
-                uuid: uuids.cyclingPowerMeasurement,
-                supported: false,
-                characteristic: undefined,
-            },
-        };
-    }
-    async postStart() {
-        const self = this;
+    // config
+    const onData = args.onData;
+    const txRate = 1000;
 
-        const measurement = Measurement();
+    // BluetoothRemoteGATTService{
+    //     device: BluetoothDevice,
+    //     uuid: String,
+    //     isPrimary: Bool,
+    // }
+    const gattService = expect(
+        args.service, 'WCPS needs BluetoothRemoteGATTService!'
+    );
+    // end config
 
-        if(self.supported('cyclingPowerMeasurement')) {
-            await self.sub('cyclingPowerMeasurement',
-                           measurement.decode,
-                           self.onData.bind(self));
+    // private state
+    let controlMode = ControlMode.sim;
+    let q = [];
+    let msgSeqLock = false;
+    // end private state
+
+    // service
+    function onControlResponse(msg) {
+        let control = service.characteristics.control;
+
+        if(msgSeqLock) {
+            if(msg.request === 'setSimMode') {
+                if(msg.status === 'success') {
+                    msgSeqLock = false;
+                    setSimulation(q.pop()?.params ?? {grade: 0});
+                    return;
+                } else {
+                    msgSeqLock = true;
+                    setSimMode();
+                    return;
+                }
+            }
         }
 
-        if(self.supported('wahooTrainer')) {
-            await self.sub('wahooTrainer',
-                           control.response.decode,
-                           self.onControl.bind(self));
+        control.release();
+    }
 
-            await self.requestControl();
+    // Void -> Bool
+    async function protocol() {
+        const control = service.characteristics.control;
+
+        // TODO: return false if any of those fails or
+        // returns false and dicsonnect the device
+        await requestControl();
+        await wait(txRate);
+        await setUser();
+        await wait(txRate);
+        await setWindResistance();
+        await wait(txRate);
+        await setWheelCircumference();
+
+        return true;
+    }
+
+    const spec = {
+        measurement: {
+            uuid: uuids.cyclingPowerMeasurement,
+            notify: {callback: onData, parser: cyclingPowerMeasurementParser},
+        },
+        control: {
+            uuid: uuids.wahooTrainer,
+            notify: {callback: onControlResponse, parser: controlParser.response},
+        },
+    };
+
+    const service = Service({spec, protocol, service: gattService,});
+    // end service
+
+    // methods
+
+    // {WindSpeed: Float, Grade: Float, Crr: Float, WindResistance: Float} -> Void
+    function setSimulation(parameters = {}) {
+        const control = service.characteristics.control;
+        if(!exists(control) || !control.isReady() || msgSeqLock) return false;
+
+        const gradeParams = {grade: parameters.grade};
+
+        // if in erg mode -> init sim mode -> send grade
+        // else send grade
+        if(controlMode === ControlMode.sim) {
+            control.write(controlParser.grade.encode(gradeParams));
+            control.block();
+        } else {
+            msgSeqLock = true;
+            q.push({command: "setSimulation", params: gradeParams});
+            setSimMode();
         }
+    }
 
-        await self.setParameters();
+    // {power: Int} -> Void
+    function setPowerTarget(args = {}) {
+        const control = service.characteristics.control;
+        control.write(controlParser.setERG.encode(args));
+        controlMode = ControlMode.erg;
+        // control.block();
     }
-    async requestControl() {
-        const self = this;
-        const buffer = control.requestControl.encode();
 
-        return await self.write('wahooTrainer', buffer);
+    // {weigth: Float, crr: Float, windResistance: Float} -> Void
+    function setSimMode(args = {}) {
+        const control = service.characteristics.control;
+        const weight = userData.userWeight() + userData.bikeWeight();
+        control.write(controlParser.sim.encode({
+            weight,
+            crr: args.crr,
+            windResistance: args.windResistance
+        }));
+        controlMode = ControlMode.sim;
     }
-    async setTargetPower(value) {
-        const self = this;
-        const buffer = control.powerTarget.encode({power: value});
-        return await self.write('wahooTrainer', buffer);
-    }
-    async setTargetResistance(value) {
-        const self = this;
-        const buffer = control.loadIntensity.encode({intensity: (value / 100)});
-        return await self.write('wahooTrainer', buffer);
-    }
-    async setTargetSlope(value) {
-        const self = this;
 
-        // console.log(self.controllable.mode);
-
-        await self.setSIM({weight: (self.userWeight + self.bikeWeight)});
-        await delay(1000); // test if this is really needed
-
-        const buffer = control.slopeTarget.encode({grade: value});;
-        return await self.write('wahooTrainer', buffer);
+    function setUser() {
+        setSimMode();
     }
-    async setParameters(args) {
-        const self = this;
 
-        const params = {
-            circumference: 2105,
-            windSpeed: 0,
-            weight: self.userWeight + self.bikeWeight,
-        };
+    async function requestControl() {
+        const control = service.characteristics.control;
 
-        await delay(1000);
-        await self.setWheelCircumference(params.circumference);
-        await delay(1000);
-        await self.setSIM(params);
-        await delay(1000);
-        await self.setWindSpeed(params.windSpeed);
-    }
-    async setSIM(args) {
-        const self = this;
+        const res = await control.write(controlParser.requestControl.encode());
 
-        const params = {
-            weight: args.weight,
-            crr: 0.004,
-            windResistance: 0.51,
-        };
+        return res;
+    }
 
-        const buffer = control.sim.encode(params);
-        return await self.write('wahooTrainer', buffer);
-    }
-    async setWindSpeed(value) {
-        const self = this;
+    async function setWindResistance() {
+        const control = service.characteristics.control;
 
-        const buffer = control.windSpeed.encode({windSpeed: value});
-        return await self.write('wahooTrainer', buffer);
-    }
-    async setWheelCircumference(value) {
-        const self = this;
+        const res = await control.write(controlParser.windSpeed.encode({windSpeed: 0}));
 
-        const buffer = control.wheelCircumference.encode({circumference: value});
-        return await self.write('wahooTrainer', buffer);
+        return res;
     }
-    async setUserWeight(kg = 85) {
-        const self = this;
-        self.userWeight = kg;
-        const weight = self.userWeight + self.bikeWeight;
-        await self.setSIM({weight});
+
+    async function setWheelCircumference() {
+        const control = service.characteristics.control;
+
+        const res = await control.write(
+            controlParser.wheelCircumference.encode({
+                circumference: controlParser.wheelCircumference.definitions.circumference.default,
+            })
+        );
+
+        return res;
     }
-    defaultOnData(decoded) {
-        console.log(':rx :wcps :measurement ', JSON.stringify(decoded));
-    }
-    defaultOnControlPoint(decoded) {
-        control.response.toString(decoded);
-    }
+    // end methods
+
+    return Object.freeze({
+        ...service, // WCPS will have all the public methods and properties of Service
+        setSimulation,
+        setPowerTarget,
+        setUser,
+        setWindResistance,
+        setWheelCircumference,
+        requestControl,
+    });
 }
 
-export { WahooCyclingPower };
+export default WCPS;
