@@ -1,7 +1,7 @@
 import { xf } from './functions.js';
 import './db.js';
 import './views/views.js';
-import './connectionManager.js';
+import './ble/devices.js';
 import './watch.js';
 import './course.js';
 import './lock.js';
@@ -31,10 +31,17 @@ function start() {
     console.log('start app.');
 
     // startServiceWorker(); // stable version only
-
     xf.dispatch('app:start');
 }
 
-function stop() {}
+function stop() {
+    xf.dispatch('app:stop');
+}
 
 start();
+
+export {
+    start,
+    stop,
+};
+
