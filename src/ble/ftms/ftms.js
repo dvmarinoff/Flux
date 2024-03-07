@@ -14,7 +14,6 @@ function FTMS(args = {}) {
 
     // config
     const onData = args.onData;
-    console.log(`ftms: onData: `, onData);
 
     // BluetoothRemoteGATTService{
     //     device: BluetoothDevice,

@@ -1,50 +1,41 @@
-import { uuids } from '../uuids.js';
-import { BLEService } from '../service.js';
-import { Measurement } from './measurement.js';
-import { feature } from './feature.js';
-import { equals, exists, existance, first } from '../../functions.js';
+//
+// Cycling Speec and Cadence Service
+//
 
-class SpeedCadenceService extends BLEService {
-    uuid = uuids.speedCadence;
+import { expect, f } from '../../functions.js';
+import { uuids, } from '../web-ble.js';
+import { Service } from '../service.js';
+import { Characteristic } from '../characteristic.js';
+import { cscMeasurement as cscMeasurementParser } from './cycling-speed-cadence-measurement.js';
 
-    postInit(args = {}) {
-        this.characteristics = {
-            measurement: {
-                uuid: uuids.speedCadenceMeasurement,
-                supported: false,
-                characteristic: undefined,
-            },
-            feature: {
-                uuid: uuids.speedCadenceFeature,
-                supported: false,
-                characteristic: undefined,
-            },
-            sensorLocation: {
-                uuid: uuids.sensorLocation,
-                supported: false,
-                characteristic: undefined,
-            },
-            controlPoint: {
-                uuid: uuids.speedCadenceControlPoint,
-                supported: false,
-                characteristic: undefined,
-            },
-        };
-    }
-    async postStart() {
-        const self = this;
+function CSCS(args = {}) {
 
-        const measurement = Measurement();
+    // config
 
-        measurement.cadence.setMaxRateCount(
-            existance(self.options.maxRateCount)
-        );
+    // BluetoothRemoteGATTService{
+    //     device: BluetoothDevice,
+    //     uuid: String,
+    //     isPrimary: Bool,
+    // }
+    const gattService = expect(
+        args.service, 'HRS needs BluetoothRemoteGATTService!'
+    );
 
-        if(self.supported('measurement')) {
-            await self.sub('measurement', measurement.decode, self.onData);
-        }
-    }
+    const onData = args.onData;
+    // end config
+
+    // Service
+    const spec = {
+        measurement: {
+            uuid: uuids.speedCadenceMeasurement,
+            notify: {callback: onData, parser: cscMeasurementParser},
+        },
+    };
+    const service = Service({service: gattService, spec,});
+
+    return Object.freeze({
+        ...service,
+    });
 }
 
-export { SpeedCadenceService };
-
+export default CSCS;

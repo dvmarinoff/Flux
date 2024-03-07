@@ -1,76 +1,40 @@
-import { uuids } from '../uuids.js';
-import { BLEService } from '../service.js';
-import { feature } from './cycling-power-feature.js';
-import { Measurement } from './cycling-power-measurement.js';
-import { control } from './control-point.js';
-import { equals, exists, existance, first } from '../../functions.js';
+//
+// Cycling Power Service
+//
 
-class CyclingPowerService extends BLEService {
-    uuid = uuids.cyclingPower;
+import { expect, f } from '../../functions.js';
+import { uuids, } from '../web-ble.js';
+import { Service } from '../service.js';
+import { Characteristic } from '../characteristic.js';
+import { cyclingPowerMeasurement as cyclingPowerMeasurementParser } from './cycling-power-measurement.js';
 
-    postInit(args) {
-        this.onData    = existance(args.onData,    this.defaultOnData);
-        this.onControl = existance(args.onControl, this.defaultOnControlPoint);
+function CPS(args = {}) {
+    // config
+    // BluetoothRemoteGATTService{
+    //     device: BluetoothDevice,
+    //     uuid: String,
+    //     isPrimary: Bool,
+    // }
+    const gattService = expect(
+        args.service, 'CPS needs BluetoothRemoteGATTService!'
+    );
 
-        this.characteristics = {
-            cyclingPowerFeature: {
-                uuid: uuids.cyclingPowerFeature,
-                supported: false,
-                characteristic: undefined,
-            },
-            cyclingPowerMeasurement: {
-                uuid: uuids.cyclingPowerMeasurement,
-                supported: false,
-                characteristic: undefined,
-            },
-            cyclingPowerControlPoint: {
-                uuid: uuids.cyclingPowerControlPoint,
-                supported: false,
-                characteristic: undefined,
-            },
-        };
-    }
-    async postStart() {
-        const self = this;
-        self.features = await self.getFeatures();
+    // {} -> Void
+    const onData = args.onData;
+    // end config
 
-        const measurement = Measurement();
+    // Service
+    const spec = {
+        measurement: {
+            uuid: uuids.cyclingPowerMeasurement,
+            notify: {callback: onData, parser: cyclingPowerMeasurementParser},
+        },
+    };
+    const service = Service({service: gattService, spec,});
 
-        if(self.supported('cyclingPowerMeasurement')) {
-            await self.sub('cyclingPowerMeasurement',
-                           measurement.decode,
-                           self.onData.bind(self));
-        }
-
-        if(self.supported('cyclingPowerControlPoint')) {
-            await self.sub('cyclingPowerControlPoint',
-                           control.response.decode,
-                           self.onControl.bind(self));
-
-            await self.requestControl();
-        }
-    }
-    async getFeatures(service) {
-        const self = this;
-        const features = self.read('cyclingPowerFeature', feature.decode);
-
-        console.log(':rx :cyclingPowerFeature ', JSON.stringify(features));
-
-        return features;
-    }
-    async requestControl() {
-        const self = this;
-        const buffer = control.requestControl.encode();
-
-        return await self.write('cyclingPowerControlPoint', buffer);
-    }
-    defaultOnData(decoded) {
-        console.log(':rx :cps :measurement ', JSON.stringify(decoded));
-    }
-    defaultOnControlPoint(decoded) {
-        control.response.toString(decoded);
-    }
+    return Object.freeze({
+        ...service, // CPS will have all the public methods and properties of Service
+    });
 }
 
-export { CyclingPowerService };
-
+export default CPS;

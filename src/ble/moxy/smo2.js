@@ -1,39 +1,42 @@
-import { uuids } from '../uuids.js';
-import { BLEService } from '../service.js';
-import { sensorData } from './moxy.js';
-import { existance } from '../../functions.js';
+//
+// Heart Rate Service
+//
 
-class SmO2Service extends BLEService {
-    uuid = uuids.moxySmO2
+import { expect, } from '../functions.js';
+import { uuids, } from '../web-ble.js';
+import { Service } from '../service.js';
+import { Characteristic } from '../characteristic.js';
+import { sensorData as smo2MeasurementParser } from './heart-rate-measurement.js';
 
-    postInit(args = {}) {
-        this.onData = args.onData ?? this.defaultOnData;
+function SMO2(args = {}) {
 
-        this.characteristics = {
-            moxySmO2SensorData: {
-                uuid: uuids.moxySmO2SensorData,
-                supported: false,
-                characteristic: undefined,
-            },
-            SmO2DeviceControl: {
-                uuid: uuids.moxySmO2DeviceControl,
-                supported: false,
-                characteristic: undefined,
-            },
-        };
-    }
-    async postStart() {
-        const self = this;
+    // config
+    const onData = args.onData;
 
-        if(self.supported('moxySmO2SensorData')) {
-            await self.sub('moxySmO2SensorData', sensorData.decode, self.onData.bind(self));
-        }
-    }
-    defaultOnData(decoded) {
-        console.log(':rx :smo2 :sensorData ', JSON.stringify(decoded));
-    }
+    // BluetoothRemoteGATTService{
+    //     device: BluetoothDevice,
+    //     uuid: String,
+    //     isPrimary: Bool,
+    // }
+    const gattService = expect(
+        args.service, 'SMO2 needs BluetoothRemoteGATTService!'
+    );
+    // end config
+
+    // service
+    const spec = {
+        measurement: {
+            uuid: uuids.moxySmO2SensorData,
+            notify: {callback: onData, parser: smo2MeasurementParser},
+        },
+    };
+
+    const service = Service({spec, service: gattService,});
+    // end service
+
+    return Object.freeze({
+        ...service, // SMO2 will have all the public methods and properties of Service
+    });
 }
 
-export {
-    SmO2Service,
-}
+export default SMO2;

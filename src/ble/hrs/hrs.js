@@ -1,33 +1,42 @@
-import { uuids } from '../uuids.js';
-import { BLEService } from '../service.js';
-import { heartRateMeasurement } from './heartRateMeasurement.js';
-import { existance } from '../../functions.js';
+//
+// Heart Rate Service
+//
 
-class HeartRateService extends BLEService {
-    uuid = uuids.heartRate;
+import { expect, } from '../../functions.js';
+import { uuids, } from '../web-ble.js';
+import { Service } from '../service.js';
+import { Characteristic } from '../characteristic.js';
+import { heartRateMeasurement as heartRateMeasurementParser } from './heart-rate-measurement.js';
 
-    postInit(args) {
-        this.onData = existance(args.onData, ((x) => x));
+function HRS(args = {}) {
 
-        this.characteristics = {
-            heartRateMeasurement: {
-                uuid: uuids.heartRateMeasurement,
-                supported: false,
-                characteristic: undefined,
-            },
-        };
-    }
-    async postStart() {
-        const self = this;
-        if(self.supported('heartRateMeasurement')) {
-            await self.sub('heartRateMeasurement',
-                           heartRateMeasurement.decode,
-                           self.onData.bind(self));
-        }
-    }
+    // config
+    const onData = args.onData;
+
+    // BluetoothRemoteGATTService{
+    //     device: BluetoothDevice,
+    //     uuid: String,
+    //     isPrimary: Bool,
+    // }
+    const gattService = expect(
+        args.service, 'HRS needs BluetoothRemoteGATTService!'
+    );
+    // end config
+
+    // service
+    const spec = {
+        measurement: {
+            uuid: uuids.heartRateMeasurement,
+            notify: {callback: onData, parser: heartRateMeasurementParser},
+        },
+    };
+
+    const service = Service({spec, service: gattService,});
+    // end service
+
+    return Object.freeze({
+        ...service, // HRS will have all the public methods and properties of Service
+    });
 }
 
-export {
-    HeartRateService
-};
-
+export default HRS;
