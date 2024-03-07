@@ -63,9 +63,9 @@ function existance(value, fallback) {
     throw new Error(`existance needs a fallback value `, value);
 }
 
-function expect(x, msg = '') {
-    const err = (msg) => { throw msg; };
-    return exists(x) ? x : err(msg);
+function expect(x, msg = 'expected value here') {
+    if(exists(x)) return x;
+    throw new Error(msg);
 }
 
 function validate(predicates = [], value, fallback = undefined) {
@@ -76,60 +76,38 @@ function validate(predicates = [], value, fallback = undefined) {
 
 // Collections
 function empty(x) {
-    if(isNull(x)) throw new Error(`empty called with null: ${x}`);
-    if(!isCollection(x) && !isString(x) && !isUndefined(x)) {
-        throw new Error(`empty takes a collection: ${x}`);
-    }
-    if(isUndefined(x)) return true;
-    if(isArray(x))  {
-        if(equals(x.length, 0)) return true;
-    }
-    if(isObject(x)) {
-        if(equals(Object.keys(x).length, 0)) return true;
-    }
-    if(isString(x)) {
-        if(equals(x, "")) return true;
-    }
-    return false;
+    if(isObject(x)) return (Object.keys(x).length === 0);
+    return x.length === 0;
 };
 
-function first(xs) {
-    if(!isArray(xs) && !isString(xs) && !isUndefined(xs)) {
-        throw new Error(`first takes ordered collection or a string: ${xs}`);
+const nth = curry2(function(offset, xs) {
+    let i = (offset < 0) ? (xs.length + offset) : (offset);
+    if(isString(xs)) {
+        return xs.charAt(i);
     }
-    if(isUndefined(xs)) return undefined;
-    if(empty(xs)) return undefined;
-    return xs[0];
+    return xs[i];
+});
+
+function first(xs) {
+    return xs.at(0);
 }
 
 function second(xs) {
-    if(!isArray(xs) && !isString(xs) && !isUndefined(xs)) {
-        throw new Error(`second takes ordered collection or a string: ${xs}`);
-    }
-    if(isUndefined(xs)) return undefined;
-    if(empty(xs)) return undefined;
-    if(xs.length < 2) return undefined;
-    return xs[1];
+    return xs.at(1);
 }
 
 function third(xs) {
-    if(!isArray(xs) && !isString(xs) && !isUndefined(xs)) {
-        throw new Error(`third takes ordered collection or a string: ${xs}`);
-    }
-    if(isUndefined(xs)) return undefined;
-    if(empty(xs)) return undefined;
-    if(xs.length < 3) return undefined;
-    return xs[2];
+    return xs.at(2);
 }
 
 function last(xs) {
-    if(!isArray(xs) && !isString(xs) && !isUndefined(xs)) {
-        throw new Error(`last takes ordered collection or a string: ${xs}`);
-    }
-    if(isUndefined(xs)) return undefined;
-    if(empty(xs)) return undefined;
-    return xs[xs.length - 1];
+    return xs.at(-1);
 }
+
+const prop = curry2(function(p, x) {
+    if(!exists(x)) return;
+    return Number.isInteger(p) ? nth(p, x) : x[p];
+});
 
 function map(coll, fn) {
     if(isArray(coll)) return coll.map(fn);
@@ -202,7 +180,7 @@ function max(xs, prop = false) {
     if(prop !== false) {
         return xs.reduce( (acc,v,i) => v[prop] > acc ? v[prop] : acc, 0);
     } else {
-        return xs.reduce( (acc,v,i) => v > acc ? v : acc, 0);
+        return Math.max(xs);
     }
 };
 
@@ -270,23 +248,6 @@ function curry2(fn) {
         }
     };
 }
-
-const nth = curry2(function(offset, xs) {
-    let i = (offset < 0) ? (xs.length + offset) : (offset);
-    if(isString(xs)) {
-        return xs.charAt(i);
-    }
-    return xs[i];
-});
-
-const f = {
-    '_': {'@@functional/placeholder': true},
-    'q': function(value) { return function() {return value;}; },
-    'I': (x) => x,
-    'true': (x) => true,
-    'false': (x) => false,
-    'equals': curry2(equals),
-};
 
 //
 // Copied from lodash.js
@@ -446,8 +407,12 @@ function debounce(func, wait, options = {}) {
 // end copied from lodash.js
 
 // Async
-function delay(ms) {
-    return new Promise(res => setTimeout(res, ms));
+async function delay(ms) {
+    return await new Promise(res => setTimeout(res, ms));
+}
+
+async function wait(ms) {
+    return await new Promise(res => setTimeout(res, ms));
 }
 
 // XF (Events)
@@ -539,6 +504,10 @@ function XF(args = {}) {
 const xf = XF();
 
 // format
+function hex(n) {
+    return '0x' + parseInt(n).toString(16).toUpperCase().padStart(2, '0');
+}
+
 function toNumber(value) {
     return +value;
 }
@@ -547,7 +516,8 @@ function toBool(value) {
     return !!(value);
 };
 
-function toFixed(x, points = 2) {
+function toFixed(x, points = 2, fallback = 0) {
+    if(!isNumber(x)) return fallback;
     const precision = 10**points;
     return Math.round(x * precision) / precision;
 }
@@ -561,6 +531,10 @@ function dataviewToString(dataview) {
     return utf8decoder.decode(dataview.buffer);
 }
 
+function arrayBufferToArray(buffer) {
+    return Array.from(new Uint8Array(buffer));
+}
+
 function stringToCharCodes(str) {
     return str.split('').map(c => c.charCodeAt(0));
 }
@@ -571,6 +545,14 @@ function stringToDataview(str) {
     let dataview = new DataView(uint8.buffer);
 
     return dataview;
+}
+
+function time() {
+    const d = new Date();
+    const mm = (d.getMinutes()).toString().padStart(2, '0');
+    const ss = (d.getSeconds()).toString().padStart(2, '0');
+    const mmmm = (d.getMilliseconds()).toString().padStart(4, '0');
+    return `${mm}:${ss}:${mmmm}`;
 }
 
 // Bits
@@ -613,6 +595,84 @@ function getUint24LE(dataview, index = 0) {
 
     return (MSB << 16) + (MB << 8) + LSB;
 }
+function Spec(args = {}) {
+    const definitions = expect(args.definitions);
+
+    const applyResolution = curry2((prop, value) => {
+        return value / definitions[prop].resolution;
+    });
+
+    const removeResolution = curry2((prop, value) => {
+        return value * definitions[prop].resolution;
+    });
+
+    function encodeField(prop, input, transform = applyResolution(prop)) {
+        const fallback = definitions[prop].default;
+        const min      = applyResolution(definitions[prop].min);
+        const max      = applyResolution(definitions[prop].max);
+        const value    = input ?? fallback;
+
+        return Math.floor(clamp(min, max, transform(value)));
+    }
+
+    function decodeField(prop, input, transform = removeResolution) {
+        return transform(prop, input);
+    }
+
+    return {
+        definitions,
+        applyResolution,
+        removeResolution,
+        encodeField,
+        decodeField,
+    };
+}
+
+// print
+function Print() {
+    let printLog = true;
+    let printWarn = true;
+
+    function log(msg) {
+        if(printLog) {
+            console.log(`[${time()}] ${msg}`);
+        }
+    }
+
+    function warn(msg) {
+        if(printWarn) {
+            console.warn(`[${time()}] ${msg}`);
+        }
+    }
+
+    function callKarenFromHR() {
+        console.warn(`calling Karen from HR ...`);
+    }
+
+    function makeCoffee() {
+        console.warn(`making coffee ...`);
+        console.warn(`
+      )  (
+     (   ) )
+      ) ( (
+    _______)_
+ .-'---------|
+( C|=========|
+ '-./_/_/_/_/|
+   '_________'
+    '-------'
+`);
+    }
+
+    return {
+        log,
+        warn,
+        makeCoffee,
+        callKarenFromHR,
+    };
+}
+
+const print = Print();
 
 export {
     // values
@@ -654,26 +714,32 @@ export {
 
     // functions
     compose,
+    compose2,
     pipe,
     repeat,
     nth,
     curry2,
     debounce,
-    f,
 
     // async
     delay,
+    wait,
 
     // events
     xf,
 
     // format
+    hex,
     toNumber,
     toFixed,
     toBool,
     dataviewToArray,
     dataviewToString,
+    arrayBufferToArray,
     stringToCharCodes,
+    time,
+    print,
+    Spec,
 
     // bits
     nthBit,
