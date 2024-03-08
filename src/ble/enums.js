@@ -11,6 +11,7 @@ const Device = {
     powerMeter: 'powerMeter',
     heartRateMonitor: 'heartRateMonitor',
     raceController: 'raceController',
+    smo2: 'smo2',
     generic: 'generic',
 };
 
@@ -18,6 +19,7 @@ const Metric = {
     power: 'power',
     cadence: 'cadence',
     heartRate: 'heartRate',
+    smo2: 'smo2',
 };
 
 const Responsibility = {
@@ -25,12 +27,13 @@ const Responsibility = {
     powerMeter: [Metric.power, Metric.cadence],
     speedCadenceSensor: [Metric.cadence],
     heartRateMonitor: [Metric.heartRate, Metric.cadence],
+    smo2: [Metric.smo2],
 };
 
 const Priority = {
     power: [
         Device.powerMeter,
-        Device.controllable
+        Device.controllable,
     ],
     cadence: [
         Device.speedCadenceSensor,
@@ -40,10 +43,12 @@ const Priority = {
     ],
     heartRate: [
         Device.heartRateMonitor,
-        Device.controllable
+        Device.controllable,
     ],
+    smo2: [
+        Device.smo2,
+    ]
 };
-
 
 const ControlMode = {
     erg: 'erg',
@@ -60,3 +65,4 @@ export {
     Priority,
     ControlMode,
 };
+

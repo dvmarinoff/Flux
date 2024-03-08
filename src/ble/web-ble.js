@@ -94,9 +94,16 @@ function Filters() {
         };
     }
 
-    function hrm() {
+    function heartRateMonitor() {
         return {
             filters: [{services: [uuids.heartRate]}],
+            optionalServices: []
+        };
+    }
+
+    function smo2() {
+        return {
+            filters: [{services: [uuids.moxySmO2]}],
             optionalServices: []
         };
     }
@@ -124,18 +131,20 @@ function Filters() {
                 {services: [uuids.wahooFitnessMachine]},
                 {services: [uuids.cyclingPower]},
                 {services: [uuids.speedCadence]},
-                {services: [uuids.heartRate]},
                 {services: [uuids.raceController]},
+                {services: [uuids.moxySmO2]},
+                {services: [uuids.heartRate]},
             ],
             exclusionFilters,
         };
     }
 
     return Object.freeze({
-        hrm,
         controllable,
-        powerMeter,
         speedCadenceSensor,
+        heartRateMonitor,
+        powerMeter,
+        smo2,
         all,
         generic,
     });
