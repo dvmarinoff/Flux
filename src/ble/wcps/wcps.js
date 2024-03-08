@@ -108,6 +108,16 @@ function WCPS(args = {}) {
         }
     }
 
+    // {resistance: Int} -> Void
+    function setResistanceTarget(args = {}) {
+        const control = service.characteristics.control;
+        control.write(controlParser.loadIntensity.encode({
+            intensity: (args.resistance / 100),
+        }));
+        controlMode = ControlMode.resistance;
+        // control.block();
+    }
+
     // {power: Int} -> Void
     function setPowerTarget(args = {}) {
         const control = service.characteristics.control;
@@ -164,6 +174,7 @@ function WCPS(args = {}) {
     return Object.freeze({
         ...service, // WCPS will have all the public methods and properties of Service
         setSimulation,
+        setResistanceTarget,
         setPowerTarget,
         setUser,
         setWindResistance,

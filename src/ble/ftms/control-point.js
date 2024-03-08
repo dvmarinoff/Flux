@@ -62,6 +62,48 @@ function SimulationParameters(args) {
     });
 }
 
+function ResistanceTarget() {
+    const opCode = 0x04;
+    const length = 3; // 3
+
+    const definitions = {
+        resistance: {resolution: 0.1, unit: '', size: 2, min: -100, max: 100, default: 0},
+    };
+
+    const spec = Spec({definitions});
+
+    function encode(args = {}) {
+        const resistance = spec.encodeField('resistance', args.resistance);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        view.setUint8(0, opCode, true);
+        view.setInt16(1, resistance, true);
+
+        print.log(`:tx :ftms :resistance ${args.resistance} -> ${resistance}`);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode     = dataview.getUint8(0);
+        const resistance = spec.decodeField('resistance', dataview.getInt16(1, true));
+
+        return {
+            resistance,
+        };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        encode,
+        decode
+    });
+}
+
 function PowerTarget() {
     const opCode = 0x05;
     const length = 3;
@@ -94,6 +136,58 @@ function PowerTarget() {
     });
 }
 
+function WheelCircumference(args) {
+    const opCode = 0x12;
+    const length = 3;
+
+    const definitions = {
+        circumference: {resolution: 0.1, unit: 'mm', min: 0, max: 6553.4, default: 2105}
+    };
+
+    const values = {
+        2080: '700x19C', 2086: '700x20C', 2096: '700x23C', 2105: '700x25C', 2136: '700x28C', // 20s
+	      2146: '700x30C', 2155: '700x32C', 2168: '700x35C', 2180: '700x38C',                  // 30s
+        2200: '700x40C', 2242: '700x45C', 2268: '700x47C',                                   // 40s
+        2281: `29"x2.25"`, 2326: `29"x2.3"`, 2750: 'tractor',                                // MTBs
+    };
+
+    // 700x25C -> 2105 -> [0x12, 0x3A, 0x52] -> [18, 58, 82]
+    // 700x40C -> 2200 -> [0x12, 0xF0, 0x55] -> [18, 240, 85]
+    // 700x47C -> 2268 -> [0x12, 0x98, 0x58] -> [18, 152, 88]
+    // Max     -> 2750 -> [0x12, 0x6C, 0x6B] -> [18, 108, 107]
+
+    const spec = Spec({definitions});
+
+    function encode(args = {}) {
+        const circumference = spec.encodeField('circumference', args.circumference);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8( 0, opCode, true);
+        view.setUint16(1, circumference, true);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode        = dataview.getUint8(0);
+        const circumference = spec.decodeField('circumference', dataview.getUint16(1, true));
+
+        return {
+            circumference,
+        };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        values,
+        encode,
+        decode,
+    });
+}
+
 function RequestControl() {
     const opCode = 0x00;
     const length = 1;
@@ -104,6 +198,33 @@ function RequestControl() {
         view.setUint8(0, opCode, true);
 
         print.log(`rx: ftms: request-control:'`);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0);
+        return { opCode };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        encode,
+        decode
+    });
+}
+
+function Reset() {
+    const opCode = 0x01;
+    const length = 1;
+
+    function encode() {
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, opCode, true);
+
+        print.log(`rx: ftms: reset:'`);
 
         return view.buffer;
     }
@@ -186,8 +307,11 @@ function Response() {
 
 const control = {
     simulationParameters: SimulationParameters(),
+    resistanceTarget:     ResistanceTarget(),
     powerTarget:          PowerTarget(),
+    wheelCircumference:   WheelCircumference(),
     requestControl:       RequestControl(),
+    reset:                Reset(),
     response:             Response(),
 };
 

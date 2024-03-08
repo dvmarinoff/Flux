@@ -88,6 +88,19 @@ function FTMS(args = {}) {
         );
         return res;
     }
+
+    // {power: Int} -> Bool
+    async function setResistanceTarget(args = {}) {
+        const control = service.characteristics.control;
+
+        if(!exists(control)) return false;
+
+        const res = await control.writeWithRetry(
+            controlParser.resistanceTarget.encode(args),
+            4, 500,
+        );
+        return res;
+    }
     // end methods
 
     // expose public methods and properties
@@ -96,6 +109,7 @@ function FTMS(args = {}) {
         protocol,
         setSimulation,
         setPowerTarget,
+        setResistanceTarget,
     });
 }
 

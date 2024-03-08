@@ -1,4 +1,4 @@
-import { equals, exists, Spec, hex, dataviewToArray } from '../../functions.js';
+import { equals, exists, Spec, hex, dataviewToArray, print, } from '../../functions.js';
 
 function Grade() {
     // set Sim Grade
@@ -40,7 +40,7 @@ function Grade() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, grade,  true);
 
-        console.log(`${Date.now()} :tx :wcps :grade ${grade}`);
+        print.log(`tx: wcps: grade: ${grade}`);
 
         return view.buffer;
     }
@@ -99,7 +99,7 @@ function WindSpeed() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, windSpeed, true);
 
-        console.log(`${Date.now()} :tx :wcps :windSpeed ${windSpeed}`);
+        print.log(`tx: wcps: windSpeed: ${windSpeed}`);
 
         return view.buffer;
     }
@@ -151,7 +151,7 @@ function SIM() {
         view.setUint16(3, crr,            true);
         view.setUint16(5, windResistance, true);
 
-        console.log(`${Date.now()} :tx :wcps :sim ${weight}, ${crr}, ${windResistance}`);
+        print.log(`tx: wcps: sim: ${weight}, ${crr}, ${windResistance}`);
 
         return view.buffer;
     }
@@ -204,7 +204,7 @@ function WheelCircumference() {
         view.setUint8( 0, opCode, true);
         view.setUint16(1, circumference, true);
 
-        console.log(`${Date.now()} :tx :wcps :circumference ${circumference}`);
+        print.log(`tx: wcps: circumference: ${circumference}`);
 
         return view.buffer;
     }
@@ -241,6 +241,8 @@ function SetERG() {
 
         const view = new DataView(new ArrayBuffer(length));
 
+        print.log(`tx: wcps: setERG: ${args.power}`);
+
         view.setUint8( 0, opCode, true);
         view.setUint16(0, power,  true);
 
@@ -252,6 +254,118 @@ function SetERG() {
         length,
         definitions,
         encode,
+    });
+}
+
+function LoadIntensity() {
+    // set Load Intensity
+    const opCode = 0x40; // 64
+    const length = 3;
+
+    // Format ????
+    // input value is between 0 and 1
+    // let norm = UInt16((1 - resistance) * 16383)
+    // int value = (1.0 - load) * 16383.0;
+
+    const definitions = {
+        intensity: {
+            resolution: 1,
+            unit: '',
+            size: 2,
+            min: applyOffset(1), // it flips the value
+            max: applyOffset(0),
+            default: applyOffset(0)
+        },
+    };
+
+    const spec = Spec({definitions});
+
+    function applyOffset(value) {
+        return Math.round((1 - value) * 16383);
+    }
+
+    function removeOffset(prop, value) {
+        return format((1 - (value / 16383)), 100);
+    }
+
+    function encode(args = {}) {
+        const intensity = spec.encodeField('intensity', args.intensity, applyOffset);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        view.setUint8( 0, opCode, true);
+        view.setUint16(1, intensity, true);
+
+        print.log(`tx: wcps: loadIntensity: ${args.intensity}`);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, true);
+        const intensity = spec.decodeField('intensity', dataview.getUint16(1, true), removeOffset);
+
+        return { intensity };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        encode,
+        decode
+    });
+}
+
+function LoadLevel() {
+    // set Load Level
+    const opCode = 0x41; // 65
+    const length = 2;
+
+    // Format ????
+    // input value is between 0 and 9
+
+    const definitions = {
+        level: {
+            resolution: 1,
+            unit: '',
+            size: 1,
+            min: 0,
+            max: 9,
+            default: 0,
+        },
+    };
+
+    const spec = Spec({definitions});
+
+    function encode(args = {}) {
+        const level = spec.encodeField('level', args.level);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        view.setUint8( 0, opCode, true);
+        view.setUint8(1, level, true);
+
+        print.log(`tx: wcps: loadLevel: ${args.level}`);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, true);
+        const level = spec.decodeField('level', dataview.getUint8(1, true));
+
+        return { level };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        encode,
+        decode
     });
 }
 
@@ -360,7 +474,7 @@ function Response() {
             res.value = dataview.getUint16(4, true);
         }
 
-        console.log(`${Date.now()} :rx :wcps :status ${res.status} :request ${res.request} ${raw}`);
+        print.log(`rx: wcps: status: ${res.status} request: ${res.request} ${raw}`);
 
         return res;
     }
@@ -384,6 +498,7 @@ const control = {
     sim:                SIM(),
     wheelCircumference: WheelCircumference(),
     setERG:             SetERG(),
+    loadIntensity:      LoadIntensity(),
     requestControl:     RequestControl(),
     response:           Response(),
 };
