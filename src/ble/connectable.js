@@ -89,7 +89,7 @@ function Connectable(args = {}) {
         defaultOnConnected
     );
     const onConnectFail  = compose2(
-        args.onConnected ?? ((x) => x),
+        args.onConnectFail ?? ((x) => x),
         defaultOnConnectFail
     );
     const onDisconnect  = compose2(
@@ -334,7 +334,6 @@ function Connectable(args = {}) {
             onConnected();
 
         } catch(e) {
-            console.error(`ble: connecting: to: ${getName()}, error: `, e);
             _connected = false;
             _status = Status.disconnected;
             onConnectFail();
