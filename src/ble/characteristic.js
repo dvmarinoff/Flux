@@ -64,7 +64,7 @@ function Characteristic(args = {}) {
                 'characteristicvaluechanged', (e) => handler(e.target.value), signal
             );
 
-            print.log(`ble: notifications: started: on: ${name} ${uuid}.`);
+            print.log(`tx: notifications: started: on: ${name} ${uuid}.`);
             return true;
         } catch(e) {
             console.error(`notifications: failed: starting: on: name: ${name} uuid: ${uuid}`, e);
@@ -80,10 +80,10 @@ function Characteristic(args = {}) {
         } else {
             if(attempts > 0) {
                 await wait(txRate);
-                print.log(`ble: startNotificationsWithRetry: fail: 'trying again'`);
+                print.log(`tx: startNotificationsWithRetry: fail: 'trying again'`);
                 return await startNotificationsWithRetry(handler, attempts-1);
             } else {
-                print.log(`ble: startNotificationsWithRetry: fail: 'give up'`);
+                print.log(`tx: startNotificationsWithRetry: fail: 'give up'`);
                 return false;
             }
         }
@@ -111,7 +111,7 @@ function Characteristic(args = {}) {
             const value = await _characteristic.readValue();
             return value;
         } catch(e) {
-            console.error(`ble: characteristic: :failed :read on: ${name} uuid: ${uuid}`, e);
+            console.error(`rx: characteristic: :failed :read on: ${name} uuid: ${uuid}`, e);
             return fallback;
         }
     }
@@ -123,7 +123,7 @@ function Characteristic(args = {}) {
             res = await _characteristic[writterFn](value);
             return true;
         } catch(e) {
-            print.warn(`ble: characteristic: failed: write: on: ${name} uuid: ${uuid} value: [${arrayBufferToArray(value)}]`, e);
+            print.warn(`tx: characteristic: failed: write: on: ${name} uuid: ${uuid} value: [${arrayBufferToArray(value)}]`, e);
             return false;
         }
     }
@@ -132,15 +132,15 @@ function Characteristic(args = {}) {
     async function writeWithRetry(value, attempts = 10, txRate = 250) {
         let success = await write(value);
         if(success) {
-            print.log(`ble: characteristic: writeWithRetry: success:`);
+            print.log(`tx: characteristic: writeWithRetry: success:`);
             return true;
         } else {
             if(attempts > 0) {
-                print.log(`ble: characteristic: writeWithRetry: fail: continue:`);
+                print.log(`tx: characteristic: writeWithRetry: fail: continue:`);
                 await wait(txRate);
                 return await writeWithRetry(value, attempts-1);
             } else {
-                print.log(`ble: characteristic: writeWithRetry: fail: break:`);
+                print.log(`tx: characteristic: writeWithRetry: fail: break:`);
                 return false;
             }
         }
