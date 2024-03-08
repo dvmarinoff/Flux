@@ -32,7 +32,7 @@
                                 <div class="connection-switch--label">Controllable</div>
                             </connection-switch>
 
-                            <connection-switch for="ble:hrm" id="switch-hrm" class="connection-switch">
+                            <connection-switch for="ble:heartRateMonitor" id="switch-hrm" class="connection-switch">
                                 <div class="connection-switch--indicator off"></div>
                                 <div class="connection-switch--label">HRM</div>
                             </connection-switch>
@@ -640,7 +640,7 @@
                         </div>
                         <div class="device-card--body">
                             <div class="device-card--body--row">
-                                <connection-switch for="ble:power-meter"
+                                <connection-switch for="ble:powerMeter"
                                                    id="switch-power-meter"
                                                    indicatorClass="connection-icon-switch--indicator"
                                                    class="connection-icon-switch">
@@ -654,12 +654,12 @@
                                 <div class="device-card--tile">
                                     <h3 class="device-card--tile--header">Name</h3>
                                     <data-view class="data-view device-card--tile--value"
-                                               prop="ble:power-meter:name">--</data-view>
+                                               prop="ble:powerMeter:name">--</data-view>
                                 </div>
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                    for="power"
-                                                   use="ble:power-meter">
+                                                   use="ble:powerMeter">
                                         <h3 class="device-card--tile--header">Power</h3>
                                         <power-value class="data-view device-card--tile--value" prop="db:power1s">--</power-value>
                                     </source-switch>
@@ -667,7 +667,7 @@
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                    for="cadence"
-                                                   use="ble:power-meter">
+                                                   use="ble:powerMeter">
                                         <h3 class="device-card--tile--header">Cadence</h3>
                                         <cadence-value class="data-view device-card--tile--value">--</cadence-value>
                                     </source-switch>
@@ -675,7 +675,7 @@
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                    for="speed"
-                                                   use="ble:power-meter">
+                                                   use="ble:powerMeter">
                                         <h3 class="device-card--tile--header">Speed</h3>
                                         <speed-value class="data-view device-card--tile--value">--</speed-value>
                                     </source-switch>
@@ -693,7 +693,7 @@
                         </div>
                         <div class="device-card--body">
                             <div class="device-card--body--row">
-                                <connection-switch for="ble:speed-and-cadence"
+                                <connection-switch for="ble:speedCadenceSensor"
                                                    class="connection-icon-switch"
                                                    indicatorClass="connection-icon-switch--indicator">
                                     <svg class="connection-icon-switch--icon icon" xmlns="http://www.w3.org/2000/svg"
@@ -706,13 +706,13 @@
                                 <div class="device-card--tile">
                                     <h3 class="device-card--tile--header">Name</h3>
                                     <data-view class="data-view device-card--tile--value"
-                                               prop="ble:speed-and-cadence:name">--</data-view>
+                                               prop="ble:speedCadenceSensor:name">--</data-view>
                                 </div>
                                 <div class="device-card--tile"></div>
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                    for="cadence"
-                                                   use="ble:speed-and-cadence">
+                                                   use="ble:speedCadenceSensor">
                                         <h3 class="device-card--tile--header">Cadence</h3>
                                         <cadence-value class="data-view device-card--tile--value">--</cadence-value>
                                     </source-switch>
@@ -720,7 +720,7 @@
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                    for="speed"
-                                                   use="ble:speed-and-cadence">
+                                                   use="ble:speedCadenceSensor">
                                         <h3 class="device-card--tile--header">Speed</h3>
                                         <speed-value class="data-view device-card--tile--value">--</speed-value>
                                     </source-switch>
@@ -736,7 +736,7 @@
                         <div class="device-card--header--label">HRM</div>
                         <div class="device-card--body">
                             <div class="device-card--body--row">
-                                <connection-switch for="ble:hrm"
+                                <connection-switch for="ble:heartRateMonitor"
                                                    id="switch-hrm"
                                                    indicatorClass="connection-icon-switch--indicator"
                                                    class="connection-icon-switch">
@@ -750,7 +750,7 @@
                                 <div class="device-card--tile">
                                     <h3 class="device-card--tile--header">Name</h3>
                                     <data-view class="device-card--tile--value"
-                                               prop="ble:hrm:name">--</data-view>
+                                               prop="ble:heartRateMonitor:name">--</data-view>
                                 </div>
                                 <div class="device-card--tile"></div>
                                 <div class="device-card--tile"></div>
@@ -758,7 +758,7 @@
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                 for="heartRate"
-                                                use="ble:hrm">
+                                                use="ble:heartRateMonitor">
                                         <h3 class="device-card--tile--header">Heart Rate</h3>
                                         <heart-rate-value id="hrm-heartRate"
                                                         class="data-view device-card--tile--value">--</heart-rate-value>
@@ -827,12 +827,12 @@
                                 <div class="device-card--tile">
                                     <h3 class="device-card--tile--header">Name</h3>
                                     <data-view class="data-view device-card--tile--value"
-                                               prop="ble:moxy:name">--</data-view>
+                                               prop="ble:smo2:name">--</data-view>
                                 </div>
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                    for="moxy"
-                                                   use="ble:moxy">
+                                                   use="ble:smo2">
                                         <h3 class="device-card--tile--header">SmO2</h3>
                                         <smo2-value class="data-view device-card--tile--value">--</smo2-value>
                                     </source-switch>
@@ -840,7 +840,7 @@
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
                                                    for="thb"
-                                                   use="ble:moxy">
+                                                   use="ble:smo2">
                                         <h3 class="device-card--tile--header">THb</h3>
                                         <thb-value class="data-view device-card--tile--value">--</thb-value>
                                     </source-switch>
