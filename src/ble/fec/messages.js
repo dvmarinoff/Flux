@@ -2,7 +2,7 @@
 // FEC3 Custom characteristic
 //
 
-import { getBits, dataviewToArray } from '../../functions.js';
+import { getBits, dataviewToArray, print, } from '../../functions.js';
 
 function applyDefinition(field, value) {
     const _value = value ?? field.default;
@@ -16,6 +16,37 @@ function removeDefinition(field, value) {
     const _resolution = field.resolution ?? 1;
     const _offset = field.offset ?? 0;
     return (_value - (_offset * _resolution)) * _resolution;
+}
+
+function DataPage48() {
+    // Data Page 48 (0x30) – Basic Resistance
+    const number = 48;
+    const length = 8;
+    const architecture = true;
+
+    const fields = {
+        dataPage:  { size: 1, type: 'Uint8',  default: 48, },
+        resistance: {
+            size: 1, type: 'Uint8', default: 0, resolution: 0.5, unit: '',
+        },
+    };
+
+    function encode(dataview, start = 4, payload = {}) {
+        const resistance = applyDefinition(fields.resistance, payload?.resistance);
+
+        dataview.setUint8(start+0, number,     architecture);
+        dataview.setUint8(start+7, resistance, architecture);
+
+        print.log(`:tx :fec :basic-resistance ${payload?.resistance} ${resistance}`);
+
+        return dataview;
+    }
+
+    return Object.freeze({
+        number,
+        fields,
+        encode,
+    });
 }
 
 function DataPage50() {
@@ -41,7 +72,7 @@ function DataPage50() {
         const windSpeed = applyDefinition(fields.windSpeed, payload?.windSpeed);
         const draftingFactor = applyDefinition(fields.draftingFactor, payload?.draftingFactor);
 
-        console.log(`:tx :fec :wind-resistance :windResistance ${windResistance} windSpeed: ${windSpeed} :draftingFactor ${draftingFactor}`);
+        print.log(`:tx :fec :wind-resistance :windResistance ${windResistance} windSpeed: ${windSpeed} :draftingFactor ${draftingFactor}`);
 
         dataview.setUint8(start+0, dataPage, architecture);
         dataview.setUint8(start+5, windResistance, architecture);
@@ -78,7 +109,7 @@ function DataPage51() {
         const grade = applyDefinition(fields.grade, payload?.grade);
         const crr = applyDefinition(fields.crr, payload?.crr);
 
-        console.log(`:tx :fec :track-resistance :grade ${payload?.grade} :crr ${payload?.crr}`);
+        print.log(`:tx :fec :track-resistance :grade ${payload?.grade} :crr ${crr}`);
 
         dataview.setUint8(start+0, dataPage, architecture);
         dataview.setUint16(start+5, grade, architecture);
@@ -114,7 +145,7 @@ function DataPage49() {
         dataview.setUint8( start+0, dataPage, architecture);
         dataview.setUint16(start+6, power,  architecture);
 
-        console.log(`:tx :fec :target-power :power ${payload?.power}`);
+        print.log(`:tx :fec :target-power :power ${payload?.power}`);
 
         return dataview;
     }
@@ -169,7 +200,7 @@ function DataPage55() {
         const combined1 = (getBits(0, 4, bikeWeight) << 4) + diameterOffset;
         const bikeWeightMSB = bikeWeight >> 4;
 
-        console.log(`:tx :fec :user-configuration :userWeight ${userWeight} :bikeWeight ${bikeWeight}`);
+        print.log(`:tx :fec :user-configuration :userWeight ${userWeight} :bikeWeight ${bikeWeight}`);
 
         dataview.setUint8( start+0, dataPage, architecture);
         dataview.setUint16(start+1, userWeight, architecture);
@@ -322,7 +353,7 @@ function DataPage71() {
         const data3          = dataview.getUint8(start+6, architecture);
         const data4          = dataview.getUint8(start+7, architecture);
 
-        console.log(`:rx :fec :command-status ${status} sequence: ${sequenceNumber} :id ${lastCommandId}`);
+        print.log(`:rx :fec :command-status ${status} sequence: ${sequenceNumber} :id ${lastCommandId}`);
 
         return {
             dataPage,
@@ -344,6 +375,7 @@ function DataPage71() {
 
 const messages = {
     // fec3
+    dataPage48: DataPage48(),
     dataPage49: DataPage49(),
     dataPage50: DataPage50(),
     dataPage51: DataPage51(),

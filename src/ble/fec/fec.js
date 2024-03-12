@@ -81,6 +81,31 @@ function FEC(args = {}) {
     // methods
     //
 
+    // {power: Int} -> Bool
+    async function setPowerTarget(args = {}) {
+        let control = service.characteristics.control;
+
+        if(!exists(control)) return false;
+
+        const res = await control.writeWithRetry(
+            fecParser.encode({dataPage: 49, payload: args}),
+            4, 500,
+        );
+        return res;
+    }
+
+    // {resistance: Int} -> Bool
+    async function setResistanceTarget(args = {}) {
+        let control = service.characteristics.control;
+        if(!exists(control)) return false;
+
+        let res = await control.write(
+            fecParser.encode({dataPage: 48, payload: args}),
+        );
+
+        return res;
+    }
+
     // {WindSpeed: Float, Grade: Float, Crr: Float, WindResistance: Float} -> Bool
     async function setSimulation(args = {}) {
         let control = service.characteristics.control;
@@ -96,19 +121,6 @@ function FEC(args = {}) {
         return res;
     }
 
-    // {power: Int} -> Bool
-    async function setPowerTarget(args = {}) {
-        let control = service.characteristics.control;
-        console.log(`ftms: set-power-target: `, args);
-
-        if(!exists(control)) return false;
-
-        const res = await control.writeWithRetry(
-            fecParser.encode({dataPage: 49, payload: args}),
-            4, 500,
-        );
-        return res;
-    }
 
     // {userWeight: Int, bikeWeight: Int}
     async function setUserData(args = {}) {
@@ -141,8 +153,9 @@ function FEC(args = {}) {
     return Object.freeze({
         ...service, // FEC will have all the public methods and properties of Service
         protocol,
-        setSimulation,
         setPowerTarget,
+        setResistanceTarget,
+        setSimulation,
         setUserData,
         setWindResistance,
         setRoadFeel,
