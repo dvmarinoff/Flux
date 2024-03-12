@@ -1,5 +1,6 @@
 import { xf, equals, exists, first, } from './functions.js';
 import { models } from './models/models.js';
+import { Status, ControlMode, } from './ble/enums.js';
 
 function Course() {
 
@@ -108,7 +109,7 @@ function Course() {
         // slope = indexToSlope(index);
 
         xf.dispatch(`ui:slope-target-set`, slope);
-        xf.dispatch(`ui:mode-set`, 'slope');
+        xf.dispatch(`ui:mode-set`, ControlMode.sim);
         console.log(`start a course ...`);
     }
     function setCourse(course) {

@@ -1,4 +1,5 @@
 import { xf, exists } from '../functions.js';
+import { ControlMode, } from '../ble/enums.js';
 
 function Keyboard() {
 
@@ -54,7 +55,7 @@ function Keyboard() {
 
 
 function KeyboardControls() {
-    let mode = 'erg';
+    let mode = ControlMode.erg;
     xf.sub('db:mode', x => mode = x);
 
     let watchStatus = 'stopped';
@@ -62,37 +63,37 @@ function KeyboardControls() {
 
     // Modes Inc/Dec
     xf.sub('key:up', e => {
-        if(mode === 'erg') {
+        if(mode === ControlMode.erg) {
             xf.dispatch('ui:power-target-inc');
         }
-        if(mode === 'resistance') {
+        if(mode === ControlMode.resistance) {
             xf.dispatch('ui:resistance-target-inc');
         }
-        if(mode === 'slope') {
+        if(mode === ControlMode.sim) {
             xf.dispatch('ui:slope-target-inc');
         }
     });
     xf.sub('key:down', e => {
-        if(mode === 'erg') {
+        if(mode === ControlMode.erg) {
             xf.dispatch('ui:power-target-dec');
         }
-        if(mode === 'resistance') {
+        if(mode === ControlMode.resistance) {
             xf.dispatch('ui:resistance-target-dec');
         }
-        if(mode === 'slope') {
+        if(mode === ControlMode.sim) {
             xf.dispatch('ui:slope-target-dec');
         }
     });
 
     // Modes
     xf.sub('key:e', e => {
-        xf.dispatch('ui:mode-set', 'erg');
+        xf.dispatch('ui:mode-set', ControlMode.erg);
     });
     xf.sub('key:r', e => {
-        xf.dispatch('ui:mode-set', 'resistance');
+        xf.dispatch('ui:mode-set', ControlMode.resistance);
     });
     xf.sub('key:s', e => {
-        xf.dispatch('ui:mode-set', 'slope');
+        xf.dispatch('ui:mode-set', ControlMode.sim);
     });
 
     // Watch

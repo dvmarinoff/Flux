@@ -14,6 +14,8 @@ import { fileHandler } from '../file.js';
 import { Model as Cycling } from '../physics.js';
 import { fit } from '../fit/fit.js';
 
+import { Device, Status, ControlMode, } from '../ble/enums.js';
+
 class Model {
     constructor(args = {}) {
         this.init(args);
@@ -282,9 +284,9 @@ class CadenceTarget extends Target {
 class Mode extends Model {
     postInit(args) {
         this.state = this.defaultValue();
-        this.values = ['erg', 'resistance', 'slope'];
+        this.values = Object.values(ControlMode);
     }
-    defaultValue() { return 'erg'; }
+    defaultValue() { return ControlMode.erg; }
     defaultIsValid(value) { return this.values.includes(value); }
 }
 

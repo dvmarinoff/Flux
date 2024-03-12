@@ -2,6 +2,8 @@ import { xf, exists, equals } from './functions.js';
 import { models } from './models/models.js';
 import { Sound } from './sound.js';
 import { idb } from './storage/idb.js';
+import { ControlMode, } from './ble/enums.js';
+
 // import { trainerMock } from './simulation-scripts.js';
 
 let db = {
@@ -151,13 +153,13 @@ xf.reg('ui:page-set', (page, db) => {
 xf.reg('ui:mode-set', (mode, db) => {
     db.mode = models.mode.set(mode);
 
-    if(equals(mode, 'erg')) {
+    if(equals(mode, ControlMode.erg)) {
         xf.dispatch(`ui:power-target-set`, db.powerTarget);
     }
-    if(equals(mode, 'resistance')) {
+    if(equals(mode, ControlMode.resistance)) {
         xf.dispatch(`ui:resistance-target-set`, db.resistanceTarget);
     }
-    if(equals(mode, 'slope')) {
+    if(equals(mode, ControlMode.sim)) {
         xf.dispatch(`ui:slope-target-set`, db.slopeTarget);
     }
 });
