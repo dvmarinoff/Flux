@@ -21,8 +21,8 @@ const fields = {
     Flags:                 {resolution: 1,    unit: 'bit',      size: 2, type: 'Uint16', present: (_ => true),                                   },
     InstantaneousSpeed:    {resolution: 0.01, unit: 'kph',      size: 2, type: 'Uint16', present: speedPresent,               short: 'speed',    },
     AverageSpeed:          {resolution: 0.01, unit: 'kph',      size: 2, type: 'Uint16', present: avgSpeedPresent,                               },
-    InstantaneousCandence: {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: cadencePresent,             short: 'cadence',  },
-    AverageCandence:       {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: avgCadencePresent,                             },
+    InstantaneousCadence: {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: cadencePresent,             short: 'cadence',  },
+    AverageCadence:       {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: avgCadencePresent,                             },
     TotalDistance:         {resolution: 1,    unit: 'm',        size: 3, type: 'Uint24', present: distancePresent,                               },
     ResistanceLevel:       {resolution: 1,    unit: 'unitless', size: 2, type: 'Uint16', present: resistancePresent,                             },
     InstantaneousPower:    {resolution: 1,    unit: 'W',        size: 2, type: 'Uint16', present: powerPresent,               short: 'power',    },
@@ -40,8 +40,8 @@ const order = [
     'Flags',
     'InstantaneousSpeed',
     'AverageSpeed',
-    'InstantaneousCandence',
-    'AverageCandence',
+    'InstantaneousCadence',
+    'AverageCadence',
     'TotalDistance',
     'ResistanceLevel',
     'InstantaneousPower',
@@ -73,8 +73,8 @@ function IndoorBikeData(args = {}) {
 
             if(field.present(acc.flags)) {
                 const value = getField(field, dataview, acc.i);
-                const unit  = field.unit;
-                const name  = field.short ?? fieldName;
+                const unit  = field?.unit ?? '';
+                const name  = field?.short ?? fieldName;
 
                 if(acc.i === 0) {
                     acc.flags = value;
