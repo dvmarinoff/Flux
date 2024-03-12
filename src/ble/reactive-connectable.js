@@ -87,23 +87,27 @@ function ReactiveConnectable(args = {}) {
         mode = x;
     }
 
-    function onUserWeight() {
+    function onUserWeight(x) {
+        if(!connectable.isConnected()) return;
     }
 
     function onPowerTarget(powerTarget) {
-        if(!connectable.isConnected()) return;
+        if(!connectable.isConnected() ||
+           !equals(mode, ControlMode.erg)) return;
         connectable.services.trainer.setPowerTarget({power: powerTarget});
     }
 
     function onResistanceTarget(resistanceTarget) {
-        if(!connectable.isConnected()) return;
+        if(!connectable.isConnected() ||
+           !equals(mode, ControlMode.resistance)) return;
         connectable.services.trainer.setResistanceTarget({
             resistance: resistanceTarget,
         });
     }
 
     function onSlopeTarget(slopeTarget) {
-        if(!connectable.isConnected()) return;
+        if(!connectable.isConnected() ||
+           !equals(mode, ControlMode.sim)) return;
         connectable.services.trainer.setSimulation({grade: slopeTarget});
     }
 
@@ -132,6 +136,7 @@ function ReactiveConnectable(args = {}) {
         getIdentifier,
         start,
         stop,
+        ...connectable
     });
 }
 
