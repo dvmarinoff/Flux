@@ -1,12 +1,12 @@
 //
-// Heart Rate Service
+// SmO2 Service
 //
 
-import { expect, } from '../functions.js';
+import { expect, } from '../../functions.js';
 import { uuids, } from '../web-ble.js';
 import { Service } from '../service.js';
 import { Characteristic } from '../characteristic.js';
-import { sensorData as smo2MeasurementParser } from './heart-rate-measurement.js';
+import { sensorData as smo2MeasurementParser } from './moxy.js';
 
 function SMO2(args = {}) {
 
@@ -26,7 +26,7 @@ function SMO2(args = {}) {
     // service
     const spec = {
         measurement: {
-            uuid: uuids.moxySmO2SensorData,
+            uuid: uuids.smo2SensorData,
             notify: {callback: onData, parser: smo2MeasurementParser},
         },
     };
