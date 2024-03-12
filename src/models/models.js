@@ -185,6 +185,9 @@ class Sources extends Model {
             heartRate:    'ble:hrm',
             virtualState: 'power',
             smo2:         'ble:smo2',
+            thb:          'ble:smo2',
+            coreBodyTemperature: 'ble:coreTemp',
+            skinTemperature:     'ble:coreTemp',
         };
         return sources;
     }

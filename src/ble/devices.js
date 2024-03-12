@@ -28,6 +28,11 @@ const moxy = ReactiveConnectable({
     filter: webBle.filters.smo2(),
 });
 
+const coreTemp = ReactiveConnectable({
+    deviceType: Device.coreTemp,
+    filter: webBle.filters.coreTemp(),
+});
+
 // export {
 //     controllabe,
 //     heartRateMonitor,

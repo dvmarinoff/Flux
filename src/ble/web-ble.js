@@ -8,7 +8,8 @@ const services = {
     fec:                 '6e40fec1-b5a3-f393-e0a9-e50e24dcca9e',
     wahooFitnessMachine: 'a026ee0b-0a7d-4ab3-97fa-f1500f9feb8b',
     raceController:      '00000001-19ca-4651-86e5-fa29dcdd09d1',
-    moxySmO2:            '6404d801-4cb9-11e8-b566-0800200c9a66',
+    smo2:                '6404d801-4cb9-11e8-b566-0800200c9a66',
+    coreTemp:            '00002100-5b1e-4347-b07c-97b514dae121',
 };
 
 const characteristics = {
@@ -47,17 +48,20 @@ const characteristics = {
     fec3:                          '6e40fec3-b5a3-f393-e0a9-e50e24dcca9e',
 
     // Wahoo Fitness Machine
-    wahooFitnessMachineControlPoint:   'a026e037-0a7d-4ab3-97fa-f1500f9feb8b',
+    wahooFitnessMachineControlPoint: 'a026e037-0a7d-4ab3-97fa-f1500f9feb8b',
 
     // Race Controller (Zwift)
-    raceControllerMeasurement:    '00000002-19ca-4651-86e5-fa29dcdd09d1',
-    raceControllerControlPoint:   '00000003-19ca-4651-86e5-fa29dcdd09d1',
-    raceControllerResponse:       '00000004-19ca-4651-86e5-fa29dcdd09d1',
+    raceControllerMeasurement:     '00000002-19ca-4651-86e5-fa29dcdd09d1',
+    raceControllerControlPoint:    '00000003-19ca-4651-86e5-fa29dcdd09d1',
+    raceControllerResponse:        '00000004-19ca-4651-86e5-fa29dcdd09d1',
 
     // SmO2 Moxy
-    moxySmO2SensorData:            '6404d804-4cb9-11e8-b566-0800200c9a66',
-    moxySmO2DeviceControl:         '6404d810-4cb9-11e8-b566-0800200c9a66',
-    moxySmO2ControlPoint:          '6404d811-4cd9-11e8-b566-0800200c9a66',
+    smo2SensorData:                '6404d804-4cb9-11e8-b566-0800200c9a66',
+    smo2DeviceControl:             '6404d810-4cb9-11e8-b566-0800200c9a66',
+    smo2ControlPoint:              '6404d811-4cd9-11e8-b566-0800200c9a66',
+
+    // CoreTemp
+    coreBodyTemp:                  '00002101-5b1e-4347-b07c-97b514dae121',
 
     // others
     sensorLocation:                    '00002a5d-0000-1000-8000-00805f9b34fb',
@@ -83,28 +87,30 @@ function Filters() {
     function powerMeter() {
         return {
             filters: [{services: [uuids.cyclingPower]}],
-            optionalServices: []
         };
     }
 
     function speedCadenceSensor() {
         return {
             filters: [{services: [uuids.speedCadence]}],
-            optionalServices: []
         };
     }
 
     function heartRateMonitor() {
         return {
             filters: [{services: [uuids.heartRate]}],
-            optionalServices: []
         };
     }
 
     function smo2() {
         return {
-            filters: [{services: [uuids.moxySmO2]}],
-            optionalServices: []
+            filters: [{services: [uuids.smo2]}],
+        };
+    }
+
+    function coreTemp() {
+        return {
+            filters: [{services: [uuids.coreTemp]}],
         };
     }
 
@@ -132,8 +138,9 @@ function Filters() {
                 {services: [uuids.cyclingPower]},
                 {services: [uuids.speedCadence]},
                 {services: [uuids.raceController]},
-                {services: [uuids.moxySmO2]},
+                {services: [uuids.smo2]},
                 {services: [uuids.heartRate]},
+                {services: [uuids.coreTemp]},
             ],
             exclusionFilters,
         };
@@ -145,6 +152,7 @@ function Filters() {
         heartRateMonitor,
         powerMeter,
         smo2,
+        coreTemp,
         all,
         generic,
     });

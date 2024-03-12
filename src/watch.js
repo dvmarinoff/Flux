@@ -333,6 +333,8 @@ xf.reg('watch:elapsed', (x, db) => {
         position_long:                db.position_long,
         saturated_hemoglobin_percent: db.smo2,
         total_hemoglobin_conc:        db.thb,
+        core_temperature:             db.coreBodyTemperature,
+        skin_temperature:             db.skinTemperature,
         device_index:                 0,
     };
 

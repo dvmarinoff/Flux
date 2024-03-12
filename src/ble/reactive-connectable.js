@@ -73,6 +73,14 @@ function ReactiveConnectable(args = {}) {
         if('totalHemoglobinSaturation' in data) {
             xf.dispatch(`thb`, data.totalHemoglobinSaturation);
         }
+
+        if('coreBodyTemperature' in data) {
+            xf.dispatch(`coreBodyTemperature`, data.coreBodyTemperature);
+        }
+
+        if('skinTemperature' in data) {
+            xf.dispatch(`skinTemperature`, data.skinTemperature);
+        }
     }
 
     async function onSwitch() {

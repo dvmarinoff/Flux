@@ -15,6 +15,7 @@ let db = {
     sources: models.sources.default,
     smo2: models.smo2.default,
     thb: models.thb.default,
+    coreBodyTemperature: 0x7FFF,
     position_lat: 0,
     position_long: 0,
 
@@ -108,6 +109,14 @@ xf.reg(models.smo2.prop, (smo2, db) => {
 
 xf.reg(models.thb.prop, (thb, db) => {
     db.thb = thb;
+});
+
+xf.reg(`coreBodyTemperature`, (coreBodyTemperature, db) => {
+    db.coreBodyTemperature = coreBodyTemperature;
+});
+
+xf.reg(`skinTemperature`, (skinTemperature, db) => {
+    db.skinTemperature = skinTemperature;
 });
 
 xf.reg(models.sources.prop, (sources, db) => {

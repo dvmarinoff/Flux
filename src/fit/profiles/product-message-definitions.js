@@ -36,6 +36,7 @@ const productMessageDefinitions = [
         'device_index',
         'total_hemoglobin_conc',
         'saturated_hemoglobin_percent',
+        'core_temperature',
     ], 3],
     ['lap', [
         'timestamp',

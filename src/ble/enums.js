@@ -12,6 +12,7 @@ const Device = {
     heartRateMonitor: 'heartRateMonitor',
     raceController: 'raceController',
     smo2: 'smo2',
+    coreTemp: 'coreTemp',
     generic: 'generic',
 };
 
@@ -20,6 +21,9 @@ const Metric = {
     cadence: 'cadence',
     heartRate: 'heartRate',
     smo2: 'smo2',
+    thb: 'thb',
+    coreBodyTemperature: 'coreBodyTemperature',
+    skinTemperature: 'skinTemperature',
 };
 
 const Responsibility = {
@@ -27,7 +31,7 @@ const Responsibility = {
     powerMeter: [Metric.power, Metric.cadence],
     speedCadenceSensor: [Metric.cadence],
     heartRateMonitor: [Metric.heartRate, Metric.cadence],
-    smo2: [Metric.smo2],
+    smo2: [Metric.smo2, Metric.thb],
 };
 
 const Priority = {
@@ -47,6 +51,9 @@ const Priority = {
     ],
     smo2: [
         Device.smo2,
+    ],
+    coreTemp: [
+        Device.coreTemp,
     ]
 };
 

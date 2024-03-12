@@ -8,6 +8,8 @@ import CPS from './cps/cps.js';
 import CSCS from './cscs/cscs.js';
 import HRS from './hrs/hrs.js';
 import RCS from './rcs/rcs.js';
+import SMO2 from './moxy/smo2.js';
+import CoreTemp from './ct/ct.js';
 import { webBle, uuids } from './web-ble.js';
 import { Device, Status, } from './enums.js';
 
@@ -423,6 +425,8 @@ function Connectable(args = {}) {
         const hasCadence = hasService(uuids.speedCadence);
         const hasHeartRate = hasService(uuids.heartRate);
         const hasRaceController = hasService(uuids.raceController);
+        const hasSmo2 = hasService(uuids.smo2);
+        const hasCoreTemp = hasService(uuids.coreTemp);
 
         // order here is important
         if(hasFTMS || hasFEC || hasWCPS) {
@@ -481,13 +485,41 @@ function Connectable(args = {}) {
         if(hasRaceController) {
             // zwift click or play
             _deviceType = Device.raceController;
-            print.log(`ble: connectable: setup: ${getDeviceType()} `);
+            print.log(`ble: connectable: setup: ${getDeviceType()}`);
 
             services['rcs'] = RCS({
                 service: getService(uuids.raceController),
                 onData: onData,
             });
             let res = await services.rcs.setup();
+
+            return res;
+        }
+
+        if(hasSmo2) {
+            // SmO2
+            _deviceType = Device.smo2;
+            print.log(`ble: connectable: setup: ${getDeviceType()}`);
+
+            services['smo2'] = SMO2({
+                service: getService(uuids.smo2),
+                onData: onData,
+            });
+            let res = await services.smo2.setup();
+
+            return res;
+        }
+
+        if(hasCoreTemp) {
+            // CoreTemp
+            _deviceType = Device.coreTemp;
+            print.log(`ble: connectable: setup: ${getDeviceType()}`);
+
+            services['coreTemp'] = CoreTemp({
+                service: getService(uuids.coreTemp),
+                onData: onData,
+            });
+            let res = await services.coreTemp.setup();
 
             return res;
         }
