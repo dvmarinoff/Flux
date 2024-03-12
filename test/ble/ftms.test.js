@@ -1,4 +1,4 @@
-import { uuids } from '../../src/ble/uuids.js';
+import { uuids } from '../../src/ble/web-ble.js';
 import { control } from '../../src/ble/ftms/control-point.js';
 import { indoorBikeData } from '../../src/ble/ftms/indoor-bike-data.js';
 import { status } from '../../src/ble/ftms/fitness-machine-status.js';
