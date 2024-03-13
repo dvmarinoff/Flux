@@ -55,6 +55,14 @@ function CoreBodyTemperature(args = {}) {
         return dataview[`get${field.type}`](i, architecture) * field.resolution;
     }
 
+    function fahrenheitToCelsius(fahrenheit) {
+        return Math.round((5/9 * (fahrenheit - 32)) * 100) / 100;
+    }
+
+    function celsiusToFahrenheit(celsius) {
+        return Math.round(((celsius * 9/5) + 32) * 100) / 100;
+    }
+
     // Int -> String
     function readTemperatureUnit(flags) {
         return ((flags >> 3) & 1) === 0 ? 'C' : 'F';
@@ -87,9 +95,16 @@ function CoreBodyTemperature(args = {}) {
             if((acc.i + field.size) > byteLength) return acc;
 
             if(field.present(acc.flags)) {
-                const value = getField(field, dataview, acc.i);
-                const unit  = field?.unit ?? '';
-                const name  = field?.short ?? fieldName;
+                let value  = getField(field, dataview, acc.i);
+                const unit   = field?.unit ?? '';
+                const name = field?.short ?? fieldName;
+
+                if(acc.temperatureUnit === 'F' && (
+                    fieldName === 'coreBodyTemperature' ||
+                    fieldName === 'skinTemperature')
+                  ) {
+                    value = fahrenheitToCelsius(value);
+                }
 
                 if(acc.i === 0) {
                     acc.flags = value;
@@ -108,12 +123,16 @@ function CoreBodyTemperature(args = {}) {
     function encode(args = {}) {
         const coreBodyTemperature = Math.round(
             args.coreBodyTemperature /
-            Fields.coreBodyTemperature.resolution
+                Fields.coreBodyTemperature.resolution
         ) ?? Fields.coreBodyTemperature.invalid;
 
         // construct based on what is present in args
         let flags = args.flags ?? 0b00000000;
         let length = 3; // depends on flags, min 3, max 9
+
+        if('temperatureUnit' in args && args.temperatureUnit === 'F') {
+            flags = flags | 0b00001000;
+        }
 
         if('skinTemperature' in args) {
             flags = flags | 0b00000001;
@@ -139,6 +158,8 @@ function CoreBodyTemperature(args = {}) {
     return Object.freeze({
         decode,
         encode,
+        fahrenheitToCelsius,
+        celsiusToFahrenheit,
     });
 }
 

@@ -22,8 +22,21 @@ describe('Core Body Temperature', () => {
             skinTemperature: 38.47,
         });
 
-        console.log(dataview.buffer);
-        console.log(dataviewToArray(dataview));
+        const expected = {
+            coreBodyTemperature: 38.12,
+            skinTemperature: 38.47,
+        };
+
+        const res = coreBodyTemperature.decode(dataview);
+        expect(res).toEqual(expected);
+    });
+
+    test('temperature in Fahrenheit', () => {
+        const dataview = coreBodyTemperature.encode({
+            temperatureUnit: 'F',
+            coreBodyTemperature: coreBodyTemperature.celsiusToFahrenheit(38.12),
+            skinTemperature: coreBodyTemperature.celsiusToFahrenheit(38.47),
+        });
 
         const expected = {
             coreBodyTemperature: 38.12,
