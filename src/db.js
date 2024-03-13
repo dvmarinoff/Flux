@@ -351,6 +351,19 @@ xf.reg('app:start', async function(_, db) {
 function start () {
     console.log('start db');
     xf.dispatch('db:start');
+
+    // UI test
+    // setTimeout(function() {
+    //     xf.dispatch('watch:elapsed', 1);
+    //     xf.dispatch('power', 180);
+    //     xf.dispatch('cadence', 80);
+    //     xf.dispatch('heartRate', 130);
+    //     xf.dispatch('smo2', 83.17);
+    //     xf.dispatch('thb', 11.14);
+    //     xf.dispatch('coreBodyTemperature', 38.12);
+    //     xf.dispatch('skinTemperature', 38.47);
+    // }, 1000);
+    // end UI test
 }
 
 start();
