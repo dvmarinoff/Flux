@@ -43,6 +43,29 @@ function ReactiveConnectable(args = {}) {
     function onDisconnect() {
         xf.dispatch(`${getIdentifier()}:disconnected`);
         xf.dispatch(`${getIdentifier()}:name`, '--');
+
+        if(models.sources.isSource('power', getIdentifier())) {
+            xf.dispatch(`power`, 0);
+        }
+        if(models.sources.isSource('cadence', getIdentifier())) {
+            xf.dispatch(`cadence`, 0);
+        }
+        if(models.sources.isSource('speed', getIdentifier())) {
+            xf.dispatch(`speed`, 0);
+        }
+        if(models.sources.isSource('heartRate', getIdentifier())) {
+            xf.dispatch(`heartRate`, 0);
+        }
+        if(models.sources.isSource('smo2', getIdentifier())) {
+            xf.dispatch(`smo2`, 0);
+        }
+        if(models.sources.isSource('thb', getIdentifier())) {
+            xf.dispatch(`thb`, 0);
+        }
+        if(models.sources.isSource('coreBodyTemperature', getIdentifier())) {
+            xf.dispatch(`coreBodyTemperature`, 0);
+            xf.dispatch(`skinTemperature`, 0);
+        }
     }
 
     function onConnectFail() {
