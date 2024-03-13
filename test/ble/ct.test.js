@@ -1,16 +1,15 @@
 import { coreBodyTemperature } from '../../src/ble/ct/core-body-temperature.js';
-
-// [0b00010011, 3674, 3708, 0, 0, 130]
+import { dataviewToArray } from '../../src/functions.js';
 
 describe('Core Body Temperature', () => {
 
     test('coreBody temperature', () => {
         const dataview = coreBodyTemperature.encode({
-            coreBodyTemperature: 36.74,
+            coreBodyTemperature: 38.12,
         });
 
         const expected = {
-            coreBodyTemperature: 36.74,
+            coreBodyTemperature: 38.12,
         };
 
         const res = coreBodyTemperature.decode(dataview);
@@ -19,13 +18,36 @@ describe('Core Body Temperature', () => {
 
     test('coreBody + skin temperature', () => {
         const dataview = coreBodyTemperature.encode({
-            coreBodyTemperature: 36.74,
-            skinTemperature: 37.07,
+            coreBodyTemperature: 38.12,
+            skinTemperature: 38.47,
         });
 
+        console.log(dataview.buffer);
+        console.log(dataviewToArray(dataview));
+
         const expected = {
-            coreBodyTemperature: 36.74,
-            skinTemperature: 37.07,
+            coreBodyTemperature: 38.12,
+            skinTemperature: 38.47,
+        };
+
+        const res = coreBodyTemperature.decode(dataview);
+        expect(res).toEqual(expected);
+    });
+
+    test('all', () => {
+
+        const payload = [0b00010111, 228, 14, 7, 15, 0, 0, 0b00010011, 130];
+        const dataview = new DataView(new Uint8Array(payload).buffer);
+
+        console.log(dataview.buffer);
+        console.log(dataviewToArray(dataview));
+
+        const expected = {
+            coreBodyTemperature: 38.12,
+            skinTemperature: 38.47,
+            coreReserved: 0,
+            qualityAndState: 19,
+            heartRate: 130,
         };
 
         const res = coreBodyTemperature.decode(dataview);
