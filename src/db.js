@@ -61,6 +61,7 @@ let db = {
     records: [],
     lap: [],
     laps: [],
+    events: [],
     lapStartTime: false,
 
     // Watch
@@ -277,6 +278,8 @@ xf.reg('activity:save:success', (e, db) => {
     // file:download:activity
     // reset db session:
     db.records = [];
+    db.events = [];
+    db.laps = [];
     db.resistanceTarget = 0;
     db.slopeTarget = 0;
     db.powerTarget = 0;

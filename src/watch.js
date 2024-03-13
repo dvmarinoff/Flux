@@ -1,7 +1,8 @@
-import { equals, exists, existance, first, last, xf, avg, max } from './functions.js';
+import { equals, exists, empty, first, last, xf, avg, max } from './functions.js';
 import { kphToMps, mpsToKph, timeDiff } from './utils.js';
 import { models } from './models/models.js';
 import { Status, ControlMode, } from './ble/enums.js';
+import { EventType } from './activity/enums.js';
 
 // const timer = new Worker('./timer.js');
 const timer = new Worker(new URL('./timer.js', import.meta.url));
@@ -69,6 +70,11 @@ class Watch {
             // self.timer = setInterval(self.onTick.bind(self), 1000);
             timer.postMessage('start');
             xf.dispatch('watch:started');
+
+            xf.dispatch('watch:event', {
+                timestamp: Date.now(),
+                type: EventType.start,
+            });
         }
     }
     startWorkout() {
@@ -115,13 +121,22 @@ class Watch {
             // self.timer = setInterval(self.onTick.bind(self), 1000);
             timer.postMessage('start');
             xf.dispatch('watch:started');
+
+            xf.dispatch('watch:event', {
+                timestamp: Date.now(),
+                type: EventType.start,
+            });
         }
     }
     pause() {
         const self = this;
-        // clearInterval(self.timer);
         timer.postMessage('pause');
         xf.dispatch('watch:paused');
+
+        xf.dispatch('watch:event', {
+            timestamp: Date.now(),
+            type: EventType.stop,
+        });
     }
     stop() {
         const self = this;
@@ -130,6 +145,11 @@ class Watch {
             timer.postMessage('stop');
 
             xf.dispatch('watch:stopped');
+
+            xf.dispatch('watch:event', {
+                timestamp: Date.now(),
+                type: EventType.stop,
+            });
 
             if(self.isWorkoutStarted()) {
                 xf.dispatch('workout:stopped');
@@ -141,8 +161,8 @@ class Watch {
                 xf.dispatch('watch:intervalIndex', 0);
                 xf.dispatch('watch:stepIndex',     0);
             }
-            xf.dispatch('watch:elapsed',       0);
-            xf.dispatch('watch:lapTime',       0);
+            xf.dispatch('watch:elapsed', 0);
+            xf.dispatch('watch:lapTime', 0);
         }
     }
     onTick() {
@@ -364,6 +384,12 @@ xf.reg('watch:lap', (x, db) => {
         db.lap = [];
     }
     db.lapStartTime = timeEnd + 0;
+});
+
+xf.reg('watch:event', (x, db) => {
+    if(!empty(db.events) && equals(last(db.events).type, x.type)) return;
+
+    db.events.push(x);
 });
 
 const watch = new Watch();

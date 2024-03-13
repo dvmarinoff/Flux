@@ -513,14 +513,20 @@ class Workout extends Model {
     toFitLaps(db) {
         return db.laps;
     }
+    toFitEvents(db) {
+        return db.events;
+    }
     encode(db) {
         const self = this;
+
         const records = self.toFitRecords(db);
         const laps = self.toFitLaps(db);
+        const events = self.toFitEvents(db);
 
         return fit.localActivity.encode({
             records,
             laps,
+            events,
         });
     }
     download(activity) {
@@ -646,6 +652,7 @@ function Session(args = {}) {
             // Recording
             records: db.records,
             laps: db.laps,
+            events: db.events,
             lap: db.lap,
             distance: db.distance,
             altitude: db.altitude,
