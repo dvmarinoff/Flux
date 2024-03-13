@@ -62,6 +62,7 @@ const characteristics = {
 
     // CoreTemp
     coreBodyTemp:                  '00002101-5b1e-4347-b07c-97b514dae121',
+    corePrivate:                   '00004200-f366-40b2-ac37-70cce0aa83b1',
 
     // others
     sensorLocation:                    '00002a5d-0000-1000-8000-00805f9b34fb',
@@ -110,7 +111,10 @@ function Filters() {
 
     function coreTemp() {
         return {
-            filters: [{services: [uuids.coreTemp]}],
+            filters: [
+                {services: [uuids.coreTemp]},
+                {services: [uuids.corePrivate]},
+            ],
         };
     }
 
