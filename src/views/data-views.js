@@ -376,6 +376,40 @@ class THbValue extends DataView {
 customElements.define('thb-value', THbValue);
 
 
+class CoreBodyTemperatureValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:coreBodyTemperature',
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    transform(state) {
+        return toFixed(state, 2);
+    }
+}
+
+customElements.define('core-body-temperature-value', CoreBodyTemperatureValue);
+
+
+class SkinTemperatureValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:skinTemperature',
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    transform(state) {
+        return toFixed(state, 2);
+    }
+}
+
+customElements.define('skin-temperature-value', SkinTemperatureValue);
+
+
 class WorkoutName extends DataView {
     getDefaults() {
         return {
@@ -910,6 +944,10 @@ class DataTileSwitchGroup extends SwitchGroup {
         this.$slope    = document.querySelector('#data-tile--slope');     // tab 1
         this.$smo2     = document.querySelector('#data-tile--smo2');      // tab 2
         this.$thb      = document.querySelector('#data-tile--thb');       // tab 2
+        this.$coreBodyTemperature =
+            document.querySelector('#data-tile--core-body-temperature');  // tab 3
+        this.$skinTemperature =
+            document.querySelector('#data-tile--skin-temperature');       // tab 3
 
         this.renderEffect(this.state);
     }
@@ -917,24 +955,19 @@ class DataTileSwitchGroup extends SwitchGroup {
         if(equals(state, 0)) {
             this.$speed.classList.add('active');
             this.$distance.classList.add('active');
+            this.$slope.classList.add('active');
+            this.$powerAvg.classList.add('active');
 
             this.$smo2.classList.remove('active');
             this.$thb.classList.remove('active');
-            this.$powerAvg.classList.remove('active');
-            this.$slope.classList.remove('active');
+            this.$coreBodyTemperature.classList.remove('active');
+            this.$skinTemperature.classList.remove('active');
         }
         if(equals(state, 1)) {
-            this.$powerAvg.classList.add('active');
-            this.$slope.classList.add('active');
-
-            this.$speed.classList.remove('active');
-            this.$distance.classList.remove('active');
-            this.$smo2.classList.remove('active');
-            this.$thb.classList.remove('active');
-        }
-        if(equals(state, 2)) {
             this.$smo2.classList.add('active');
             this.$thb.classList.add('active');
+            this.$coreBodyTemperature.classList.add('active');
+            this.$skinTemperature.classList.add('active');
 
             this.$speed.classList.remove('active');
             this.$distance.classList.remove('active');
