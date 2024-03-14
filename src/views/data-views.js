@@ -377,16 +377,38 @@ customElements.define('thb-value', THbValue);
 
 
 class CoreBodyTemperatureValue extends DataView {
+    postInit() {
+        this.measurement = this.getDefaults().measurement;
+    }
     getDefaults() {
         return {
             prop: 'db:coreBodyTemperature',
+            measurement: 'metric',
         };
     }
     subs() {
         xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        xf.sub(`db:measurement`, this.onMeasurement.bind(this), this.signal);
+    }
+    onMeasurement(measurement) {
+        this.measurement = measurement;
+    }
+    celsiusToFahrenheit(celsius) {
+        return Math.round(((celsius * 9/5) + 32) * 100) / 100;
+    }
+    format(temperature, measurement = 'metric') {
+        if(equals(measurement, 'imperial')) {
+            return this.celsiusToFahrenheit(temperature);
+        }
+
+        if(equals(measurement, 'metric')) {
+            return toFixed(temperature);
+        }
+
+        return toFixed(temperature);
     }
     transform(state) {
-        return toFixed(state, 2);
+        return this.format(state, this.measurement);
     }
 }
 
