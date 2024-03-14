@@ -536,6 +536,7 @@ function Connectable(args = {}) {
             let res = await services.hrs.setup();
 
             // NOTE: we don't return here because the Tickr X has a CSC service too
+            if(!hasCadence) return res;
         }
 
         if(hasCadence) {
