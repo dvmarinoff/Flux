@@ -182,12 +182,12 @@ class Sources extends Model {
             cadence:      'ble:controllable',
             speed:        'ble:controllable',
             control:      'ble:controllable',
-            heartRate:    'ble:hrm',
-            virtualState: 'power',
+            heartRate:    'ble:heartRateMonitor',
             smo2:         'ble:smo2',
             thb:          'ble:smo2',
             coreBodyTemperature: 'ble:coreTemp',
             skinTemperature:     'ble:coreTemp',
+            virtualState: 'power',
         };
         return sources;
     }
