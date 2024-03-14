@@ -1,8 +1,8 @@
 import { equals, exists, empty, first, last, xf, avg, max } from './functions.js';
 import { kphToMps, mpsToKph, timeDiff } from './utils.js';
 import { models } from './models/models.js';
-import { Status, ControlMode, } from './ble/enums.js';
-import { EventType } from './activity/enums.js';
+import { ControlMode, } from './ble/enums.js';
+import { TimerStatus, EventType, } from './activity/enums.js';
 
 // const timer = new Worker('./timer.js');
 const timer = new Worker(new URL('./timer.js', import.meta.url));
@@ -334,6 +334,11 @@ xf.reg('watch:paused',  (x, db) => db.watchStatus = 'paused');
 xf.reg('watch:stopped', (x, db) => db.watchStatus = 'stopped');
 
 xf.reg('watch:elapsed', (x, db) => {
+    if(equals(db.watchStatus, TimerStatus.stopped)) {
+        db.elapsed   = x;
+        return;
+    };
+
     db.elapsed   = x;
 
     const speed = equals(db.sources.virtualState, 'speed') ?

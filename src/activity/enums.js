@@ -11,13 +11,6 @@ const TimerAction = {
     pause: 'pause',
 };
 
-const RideStatus = {
-    stopped: 'stopped',
-    started: 'started',
-    paused: 'paused',
-    stopping: 'stopping',
-};
-
 const EventType = {
     start: 'start',
     stop: 'stop',
@@ -26,7 +19,6 @@ const EventType = {
 export {
     TimerStatus,
     TimerAction,
-    RideStatus,
     EventType,
 };
 
