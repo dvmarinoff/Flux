@@ -266,6 +266,8 @@ body {
     --white-gray:  #F7F7FA;
     --red-logo:    #E50914;
 
+    --progress-orange: rgba(255, 166, 0, 0.335);
+
     --black-opacity-01:  rgba(0,0,0, 0.1);
     --black-opacity-02:  rgba(0,0,0, 0.2);
     --white-opacity-01:  rgba(255,255,255, 0.1);
@@ -814,7 +816,7 @@ div.graph--bar-group {
     white-space: nowrap;
     background-color: var(--white);
     border-radius: 0.2em;
-    z-index: 1;
+    z-index: 2;
 }
 
 #workout-list svg.graph--bar-group {
@@ -942,6 +944,10 @@ div.graph--bar-group {
     left: 0;
     width: 0px;
     height: var(--graph-height);
+    background: var(--progress-orange);
+    border-right: 2px solid var(--zone-orange);;
+    z-index: 1;
+    pointer-events: none;
 }
 
 #progress-active {
@@ -954,6 +960,7 @@ div.graph--bar-group {
     width: 0px;
     height: var(--graph-height);
     z-index: 1;
+    pointer-events: none;
 }
 /* END Graphs */
 

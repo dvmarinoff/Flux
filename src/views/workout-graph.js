@@ -128,6 +128,7 @@ class WorkoutGraph extends HTMLElement {
         xf.sub('db:intervalIndex', this.onIntervalIndex.bind(this), this.signal);
         xf.sub('db:distance', this.onDistance.bind(this), this.signal);
         xf.sub('db:page', this.onPage.bind(this), this.signal);
+        xf.sub('db:lapTime', this.onLapTime.bind(this), this.signal)
 
         this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
         this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
@@ -206,7 +207,7 @@ class WorkoutGraph extends HTMLElement {
     onIntervalIndex(index) {
         const self = this;
         this.index = index;
-        this.progress({index: self.index, dom: self.dom, parent: self,});
+        this.progress({index: self.index, dom: self.dom, parent: self, lapTime: self.lapTime});
     }
     onDistance(distance) {
         const self = this;
@@ -223,16 +224,25 @@ class WorkoutGraph extends HTMLElement {
         }
         return;
     }
+    onLapTime(lapTime) {
+        const self = this;
+        this.lapTime = lapTime;
+        this.progress({index: self.index, dom: self.dom, parent: self, lapTime: self.lapTime});
+    }
     progress(args = {}) {
-        const index   = args.index ?? 0;
-        const $dom    = args.dom;
-        const $parent = args.parent;
-        const rect    = $dom.intervals[index].getBoundingClientRect();
-        const left    = rect.left - $parent.getBoundingClientRect().left;
+        const index                 = args.index ?? 0;
+        const lapTime               = args.lapTime ?? this.workout.intervals[index].duration;
+        const $dom                  = args.dom;
+        const $parent               = args.parent;
+        const rect                  = $dom.intervals[index].getBoundingClientRect();
+        const left                  = rect.left - $parent.getBoundingClientRect().left;
+        const lapPercentageComplete = 1 - (lapTime / this.workout.intervals[index].duration);
 
         $dom.active.style.left   = `${left}px`;
         $dom.active.style.width  = `${rect.width}px`;
         $dom.active.style.height = `${$parent.getBoundingClientRect().height}px`;
+
+        $dom.progress.style.width = `${left + (rect.width * lapPercentageComplete)}px`;
     }
     render() {
         const self = this;
@@ -248,7 +258,7 @@ class WorkoutGraph extends HTMLElement {
             this.dom.intervals = this.querySelectorAll('.graph--bar-group');
             this.dom.steps     = this.querySelectorAll('.graph--bar');
 
-            this.progress({index: self.index, dom: self.dom, parent: self,});
+            this.progress({index: self.index, dom: self.dom, parent: self, lapTime: self.lapTime});
         }
 
         if(equals(this.type, 'course')) {
