@@ -247,12 +247,12 @@ function Connectable(args = {}) {
         });
     }
 
-    // String => Bool
+    // String -> Bool
     function hasService(uuid) {
         return uuid in _primaryServices;
     }
 
-    // String => BluetoothRemoteGATTService?
+    // String -> BluetoothRemoteGATTService?
     function getService(uuid) {
         return _primaryServices[uuid];
     }
