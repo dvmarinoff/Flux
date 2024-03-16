@@ -1359,16 +1359,27 @@ div.graph--bar-group {
 }
 
 .laps--cont {
-    margin: 2em auto 4em;
+    margin: 0em auto 4em;
 }
 
 .lap--item {
     border-bottom: 1px solid var(--white-opacity-01);
 }
 
+.laps--header {
+    display: grid;
+    grid-template-columns: 2em repeat(8, 1fr);
+    justify-items: center;
+    align-items: center;
+    padding: 0 1em;
+    height: 2em;
+    margin: 4em auto 0;
+    max-width: var(--inner-max-width);
+}
+
 .lap--item--inner {
     display: grid;
-    grid-template-columns: 2em repeat(4, 1fr);
+    grid-template-columns: 2em repeat(8, 1fr);
     justify-items: center;
     align-items: center;
     padding: 0 1em;

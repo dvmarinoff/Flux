@@ -1,4 +1,4 @@
-import { equals, exists, empty, first, last, xf, avg, max } from './functions.js';
+import { equals, exists, empty, first, last, xf, avg, max, toFixed, } from './functions.js';
 import { kphToMps, mpsToKph, timeDiff } from './utils.js';
 import { models } from './models/models.js';
 import { ControlMode, } from './ble/enums.js';
@@ -385,6 +385,10 @@ xf.reg('watch:lap', (x, db) => {
             maxPower:         max(db.lap, 'power'),
             avgCadence:       Math.round(avg(db.lap, 'cadence')),
             avgHeartRate:     Math.round(avg(db.lap, 'heart_rate')),
+            saturated_hemoglobin_percent: toFixed(avg(db.lap, 'saturated_hemoglobin_percent'), 2),
+            total_hemoglobin_conc: toFixed(avg(db.lap, 'total_hemoglobin_conc'), 2),
+            core_temperature: toFixed(avg(db.lap, 'core_temperature'), 2),
+            skin_temperature: toFixed(avg(db.lap, 'skin_temperature'), 2)
         });
         db.lap = [];
     }
