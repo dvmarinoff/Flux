@@ -15,7 +15,8 @@ let db = {
     sources: models.sources.default,
     smo2: models.smo2.default,
     thb: models.thb.default,
-    coreBodyTemperature: 0x7FFF,
+    coreBodyTemperature: 0,
+    skinTemperature: 0,
     position_lat: 0,
     position_long: 0,
 
