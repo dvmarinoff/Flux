@@ -377,7 +377,7 @@ xf.reg('watch:lap', (x, db) => {
     let elapsed   = timeDiff(timeStart, timeEnd);
 
     if(elapsed > 0) {
-        db.laps.push({
+        const lap = {
             timestamp:        timeEnd,
             start_time:       timeStart,
             totalElapsedTime: elapsed,
@@ -389,7 +389,9 @@ xf.reg('watch:lap', (x, db) => {
             total_hemoglobin_conc: toFixed(avg(db.lap, 'total_hemoglobin_conc'), 2),
             core_temperature: toFixed(avg(db.lap, 'core_temperature'), 2),
             skin_temperature: toFixed(avg(db.lap, 'skin_temperature'), 2)
-        });
+        };
+
+        db.laps.push(lap);
         db.lap = [];
     }
     db.lapStartTime = timeEnd + 0;
