@@ -266,7 +266,7 @@ body {
     --white-gray:  #F7F7FA;
     --red-logo:    #E50914;
 
-    --progress-orange: rgba(255, 166, 0, 0.335);
+    --progress-white: #fff4;
 
     --black-opacity-01:  rgba(0,0,0, 0.1);
     --black-opacity-02:  rgba(0,0,0, 0.2);
@@ -400,7 +400,7 @@ body {
 }
 
 #progress-active {
-    background-color: var(--white-opacity-03);
+    background-color: transparent;
 }
 .radio {
     fill: var(--white);
@@ -944,8 +944,8 @@ div.graph--bar-group {
     left: 0;
     width: 0px;
     height: var(--graph-height);
-    background: var(--progress-orange);
-    border-right: 2px solid var(--zone-orange);;
+    background: var(--progress-white);
+    border-right: 1px solid var(--zone-orange);
     z-index: 1;
     pointer-events: none;
 }
