@@ -3,6 +3,8 @@
 // 4.9 Indoor Bike Data (characteristic)
 //
 
+import { equals, getUint24LE, } from '../../functions.js';
+
 const speedPresent               = (flags) => ((flags >>  0) & 1) === 0;
 const avgSpeedPresent            = (flags) => ((flags >>  1) & 1) === 1;
 const cadencePresent             = (flags) => ((flags >>  2) & 1) === 1;
@@ -21,9 +23,9 @@ const fields = {
     Flags:                 {resolution: 1,    unit: 'bit',      size: 2, type: 'Uint16', present: (_ => true),                                   },
     InstantaneousSpeed:    {resolution: 0.01, unit: 'kph',      size: 2, type: 'Uint16', present: speedPresent,               short: 'speed',    },
     AverageSpeed:          {resolution: 0.01, unit: 'kph',      size: 2, type: 'Uint16', present: avgSpeedPresent,                               },
-    InstantaneousCadence: {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: cadencePresent,             short: 'cadence',  },
-    AverageCadence:       {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: avgCadencePresent,                             },
-    TotalDistance:         {resolution: 1,    unit: 'm',        size: 3, type: 'Uint24', present: distancePresent,                               },
+    InstantaneousCadence:  {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: cadencePresent,             short: 'cadence',  },
+    AverageCadence:        {resolution: 0.5,  unit: 'rpm',      size: 2, type: 'Uint16', present: avgCadencePresent,                             },
+    TotalDistance:         {resolution: 1,    unit: 'm',        size: 3, type: 'Uint24', present: distancePresent,            short: 'distance'  },
     ResistanceLevel:       {resolution: 1,    unit: 'unitless', size: 2, type: 'Uint16', present: resistancePresent,                             },
     InstantaneousPower:    {resolution: 1,    unit: 'W',        size: 2, type: 'Uint16', present: powerPresent,               short: 'power',    },
     AveragePower:          {resolution: 1,    unit: 'W',        size: 2, type: 'Uint16', present: avgPowerPresent,                               },
@@ -59,6 +61,9 @@ function IndoorBikeData(args = {}) {
     const architecture = true;
 
     function getField(field, dataview, i) {
+        if(equals(field.type, 'Uint24')) {
+            return getUint24LE(dataview, i) * field.resolution;
+        }
         return dataview[`get${field.type}`](i, architecture) * field.resolution;
     }
 

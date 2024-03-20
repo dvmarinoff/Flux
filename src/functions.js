@@ -595,6 +595,7 @@ function getUint24LE(dataview, index = 0) {
 
     return (MSB << 16) + (MB << 8) + LSB;
 }
+
 function Spec(args = {}) {
     const definitions = expect(args.definitions);
 
@@ -630,7 +631,7 @@ function Spec(args = {}) {
 
 // print
 function Print() {
-    let printLog = false;
+    let printLog = true;
     let printWarn = true;
 
     function log(msg) {
