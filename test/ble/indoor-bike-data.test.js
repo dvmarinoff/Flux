@@ -33,6 +33,9 @@ describe('Indoor Bike Data', () => {
     });
 
     test('speed-cadence-distance-power-heartRate', () => {
+        // ['0x54', '0x02', '0xCA', '0x0C', '0xA0', '0x00', '0xD3', '0xA4', '0x00', '0x2C', '0x01', '0x8F']
+        // '0x 54 02 CA 0C A0 00 D3 A4 00 2C 01 8F'
+
         const view = new DataView(
             new Uint8Array([
                 84, 2,       // flags, 0b1001010100
