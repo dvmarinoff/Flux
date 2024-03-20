@@ -631,7 +631,7 @@ function Spec(args = {}) {
 
 // print
 function Print() {
-    let printLog = true;
+    let printLog = false;
     let printWarn = true;
 
     function log(msg) {
