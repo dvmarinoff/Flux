@@ -1,4 +1,4 @@
-import { equals, exists, first, compose2, time, print, } from '../functions.js';
+import { equals, exists, first, expect, compose2, time, print, } from '../functions.js';
 import { Characteristic } from './characteristic.js';
 import { Service, serviceToString, gattListToObject, } from './service.js';
 import FTMS from './ftms/ftms.js';
@@ -341,7 +341,8 @@ function Connectable(args = {}) {
         } catch(e) {
             _connected = false;
             _status = Status.disconnected;
-            onConnectFail();
+            onConnectFail(e);
+            console.warn(e);
         }
     }
 
@@ -553,7 +554,9 @@ function Connectable(args = {}) {
             });
             let res = await services.hrs.setup();
 
-            // NOTE: we don't return here because the Tickr X has a CSC service too
+            // NOTE: we don't return here because:
+            // - the Tickr X has a CSC service too
+            // - the Zwift Hub has FTMS
             if(!hasCadence) return res;
         }
 
@@ -581,6 +584,29 @@ function Connectable(args = {}) {
         console.warn(`ble: connectable: setup: ${getName()} fail: 'this device doesn't have a supported service!`);
 
         return false;
+    }
+
+    async function setupService(args = {}) {
+        const name   = expect(
+            args.name,
+            'connectable.setupService needs name: String'
+        );
+        const struct = expect(
+            args.struct,
+            `connectable.setupService needs struct: Function.`
+        );
+        const uuid   = expect(
+            args.uuid,
+            `connectable.setupService needs service uuid: UUID.`
+        );
+
+        services[name] = struct({
+            service: getService(uuid),
+            onData: onData,
+        });
+
+        let res = await services[name].setup();
+        return res;
     }
 
     // expose public methods and properties
