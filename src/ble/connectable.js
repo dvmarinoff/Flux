@@ -1,4 +1,4 @@
-import { exists, first, compose2, time, print, } from '../functions.js';
+import { equals, exists, first, compose2, time, print, } from '../functions.js';
 import { Characteristic } from './characteristic.js';
 import { Service, serviceToString, gattListToObject, } from './service.js';
 import FTMS from './ftms/ftms.js';
@@ -282,6 +282,10 @@ function Connectable(args = {}) {
     //   recover devices that have droped.
     //
     async function connect(args = {}) {
+        if(equals(getStatus(), Status.connecting) ||
+           equals(getStatus(), Status.connected)) return;
+
+
         const requesting = args.requesting ?? false;
         const watching = args.watching ?? false;
 
