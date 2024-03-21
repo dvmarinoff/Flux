@@ -1,4 +1,69 @@
-import { equals, exists, Spec, hex, dataviewToArray, print, } from '../../functions.js';
+import { equals, exists, toFixed, Spec, hex, dataviewToArray, print, } from '../../functions.js';
+
+function RequestControl() {
+    const opCode = 0x20; // 32
+    const length = 3;
+    const unlockCode = [0xEE, 0xFC];
+
+    function encode() {
+        // [0x20, 0xEE, 0xFC]
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+        view.setUint8(0, opCode,        true);
+        view.setUint8(1, unlockCode[0], true);
+        view.setUint8(2, unlockCode[1], true);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, true);
+        const unlockCode = [
+            dataview.getUint8(1, true),
+            dataview.getUint8(2, true),
+        ];
+        return { opCode, unlockCode };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        encode,
+        decode
+    });
+}
+
+function SetERG() {
+    const opCode = 0x42;
+    const length = 3;
+
+    const definitions = {
+        power: {resolution: 1, unit: 'W', size: 2, min: 0, max: 65534, default: 0},
+    };
+
+    const spec = Spec({definitions});
+
+    // {power: Int} -> ArrayBuffer
+    function encode(args = {}) {
+        const power = spec.encodeField('power', args.power);
+
+        const view = new DataView(new ArrayBuffer(length));
+
+        print.log(`tx: wcps: setERG: ${args.power}`);
+
+        view.setUint8( 0, opCode, true);
+        view.setUint16(1, power,  true);
+
+        return view.buffer;
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        encode,
+    });
+}
 
 function Grade() {
     // set Sim Grade
@@ -28,7 +93,7 @@ function Grade() {
     }
 
     function removeOffset(prop, value) {
-        return format((((value / 32768) - 1) * 100), 10);
+        return toFixed((((value / 32768) - 1) * 100), 1);
     }
 
     function encode(args = {}) {
@@ -47,68 +112,13 @@ function Grade() {
 
     function decode(dataview) {
         const opCode = dataview.getUint8(0, true);
-        const grade  = spec.decodeField('grade', dataview.getUint16(1, true), removeOffset);
+        const grade  = spec.decodeField(
+            'grade',
+            dataview.getUint16(1, true),
+            removeOffset
+        );
 
         return { grade };
-    }
-
-    return Object.freeze({
-        opCode,
-        length,
-        definitions,
-        encode,
-        decode
-    });
-}
-
-function WindSpeed() {
-    // set Wind Speed
-    const opCode = 0x47; // 71
-    const length = 3;
-
-    // Format ????
-    // int value = (int)((windSpeed + 32.768) * 1000.0);
-
-    const definitions = {
-        windSpeed: {
-            resolution: 1,
-            unit: 'mps',
-            size: 2,
-            min: applyOffset(-35.56),
-            max: applyOffset(35.56),
-            default: applyOffset(0)
-        },
-    };
-
-    const spec = Spec({definitions});
-
-    function applyOffset(value) {
-        return (value + 32.768) * 1000;
-    }
-
-    function removeOffset(prop, value) {
-        return format(((value / 1000) - 32.768), 100);
-    }
-
-    function encode(args = {}) {
-        const windSpeed = spec.encodeField('windSpeed', args.windSpeed, applyOffset);
-
-        const buffer = new ArrayBuffer(length);
-        const view   = new DataView(buffer);
-
-        view.setUint8( 0, opCode, true);
-        view.setUint16(1, windSpeed, true);
-
-        print.log(`tx: wcps: windSpeed: ${windSpeed}`);
-
-        return view.buffer;
-    }
-
-    function decode(dataview) {
-        const opCode = dataview.getUint8(0, true);
-        const windSpeed = spec.decodeField('windSpeed', dataview.getUint16(1, true), removeOffset);
-
-        return { windSpeed };
     }
 
     return Object.freeze({
@@ -174,6 +184,70 @@ function SIM() {
     });
 }
 
+
+function WindSpeed() {
+    // set Wind Speed
+    const opCode = 0x47; // 71
+    const length = 3;
+
+    // Format ????
+    // int value = (int)((windSpeed + 32.768) * 1000.0);
+
+    const definitions = {
+        windSpeed: {
+            resolution: 1,
+            unit: 'mps',
+            size: 2,
+            min: applyOffset(-35.56),
+            max: applyOffset(35.56),
+            default: applyOffset(0)
+        },
+    };
+
+    const spec = Spec({definitions});
+
+    function applyOffset(value) {
+        return (value + 32.768) * 1000;
+    }
+
+    function removeOffset(prop, value) {
+        return toFixed(((value / 1000) - 32.768), 2);
+    }
+
+    function encode(args = {}) {
+        const windSpeed = spec.encodeField('windSpeed', args.windSpeed, applyOffset);
+
+        const buffer = new ArrayBuffer(length);
+        const view   = new DataView(buffer);
+
+        view.setUint8( 0, opCode, true);
+        view.setUint16(1, windSpeed, true);
+
+        print.log(`tx: wcps: windSpeed: ${windSpeed}`);
+
+        return view.buffer;
+    }
+
+    function decode(dataview) {
+        const opCode = dataview.getUint8(0, true);
+        const windSpeed = spec.decodeField(
+            'windSpeed',
+            dataview.getUint16(1, true),
+            removeOffset
+        );
+
+        return { windSpeed };
+    }
+
+    return Object.freeze({
+        opCode,
+        length,
+        definitions,
+        encode,
+        decode
+    });
+}
+
 function WheelCircumference() {
     // set Wind Speed
     const opCode = 0x48; // 72
@@ -225,38 +299,6 @@ function WheelCircumference() {
     });
 }
 
-function SetERG() {
-    const opCode = 0x42;
-    const length = 3;
-
-    const definitions = {
-        power: {resolution: 1, unit: 'W', size: 2, min: 0, max: 65534, default: 0},
-    };
-
-    const spec = Spec({definitions});
-
-    // {power: Int} -> ArrayBuffer
-    function encode(args = {}) {
-        const power = spec.encodeField('power', args.power);
-
-        const view = new DataView(new ArrayBuffer(length));
-
-        print.log(`tx: wcps: setERG: ${args.power}`);
-
-        view.setUint8( 0, opCode, true);
-        view.setUint16(0, power,  true);
-
-        return view.buffer;
-    }
-
-    return Object.freeze({
-        opCode,
-        length,
-        definitions,
-        encode,
-    });
-}
-
 function LoadIntensity() {
     // set Load Intensity
     const opCode = 0x40; // 64
@@ -285,7 +327,7 @@ function LoadIntensity() {
     }
 
     function removeOffset(prop, value) {
-        return format((1 - (value / 16383)), 100);
+        return toFixed((1 - (value / 16383)), 2);
     }
 
     function encode(args = {}) {
@@ -364,39 +406,6 @@ function LoadLevel() {
         opCode,
         length,
         definitions,
-        encode,
-        decode
-    });
-}
-
-function RequestControl() {
-    const opCode = 0x20; // 32
-    const length = 3;
-    const unlockCode = [0xEE, 0xFC];
-
-    function encode() {
-        // [0x20, 0xEE, 0xFC]
-        const buffer = new ArrayBuffer(length);
-        const view   = new DataView(buffer);
-        view.setUint8(0, opCode,        true);
-        view.setUint8(1, unlockCode[0], true);
-        view.setUint8(2, unlockCode[1], true);
-
-        return view.buffer;
-    }
-
-    function decode(dataview) {
-        const opCode = dataview.getUint8(0, true);
-        const unlockCode = [
-            dataview.getUint8(1, true),
-            dataview.getUint8(2, true),
-        ];
-        return { opCode, unlockCode };
-    }
-
-    return Object.freeze({
-        opCode,
-        length,
         encode,
         decode
     });
@@ -487,11 +496,6 @@ function Response() {
     });
 }
 
-function format(v) {
-    v.avg = Math.floor(v.avg);
-    return v;
-}
-
 const control = {
     grade:              Grade(),
     windSpeed:          WindSpeed(),
@@ -499,6 +503,7 @@ const control = {
     wheelCircumference: WheelCircumference(),
     setERG:             SetERG(),
     loadIntensity:      LoadIntensity(),
+    loadLevel:          LoadLevel(),
     requestControl:     RequestControl(),
     response:           Response(),
 };

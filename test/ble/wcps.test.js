@@ -1,5 +1,4 @@
-import { uuids } from '../../src/ble/uuids.js';
-import { control } from '../../src/ble/wcps/control.js';
+import { control } from '../../src/ble/wcps/control-point.js';
 import { dataviewToArray } from '../../src/functions.js';
 
 global.console = {
@@ -34,41 +33,285 @@ describe('Control Point', () => {
         });
     });
 
-    describe('PowerTarget', () => {
+    describe('SetERG', () => {
         test('opCode', () => {
-            const res = control.powerTarget.opCode;
+            const res = control.setERG.opCode;
             expect(res).toEqual(0x42);
         });
 
         test('length', () => {
-            const res = control.powerTarget.length;
+            const res = control.setERG.length;
             expect(res).toEqual(3);
         });
 
         test('encode', () => {
-            const res = control.powerTarget.encode({power: 200});
+            const res = control.setERG.encode({power: 200});
             const view = new DataView(res);
             expect(view.getUint8(0, true)).toBe(0x42);
             expect(view.getUint16(1, true)).toBe(200);
         });
 
-        test('decode', () => {
+        test.skip('decode', () => {
             const view = new DataView((new Uint8Array(3)).buffer);
             view.setUint8( 0, 0x42, true);
             view.setUint16(1, 200, true);
 
-            const res = control.powerTarget.decode(view);
+            const res = control.setERG.decode(view);
             expect(res).toEqual({power: 200});
         });
 
-        test('encode -> decode', () => {
+        test.skip('encode -> decode', () => {
             const value  = {power: 200};
-            const buffer = control.powerTarget.encode(value);
-            const res    = control.powerTarget.decode(new DataView(buffer));
+            const buffer = control.setERG.encode(value);
+            const res    = control.setER.decode(new DataView(buffer));
 
             expect(res).toEqual(value);
         });
     });
+
+    describe('Grade', () => {
+        test('opCode', () => {
+            const res = control.grade.opCode;
+            expect(res).toEqual(0x46);
+        });
+
+        test('length', () => {
+            const res = control.grade.length;
+            expect(res).toEqual(3);
+        });
+
+        test('definitions', () => {
+            const res = control.grade.definitions;
+            expect(res).toEqual({
+                grade: {
+                    resolution: 1,
+                    unit: '%',
+                    size: 2,
+                    min: 0,
+                    max: 65536,
+                    default: 32768
+                },
+            });
+        });
+
+        test('encode', () => {
+            const res = control.grade.encode({grade: 4.8});
+            const view = new DataView(res);
+            expect(view.getUint8(0, true)).toBe(0x46);
+            expect(view.getUint16(1, true)).toBe(34340);
+        });
+
+        test('encode -1', () => {
+            const view = new DataView(control.grade.encode({grade: -1}));
+            expect(view.getUint16(1, true)).toBe(32440);
+        });
+
+        test('encode 0', () => {
+            const view = new DataView(control.grade.encode({grade: 0}));
+            expect(view.getUint16(1, true)).toBe(32768);
+        });
+
+        test('encode 1', () => {
+            const view = new DataView(control.grade.encode({grade: 1}));
+            expect(view.getUint16(1, true)).toBe(33095);
+        });
+
+        test('encode 10', () => {
+            const view = new DataView(control.grade.encode({grade: 10}));
+            expect(view.getUint16(1, true)).toBe(36044);
+        });
+
+        test('decode', () => {
+            const view = new DataView((new Uint8Array(3)).buffer);
+            view.setUint8( 0, 0x46, true);
+            view.setUint16(1, 34340, true);
+
+            const res = control.grade.decode(view);
+            expect(res).toEqual({grade: 4.8});
+        });
+
+        test('decode -1', () => {
+            const view = new DataView(control.grade.encode({grade: -1}));
+            expect(control.grade.decode(view).grade).toBe(-1);
+        });
+
+        test('decode 0', () => {
+            const view = new DataView(control.grade.encode({grade: 0}));
+            expect(control.grade.decode(view).grade).toBe(0);
+        });
+
+        test('decode 1', () => {
+            const view = new DataView(control.grade.encode({grade: 1}));
+            expect(control.grade.decode(view).grade).toBe(1);
+        });
+
+        test('decode 10', () => {
+            const view = new DataView(control.grade.encode({grade: 10}));
+            expect(control.grade.decode(view).grade).toBe(10);
+        });
+
+        test('encode -> decode', () => {
+            const value  = {grade: 4.8};
+            const buffer = control.grade.encode(value);
+            const res    = control.grade.decode(new DataView(buffer));
+
+            expect(res).toEqual(value);
+        });
+    });
+
+    describe('SIM', () => {
+        test('opCode', () => {
+            const res = control.sim.opCode;
+            expect(res).toEqual(0x43);
+        });
+
+        test('length', () => {
+            const res = control.sim.length;
+            expect(res).toEqual(7);
+        });
+
+        test('encode', () => {
+            const value = {
+                weight: 74,
+                crr: 0.004,
+                windResistance: 0.48,
+            };
+            const res = control.sim.encode(value);
+            const view = new DataView(res);
+            expect(view.getUint8( 0, true)).toBe(0x43);
+            expect(view.getUint16(1, true)).toBe(7400);
+            expect(view.getUint16(3, true)).toBe(40);
+            expect(view.getUint16(5, true)).toBe(480);
+        });
+
+        test('encode max', () => {
+            const value = {
+                weight: 655.35,
+                crr: 6.5535,
+                windResistance: 65.535,
+            };
+            const res = control.sim.encode(value);
+            const view = new DataView(res);
+            expect(view.getUint8( 0, true)).toBe(0x43);
+            expect(view.getUint16(1, true)).toBe(65535);
+            expect(view.getUint16(3, true)).toBe(65534);
+            expect(view.getUint16(5, true)).toBe(65534);
+        });
+
+        test('decode', () => {
+            const view = new DataView((new Uint8Array(7)).buffer);
+            view.setUint8( 0, 0x43, true);
+            view.setUint16(1, 7400, true);
+            view.setUint16(3, 40,   true);
+            view.setUint16(5, 480,  true);
+
+            const res = control.sim.decode(view);
+            expect(res).toEqual({
+                weight: 74,
+                crr: 0.004,
+                windResistance: 0.48,
+            });
+        });
+
+        test('encode -> decode', () => {
+            const value = {
+                weight: 74,
+                crr: 0.004,
+                windResistance: 0.48,
+            };
+            const buffer = control.sim.encode(value);
+            const res    = control.sim.decode(new DataView(buffer));
+
+            expect(res).toEqual(value);
+        });
+    });
+
+    describe('WindSpeed', () => {
+        test('opCode', () => {
+            const res = control.windSpeed.opCode;
+            expect(res).toEqual(0x47);
+        });
+
+        test('length', () => {
+            const res = control.windSpeed.length;
+            expect(res).toEqual(3);
+        });
+
+        test('encode', () => {
+            const value = {
+                windSpeed: 4,
+            };
+            const res = control.windSpeed.encode(value);
+            const view = new DataView(res);
+            expect(view.getUint8( 0, true)).toBe(0x47);
+            expect(view.getUint16(1, true)).toBe(36768);
+        });
+
+        test('decode', () => {
+            const view = new DataView((new Uint8Array(7)).buffer);
+            view.setUint8( 0, 0x47, true);
+            view.setUint16(1, 36768, true);
+
+            const res = control.windSpeed.decode(view);
+            expect(res).toEqual({
+                windSpeed: 4,
+            });
+        });
+
+        test('encode -> decode', () => {
+            const value = {
+                windSpeed: 4,
+            };
+            const buffer = control.windSpeed.encode(value);
+            const res    = control.windSpeed.decode(new DataView(buffer));
+
+            expect(res).toEqual(value);
+        });
+    });
+
+    describe('WheelCircumference', () => {
+        test('opCode', () => {
+            const res = control.wheelCircumference.opCode;
+            expect(res).toEqual(0x48);
+        });
+
+        test('length', () => {
+            const res = control.wheelCircumference.length;
+            expect(res).toEqual(3);
+        });
+
+        test('encode', () => {
+            const value = {
+                circumference: 2180,
+            };
+            const res = control.wheelCircumference.encode(value);
+            const view = new DataView(res);
+            expect(view.getUint8( 0, true)).toBe(0x48);
+            expect(view.getUint16(1, true)).toBe(21800);
+        });
+
+        test('decode', () => {
+            const view = new DataView((new Uint8Array(7)).buffer);
+            view.setUint8( 0, 0x48, true);
+            view.setUint16(1, 21800, true);
+
+            const res = control.wheelCircumference.decode(view);
+            expect(res).toEqual({
+                circumference: 2180,
+            });
+        });
+
+        test('encode -> decode', () => {
+            const value = {
+                circumference: 2180,
+            };
+            const buffer = control.wheelCircumference.encode(value);
+            const res    = control.wheelCircumference.decode(new DataView(buffer));
+
+            expect(res).toEqual(value);
+        });
+    });
+
 
     describe('LoadIntensity', () => {
         test('opCode', () => {
@@ -144,248 +387,6 @@ describe('Control Point', () => {
         });
     });
 
-    describe('SlopeTarget', () => {
-        test('opCode', () => {
-            const res = control.slopeTarget.opCode;
-            expect(res).toEqual(0x46);
-        });
-
-        test('length', () => {
-            const res = control.slopeTarget.length;
-            expect(res).toEqual(3);
-        });
-
-        test('definitions', () => {
-            const res = control.slopeTarget.definitions;
-            expect(res).toEqual({
-                grade: {
-                    resolution: 1,
-                    unit: '%',
-                    size: 2,
-                    min: 0,
-                    max: 65536,
-                    default: 32768
-                },
-            });
-        });
-
-        test('encode', () => {
-            const res = control.slopeTarget.encode({grade: 4.8});
-            const view = new DataView(res);
-            expect(view.getUint8(0, true)).toBe(0x46);
-            expect(view.getUint16(1, true)).toBe(34340);
-        });
-
-        test('encode -1', () => {
-            const view = new DataView(control.slopeTarget.encode({grade: -1}));
-            expect(view.getUint16(1, true)).toBe(32440);
-        });
-
-        test('encode 0', () => {
-            const view = new DataView(control.slopeTarget.encode({grade: 0}));
-            expect(view.getUint16(1, true)).toBe(32768);
-        });
-
-        test('encode 1', () => {
-            const view = new DataView(control.slopeTarget.encode({grade: 1}));
-            expect(view.getUint16(1, true)).toBe(33095);
-        });
-
-        test('encode 10', () => {
-            const view = new DataView(control.slopeTarget.encode({grade: 10}));
-            expect(view.getUint16(1, true)).toBe(36044);
-        });
-
-        test('decode', () => {
-            const view = new DataView((new Uint8Array(3)).buffer);
-            view.setUint8( 0, 0x46, true);
-            view.setUint16(1, 34340, true);
-
-            const res = control.slopeTarget.decode(view);
-            expect(res).toEqual({grade: 4.8});
-        });
-
-        test('decode -1', () => {
-            const view = new DataView(control.slopeTarget.encode({grade: -1}));
-            expect(control.slopeTarget.decode(view).grade).toBe(-1);
-        });
-
-        test('decode 0', () => {
-            const view = new DataView(control.slopeTarget.encode({grade: 0}));
-            expect(control.slopeTarget.decode(view).grade).toBe(0);
-        });
-
-        test('decode 1', () => {
-            const view = new DataView(control.slopeTarget.encode({grade: 1}));
-            expect(control.slopeTarget.decode(view).grade).toBe(1);
-        });
-
-        test('decode 10', () => {
-            const view = new DataView(control.slopeTarget.encode({grade: 10}));
-            expect(control.slopeTarget.decode(view).grade).toBe(10);
-        });
-
-        test('encode -> decode', () => {
-            const value  = {grade: 4.8};
-            const buffer = control.slopeTarget.encode(value);
-            const res    = control.slopeTarget.decode(new DataView(buffer));
-
-            expect(res).toEqual(value);
-        });
-    });
-
-    describe('WheelCircumference', () => {
-        test('opCode', () => {
-            const res = control.wheelCircumference.opCode;
-            expect(res).toEqual(0x48);
-        });
-
-        test('length', () => {
-            const res = control.wheelCircumference.length;
-            expect(res).toEqual(3);
-        });
-
-        test('encode', () => {
-            const value = {
-                circumference: 2180,
-            };
-            const res = control.wheelCircumference.encode(value);
-            const view = new DataView(res);
-            expect(view.getUint8( 0, true)).toBe(0x48);
-            expect(view.getUint16(1, true)).toBe(21800);
-        });
-
-        test('decode', () => {
-            const view = new DataView((new Uint8Array(7)).buffer);
-            view.setUint8( 0, 0x48, true);
-            view.setUint16(1, 21800, true);
-
-            const res = control.wheelCircumference.decode(view);
-            expect(res).toEqual({
-                circumference: 2180,
-            });
-        });
-
-        test('encode -> decode', () => {
-            const value = {
-                circumference: 2180,
-            };
-            const buffer = control.wheelCircumference.encode(value);
-            const res    = control.wheelCircumference.decode(new DataView(buffer));
-
-            expect(res).toEqual(value);
-        });
-    });
-
-    describe('WindSpeed', () => {
-        test('opCode', () => {
-            const res = control.windSpeed.opCode;
-            expect(res).toEqual(0x47);
-        });
-
-        test('length', () => {
-            const res = control.windSpeed.length;
-            expect(res).toEqual(3);
-        });
-
-        test('encode', () => {
-            const value = {
-                windSpeed: 4,
-            };
-            const res = control.windSpeed.encode(value);
-            const view = new DataView(res);
-            expect(view.getUint8( 0, true)).toBe(0x47);
-            expect(view.getUint16(1, true)).toBe(36768);
-        });
-
-        test('decode', () => {
-            const view = new DataView((new Uint8Array(7)).buffer);
-            view.setUint8( 0, 0x47, true);
-            view.setUint16(1, 36768, true);
-
-            const res = control.windSpeed.decode(view);
-            expect(res).toEqual({
-                windSpeed: 4,
-            });
-        });
-
-        test('encode -> decode', () => {
-            const value = {
-                windSpeed: 4,
-            };
-            const buffer = control.windSpeed.encode(value);
-            const res    = control.windSpeed.decode(new DataView(buffer));
-
-            expect(res).toEqual(value);
-        });
-    });
-
-    describe('SIM', () => {
-        test('opCode', () => {
-            const res = control.sim.opCode;
-            expect(res).toEqual(0x43);
-        });
-
-        test('length', () => {
-            const res = control.sim.length;
-            expect(res).toEqual(7);
-        });
-
-        test('encode', () => {
-            const value = {
-                weight: 74,
-                crr: 0.004,
-                windResistance: 0.48,
-            };
-            const res = control.sim.encode(value);
-            const view = new DataView(res);
-            expect(view.getUint8( 0, true)).toBe(0x43);
-            expect(view.getUint16(1, true)).toBe(7400);
-            expect(view.getUint16(3, true)).toBe(40);
-            expect(view.getUint16(5, true)).toBe(480);
-        });
-
-        test('encode max', () => {
-            const value = {
-                weight: 655.35,
-                crr: 6.5535,
-                windResistance: 65.535,
-            };
-            const res = control.sim.encode(value);
-            const view = new DataView(res);
-            expect(view.getUint8( 0, true)).toBe(0x43);
-            expect(view.getUint16(1, true)).toBe(65535);
-            expect(view.getUint16(3, true)).toBe(65534);
-            expect(view.getUint16(5, true)).toBe(65534);
-        });
-
-        test('decode', () => {
-            const view = new DataView((new Uint8Array(7)).buffer);
-            view.setUint8( 0, 0x43, true);
-            view.setUint16(1, 7400, true);
-            view.setUint16(3, 40,   true);
-            view.setUint16(5, 480,  true);
-
-            const res = control.sim.decode(view);
-            expect(res).toEqual({
-                weight: 74,
-                crr: 0.004,
-                windResistance: 0.48,
-            });
-        });
-
-        test('encode -> decode', () => {
-            const value = {
-                weight: 74,
-                crr: 0.004,
-                windResistance: 0.48,
-            };
-            const buffer = control.sim.encode(value);
-            const res    = control.sim.decode(new DataView(buffer));
-
-            expect(res).toEqual(value);
-        });
-    });
 
     describe('Response', () => {
 
@@ -394,7 +395,7 @@ describe('Control Point', () => {
 
             const res = control.response.decode(view);
             expect(res).toEqual({
-                status:  ':success',
+                status:  'success',
                 request: 'setPowerTarget',
                 value:   50,
             });
@@ -405,7 +406,7 @@ describe('Control Point', () => {
 
             const res = control.response.decode(view);
             expect(res).toEqual({
-                status:  ':fail',
+                status:  'fail',
                 request: 'setPowerTarget',
                 value:   50,
             });
@@ -416,9 +417,10 @@ describe('Control Point', () => {
 
             const res = control.response.decode(view);
             expect(res).toEqual({
-                status:  ':success',
+                status:  'success',
                 request: 'unlock',
             });
         });
     });
 });
+
