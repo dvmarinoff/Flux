@@ -9,7 +9,7 @@ import { xf } from './functions.js';
 import { driver as antDriver } from './ant/driver.js';
 
 function start() {
-    console.log(`start connection manager`);
+    console.log(`start stable version`);
 
     const controllable = new Controllable();
     const hrm = new Hrm();
