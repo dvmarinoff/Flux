@@ -44,6 +44,7 @@ function DataPage48() {
 
     return Object.freeze({
         number,
+        length,
         fields,
         encode,
     });
@@ -159,7 +160,7 @@ function DataPage49() {
 }
 
 function DataPage55() {
-    // DataPage 55 (0x34) - User Configuration
+    // DataPage 55 (0x37) - User Configuration
     const number = 55;
     const length = 8;
     const architecture = true;
