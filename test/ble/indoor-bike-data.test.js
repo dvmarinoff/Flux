@@ -1,35 +1,49 @@
 import { indoorBikeData } from '../../src/ble/ftms/indoor-bike-data.js';
 
 
-// global.console = {
-//     log: jest.fn(),
-//     error: console.error,
-//     warn: console.warn,
-// };
 
 describe('Indoor Bike Data', () => {
 
     test('speed-cadence-power', () => {
-        const view = new DataView((new Uint8Array([68, 0, 24, 1, 20, 0, 6, 0])).buffer);
+        const view = new DataView(
+            new Uint8Array([
+                 68,  0, // flags, 0b1000100
+                202, 12, // instantaneous speed
+                160,  0, // instantaneous cadence
+                 44,  1, // power
+            ]).buffer
+        );
+
+        const expected = {
+            speed: 32.74,
+            cadence: 80,
+            power: 300,
+        };
 
         const res = indoorBikeData.decode(view);
-        expect(res).toEqual({
-            speed: 280 * 0.01,
-            cadence: 10,
-            power: 6,
-        });
+        expect(res).toEqual(expected);
     });
 
     test('speed-cadence-power-heartRate', () => {
-        const view = new DataView((new Uint8Array([68, 2, 170, 5, 46, 0, 24, 0, 70])).buffer);
+        const view = new DataView(
+            new Uint8Array([
+                 68,  2, // flags, 0b1001000100
+                202, 12, // instantaneous speed
+                160,  0, // instantaneous cadence
+                 44,  1, // power
+                143,     // heart rate
+            ]).buffer
+        );
+
+        const expected = {
+            speed: 32.74,
+            cadence: 80,
+            power: 300,
+            heartRate: 143,
+        };
 
         const res = indoorBikeData.decode(view);
-        expect(res).toEqual({
-            speed: 1450 * 0.01,
-            cadence: 23,
-            power: 24,
-            heartRate: 70,
-        });
+        expect(res).toEqual(expected);
     });
 
     test('speed-cadence-distance-power-heartRate', () => {
@@ -60,3 +74,4 @@ describe('Indoor Bike Data', () => {
         expect(res).toEqual(expected);
     });
 });
+
