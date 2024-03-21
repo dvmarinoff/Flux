@@ -127,7 +127,6 @@ function Connectable(args = {}) {
     // Void -> Void
     function defaultOnConnected() {
         print.log(`ble: connected: to: ${getName()} ${getDeviceType()}`);
-        printServices();
     }
 
     // Void -> Void
@@ -285,7 +284,6 @@ function Connectable(args = {}) {
         if(equals(getStatus(), Status.connecting) ||
            equals(getStatus(), Status.connected)) return;
 
-
         const requesting = args.requesting ?? false;
         const watching = args.watching ?? false;
 
@@ -326,6 +324,7 @@ function Connectable(args = {}) {
             _primaryServicesList = await _server.getPrimaryServices();
             _primaryServices     = gattListToObject(_primaryServicesList);
             _connected           = true;
+            _autoReconnect       = true;
             _status              = Status.connected;
 
             _device.addEventListener('gattserverdisconnected', _onDisconnect, signal);
@@ -363,20 +362,34 @@ function Connectable(args = {}) {
         const device = devices.find(device => device.id === deviceId);
 
         let resolve;
+        let reject;
         const maybeDevice = new Promise(function(res, rej) {
             resolve = res;
+            reject = rej;
         });
+
+        const timeout = 1 * 60 * 1000; // 60s
+        const timeoutId = setTimeout(function() {
+            print.log(`ble: watch: timeout:`);
+            abortController.abort();
+            reject();
+        }, timeout);
 
         const abortController = new AbortController();
         device.addEventListener(
             'advertisementreceived',
-            onAdvertisementReceived.bind(this),
-            {once: true}
+            onAdvertisementReceived,
+            {
+                signal: abortController.signal,
+                once: true,
+            }
         );
 
         async function onAdvertisementReceived(e) {
             abortController.abort();
-            print.log(`ble: advertisementReceived: `, e);
+            clearTimeout(timeoutId);
+
+            print.log(`ble: watch: advertisement: received:`);
             resolve(e.device);
         }
 
@@ -397,6 +410,7 @@ function Connectable(args = {}) {
     }
 
     function _onDisconnect() {
+        _status = Status.disconnected;
         onDisconnect();
         if(_autoReconnect) onDropout();
     }
