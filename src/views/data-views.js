@@ -330,6 +330,26 @@ class HeartRateValue extends DataView {
 
 customElements.define('heart-rate-value', HeartRateValue);
 
+class HeartRateLapValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:heartRateLap',
+        };
+    }
+}
+
+customElements.define('heart-rate-lap-value', HeartRateLapValue);
+
+class HeartRateAvgValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:heartRateAvgLap',
+        };
+    }
+}
+
+customElements.define('heart-rate-avg-value', HeartRateAvgValue);
+
 
 class SmO2Value extends DataView {
     getDefaults() {
@@ -477,31 +497,26 @@ class PowerTargetFTP extends DataView {
 
 customElements.define('power-target-ftp', PowerTargetFTP);
 
-class PowerTargetGroup extends DataView {
+class CompanionGroup extends DataView {
     getDefaults() {
         return {
             prop: '',
-            state: '',
+            active: false,
         };
+    }
+    config() {
+        this.$main = this.querySelector('.companion-main');
+        this.$aux = this.querySelector('.companion-aux');
     }
     subs() {
         this.addEventListener(`pointerup`, this.onPointerup.bind(this), this.signal);
     }
     onPointerup() {
-        if(equals(this.state, 'active')) {
-            this.state = '';
-            this.render();
-        } else {
-            this.state = 'active';
-            this.render();
-        }
-    }
-    config() {
-        this.$main = this.querySelector('power-target');
-        this.$aux = this.querySelector('power-target-ftp');
+        this.active = !this.active;
+        this.render();
     }
     render() {
-        if(equals(this.state, 'active')) {
+        if(this.active) {
             this.$main.classList.add('active');
             this.$aux.classList.add('active');
         } else {
@@ -511,7 +526,45 @@ class PowerTargetGroup extends DataView {
     }
 }
 
-customElements.define('power-target-group', PowerTargetGroup);
+customElements.define('companion-group', CompanionGroup);
+
+class ZStack extends DataView {
+    getDefaults() {
+        return {
+            prop: '',
+            items: [],
+            active: 0,
+        };
+    }
+    postInit() {
+        this.items = [];
+        this.active = 0;
+    }
+    config() {
+        this.$items = this.querySelectorAll('z-stack-item');
+    }
+    subs() {
+        this.addEventListener(`pointerup`, this.onPointerup.bind(this), this.signal);
+    }
+    onPointerup() {
+        this.incrementActive();
+        this.render();
+    }
+    incrementActive() {
+        this.active = (this.active + 1) % Math.max(this.$items.length, 1);
+    }
+    render() {
+        this.$items.forEach(($item, i) => {
+            if(equals(i, this.active)) {
+                $item.classList.add('active');
+            } else {
+                $item.classList.remove('active');
+            }
+        });
+    }
+}
+
+customElements.define('z-stack', ZStack);
 
 customElements.define('power-target', PowerTarget);
 
@@ -669,6 +722,22 @@ class PowerLap extends DataView {
 }
 
 customElements.define('power-lap', PowerLap);
+
+class KcalAvg extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:kcal',
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+    }
+    transform(state) {
+        return Math.round(state);
+    }
+}
+
+customElements.define('kcal-avg', KcalAvg);
 
 class PowerInZone extends HTMLElement {
     constructor() {
@@ -1253,6 +1322,8 @@ export {
     SpeedValue,
     DistanceValue,
     HeartRateValue,
+    HeartRateLapValue,
+    HeartRateAvgValue,
     SmO2Value,
     THbValue,
     PowerAvg,

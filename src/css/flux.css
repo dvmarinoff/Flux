@@ -793,6 +793,16 @@ body {
     width: auto;
     min-width: 1.5em;
 }
+
+z-stack-item {
+    display: none;
+    cursor: pointer;
+}
+
+z-stack-item.active {
+    display: block;
+}
+
 /* END Data Tiles */
 
 /* Graphs */

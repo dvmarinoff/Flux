@@ -40,20 +40,38 @@
 
                         <div class="data-tiles">
                             <div class="data-tile--small wide" id="data-tile--power-avg">
-                                <h2 class="data-tile-small--heading">Power Lap</h2>
-                                <div class="data-tile-small--value-cont">
-                                    <power-lap id=power-avg-value"
-                                               class="data-tile-small--value">--</power-lap>
-                                </div>
+                                <z-stack>
+                                    <z-stack-item class="active">
+                                        <h2 class="data-tile-small--heading">Power Lap</h2>
+                                        <div class="data-tile-small--value-cont">
+                                            <power-lap id="power-lap-value"
+                                                       class="data-tile-small--value">--</power-lap>
+                                        </div>
+                                    </z-stack-item>
+                                    <z-stack-item>
+                                        <h2 class="data-tile-small--heading">Power Avg</h2>
+                                        <div class="data-tile-small--value-cont">
+                                            <power-avg id="power-avg-value"
+                                                       class="data-tile-small--value">--</power-avg>
+                                        </div>
+                                    </z-stack-item>
+                                    <z-stack-item>
+                                        <h2 class="data-tile-small--heading">Kcal</h2>
+                                        <div class="data-tile-small--value-cont">
+                                            <kcal-avg id="kcal-avg-value"
+                                                      class="data-tile-small--value">--</kcal-avg>
+                                        </div>
+                                    </z-stack-item>
+                                <z-stack>
                             </div>
 
                             <div class="data-tile" id="data-tile--power">
-                                <h2 class="data-tile--heading">Power</h2>
-                                <div class="data-tile--value-cont">
-                                    <power-value id=power-value"
-                                                 class="data-tile--value"
-                                                 prop="db:power1s">--</power-value>
-                                </div>
+                                    <h2 class="data-tile--heading">Power</h2>
+                                    <div class="data-tile--value-cont">
+                                        <power-value id=power-value"
+                                                        class="data-tile--value"
+                                                        prop="db:power1s">--</power-value>
+                                    </div>
                             </div>
 
                             <div class="data-tile" id="data-tile--interval-time">
@@ -64,11 +82,29 @@
                                 </div>
                             </div>
                             <div class="data-tile" id="data-tile--heart-rate">
-                                <h2 class="data-tile--heading">Heart Rate</h2>
-                                <div class="data-tile--value-cont">
-                                    <heart-rate-value id="heart-rate-value"
-                                                      class="data-tile--value">--</heart-rate-value>
-                                </div>
+                                <z-stack>
+                                    <z-stack-item class="active">
+                                        <h2 class="data-tile--heading">Heart Rate</h2>
+                                        <div class="data-tile--value-cont">
+                                            <heart-rate-value id="heart-rate-value"
+                                                            class="data-tile--value">--</heart-rate-value>
+                                        </div>
+                                    </z-stack-item>
+                                    <z-stack-item>
+                                        <h2 class="data-tile--heading">Heart Rate Lap</h2>
+                                        <div class="data-tile--value-cont">
+                                            <heart-rate-value id="heart-rate-lap-value"
+                                                            class="data-tile--value">--</heart-rate-value>
+                                        </div>
+                                    </z-stack-item>
+                                    <z-stack-item>
+                                        <h2 class="data-tile--heading">Heart Rate Avg</h2>
+                                        <div class="data-tile--value-cont">
+                                            <heart-rate-value id="heart-rate-avg-value"
+                                                            class="data-tile--value">--</heart-rate-value>
+                                        </div>
+                                    </z-stack-item>
+                                </z-stack>
                             </div>
 
                             <div class="data-tile--small wide" id="data-tile--speed">
@@ -87,12 +123,18 @@
                             <div class="data-tile" id="data-tile--target">
                                 <h2 class="data-tile--heading">Target</h2>
                                 <div class="data-tile--value-cont">
-                                    <power-target-group class="data-tile--value-cont complex">
-                                        <power-target id=power-target-value"
-                                                      class="data-tile--value">--</power-target>
-                                        <power-target-ftp id="power-target-ftp"
-                                                         class="data-tile-target--value" >--</power-ftp-value>
-                                    </power-target-group>
+                                    <companion-group class="data-tile--value-cont complex">
+                                        <power-target
+                                            id=power-target-value"
+                                            class="companion-main data-tile--value">
+                                            --
+                                        </power-target>
+                                        <power-target-ftp
+                                            id="power-target-ftp"
+                                            class="companion-aux data-tile-target--value">
+                                            --
+                                        </power-ftp-value>
+                                    </companion-group>
                                 </div>
 
 

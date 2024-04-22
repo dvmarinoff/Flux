@@ -694,10 +694,11 @@ class MetaProp {
     constructor(args = {}) {
         const self = this;
         this.init(args);
-        this.prop     = existance(args.prop, this.getDefaults().prop);
-        this.disabled = existance(args.default, this.getDefaults().disabled);
-        this.default  = existance(args.default, this.getDefaults().default);
-        this.state    = existance(args.state, this.default);
+        this.prop     = args.prop ?? this.getDefaults().prop;
+        this.disabled = args.default ?? this.getDefaults().disabled;
+        this.default  = args.default ?? this.getDefaults().default;
+        this.state    = args.state ?? this.default;
+        this.name     = args.name ?? `meta-prop`;
         this.postInit(args);
         this.start();
     }
@@ -751,7 +752,7 @@ class MetaProp {
 
 class PropAccumulator extends MetaProp {
     postInit(args = {}) {
-        this.event = existance(args.event, this.getDefaults().event);
+        this.event = args.event ?? this.getDefaults().event;
         this.count = this.getDefaults().count;
         this.prev  = this.getDefaults().prev;
     }
@@ -771,7 +772,7 @@ class PropAccumulator extends MetaProp {
     format(state) {
         return Math.round(state);
     }
-    reset() { this.count = 0;}
+    reset() { this.count = 0; }
     subsConfig() {
         if(!equals(this.prop, '')) {
             xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
@@ -781,9 +782,9 @@ class PropAccumulator extends MetaProp {
         }
     }
     updateState(value) {
-        if(equals(this.state, 0) && equals(value, 0)) {
+        if(this.state === 0 && value === 0) {
             this.state = 0;
-        } else if(equals(value, 0)) {
+        } else if(value === 0) {
             return this.state;
         } else {
             this.count += 1;
@@ -793,6 +794,7 @@ class PropAccumulator extends MetaProp {
             const count_p = this.count-1;
             this.state = mavg(value_c, value_p, count_c, count_p);
             this.prev = this.state;
+
         }
         return this.state;
     }
@@ -801,14 +803,24 @@ class PropAccumulator extends MetaProp {
     }
 }
 
-const powerLap = new PropAccumulator({event: 'watch:lap'});
-const powerAvg = new PropAccumulator({event: 'watch:stopped'});
+class KcalAccumulator extends PropAccumulator {
+    updateState(power) {
+        this.state = this.state + power * 0.001;
+        return this.state;
+    }
+}
 
-const cadenceLap = new PropAccumulator({event: 'watch:lap'});
-const heartRateLap = new PropAccumulator({event: 'watch:lap'});
+const powerLap = new PropAccumulator({event: 'watch:lap', name: 'power-lap'});
+const powerAvg = new PropAccumulator({event: 'watch:stopped', name: 'power-avg'});
+const kcal = new KcalAccumulator({event: 'watch:stopped', name: 'kcal'});
 
-// const cadenceAvg = new PropAccumulator({event: 'watch:stopped'});
-// const heartRateAvg = new PropAccumulator({event: 'watch:stopped'});
+const cadenceLap = new PropAccumulator({event: 'watch:lap', name: 'cadence-lap'});
+const cadenceAvg = new PropAccumulator({event: 'watch:stopped', name: 'cadence-avg'});
+
+const heartRateLap = new PropAccumulator({event: 'watch:lap', name: 'heart-rate-lap'});
+const heartRateAvg = new PropAccumulator({event: 'watch:stopped', name: 'heart-rate-avg'});
+
+
 
 class PropInterval {
     constructor(args = {}) {
@@ -1132,9 +1144,13 @@ let models = {
     powerLap,
     powerAvg,
     powerInZone,
+    kcal,
 
     heartRateLap,
+    heartRateAvg,
+
     cadenceLap,
+    cadenceAvg,
 
     powerTarget,
     resistanceTarget,

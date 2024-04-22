@@ -29,6 +29,7 @@ let db = {
     powerLap: models.powerLap.default,
     powerAvg: models.powerAvg.default,
     powerInZone: models.powerInZone.default,
+    kcal: models.kcal.default,
 
     cadenceLap: models.cadenceLap.default,
     heartRateLap: models.heartRateLap.default,
@@ -90,6 +91,7 @@ xf.create(db);
 xf.reg(models.heartRate.prop, (heartRate, db) => {
     db.heartRate = heartRate;
     db.heartRateLap = models.heartRateLap.setState(heartRate);
+    db.heartRateavg = models.heartRateAvg.setState(heartRate);
 });
 
 xf.reg(models.power.prop, (power, db) => {
@@ -99,6 +101,7 @@ xf.reg(models.power.prop, (power, db) => {
 xf.reg(models.cadence.prop, (cadence, db) => {
     db.cadence = cadence;
     db.cadenceLap = models.cadenceLap.setState(cadence);
+    db.cadenceAvg = models.cadenceAvg.setState(cadence);
 });
 
 xf.reg(models.speed.prop, (speed, db) => {
@@ -131,6 +134,7 @@ xf.reg('power1s', (power, db) => {
     db.power1s = power;
     db.powerLap = models.powerLap.setState(power);
     db.powerAvg = models.powerAvg.setState(power);
+    db.kcal = models.kcal.setState(power);
 });
 
 xf.reg('powerInZone', (powerInZone, db) => {
