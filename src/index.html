@@ -261,6 +261,12 @@
             </div> <!-- end page-home -->
 
             <div id="workouts-page" class="page" page="workouts">
+               <div id="intervals-icu-workout" class="intervals-icu-workout">
+  <h2 class="page--heading">Treino do Intervals.icu</h2>
+  <button id="fetch-intervals-workout" class="flat-btn">Carregar Treino de Hoje</button>
+  <div id="intervals-workout-details"></div>
+</div>
+                
                 <library-switch-group class="library--switch--group">
                     <div class="library--switch switch-item switch-0 active" index="0">
                         <div class="library--switch--icon"></div>
@@ -443,7 +449,11 @@
             </div>
 
             <div id="settings-page" class="page" page="settings">
-
+<div id="intervals-icu-settings" class="settings-tile">
+  <label for="intervals-icu-api-key" class="settings-tile--label">Intervals.icu API Key</label>
+  <input id="intervals-icu-api-key" class="settings-tile--input" type="password" />
+  <button id="save-intervals-icu-settings" class="settings-tile--btn flat-btn">Salvar</button>
+</div>
                 <!-- ant-device-request -->
                 <ant-device-request id="ant-device-request">
                     <div class="device-request--wrapper">
@@ -1077,6 +1087,17 @@
 
                 <div id="menu" class="menu">
                     <div class="page-btn-group menu--row">
+                        <page-btn id="intervals-icu-tab-btn"
+          class="menu--btn"
+          prop="page"
+          effect="page-set"
+          param="intervals-icu">
+  <svg class="menu--btn--icon" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+    <path d="M0 0h24v24H0z" fill="none"/>
+    <path class="menu--btn--icon--fill" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+  </svg>
+  <div class="menu--btn--label">Intervals.icu</div>
+</page-btn>
                         <page-btn id="settings-tab-btn"
                                   class="menu--btn"
                                   prop="page"
