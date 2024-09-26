@@ -4,7 +4,7 @@
     "description": "Cycling Structured Training",
     "start_url": "/",
     "display": "standalone",
-    "orientation": "portrait",
+    "orientation": "any",
     "scope": "/",
     "theme_color": "#35363a",
     "background_color": "#28272D",

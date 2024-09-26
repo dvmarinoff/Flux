@@ -659,6 +659,21 @@ function Session(args = {}) {
             position_lat: db.position_lat,
             position_long: db.position_long,
 
+            // Avg State
+            kcal: db.kcal,
+            powerLap: db.powerLap,
+            cadenceLap: db.cadenceLap,
+            heartRateLap: db.heartRateLap,
+            powerAvg: db.powerAvg,
+            cadenceAvg: db.cadenceAvg,
+            heartRateAvg: db.heartRateAvg,
+            powerLapCount: db.powerLapCount,
+            cadenceLapCount: db.cadenceLapCount,
+            heartRateLapCount: db.heartRateLapCount,
+            powerAvgCount: db.powerAvgCount,
+            cadenceAvgCount: db.cadenceAvgCount,
+            heartRateAvgCount: db.heartRateAvgCount,
+
             // Report
             powerInZone: db.powerInZone,
 
@@ -699,6 +714,7 @@ class MetaProp {
         this.default  = args.default ?? this.getDefaults().default;
         this.state    = args.state ?? this.default;
         this.name     = args.name ?? `meta-prop`;
+        this.propName = self.toCamelCase(args.name) ?? `metaProp`;
         this.postInit(args);
         this.start();
     }
@@ -725,6 +741,14 @@ class MetaProp {
     }
     stop() {
         this.unsubs();
+    }
+    toCamelCase(str) {
+        if(exists(str)) {
+            return str.replace(/-([a-z])/g, function (g) {
+                return g[1].toUpperCase();
+            });
+        }
+        return str;
     }
     subs() {
         const self = this;
@@ -801,6 +825,12 @@ class PropAccumulator extends MetaProp {
     onEvent() {
         this.reset();
     }
+    restore(db) {
+        console.log(`${this.propName}`);
+        this.count = db[this.propName+"Count"] ?? this.count;
+        this.state = db[this.propName] ?? this.state;
+        this.prev = db[this.propName] ?? this.prev;
+    }
 }
 
 class KcalAccumulator extends PropAccumulator {
@@ -810,15 +840,36 @@ class KcalAccumulator extends PropAccumulator {
     }
 }
 
-const powerLap = new PropAccumulator({event: 'watch:lap', name: 'power-lap'});
-const powerAvg = new PropAccumulator({event: 'watch:stopped', name: 'power-avg'});
-const kcal = new KcalAccumulator({event: 'watch:stopped', name: 'kcal'});
+const powerLap = new PropAccumulator({
+    event: 'watch:lap',
+    name: 'power-lap',
+});
+const powerAvg = new PropAccumulator({
+    event: 'watch:stopped',
+    name: 'power-avg',
+});
+const kcal = new KcalAccumulator({
+    event: 'watch:stopped',
+    name: 'kcal',
+});
 
-const cadenceLap = new PropAccumulator({event: 'watch:lap', name: 'cadence-lap'});
-const cadenceAvg = new PropAccumulator({event: 'watch:stopped', name: 'cadence-avg'});
+const cadenceLap = new PropAccumulator({
+    event: 'watch:lap',
+    name: 'cadence-lap',
+});
+const cadenceAvg = new PropAccumulator({
+    event: 'watch:stopped',
+    name: 'cadence-avg',
+});
 
-const heartRateLap = new PropAccumulator({event: 'watch:lap', name: 'heart-rate-lap'});
-const heartRateAvg = new PropAccumulator({event: 'watch:stopped', name: 'heart-rate-avg'});
+const heartRateLap = new PropAccumulator({
+    event: 'watch:lap',
+    name: 'heart-rate-lap',
+});
+const heartRateAvg = new PropAccumulator({
+    event: 'watch:stopped',
+    name: 'heart-rate-avg',
+});
 
 
 

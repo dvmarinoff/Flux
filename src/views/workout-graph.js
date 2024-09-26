@@ -104,6 +104,7 @@ class WorkoutGraph extends HTMLElement {
     constructor() {
         super();
         this.workout = {};
+        this.workoutStatus = "stopped";
         this.metricValue = 0;
         this.index = 0;
         this.minHeight = 30;
@@ -128,7 +129,8 @@ class WorkoutGraph extends HTMLElement {
         xf.sub('db:intervalIndex', this.onIntervalIndex.bind(this), this.signal);
         xf.sub('db:distance', this.onDistance.bind(this), this.signal);
         xf.sub('db:page', this.onPage.bind(this), this.signal);
-        xf.sub('db:lapTime', this.onLapTime.bind(this), this.signal)
+        xf.sub('db:lapTime', this.onLapTime.bind(this), this.signal);
+        xf.sub('db:workoutStatus', this.onWorkoutStatus.bind(this), this.signal);
 
         this.addEventListener('mouseover', this.onHover.bind(this), this.signal);
         this.addEventListener('mouseout', this.onMouseOut.bind(this), this.signal);
@@ -204,6 +206,9 @@ class WorkoutGraph extends HTMLElement {
             this.render();
         }
     }
+    onWorkoutStatus(value) {
+        this.workoutStatus = value;
+    }
     onIntervalIndex(index) {
         const self = this;
         this.index = index;
@@ -230,6 +235,10 @@ class WorkoutGraph extends HTMLElement {
         this.progress({index: self.index, dom: self.dom, parent: self, lapTime: self.lapTime});
     }
     progress(args = {}) {
+        if(this.workoutStatus === "done") {
+            return;
+        }
+
         const index                 = args.index ?? 0;
         const lapTime               = args.lapTime ?? this.workout.intervals[index].duration;
         const $dom                  = args.dom;

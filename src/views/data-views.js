@@ -277,6 +277,32 @@ class CadenceValue extends DataView {
 
 customElements.define('cadence-value', CadenceValue);
 
+class CadenceLapValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:cadenceLap',
+        };
+    }
+    transform(state) {
+        return Math.round(state);
+    }
+}
+
+customElements.define('cadence-lap-value', CadenceLapValue);
+
+class CadenceAvgValue extends DataView {
+    getDefaults() {
+        return {
+            prop: 'db:cadenceAvg',
+        };
+    }
+    transform(state) {
+        return Math.round(state);
+    }
+}
+
+customElements.define('cadence-avg-value', CadenceAvgValue);
+
 
 class CadenceTarget extends DataView {
     getDefaults() {
@@ -336,6 +362,9 @@ class HeartRateLapValue extends DataView {
             prop: 'db:heartRateLap',
         };
     }
+    transform(state) {
+        return Math.round(state);
+    }
 }
 
 customElements.define('heart-rate-lap-value', HeartRateLapValue);
@@ -343,8 +372,11 @@ customElements.define('heart-rate-lap-value', HeartRateLapValue);
 class HeartRateAvgValue extends DataView {
     getDefaults() {
         return {
-            prop: 'db:heartRateAvgLap',
+            prop: 'db:heartRateAvg',
         };
+    }
+    transform(state) {
+        return Math.round(state);
     }
 }
 
@@ -1317,6 +1349,8 @@ export {
     TimerTime,
     IntervalTime,
     CadenceValue,
+    CadenceLapValue,
+    CadenceAvgValue,
     CadenceTarget,
     CadenceGroup,
     SpeedValue,

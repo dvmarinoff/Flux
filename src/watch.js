@@ -78,7 +78,12 @@ class Watch {
         }
     }
     startWorkout() {
-        const self       = this;
+        const self = this;
+
+        if(self.isWorkoutStarted() || self.isWorkoutDone()) {
+            return;
+        }
+
         let intervalTime = 0;
         let stepTime     = 0;
 

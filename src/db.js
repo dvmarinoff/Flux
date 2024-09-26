@@ -26,13 +26,22 @@ let db = {
     ascent: models.virtualState.ascent,
 
     power1s: models.power1s.default,
-    powerLap: models.powerLap.default,
-    powerAvg: models.powerAvg.default,
     powerInZone: models.powerInZone.default,
-    kcal: models.kcal.default,
 
-    cadenceLap: models.cadenceLap.default,
+    powerLap: models.powerLap.default,
     heartRateLap: models.heartRateLap.default,
+    cadenceLap: models.cadenceLap.default,
+    kcal: models.kcal.default,
+    powerAvg: models.powerAvg.default,
+    cadenceAvg: models.cadenceAvg.default,
+    heartRateAvg: models.heartRateAvg.default,
+
+    powerLapCount: models.powerLap.count,
+    heartRateLapCount: models.heartRateLap.count,
+    cadenceLapCount: models.cadenceLap.count,
+    powerAvgCount: models.powerAvg.count,
+    cadenceAvgCount: models.cadenceAvg.count,
+    heartRateAvgCount: models.heartRateAvg.count,
 
     // Targets
     powerTarget: models.powerTarget.default,
@@ -91,7 +100,9 @@ xf.create(db);
 xf.reg(models.heartRate.prop, (heartRate, db) => {
     db.heartRate = heartRate;
     db.heartRateLap = models.heartRateLap.setState(heartRate);
-    db.heartRateavg = models.heartRateAvg.setState(heartRate);
+    db.heartRateAvg = models.heartRateAvg.setState(heartRate);
+    db.heartRateLapCount = models.heartRateLap.count;
+    db.heartRateAvgCount = models.heartRateAvg.count;
 });
 
 xf.reg(models.power.prop, (power, db) => {
@@ -102,6 +113,8 @@ xf.reg(models.cadence.prop, (cadence, db) => {
     db.cadence = cadence;
     db.cadenceLap = models.cadenceLap.setState(cadence);
     db.cadenceAvg = models.cadenceAvg.setState(cadence);
+    db.cadenceLapCount = models.cadenceLap.count;
+    db.cadenceAvgCount = models.cadenceAvg.count;
 });
 
 xf.reg(models.speed.prop, (speed, db) => {
@@ -132,9 +145,13 @@ xf.reg(models.sources.prop, (sources, db) => {
 
 xf.reg('power1s', (power, db) => {
     db.power1s = power;
+
     db.powerLap = models.powerLap.setState(power);
     db.powerAvg = models.powerAvg.setState(power);
     db.kcal = models.kcal.setState(power);
+
+    db.powerLapCount = models.powerLap.count;
+    db.powerAvgCount = models.powerAvg.count;
 });
 
 xf.reg('powerInZone', (powerInZone, db) => {
@@ -348,6 +365,14 @@ xf.reg('app:start', async function(_, db) {
 
     await models.session.restore(db);
     xf.dispatch('workout:restore');
+
+    models.kcal.restore(db);
+    models.powerLap.restore(db);
+    models.powerAvg.restore(db);
+    models.cadenceLap.restore(db);
+    models.cadenceAvg.restore(db);
+    models.heartRateLap.restore(db);
+    models.heartRateAvg.restore(db);
 
     const sound = Sound({volume: db.volume});
     sound.start();

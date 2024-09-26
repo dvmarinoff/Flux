@@ -11,14 +11,14 @@ class Watch extends HTMLElement {
             lap:     document.querySelector('#watch-lap'),
             stop:    document.querySelector('#watch-stop'),
             save:    document.querySelector('#activity-save'),
-            workout: document.querySelector('#start-workout'),
+            // workout: document.querySelector('#start-workout'),
         };
 
         this.dom.start.addEventListener('pointerup', this.onStart);
         this.dom.pause.addEventListener('pointerup', this.onPause);
         this.dom.lap.addEventListener('pointerup', this.onLap);
         this.dom.stop.addEventListener('pointerup', this.onStop);
-        this.dom.workout.addEventListener('pointerup', this.onWorkoutStart);
+        // this.dom.workout.addEventListener('pointerup', this.onWorkoutStart);
         this.dom.save.addEventListener(`pointerup`, this.onSave);
 
         this.renderInit(this.dom);
@@ -32,12 +32,15 @@ class Watch extends HTMLElement {
        this.dom.pause.removeEventListener(`pointerup`, this.onPause);
        this.dom.lap.removeEventListener(`pointerup`, this.onLap);
        this.dom.stop.removeEventListener(`pointerup`, this.onStop);
-       this.dom.workout.removeEventListener(`pointerup`, this.onWorkoutStart);
+       // this.dom.workout.removeEventListener(`pointerup`, this.onWorkoutStart);
        this.dom.save.removeEventListener(`pointerup`, this.onSave);
        document.removeEventListener(`db:watchStatus`, this.onWatchStatus);
        document.removeEventListener(`db:workoutStatus`, this.onWorkoutStatus);
     }
-    onStart(e) { xf.dispatch('ui:watchStart'); }
+    onStart(e) {
+        xf.dispatch('ui:watchStart');
+        xf.dispatch('ui:workoutStart');
+    }
     onPause(e) { xf.dispatch('ui:watchPause'); }
     onLap(e)   { xf.dispatch('ui:watchLap'); }
     onStop(e)  { xf.dispatch('ui:watchStop'); }
@@ -76,11 +79,11 @@ class Watch extends HTMLElement {
         dom.lap.style.display     = 'none';
         dom.stop.style.display    = 'none';
         dom.save.style.display    = 'inline-block';
-        dom.workout.style.display = 'inline-block';
+        // dom.workout.style.display = 'inline-block';
         dom.start.style.display   = 'inline-block';
     };
     renderWorkoutStarted(dom) {
-        dom.workout.style.display = 'none';
+        // dom.workout.style.display = 'none';
     };
 }
 

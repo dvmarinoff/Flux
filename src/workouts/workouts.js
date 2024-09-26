@@ -236,37 +236,40 @@ let workouts = [
 </workout_file>`
 ,
 `<workout_file>
-    <author>Marinov</author>
-    <name>Butter</name>
+    <author>Flux</author>
+    <name>Salmon</name>
     <category>Base</category>
-    <description>The bread and butter of Endurance training, in steady Zone 2 at 67% of FTP.</description>
-    <sportType>bike</sportType>
-    <tags>
-    </tags>
+    <subcategory></subcategory>
+    <description>The Fat Max workout to push your aerobic base up</description>
+    <sporttype>bike</sporttype>
+    <tags></tags>
     <workout>
-        <Warmup Duration="360" PowerLow="0.32" PowerHigh="0.55"/>
-        <IntervalsT Repeat="2" OnDuration="60" OffDuration="60" OnPower="0.88" OffPower="0.55"/>
-        <SteadyState Duration="4200" Power="0.67"/>
-        <Cooldown Duration="600" PowerLow="0.67" PowerHigh="0.32"/>
+        <SteadyState Duration="600" Power="0.43" />
+        <SteadyState Duration="600" Power="0.51" />
+        <SteadyState Duration="600" Power="0.56" />
+        <SteadyState Duration="600" Power="0.6" />
+        <SteadyState Duration="2400" Power="0.63" />
+        <SteadyState Duration="600" Power="0.43" />
     </workout>
-</workout_file>`
-,
+</workout_file>`,
 `<workout_file>
-    <author>Marinov</author>
-    <name>Butter+1</name>
+    <author>Flux</author>
+    <name>Salmon +1</name>
     <category>Base</category>
-    <description>The bread and butter of Endurance training, in steady Zone 2 at 67% of FTP.</description>
-    <sportType>bike</sportType>
-    <tags>
-    </tags>
+    <subcategory></subcategory>
+    <description>The Fat Max workout to push your aerobic base up</description>
+    <sporttype>bike</sporttype>
+    <tags></tags>
     <workout>
-        <Warmup Duration="360" PowerLow="0.32" PowerHigh="0.55"/>
-        <IntervalsT Repeat="2" OnDuration="60" OffDuration="60" OnPower="0.88" OffPower="0.55"/>
-        <SteadyState Duration="6000" Power="0.67"/>
-        <Cooldown Duration="600" PowerLow="0.67" PowerHigh="0.32"/>
+        <SteadyState Duration="600" Power="0.43" />
+        <SteadyState Duration="600" Power="0.51" />
+        <SteadyState Duration="600" Power="0.56" />
+        <SteadyState Duration="600" Power="0.6" />
+        <SteadyState Duration="3600" Power="0.63" />
+        <SteadyState Duration="600" Power="0.56" />
+        <SteadyState Duration="600" Power="0.43" />
     </workout>
-</workout_file>`
-,
+</workout_file>`,
 `<workout_file>
     <author>Marinov</author>
     <name>Blackcurrant</name>
@@ -281,20 +284,34 @@ let workouts = [
     </workout>
 </workout_file>`,
 `<workout_file>
-    <author>Marinov</author>
-    <name>Blackcurrant+1</name>
-    <category>Recovery</category>
-    <description></description>
-    <sportType>bike</sportType>
-    <tags>
-    </tags>
+    <author>Flux</author>
+    <name>5-1-5 Moxy Test</name>
+    <category>Test</category>
+    <subcategory></subcategory>
+    <description>It's important to not warm-up before the test. You should not cycle during the rest intervals, since they are meant to track SmO2 and THb recovery rate. You are ment to fail in the any of the last 3 steps. Use the moxy academy course for guidence on how to analyze. Muscle Oxygen Zone Assessment: https://moxy-academy.teachable.com/courses/209052/lectures/3480785.
+</description>
+    <sporttype>bike</sporttype>
+    <tags></tags>
     <workout>
-        <Warmup Duration="240" PowerLow="0.32" PowerHigh="0.60"/>
-        <SteadyState Duration="60" Power="0.60"/>
-        <SteadyState Duration="60" Power="0.70"/>
-        <SteadyState Duration="60" Power="0.50"/>
-        <IntervalsT Repeat="10" OnDuration="120" OffDuration="120" OnPower="0.58" OffPower="0.53"/>
-        <Cooldown Duration="300" PowerLow="0.50" PowerHigh="0.32"/>
+        <SteadyState Duration="300" Power="0.44" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="0.44" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="0.66" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="0.66" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="0.88" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="0.88" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="1.1" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="1.1" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="1.32" />
+        <SteadyState Duration="60" Power="0" />
+        <SteadyState Duration="300" Power="1.32" />
     </workout>
 </workout_file>`,
 `<workout_file>
