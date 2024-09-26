@@ -25,7 +25,9 @@ class Watch {
         this.intervalType      = 'duration';
         // end Distance
 
-        this.intervals        = [];
+        this.intervals         = [];
+        this.autoPauseCounter  = 0;
+        this.hasBeenAutoPaused = false;
         this.init();
     }
     init() {
@@ -51,7 +53,7 @@ class Watch {
                 console.log(`Workout done!`);
             }
         });
-
+        xf.sub('db:power1s', self.onPower1s.bind(this));
         timer.addEventListener('message', self.onTick.bind(self));
     }
     isStarted()        { return this.state        === 'started'; };
@@ -61,6 +63,23 @@ class Watch {
     isWorkoutDone()    { return this.stateWorkout === 'done'; };
     isIntervalType(type) {
         return equals(this.intervalType, type);
+    }
+    onPower1s(power) {
+        if(power === 0 && this.isStarted()) {
+            this.autoPauseCounter += 1;
+        } else {
+            this.autoPauseCounter = 0;
+        }
+
+        if(this.autoPauseCounter >= 2) {
+            this.autoPauseCounter = 0;
+            xf.dispatch(`ui:watchPause`);
+            this.hasBeenAutoPaused = true;
+        }
+
+        if(power > 40 && this.hasBeenAutoPaused) {
+            xf.dispatch(`ui:watchResume`);
+        }
     }
     start() {
         const self = this;
@@ -131,6 +150,8 @@ class Watch {
                 timestamp: Date.now(),
                 type: EventType.start,
             });
+
+            this.hasBeenAutoPaused = false;
         }
     }
     pause() {
