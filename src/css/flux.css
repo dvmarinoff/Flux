@@ -1933,6 +1933,63 @@ div.graph--bar-group {
 }
 /* END ANT Device Request */
 
+/* User Auth */
+.auth {
+    display: grid;
+    min-height: 300px;
+
+    .input {
+        margin: 1rem 0;
+        padding: 0 1rem;
+        height: 3rem;
+        color: var(--dark)
+    }
+    .btn {
+        margin: 1rem 0;
+        padding: 0 1rem;
+        height: 3rem;
+        text-transform: none;
+    }
+
+    h2 {
+        height: 3rem
+    }
+    a {
+        color: #bbb;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+    a, p {
+        font-size: 1.2rem;
+    }
+    h2 {
+        font-size: 1.2rem;
+        line-height: 3rem;
+        text-transform: uppercase;
+    }
+    #login--form.active, #signup--form.active {
+        display: block;
+    }
+    #login--form, #signup--form {
+        display: none;
+    }
+    .tab--button {
+        font-size: 1.2rem;
+        line-height: 3rem;
+        margin: 1rem;
+        height: 3rem;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    .form--submit--section {
+        display: flex;
+        justify-content: center;
+    }
+    .webauthn--section {
+        margin: 1rem 0;
+    }
+}
+
 /* App Connections */
 .app-connections {
     margin: 1.4em auto;
@@ -1963,14 +2020,14 @@ div.graph--bar-group {
 
 /* About */
 #about {
-    font-size: 1em;
+    font-size: 1.2rem;
     margin: 10px auto 0;
     padding: 10px 10px;
     max-width: var(--inner-max-width);
     text-align: center;
 }
 .about--text {
-    font-size: 1.2em;
+    font-size: 1em;
     line-height: 1.4em;
     margin-bottom: 3em;
 }

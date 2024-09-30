@@ -1041,6 +1041,88 @@
                     </div>
                 </div>
 
+                <div class="auth">
+                    <auth-switch-group>
+                        <div id="signup--form" class="signup--form">
+                            <h2>Sign Up</h2>
+                            <div class="webauthn--section">
+                                <p>This project uses <a href="https://webauthn.guide/" target="_blank">Web Authentication</a></p>
+
+                                <p>A better alternative for securing our sensitive information online</p>
+                            </div>
+                            <form>
+                                <div>
+                                    <input id="signup--email--input"
+                                        class="input"
+                                        name="email"
+                                        type="email"
+                                        placeholder="Email"
+                                        value=""/>
+                                </div>
+                                <div>
+                                    <input id="signup--password--input"
+                                        class="input"
+                                        name="password"
+                                        type="password"
+                                        placeholder="Password"
+                                        value=""/>
+                                </div>
+                                <div>
+                                    <input id="signup--password-confirmation--input"
+                                        class="input"
+                                        name="password-confirmation"
+                                        placeholder="Confirm Password"
+                                        type="password"
+                                        value=""/>
+                                </div>
+                                <div class="form--submit--section">
+                                    <button id="signup--submit"
+                                            class="btn"
+                                            type="submit">Sign Up</button>
+                                    <div id="login--tab--button"
+                                         class="tab--button auth--switch switch-item switch-0 active"
+                                         index="1">Login instead</div>
+                                </div>
+                            </form>
+                        </div>
+                        <br/>
+                        <div id="login--form" class="login--form">
+                            <h2>Login</h2>
+                            <div class="webauthn--section">
+                                <p>This project uses <a href="https://webauthn.guide/" target="_blank">Web Authentication</a></p>
+
+                                <p>A better alternative for securing our sensitive information online</p>
+                            </div>
+                            <form>
+                                <div>
+                                    <input id="login--email--input"
+                                        class="input"
+                                        name="email"
+                                        type="email"
+                                        placeholder="Email"
+                                        value=""/>
+                                </div>
+                                <div>
+                                    <input id="login--password--input"
+                                        class="input"
+                                        name="password"
+                                        type="Password"
+                                        placeholder="Password"
+                                        value=""/>
+                                </div>
+                                <div class="form--submit--section">
+                                    <button id="login--submit"
+                                            class="btn"
+                                            type="submit">Login</button>
+                                    <div id="login--tab--button"
+                                         class="tab--button auth--switch switch-item switch-1"
+                                         index="0">Sign Up instaed</div>
+                                </div>
+                            </form>
+                        </div>
+                    </auth-switch-group>
+                </div>
+
                 <div class="app-connections">
                     <h2 class="page--heading">Connections</h2>
                     <div class="app-connection">
@@ -1063,7 +1145,7 @@
                         <p class="">Latest version: 0.1.49</p>
                     </div>
                     <div class="about--version">
-                        <p class="">Old version still available here: <a class="a" href="https://flux-stable.vercel.app">0.1.43</a></p>
+                        <p class="">Old stable version still available here: <a class="a" href="https://flux-stable.vercel.app">0.1.43</a></p>
                     </div>
                     <div class="about--links">
                         License <a class="a" href="https://www.gnu.org/licenses/agpl-3.0.en.html"> AGPL-3.0</a></p>

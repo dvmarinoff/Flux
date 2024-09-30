@@ -1047,10 +1047,15 @@ class SwitchGroup extends HTMLElement {
     }
     onSwitch(e) {
         const element = this.eventOwner(e);
+        console.log(e);
+        console.log(element);
+        console.log(element.attributes.index);
+        console.log(exists(element.attributes.index));
 
         if(exists(element.attributes.index)) {
 
             const id = parseInt(element.attributes.index.value) || 0;
+            console.log(id);
 
             if(equals(id, this.state)) {
                 return;
@@ -1165,6 +1170,34 @@ class LibrarySwitchGroup extends SwitchGroup {
 }
 
 customElements.define('library-switch-group', LibrarySwitchGroup);
+
+
+class AuthSwitchGroup extends SwitchGroup {
+    postInit() {
+        this.prop = 'authSwitch';
+        this.effect = 'ui:auth-switch-set';
+    }
+    config() {
+        this.$signup = document.querySelector('#signup--form'); // tab 0
+        this.$login = document.querySelector('#login--form');   // tab 1
+        this.renderEffect(this.state);
+
+        console.log(this.$switchList);
+    }
+    renderEffect(state) {
+        if(equals(state, 0)) {
+            this.$signup.classList.add('active');
+            this.$login.classList.remove('active');
+        }
+        if(equals(state, 1)) {
+            this.$login.classList.add('active');
+            this.$signup.classList.remove('active');
+        }
+        return;
+    }
+}
+
+customElements.define('auth-switch-group', AuthSwitchGroup);
 
 
 class MeasurementUnit extends DataView {

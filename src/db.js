@@ -63,6 +63,7 @@ let db = {
     powerSmoothing: 0,
     dataTileSwitch: models.dataTileSwitch.default,
     librarySwitch: 0,
+    authSwitch: 0,
 
     // Workouts
     workouts: [],
@@ -204,6 +205,11 @@ xf.reg('ui:data-tile-switch-set', (index, db) => {
 
 xf.reg('ui:library-switch-set', (index, db) => {
     db.librarySwitch = index;
+});
+
+xf.reg('ui:auth-switch-set', (index, db) => {
+    db.authSwitch = index;
+    console.log(`ui:auth-switch-set ${index}`);
 });
 
 // Targets
