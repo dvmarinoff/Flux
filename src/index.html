@@ -1042,58 +1042,64 @@
                 </div>
 
                 <div class="auth">
-                    <auth-switch-group>
-                        <div id="signup--form" class="signup--form">
+                    <auth-forms>
+                        <div id="signup--form--section" class="signup--form--section active">
                             <h2>Sign Up</h2>
                             <div class="webauthn--section">
                                 <p>This project uses <a href="https://webauthn.guide/" target="_blank">Web Authentication</a></p>
 
                                 <p>A better alternative for securing our sensitive information online</p>
                             </div>
-                            <form>
+                            <form id="signup--form">
                                 <div>
                                     <input id="signup--email--input"
-                                        class="input"
-                                        name="email"
-                                        type="email"
-                                        placeholder="Email"
-                                        value=""/>
+                                           class="input"
+                                           name="email"
+                                           type="email"
+                                           placeholder="Email"
+                                           value=""
+                                           required
+                                    />
                                 </div>
                                 <div>
                                     <input id="signup--password--input"
-                                        class="input"
-                                        name="password"
-                                        type="password"
-                                        placeholder="Password"
-                                        value=""/>
+                                           class="input"
+                                           name="password"
+                                           type="password"
+                                           placeholder="Password"
+                                           value=""
+                                           required
+                                    />
                                 </div>
                                 <div>
                                     <input id="signup--password-confirmation--input"
-                                        class="input"
-                                        name="password-confirmation"
-                                        placeholder="Confirm Password"
-                                        type="password"
-                                        value=""/>
+                                           class="input"
+                                           name="password-confirmation"
+                                           placeholder="Confirm Password"
+                                           type="password"
+                                           value=""
+                                           required
+                                    />
                                 </div>
                                 <div class="form--submit--section">
                                     <button id="signup--submit"
                                             class="btn"
                                             type="submit">Sign Up</button>
-                                    <div id="login--tab--button"
-                                         class="tab--button auth--switch switch-item switch-0 active"
+                                    <div id="to-login--button"
+                                         class="tab--button"
                                          index="1">Login instead</div>
                                 </div>
                             </form>
                         </div>
                         <br/>
-                        <div id="login--form" class="login--form">
+                        <div id="login--form--section" class="login--form--section">
                             <h2>Login</h2>
                             <div class="webauthn--section">
                                 <p>This project uses <a href="https://webauthn.guide/" target="_blank">Web Authentication</a></p>
 
                                 <p>A better alternative for securing our sensitive information online</p>
                             </div>
-                            <form>
+                            <form id="login--form">
                                 <div>
                                     <input id="login--email--input"
                                         class="input"
@@ -1114,13 +1120,13 @@
                                     <button id="login--submit"
                                             class="btn"
                                             type="submit">Login</button>
-                                    <div id="login--tab--button"
-                                         class="tab--button auth--switch switch-item switch-1"
+                                    <div id="to-signup--button"
+                                         class="tab--button"
                                          index="0">Sign Up instaed</div>
                                 </div>
                             </form>
                         </div>
-                    </auth-switch-group>
+                    </auth-forms>
                 </div>
 
                 <div class="app-connections">

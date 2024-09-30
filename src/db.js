@@ -63,7 +63,6 @@ let db = {
     powerSmoothing: 0,
     dataTileSwitch: models.dataTileSwitch.default,
     librarySwitch: 0,
-    authSwitch: 0,
 
     // Workouts
     workouts: [],
@@ -207,11 +206,6 @@ xf.reg('ui:library-switch-set', (index, db) => {
     db.librarySwitch = index;
 });
 
-xf.reg('ui:auth-switch-set', (index, db) => {
-    db.authSwitch = index;
-    console.log(`ui:auth-switch-set ${index}`);
-});
-
 // Targets
 xf.reg('ui:power-target-set', (powerTarget, db) => {
     db.powerTarget = models.powerTarget.set(powerTarget);
@@ -350,6 +344,38 @@ xf.reg(`ant:search:stopped`, (x, db) => {
     db.antSearchList = [];
 });
 
+
+// API
+function SignUp() {
+    const url = "http://localhost:8080/api/signup";
+    const $form = document.querySelector("#signup--form");
+    $form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submit();
+    });
+
+    async function submit() {
+        const formData = new FormData($form);
+
+        try {
+            console.log(`:signup`);
+            const response = await fetch(url, {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            console.log(result);
+        } catch(error) {
+            console.log(error);
+        }
+    }
+}
+
+
+// END API
+
 //
 xf.reg('app:start', async function(_, db) {
 
@@ -383,6 +409,7 @@ xf.reg('app:start', async function(_, db) {
     const sound = Sound({volume: db.volume});
     sound.start();
 
+    SignUp();
     // TRAINER MOCK
     // trainerMock.init();
 });

@@ -1967,10 +1967,10 @@ div.graph--bar-group {
         line-height: 3rem;
         text-transform: uppercase;
     }
-    #login--form.active, #signup--form.active {
+    #login--form--section.active, #signup--form--section.active {
         display: block;
     }
-    #login--form, #signup--form {
+    #login--form--section, #signup--form--section {
         display: none;
     }
     .tab--button {

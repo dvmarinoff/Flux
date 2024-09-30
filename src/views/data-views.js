@@ -1171,33 +1171,41 @@ class LibrarySwitchGroup extends SwitchGroup {
 
 customElements.define('library-switch-group', LibrarySwitchGroup);
 
-
-class AuthSwitchGroup extends SwitchGroup {
+class AuthForms extends HTMLElement {
+    constructor() {
+        super();
+        this.postInit();
+    }
     postInit() {
-        this.prop = 'authSwitch';
-        this.effect = 'ui:auth-switch-set';
     }
-    config() {
-        this.$signup = document.querySelector('#signup--form'); // tab 0
-        this.$login = document.querySelector('#login--form');   // tab 1
-        this.renderEffect(this.state);
+    connectedCallback() {
+        const self = this;
+        this.abortController = new AbortController();
+        this.signal = { signal: self.abortController.signal };
 
-        console.log(this.$switchList);
+        this.$signup = document.querySelector('#signup--form--section'); // tab 0
+        this.$login = document.querySelector('#login--form--section');   // tab 1
+        this.$toSignUp = document.querySelector('#to-signup--button');
+        this.$toLogin= document.querySelector('#to-login--button');
+
+        this.$toSignUp.addEventListener('pointerup', self.toSignup.bind(this));
+        this.$toLogin.addEventListener('pointerup', self.toLogin.bind(this));
     }
-    renderEffect(state) {
-        if(equals(state, 0)) {
-            this.$signup.classList.add('active');
-            this.$login.classList.remove('active');
-        }
-        if(equals(state, 1)) {
-            this.$login.classList.add('active');
-            this.$signup.classList.remove('active');
-        }
-        return;
+    disconnectedCallback() {
+        this.abortController.abort();
+        this.unsubs();
+    }
+    toSignup() {
+        this.$login.classList.remove('active');
+        this.$signup.classList.add('active');
+    }
+    toLogin() {
+        this.$signup.classList.remove('active');
+        this.$login.classList.add('active');
     }
 }
 
-customElements.define('auth-switch-group', AuthSwitchGroup);
+customElements.define('auth-forms', AuthForms);
 
 
 class MeasurementUnit extends DataView {
