@@ -631,8 +631,10 @@ function Spec(args = {}) {
 
 // print
 function Print() {
-    let printLog = false;
+    let printLog = (process.env.NODE_ENV == "development") ?? false;
     let printWarn = true;
+
+    console.log(`:env ${process.env.NODE_ENV} :print ${printLog}`);
 
     function log(msg) {
         if(printLog) {
