@@ -20,6 +20,7 @@
 /* Settings Page */
     /* ANT Device Request */
     /* App Connections */
+    /* User Auth */
     /* About */
 /* Media Queries */
 
@@ -1964,7 +1965,8 @@ div.graph--bar-group {
 
 /* User Auth */
 .auth {
-    display: grid;
+    /* display: grid; */
+    display: none;
     min-height: 300px;
 
     .input {
