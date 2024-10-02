@@ -347,7 +347,7 @@ xf.reg(`ant:search:stopped`, (x, db) => {
 
 // API
 function SignUp() {
-    const url = "http://localhost:8080/api/signup";
+    const url = "http://localhost:8080/api/sign_up";
     const $form = document.querySelector("#signup--form");
     $form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -358,15 +358,15 @@ function SignUp() {
         const formData = new FormData($form);
 
         try {
-            console.log(`:signup`);
             const response = await fetch(url, {
                 method: "POST",
-                body: formData,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(Object.fromEntries(formData)),
             });
 
             const result = await response.json();
-
-            console.log(result);
         } catch(error) {
             console.log(error);
         }
