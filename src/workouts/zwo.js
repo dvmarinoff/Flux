@@ -2,6 +2,9 @@ import { equals, existance, exists,
          empty, first, last, repeat,
          capitalize, toFixed } from '../functions.js';
 
+// TODO: replace with ParserCombinators.js implementation
+// - allow for wrong xml syntax
+
 function readAttribute(args = {}) {
     const el       = args.el;
     const name     = args.name;
@@ -334,6 +337,7 @@ function Warmup(args = {}) {
         const duration  = element.Duration;
         const powerLow  = element.PowerLow;
         const powerHigh = element.PowerHigh;
+        const cadence   = element.Cadence;
 
         const stepsCount = parseInt(duration / timeDx);
         const powerDx    = (powerHigh - powerLow) / (stepsCount - 1);
@@ -342,7 +346,11 @@ function Warmup(args = {}) {
         let stepPower = powerLow;
 
         for(let i = 0; i < stepsCount; i++) {
-            steps.push({duration: timeDx, power: stepPower});
+            if(exists(cadence)) {
+                steps.push({duration: timeDx, power: stepPower, cadence,});
+            } else {
+                steps.push({duration: timeDx, power: stepPower});
+            }
             stepPower = (stepPower + powerDx);
         }
 
