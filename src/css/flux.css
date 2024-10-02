@@ -809,12 +809,17 @@ z-stack-item.active {
 .graph {
     font-size: 1rem;
     --graph-total-height: 100%;
-    --graph-height: 90%;
-    --graph-heading-height: 10%;
+    /* --graph-height: 90%; */
+    /* --graph-heading-height: 10%; */
 
     position: relative;
     height: var(--graph-total-height);
     width: 100%;
+
+    display: grid;
+    grid-template-rows: minmax(1.4rem, auto) minmax(0, 100%);
+
+    border-top: 1px solid var(--white-opacity-01);
 }
 #graph-power {
     overflow: hidden;
@@ -852,7 +857,11 @@ div.graph--bar-group {
     font-size: 1em;
     font-weight: bold;
     text-align: center;
-    height: var(--graph-heading-height);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    /* height: var(--graph-heading-height); */
     z-index: 1;
 }
 
@@ -885,7 +894,7 @@ div.graph--bar-group {
     align-items: flex-end;
     position: absolute;
     width: 100%;
-    height: var(--graph-height);
+    height: 100%;
     left: 0px;
     bottom: 0px;
     padding: 0;
@@ -937,12 +946,14 @@ div.graph--bar-group {
 }
 
 .workout--graph-cont {
+    position: relative;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: center;
     align-items: flex-end;
     height: var(--graph-height);
+    height: 100%;
     padding: 0;
 }
 
@@ -953,19 +964,20 @@ div.graph--bar-group {
     justify-content: center;
     align-items: flex-end;
     position: relative;
-    min-height: var(--list--graph--height);
+    /* min-height: 100%; */
+    /* min-height: var(--list--graph--height); */
     padding: 0;
 }
 
 #progress {
-    display: flex;
-    justify-content: start;
-    align-items: flex-end;
     position: absolute;
     bottom: 0px;
     left: 0;
+    display: flex;
+    justify-content: start;
+    align-items: flex-end;
     width: 0px;
-    height: var(--graph-height);
+    height: 100%;
     background: var(--progress-white);
     border-right: 1px solid var(--zone-orange);
     z-index: 1;
@@ -1075,6 +1087,7 @@ div.graph--bar-group {
 
 /* Fixed Bottom */
 .fixed-bottom {
+    border-top: 1px solid var(--white-opacity-01);
     font-size: 1rem;
 
     --controls-height: 5em;
@@ -1087,23 +1100,45 @@ div.graph--bar-group {
     bottom: 0px;
     width: 100%;
     height: var(--fb-total-height);
+
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: repeat(6, 1fr);
+    align-items: center;
+
     background-color: var(--dark);
     z-index: 3;
 }
 
-.fixed-bottom--cont {
-    height: var(--controls-height);
-    width: 100%;
-    border-top: 1px solid var(--white-opacity-01);
-    z-index: 1;
+/* .fixed-bottom--cont { */
+/*     height: var(--controls-height); */
+/*     width: 100%; */
+/*     /\* border-top: 1px solid var(--white-opacity-01); *\/ */
+/*     z-index: 1; */
+/* } */
+
+#workout-name {
+    display: block;
+    font-size: 1.2em;
+    font-family: var(--ssb-font-family);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    display: block;
+    margin: 0 0.8em;
+    text-align: left;
+
+    grid-area: 1 / 1 / 2 / 4;
 }
 
 /* Watch */
 .watch {
-    display: block;
-    padding: 0.5em 0 0.5em;
-    width: 100%;
-    text-align: right;
+    grid-area: 1 / 4 / 2 / 7;
+    justify-self: right;
 }
 
 .watch .btn {
@@ -1112,7 +1147,7 @@ div.graph--bar-group {
 
 .control--btn {
     display: inline-block;
-    margin: 0px 0.8em;
+    margin: 0px 1.2em;
 }
 
 .control--btn--icon {
@@ -1120,20 +1155,6 @@ div.graph--bar-group {
     height: var(--size--icon--global);
     fill: #fff;
     cursor: pointer;
-}
-
-#workout-name {
-    font-size: 1.2em;
-    font-family: var(--ssb-font-family);
-    font-weight: bold;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-
-    display: block;
-    margin: 0 0.8em;
-    float: left;
-    text-align: left;
-    max-width: 50%;
 }
 
 #watch-pause, #watch-lap, #watch-stop, #activity-save {
@@ -1153,6 +1174,7 @@ div.graph--bar-group {
 
 .menu {
     height: var(--menu-height);
+    grid-area: 2 / 1 / 2 / 7;
 }
 
 .menu--row {
@@ -1219,7 +1241,7 @@ div.graph--bar-group {
     --workout--type-font-size: 1.4em;
     --workout--duration-font-size: 1.4em;
     --workout--description-font-size: 1.4em;
-    --inner-max-width: 47em;
+    --inner-max-width: 60rem;
     --size--icon--global: 2.4em;
     --list--graph--height: 8em;
 
@@ -1267,7 +1289,11 @@ div.graph--bar-group {
 }
 
 .workout--options {
-    margin-left: 1em;
+    display: flex;
+    justify-content: center;
+}
+.workout--options-btn {
+    pointer-events: none;
 }
 
 .workout--short-info {
@@ -1280,9 +1306,9 @@ div.graph--bar-group {
 }
 
 .workout--summary {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
+    display: grid;
+    grid-template-columns: 5fr 3fr 2fr 1fr 1fr;
+
     align-items: center;
     align-content: center;
     width: 100%;
@@ -1294,20 +1320,23 @@ div.graph--bar-group {
 
 .workout--name {
     font-size: var(--workout--name-font-size);
-    width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
 }
 
 .workout--type {
     font-size: var(--workout--type-font-size);
-    width: 20%;
-    min-width: 100px;
+    /* min-width: 100px; */
     font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
 }
 
 .workout--duration {
     font-size: var(--workout--duration-font-size);
-    width: 15%;
-    min-width: 60px;
+    /* min-width: 60px; */
     color: var(--gray);
 }
 

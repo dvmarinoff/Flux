@@ -45,8 +45,8 @@ function workoutTemplate(workout) {
                             <div class="workout--duration">${duration}</div>
                             <div class="workout--select" id="btn${workout.id}">${workout.selected ? radioOn : radioOff}
                             </div>
+                            <div class="workout--options">${options}</div>
                         </div>
-                        <div class="workout--options">${options}</div>
                     </div>
                     <div class="workout--full-info">
                         <div class="workout-list--graph-cont">${workout.graph}</div>
@@ -194,6 +194,9 @@ class WorkoutListItem extends HTMLLIElement {
         this.abortController.abort();
     }
     toggleExpand(e) {
+        if(e.target.classList.contains('workout--options')) {
+            return;
+        }
         if(this.isExpanded) {
             this.collapse();
         } else {

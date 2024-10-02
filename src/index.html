@@ -233,18 +233,13 @@
                         </div> <!-- end data-tiles -->
 
                         <div id="graph-power" class="graph">
-                            <div class="line"></div>
                             <h4 class="graph--heading">Power</h4>
                             <instant-power-graph class="graph--cont"></instant-power-graph>
                         </div>
 
                         <div id="graph-workout" class="graph">
-                            <div class="line"></div>
-                            <h4 id="current-workout-name" class="graph--heading">
-                                <workout-name></workout-name>
-                            </h4>
+                            <workout-name id="current-workout-name" class="graph--heading"></workout-name>
                             <workout-graph class="workout--graph-cont" prop="workout" metric="ftp"></workout-graph>
-                            <div class="line"></div>
                         </div>
 
                         <div id="targets">
@@ -1163,67 +1158,63 @@
             </page-group>
 
             <div class="fixed-bottom">
-                <div class="fixed-bottom--cont">
-                    <watch-control id="watch" class="watch">
-                        <div id="workout-name">
-                            <!-- <workout-name prop="workout">Free ride</workout-name> -->
-                            <workout-name>Free ride</workout-name>
-                        </div>
-
-                        <!-- <div id="start-workout" class="control--btn">
-                             <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
-                             height="24" viewBox="0 0 24 24" width="24">
-                             <path d="M0 0h24v24H0V0z" fill="none"/>
-                             <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
-                             10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                             </svg>
-                             </div> -->
-
-                        <div id="watch-start" class="control--btn">
+                <!-- <div class="fixed-bottom--cont"> -->
+                <workout-name id="workout-name">Free ride</workout-name>
+                <watch-control id="watch" class="watch">
+                    <!-- <div id="start-workout" class="control--btn">
                             <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
-                                 height="24" viewBox="0 0 24 24" width="24">
-                                <path d="M0 0h24v24H0V0z" fill="none"/>
-                                <path d="M8 5v14l11-7L8 5z"/>
+                            height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
+                            10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
                             </svg>
-                        </div>
+                            </div> -->
 
-                        <div id="watch-pause" class="control--btn">
-                            <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
-                                    height="24" viewBox="0 0 24 24" width="24">
-                                <path d="M0 0h24v24H0V0z" fill="none"/>
-                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                            </svg>
-                        </div>
+                    <div id="watch-start" class="control--btn">
+                        <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M8 5v14l11-7L8 5z"/>
+                        </svg>
+                    </div>
 
-                        <div id="watch-lap" class="control--btn">
-                            <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
-                                    height="24" viewBox="0 0 24 24" width="24">
-                                <path d="M0 0h24v24H0V0z" fill="none"/>
-                                <path d="M15 1H9v2h6V1zm-4
-                                            13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42
-                                            1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03
-                                            9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7
-                                            7-7 7 3.13 7 7-3.13 7-7 7z"/>
-                        </div>
+                    <div id="watch-pause" class="control--btn">
+                        <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </div>
 
-                        <div id="watch-stop" class="control--btn">
-                            <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
-                                    height="24" viewBox="0 0 24 24" width="24">
-                                <path d="M0 0h24v24H0V0z" fill="none"/>
-                                <path d="M6 6h12v12H6V6z"/>
-                            </svg>
-                        </div>
+                    <div id="watch-lap" class="control--btn">
+                        <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M15 1H9v2h6V1zm-4
+                                        13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42
+                                        1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03
+                                        9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7
+                                        7-7 7 3.13 7 7-3.13 7-7 7z"/>
+                    </div>
 
-                        <div id="activity-save" class="control--btn">
-                            <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
-                                    height="24" viewBox="0 0 24 24" width="24">
-                                <path d="M0 0h24v24H0V0z" fill="none"/>
-                                <path d="M19 12v7H5v-7H3v9h18v-9h-2zm-6 .67l2.59-2.58L17
-                                            11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
-                            </svg>
-                        </div>
-                    </watch-control>
-                </div> <!-- end controls -->
+                    <div id="watch-stop" class="control--btn">
+                        <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M6 6h12v12H6V6z"/>
+                        </svg>
+                    </div>
+
+                    <div id="activity-save" class="control--btn">
+                        <svg class="control--btn--icon" xmlns="http://www.w3.org/2000/svg"
+                                height="24" viewBox="0 0 24 24" width="24">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M19 12v7H5v-7H3v9h18v-9h-2zm-6 .67l2.59-2.58L17
+                                        11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+                        </svg>
+                    </div>
+                </watch-control> <!-- end controls -->
+                    <!-- </div>  -->
 
                 <div id="menu" class="menu">
                     <div class="page-btn-group menu--row">
@@ -1279,7 +1270,6 @@
                         </page-btn>
                     </div> <!-- end page-btn-group -->
                 </div> <!-- end menu -->
-
             </div> <!-- end fixed-bottom -->
         </div> <!-- end wrapper -->
     </body>
