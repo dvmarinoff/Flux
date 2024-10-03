@@ -78,7 +78,7 @@ class Watch {
             this.autoPauseCounter = 0;
         }
 
-        print.log(`:auto-pause-counter ${this.autoPauseCounter} ${this.hasBeenAutoPaused}`);
+        // print.log(`:auto-pause-counter ${this.autoPauseCounter} ${this.hasBeenAutoPaused}`);
 
         if(this.autoPauseCounter >= 4) {
             this.autoPauseCounter = 0;
