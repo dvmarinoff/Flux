@@ -1285,6 +1285,40 @@ class VirtualStateSource extends DataView {
 
 customElements.define('virtual-state-source', VirtualStateSource);
 
+
+class AutoPause extends DataView {
+    postInit() {
+        this.effect  = 'sources';
+        this.state   = { autoPause: false };
+    }
+    getDefaults() {
+        return {
+            prop: 'db:sources',
+            effect: 'sources'
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        this.addEventListener('pointerup', this.onEffect.bind(this), this.signal);
+    }
+    onUpdate(value) {
+        this.state = value.autoPause;
+        this.render();
+    }
+    onEffect() {
+        if(equals(this.state, true)) {
+            xf.dispatch(`${this.effect}`, {autoPause: false});
+        } else {
+            xf.dispatch(`${this.effect}`, {autoPause: true});
+        }
+    }
+    render() {
+        this.textContent = this.state ? 'On' : 'Off';
+    }
+}
+
+customElements.define('auto-pause', AutoPause);
+
 class DockModeBtn extends DataView {
     subs() {
         this.addEventListener('pointerup', this.onSwitch.bind(this), this.signal);

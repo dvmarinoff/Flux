@@ -188,6 +188,7 @@ class Sources extends Model {
             coreBodyTemperature: 'ble:coreTemp',
             skinTemperature:     'ble:coreTemp',
             virtualState: 'power',
+            autoPause:    false,
         };
         return sources;
     }

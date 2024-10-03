@@ -1,4 +1,4 @@
-import { equals, exists, empty, first, last, xf, avg, max, toFixed, } from './functions.js';
+import { equals, exists, empty, first, last, xf, avg, max, toFixed, print, } from './functions.js';
 import { kphToMps, mpsToKph, timeDiff } from './utils.js';
 import { models } from './models/models.js';
 import { ControlMode, } from './ble/enums.js';
@@ -28,6 +28,7 @@ class Watch {
         this.intervals         = [];
         this.autoPauseCounter  = 0;
         this.hasBeenAutoPaused = false;
+        this.autoPause         = false;
         this.init();
     }
     init() {
@@ -54,6 +55,7 @@ class Watch {
             }
         });
         xf.sub('db:power1s', self.onPower1s.bind(this));
+        xf.sub('db:sources', self.onSources.bind(this));
         timer.addEventListener('message', self.onTick.bind(self));
     }
     isStarted()        { return this.state        === 'started'; };
@@ -64,14 +66,21 @@ class Watch {
     isIntervalType(type) {
         return equals(this.intervalType, type);
     }
+    onSources(value) {
+        this.autoPause = value.autoPause ?? false;
+    }
     onPower1s(power) {
+        if(!this.autoPause) { return; }
+
         if(power === 0 && this.isStarted()) {
             this.autoPauseCounter += 1;
         } else {
             this.autoPauseCounter = 0;
         }
 
-        if(this.autoPauseCounter >= 2) {
+        print.log(`:auto-pause-counter ${this.autoPauseCounter} ${this.hasBeenAutoPaused}`);
+
+        if(this.autoPauseCounter >= 4) {
             this.autoPauseCounter = 0;
             xf.dispatch(`ui:watchPause`);
             this.hasBeenAutoPaused = true;

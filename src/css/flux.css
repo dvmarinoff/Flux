@@ -1785,48 +1785,36 @@ div.graph--bar-group {
     font-weight: bold;
 }
 
-.simulation {
-    --settings-row-max-width: 60em;
-    margin: 0em auto 4em;
+.switch--btn--group {
+    display: grid;
+    /* grid-template-columns: 1fr 1fr; */
+    grid-template-rows: 1fr 1fr 1fr;
+    margin: 8rem auto 6rem;
 }
-
-.simulation--cont {
+.switch--btn {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: left;
+    align-items: center;
     max-width: var(--settings-row-max-width);
     margin: 0 auto;
+    padding: 0 4rem;
+    height: 100%;
 }
 
-.simulation-header--label {
+.switch--btn--label {
     font-size: 1.1em;
     line-height: 3em;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-.simulation--switch {
+.switch--btn--value {
     display: block;
     margin: 1em auto 1em;
     text-transform: uppercase;
     font-weight: bold;
     cursor: pointer;
-}
-
-
-.sound {
-    --settings-row-max-width: 60em;
-    margin: 4em auto 4em;
-}
-
-.sound--cont {
-    max-width: var(--settings-row-max-width);
-    margin: 0 auto;
-    padding: 0em 0 0em 0;
-}
-
-.sound-header--label {
-    font-size: 1.1em;
-    line-height: 3em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 .sound--row {

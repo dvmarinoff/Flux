@@ -995,50 +995,55 @@
                     </div>
                 </div> <!-- end moxy-monitor settings -->
 
-                <div class="sound">
-                    <div class="sound--cont">
-                        <div class="sound--header">
-                            <div class="sound-header--label">Sound</div>
-                        </div>
-                        <sound-control class="sound--row">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 id="sound--mute"
-                                 class="sound--control sound--row--item"
-                                 viewBox="0 0 24 24"
-                                 fill="#FFFFFF">
-                                <path d="M0 0h24v24H0V0z" fill="none"/>
-                                <path d="M7 9v6h4l5 5V4l-5 5H7z"/>
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 id="sound--down"
-                                 class="sound--control sound--row--item"
-                                 viewBox="0 0 24 24"
-                                 fill="#FFFFFF">
-                                <path d="M0 0h24v24H0V0z" fill="none"/>
-                                <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/>
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                    id="sound--up"
+                <div class="switch--btn--group">
+                    <div class="device-card border-top">
+                        <div class="switch--btn">
+                            <div class="switch--btn--label">Sound</div>
+                            <sound-control class="sound--row switch--btn--value">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    id="sound--mute"
                                     class="sound--control sound--row--item"
                                     viewBox="0 0 24 24"
                                     fill="#FFFFFF">
-                                <path d="M0 0h24v24H0V0z" fill="none"/>
-                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                            </svg>
-                            <div id="sound--volume" class="sound--volume sound--row--item">
-                                100%
-                            </div>
-                        </sound-control>
-                    </div>
-                </div>
-
-                <div class="simulation">
-                    <div class="simulation--cont">
-                        <div class="simulation--header">
-                            <div class="simulation-header--label">Simulation</div>
+                                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                                    <path d="M7 9v6h4l5 5V4l-5 5H7z"/>
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    id="sound--down"
+                                    class="sound--control sound--row--item"
+                                    viewBox="0 0 24 24"
+                                    fill="#FFFFFF">
+                                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                                    <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/>
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                        id="sound--up"
+                                        class="sound--control sound--row--item"
+                                        viewBox="0 0 24 24"
+                                        fill="#FFFFFF">
+                                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                                </svg>
+                                <div id="sound--volume" class="sound--volume sound--row--item">
+                                    100%
+                                </div>
+                            </sound-control>
                         </div>
-                        <div class="">
-                            <virtual-state-source class="simulation--switch">power</virtual-state-source>
+                    </div>
+
+                    <div class="device-card">
+                        <div class="switch--btn">
+                            <div class="switch--btn--label">Simulation</div>
+                            <virtual-state-source class="switch--btn--value">power</virtual-state-source>
+                        </div>
+                    </div>
+
+                    <div class="device-card">
+                        <div class="switch--btn">
+                            <div class="switch--btn--label">Auto Pause</div>
+                            <auto-pause class="switch--btn--value">
+                                OFF
+                            </auto-pause>
                         </div>
                     </div>
                 </div>
@@ -1150,7 +1155,7 @@
                         <p class="">This is an open-source project. For more information, please visit the <a class="a" href="https://github.com/dvmarinoff/Flux">github</a> page. There you can get support or join the discussions.</p>
                     </div>
                     <div class="about--version">
-                        <p class="">Latest version: 0.1.50</p>
+                        <p class="">Latest version: 0.1.51</p>
                     </div>
                     <div class="about--version">
                         <p class="">Old stable version still available here: <a class="a" href="https://flux-stable.vercel.app">0.1.43</a></p>
