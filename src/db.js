@@ -372,8 +372,6 @@ function SignUp() {
         }
     }
 }
-
-
 // END API
 
 //
@@ -409,7 +407,7 @@ xf.reg('app:start', async function(_, db) {
     const sound = Sound({volume: db.volume});
     sound.start();
 
-    SignUp();
+    // SignUp();
     // TRAINER MOCK
     // trainerMock.init();
 });

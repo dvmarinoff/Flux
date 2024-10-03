@@ -446,9 +446,27 @@ function Connectable(args = {}) {
         const hasRaceController = hasService(uuids.raceController);
         const hasSmo2 = hasService(uuids.smo2);
         const hasCoreTemp = hasService(uuids.coreTemp);
+        const hasTrainerControl = hasFTMS || hasWCPS || hasFEC;
 
-        // order here is important
-        if(hasFTMS || hasFEC || hasWCPS) {
+        // Order here is important
+        if(hasHeartRate) {
+            // heart rate
+            _deviceType = Device.heartRateMonitor;
+            print.log(`ble: connectable: setup: ${getDeviceType()} `);
+
+            services['hrs'] = HRS({
+                service: getService(uuids.heartRate),
+                onData: onData,
+            });
+            let res = await services.hrs.setup();
+
+            // NOTE: we don't return here because:
+            // - the Tickr X has a CSC service too
+            // - the Zwift Hub has FTMS
+            if(!(hasCadence || hasTrainerControl)) return res;
+        }
+
+        if(hasTrainerControl) {
             // controllable
             //
             // Here we are determining which trainer control service the device
@@ -456,6 +474,11 @@ function Connectable(args = {}) {
             // present else the device could fail (Tacx), so we do early return.
             // The supported control services are FTMS, FEC and WCPS.
             // There choosen one will be called 'trainer' and assigned to services.
+            //
+            // We don't want more than one control service to be initialized, because
+            // on many trainers they will clash and this results in resistance jumping
+            // between both services. This is resolved only by power cycling the
+            // trainer and reconnecting again.
             _deviceType = Device.controllable;
             print.log(`ble: connectable: setup: ${getDeviceType()}`);
 
@@ -541,23 +564,6 @@ function Connectable(args = {}) {
             let res = await services.coreTemp.setup();
 
             return res;
-        }
-
-        if(hasHeartRate) {
-            // heart rate
-            _deviceType = Device.heartRateMonitor;
-            print.log(`ble: connectable: setup: ${getDeviceType()} `);
-
-            services['hrs'] = HRS({
-                service: getService(uuids.heartRate),
-                onData: onData,
-            });
-            let res = await services.hrs.setup();
-
-            // NOTE: we don't return here because:
-            // - the Tickr X has a CSC service too
-            // - the Zwift Hub has FTMS
-            if(!hasCadence) return res;
         }
 
         if(hasCadence) {

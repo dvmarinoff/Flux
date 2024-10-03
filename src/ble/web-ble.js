@@ -81,7 +81,7 @@ function Filters() {
                 {services: [uuids.wahooFitnessMachine]},
                 {services: [uuids.cyclingPower]},
             ],
-            optionalServices: []
+            optionalServices: [uuids.heartRate]
         };
     }
 
@@ -100,6 +100,7 @@ function Filters() {
     function heartRateMonitor() {
         return {
             filters: [{services: [uuids.heartRate]}],
+            optionalServices: [uuids.speedCadence]
         };
     }
 

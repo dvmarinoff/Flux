@@ -839,7 +839,14 @@
                                                prop="ble:heartRateMonitor:name">--</data-view>
                                 </div>
                                 <div class="device-card--tile"></div>
-                                <div class="device-card--tile"></div>
+                                <div class="device-card--tile">
+                                    <source-switch class="source-switch"
+                                                   for="cadence"
+                                                   use="ble:heartRateMonitor">
+                                        <h3 class="device-card--tile--header">Cadence</h3>
+                                        <cadence-value class="data-view device-card--tile--value">--</cadence-value>
+                                    </source-switch>
+                                </div>
                                 <div class="device-card--tile"></div>
                                 <div class="device-card--tile">
                                     <source-switch class="source-switch"
