@@ -510,15 +510,15 @@ function RowView(args = {}) {
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24">
                     <path d="M0 0h24v24H0V0z" fill="none"/>
-                    <path fill="#ffffff" class="path" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                    <path fill="#none" class="path" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
                 </svg>
                 <svg class="editor--radio editor--radio-on"
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24">
                     <path d="M0 0h24v24H0V0z" fill="none"/>
-                    <path class="path" fill="#ffffff" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0
+                    <path class="path" fill="#none" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0
                             18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-                    <circle class="circle" cx="12" cy="12" r="5" fill="#ffffff"/>
+                    <circle class="circle" cx="12" cy="12" r="5" fill="#none"/>
                 </svg>
             </div>
             <div class="editor--td editor--static time">${data.time}</div>

@@ -1319,6 +1319,40 @@ class AutoPause extends DataView {
 
 customElements.define('auto-pause', AutoPause);
 
+class Theme extends DataView {
+    postInit() {
+        this.effect  = 'sources';
+        this.state   = { theme: 'DARK' };
+    }
+    getDefaults() {
+        return {
+            prop: 'db:sources',
+            effect: 'sources'
+        };
+    }
+    subs() {
+        xf.sub(`${this.prop}`, this.onUpdate.bind(this), this.signal);
+        this.addEventListener('pointerup', this.onEffect.bind(this), this.signal);
+    }
+    onUpdate(value) {
+        this.state = value.theme;
+        this.render();
+    }
+    onEffect() {
+        if(equals(this.state, 'DARK')) {
+            xf.dispatch(`${this.effect}`, {theme: 'WHITE'});
+        } else {
+            xf.dispatch(`${this.effect}`, {theme: 'DARK'});
+        }
+    }
+    render() {
+        this.textContent = equals(this.state, 'DARK') ? 'DARK' : 'WHITE';
+        document.body.className =  equals(this.state, 'DARK') ? 'dark-theme' : 'white-theme';
+    }
+}
+
+customElements.define('theme-layout', Theme);
+
 class DockModeBtn extends DataView {
     subs() {
         this.addEventListener('pointerup', this.onSwitch.bind(this), this.signal);
