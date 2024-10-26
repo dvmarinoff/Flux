@@ -122,7 +122,7 @@ input[type="number"] {
     text-transform: uppercase;
     font-family: var(--ss-font-family);
 
-    border: 1px solid var(--white-opacity-01);
+    border: 1px solid var(--border-color);
     border-radius: 3px;
     webkit-transition: all 0.2s ease-in-out 0s;
     transition: all 0.2s ease-in-out 0s;
@@ -143,10 +143,10 @@ input[type="number"] {
     padding: 5px 10px;
 
     color: #fff;
-    background-color: var(--chrome);
+    background-color: var(--background-color-2);
     font-family: var(--ss-font-family);
 
-    border: 1px solid var(--white-opacity-01);
+    border: 1px solid var(--border-color);
     border-radius: 3px;
     webkit-transition: all 0.2s ease-in-out 0s;
     transition: all 0.2s ease-in-out 0s;
@@ -177,8 +177,8 @@ input[type="number"] {
     letter-spacing: 1px;
     line-height: 29px;
     text-transform: uppercase;
-    color: #fff;
-    background-color: var(--chrome);
+    color: var(--foreground-color);
+    background-color: var(--background-color-2);
     border-radius: 3px;
 
     position: absolute;
@@ -254,6 +254,7 @@ body {
     --yellow:      #F8C73A;
     --dark:        #28272D;
     --chrome:      #35363a;
+    --chrome-white: #ebebeb;
 
     --zone-red:    #FE340B;
     --zone-orange: #FF663A;
@@ -266,8 +267,6 @@ body {
     --orange-logo: #FC4C02;
     --white-gray:  #F7F7FA;
     --red-logo:    #E50914;
-
-    --progress-white: #fff4;
 
     --black-opacity-01:  rgba(0,0,0, 0.1);
     --black-opacity-02:  rgba(0,0,0, 0.2);
@@ -392,41 +391,79 @@ body {
 
 /* Theme */
 /* Dark Theme */
-body {
-    color: var(--white);
-    background-color: var(--dark);
+body.dark-theme {
+    --background-color: var(--dark);
+    --background-color-2: var(--chrome);
+    --foreground-color: var(--white); 
+    --foreground-color-inactive: var(--gray);
+    --border-color: var(--white-opacity-01);
+    --progress: #fff4;
 }
+/* End Dark Theme */
+
+/* White Theme */
+body.white-theme {
+    --background-color: var(--white);
+    --background-color-2: var(--chrome-white);
+    --foreground-color: var(--dark); 
+    --foreground-color-inactive: var(--gray);
+    --border-color: var(--black-opacity-01);
+    --progress: #6f6f6f44;
+}
+/* End White Theme */
+body {
+    color: var(--foreground-color);
+    background-color: var(--background-color);
+}
+
+input {
+    color: var(--foreground-color);
+    background-color: var(--background-color);
+}
+.chrome-bg {
+    background-color: var(--background-color-2);
+}
+
+.btn {
+    color: var(--foreground-color);
+    background-color: var(--background-color-2);
+}
+
 .connections-header {
-    background-color: var(--chrome);
+    background-color: var(--background-color-2);
 }
 
 #progress-active {
     background-color: transparent;
 }
+
+.flat-btn {
+    color: var(--foreground-color);
+}
+
 .radio {
-    fill: var(--white);
+    fill: var(--foreground-color);
 }
 
 .mode.active {
-    color: #fff;
+    fill: var(--foreground-color);
 }
 
 .icon-btn .icon {
-    fill: var(--gray);
+    fill: var(--foreground-color-inactive);
 }
+
 .icon-btn .text {
-    color: var(--gray);
+    color: var(--foreground-color-inactive);
 }
+
 .tab-btn.active .text {
-    color: var(--white);
+    color: var(--foreground-color);
 }
 .tab-btn.active .icon-fill {
-    fill: var(--white);
+    fill: var(--foreground-color);
 }
-.control-icon {
-    fill: #fff;
-}
-/* Dark Theme */
+/* End Theme */
 
 /* Page */
 .wrapper {
@@ -555,27 +592,27 @@ body {
 }
 
 .protocol-switch.on {
-    color: var(--white);
+    color: var(--foreground-color);
 }
 
 .protocol-switch.loading {
-    color: var(--gray);
+    color: var(--foreground-color-inactive);
 }
 
 .protocol-switch.off {
-    color: var(--gray);
+    color: var(--foreground-color-inactive);
 }
 
 .protocol-switch.on .protocol-btn--icon {
-    fill: var(--white);
+    fill: var(--foreground-color);
 }
 
 .protocol-switch.loading .protocol-btn--icon {
-    fill: var(--gray);
+    fill: var(--foreground-color-inactive);
 }
 
 .protocol-switch.off .protocol-btn--icon {
-    fill: var(--gray);
+    fill: var(--foreground-color-inactive);
 }
 
 .protocol-btn {
@@ -586,7 +623,7 @@ body {
 }
 
 .protocol-btn--icon {
-    fill: var(--white);
+    fill: var(--foreground-color);
     width: var(--size--icon--global);
     height: var(--size--icon--global);
 }
@@ -723,12 +760,12 @@ body {
     width: 1rem;
     height: 1rem;
     border-radius: 50%;
-    border: 1px solid #fff;
+    border: 1px solid var(--foreground-color);
 }
 
 .data-tile--switch.active .data-tile--switch--icon {
-    background-color: #fff;
-    border: 1px solid #fff;
+    background-color: var(--foreground-color);
+    border: 1px solid var(--foreground-color);
 }
 
 .data-tile-small--unit {
@@ -820,7 +857,7 @@ z-stack-item.active {
     display: grid;
     grid-template-rows: minmax(1.4rem, auto) minmax(0, 100%);
 
-    border-top: 1px solid var(--white-opacity-01);
+    border-top: 1px solid var(--border-color);
 }
 #graph-power {
     overflow: hidden;
@@ -979,7 +1016,7 @@ div.graph--bar-group {
     align-items: flex-end;
     width: 0px;
     height: 100%;
-    background: var(--progress-white);
+    background: var(--progress);
     border-right: 1px solid var(--zone-orange);
     z-index: 1;
     pointer-events: none;
@@ -1064,8 +1101,9 @@ div.graph--bar-group {
     line-height: var(--number-input-line-height);
     font-size: var(--number-input-value-font-size);
     text-align: center;
-    color: var(--dark);
-    border: 1px solid var(--white-opacity-01);
+    background-color: var(--white);
+    color: var(--black);
+    border: 1px solid var(--border-color)
 }
 
 .number-input--btn {
@@ -1088,7 +1126,7 @@ div.graph--bar-group {
 
 /* Fixed Bottom */
 .fixed-bottom {
-    border-top: 1px solid var(--white-opacity-01);
+    border-top: 1px solid var(--border-color);
     font-size: 1rem;
 
     --controls-height: 5em;
@@ -1107,14 +1145,14 @@ div.graph--bar-group {
     grid-template-columns: repeat(6, 1fr);
     align-items: center;
 
-    background-color: var(--dark);
+    background-color: var(--background-color);
     z-index: 3;
 }
 
 /* .fixed-bottom--cont { */
 /*     height: var(--controls-height); */
 /*     width: 100%; */
-/*     /\* border-top: 1px solid var(--white-opacity-01); *\/ */
+/*     /\* border-top: 1px solid var(--border-color); *\/ */
 /*     z-index: 1; */
 /* } */
 
@@ -1154,7 +1192,7 @@ div.graph--bar-group {
 .control--btn--icon {
     width: var(--size--icon--global);
     height: var(--size--icon--global);
-    fill: #fff;
+    fill: var(--foreground-color);
     cursor: pointer;
 }
 
@@ -1203,26 +1241,26 @@ div.graph--bar-group {
     display: block;
     width: var(--size--icon--menu--btn);
     height: var(--size--icon--menu-btn);
-    fill: var(--gray);
+    fill: var(--foreground-color-inactive);
 }
 
 .menu--btn--label {
     font-size: 1em;
     line-height: 1.4em;
     letter-spacing: 1px;
-    color: var(--gray);
+    color: var(--foreground-color-inactive);
 }
 
 .menu--btn--icon--fill {
-    fill: var(--gray);
+    fill: var(--foreground-color-inactive);
 }
 
 .menu--btn.active .menu--btn--label {
-    color: var(--white);
+    color: var(--foreground-color);
 }
 
 .menu--btn.active .menu--btn--icon--fill {
-    fill: var(--white);
+    fill: var(--foreground-color);
 }
 /* END Menu */
 /* END Fixed Bottom */
@@ -1253,13 +1291,13 @@ div.graph--bar-group {
 .workout {
     display: block;
     position: relative;
-    border-bottom: 1px solid var(--white-opacity-01);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .workout--info {
     position: relative;
     padding: 0em 1.5em;
-    background-color: var(--dark);
+    background-color: var(--background-color);
     z-index: 1;
 }
 
@@ -1362,7 +1400,7 @@ div.graph--bar-group {
     font-size: var(--workout--description-font-size);
     line-height: 1.4em;
     margin: 0 2em 2em 2em;
-    color: var(--gray);
+    color: var(--foreground-color-inactive);
 }
 /* END Workout List */
 
@@ -1410,7 +1448,7 @@ div.graph--bar-group {
 }
 
 .lap--item {
-    border-bottom: 1px solid var(--white-opacity-01);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .laps--header {
@@ -1463,11 +1501,11 @@ div.graph--bar-group {
 }
 
 .library--switch .library--switch--heading {
-    color: var(--gray);
+    color: var(--foreground-color-inactive);
 }
 
 .library--switch.active .library--switch--heading {
-    color: #fff;
+    color: var(--foreground-color);
 }
 
 #workouts {
@@ -1511,7 +1549,7 @@ div.graph--bar-group {
 
 .editor--meta {
     display: grid;
-    background-color: var(--chrome);
+    background-color: var(--background-color-2);
     padding: 0.5em 0;
 }
 
@@ -1524,9 +1562,9 @@ div.graph--bar-group {
     font-size: 1.3em;
     line-height: 1.3em;
     margin: 1em 1em;
-    color: #fff;
-    background-color: var(--dark);
-    background-color: var(--chrome);
+    color: var(--foreground-color);
+    background-color: var(--background-color);
+    background-color: var(--background-color-2);
     border-top: none;
     border-left: none;
     border-right: none;
@@ -1550,7 +1588,7 @@ div.graph--bar-group {
 
 .editor--head {
     margin: 0 0 1em 0;
-    background-color: var(--chrome);
+    background-color: var(--background-color-2);
 }
 
 .editor--row {
@@ -1574,7 +1612,7 @@ div.graph--bar-group {
     padding: 0.5em 0.5em;
     line-height: 1.3em;
     text-align: center;
-    background-color: var(--dark);
+    background-color: var(--background-color);
     border: none;
 }
 
@@ -1589,7 +1627,7 @@ div.graph--bar-group {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: bold;
-    background-color: var(--chrome);
+    background-color: var(--background-color-2);
 }
 
 .editor--static {
@@ -1599,14 +1637,16 @@ div.graph--bar-group {
 .editor--icon {
     margin: 1em 2em;
     cursor: pointer;
+    fill: var(--foreground-color);
 }
 
 .editor--save {
-    fill: var(--gray);
+    fill: var(--foreground-color-inactive);
     cursor: not-allowed;
 }
 
 .editor--radio {
+    fill: var(--foreground-color);
     display: none;
     width: 1em;
     height: 1em;
@@ -1658,7 +1698,7 @@ div.graph--bar-group {
 
     text-align: center;
     border-radius: 50%;
-    border: 1px solid var(--white-opacity-01);
+    border: 1px solid var(--border-color);
 }
 
 .settings-tile--label {
@@ -1677,8 +1717,8 @@ div.graph--bar-group {
     font-weight: bold;
     text-align: center;
 
-    color: var(--white);
-    background-color: var(--dark);
+    color: var(--foreground-color);
+    background-color: var(--background-color);
     border: none;
 }
 
@@ -1694,7 +1734,7 @@ div.graph--bar-group {
 
     font-weight: bold;
     text-transform: uppercase;
-    color: #fff;
+    color: var(--foreground-color);
     cursor: pointer;
 }
 
@@ -1727,11 +1767,11 @@ div.graph--bar-group {
 }
 
 .row-border {
-    border-top: 1px solid var(--white-opacity-01);
+    border-top: 1px solid var(--border-color);
 }
 
 .border-top {
-    border-top: 1px solid var(--white-opacity-01);
+    border-top: 1px solid var(--border-color);
 }
 
 .device-card {
@@ -1740,7 +1780,7 @@ div.graph--bar-group {
     --line-height--device-card--tile: 1.2em;
     --grid-template-columns--device-card--body--row: 5em 2fr 1fr 1.1fr 1fr 1fr;
     --size--icon: 2.7em;
-    border-bottom: 1px solid var(--white-opacity-01);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .device-card--cont {
@@ -1835,6 +1875,7 @@ div.graph--bar-group {
 
 .sound--control {
     cursor: pointer;
+    fill: var(--foreground-color);
 }
 
 .sound--volume {
@@ -1844,13 +1885,13 @@ div.graph--bar-group {
 }
 
 .connection-icon-switch--icon {
-    fill: #fff;
+    fill: var(--foreground-color);
     width: var(--size--icon);
     height: var(--size--icon);
 }
 
 .connection-icon-switch--icon.disabled {
-    fill: var(--gray);
+    fill: var(--foreground-color-inactive);
 }
 
 .connection-icon-switch--indicator {
@@ -1862,12 +1903,12 @@ div.graph--bar-group {
 
 .source-switch {
     display: block;
-    color: var(--gray);
+    color: var(--foreground-color-inactive);
     cursor: pointer;
 }
 
 .source-switch.active {
-    color: #fff;
+    color: var(--foreground-color);
 }
 
 /* ANT Device Request */
@@ -1890,7 +1931,7 @@ div.graph--bar-group {
 
     max-width: 100%;
     width: 48em;
-    background-color: var(--chrome);
+    background-color: var(--background-color-2);
     box-shadow: 1px 2px 4px 0px rgba(0,0,0, 0.2);
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -1939,9 +1980,9 @@ div.graph--bar-group {
     font-size: 1em;
     text-transform: uppercase;
     font-family: var(--ss-font-family);
-    color: #fff;
-    background-color: var(--chrome);
-    border: 1px solid var(--white-opacity-01);
+    color: var(--foreground-color);
+    background-color: var(--background-color-2);
+    border: 1px solid var(--border-color);
     border-radius: 3px;
     cursor: pointer;
 }
@@ -2682,12 +2723,12 @@ and (min-width: 500px) {
     }
 
     .dark-theme .controls {
-        background-color: var(--chrome);
+        background-color: var(--background-color-2);
     }
 
     .menu {
         width: 60%;
-        background-color: var(--chrome);
+        background-color: var(--background-color-2);
     }
 
     .watch {
@@ -2698,7 +2739,7 @@ and (min-width: 500px) {
         align-content: center;
         height: 100vh;
         padding: 0;
-        background-color: var(--chrome);
+        background-color: var(--background-color-2);
     }
 
     .menu--row {
@@ -2768,7 +2809,7 @@ and (min-width: 1024px) {
 
         --data-tile--heading-font-size: 0.8em;
         --data-tile-small--heading-font-size: 0.8em;
-        background-color: var(--chrome);
+        background-color: var(--background-color-2);
     }
 
     #graph-workout {
@@ -2785,7 +2826,7 @@ and (min-width: 1024px) {
         --mode-selector-margin: 0em auto;
         grid-area: 3 / 3 / 3 / 3;
 
-        background-color: var(--chrome);
+        background-color: var(--background-color-2);
     }
     .targets--cont {
         display: grid;
@@ -2820,12 +2861,12 @@ and (min-width: 1024px) {
     }
 
     .dark-theme .controls {
-        background-color: var(--chrome);
+        background-color: var(--background-color-2);
     }
 
     .menu {
         width: 50%;
-        background-color: var(--chrome);
+        background-color: var(--background-color-2);
     }
 
     .watch {
