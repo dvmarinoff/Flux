@@ -2,7 +2,7 @@
 // Wahoo Cycling Power Service
 //
 
-import { exists, expect, f, wait, } from '../../functions.js';
+import { exists, expect, wait, } from '../../functions.js';
 import { Characteristic } from '../characteristic.js';
 import { Service } from '../service.js';
 import {

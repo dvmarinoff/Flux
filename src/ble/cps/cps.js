@@ -2,7 +2,7 @@
 // Cycling Power Service
 //
 
-import { expect, f } from '../../functions.js';
+import { expect } from '../../functions.js';
 import { uuids, } from '../web-ble.js';
 import { Service } from '../service.js';
 import { Characteristic } from '../characteristic.js';
