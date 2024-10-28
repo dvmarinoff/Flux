@@ -3,6 +3,7 @@ import { models, } from '../models/models.js';
 import { formatTime } from '../utils.js';
 import { zwo } from '../workouts/zwo.js';
 import { fileHandler } from '../file.js';
+import { uuid } from '../storage/uuid.js';
 
 function stringToSeconds(str) {
     const values = str.split(':').map(Number);
@@ -107,7 +108,7 @@ function Row(args = {}) {
     };
 
     function genId() {
-        return window.crypto.randomUUID();
+        return uuid();
     }
 
     function setTime(value) {
