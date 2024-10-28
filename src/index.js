@@ -5,9 +5,6 @@ import './ble/devices.js';
 import './watch.js';
 import './course.js';
 import './lock.js';
-import { inject } from '@vercel/analytics';
-
-inject();
 
 function startServiceWorker() {
     if('serviceWorker' in navigator) {
