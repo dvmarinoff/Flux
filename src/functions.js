@@ -631,10 +631,14 @@ function Spec(args = {}) {
 
 // print
 function Print() {
-    let printLog = (process.env.NODE_ENV == "development") ?? false;
+    if(!exists(process)) {
+        var process = {env: {NODE_ENV: "development"}};
+    }
+
+    let printLog = (process?.env?.NODE_ENV ?? "development" == "development") ?? false;
     let printWarn = true;
 
-    console.log(`:env ${process.env.NODE_ENV} :print ${printLog}`);
+    console.log(`:env ${process?.env?.NODE_ENV} :print ${printLog}`);
 
     function log(msg) {
         if(printLog) {
