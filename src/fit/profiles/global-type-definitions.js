@@ -1,4 +1,4 @@
-{
+export default {
     "file": {
         "base_type": "enum",
         "values": {
@@ -7393,4 +7393,5 @@
             "threat_approaching_fast": 3
         }
     }
-}
+};
+

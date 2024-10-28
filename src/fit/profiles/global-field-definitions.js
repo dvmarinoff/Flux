@@ -1,4 +1,4 @@
-{
+export default {
     "type": {
         "type": "course_point",
         "base_type": "enum",
@@ -1852,4 +1852,5 @@
         "base_type": "bool",
         "units": ""
     }
-}
+};
+
