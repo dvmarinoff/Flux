@@ -1,7 +1,5 @@
 # Auuki
 
-Flux is getting a new name: Auuki.
-
 Auuki is an App for executing structured workouts on a smart trainer.
 
 - executing Zwift .zwo workouts
@@ -35,7 +33,7 @@ _Status_: Currently working on creating a backend API and iOS app.
 
 ## Supported Browsers
 
-**TL;DR:** Use Google Chrome on Android, Windows 10, Mac (M1 or Intel) and Ubuntu, but not iOS or Apple TV.
+**TL;DR:** Use Google Chrome on Android, Windows 10, Mac (M1 or Intel) and Ubuntu, but not iOS.
 
 The Web version is running directly in the browser and relies on some of the latest web technologies. Browsers like Firefox and Safari don't have support for them. On iOS Safari is the only allowed browser, and even Chrome for iOS is just Safari with a Chrome skin. Browser support for the web version is the following:
 
@@ -54,11 +52,7 @@ On Chrome, Edge and Opera for Linux you might need to turn on the experimental p
 - Opera: `opera://flags/#enable-experimental-web-platform-features`
 
 ### iOS
-For iOS you can try [WebBLE](https://apps.apple.com/us/app/webble/id1193531073) which is:
-
-> Very simple web browser that supports an initial subset of the web bluetooth.
-
-It is not tested or supported by this project, but you can give it try if your only option is iOS.
+work is in progress to finnish the iOS, expect updates soon ...
 
 
 
