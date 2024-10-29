@@ -1,12 +1,14 @@
-# Flux
+# Auuki
 
-Flux is an App for executing structured workouts on a smart trainer.
+Flux is getting a new name: Auuki.
+
+Auuki is an App for executing structured workouts on a smart trainer.
 
 - executing Zwift .zwo workouts
 - riding .fit courses and activities
 - works with bluetooth smart trainers, power meters and heart rate monitors.
 - ERG mode and extended manual control of your trainer with Grade Simulation and Resistance mode.
-- workouts with [Slope targets](https://github.com/dvmarinoff/Flux/wiki/Slope-target-for-workout-intervals)
+- workouts with [Slope targets](https://github.com/dvmarinoff/Auuki/wiki/Slope-target-for-workout-intervals)
 - recording .FIT Activities compatible with all major platforms like Strava, Training Peaks, etc
 - build-in collection of structured workouts to get you started
 
@@ -92,21 +94,21 @@ Tacx Heart Rate monitor, Tacx Flux S trainer, and X240 laptop with Ubuntu 20.04.
 
 ## The Demo
 You can check a pre-release demo of the web version at
-[Latest Version on master](https://flux-web.vercel.app/), or [Latest development vesion](https://flux-dev.vercel.app/)
+[Latest Version on master](https://auuki.com)
 
 Keep in mind it is in active development and will change and break on daily bases, that's until the first stable version is released.
 
 ## Manual
 
-- [How-To: Using the connection settings](https://github.com/dvmarinoff/Flux/discussions/91)
-- [How-To: Using Flux and another app concurrently](https://github.com/dvmarinoff/Flux/discussions/101)
+- [How-To: Using the connection settings](https://github.com/dvmarinoff/Auuki/discussions/91)
+- [How-To: Using Auuki and another app concurrently](https://github.com/dvmarinoff/Auuki/discussions/101)
 
 <!-- sponsors -->
 ## Sponsers 💖
 
-While Flux is free software and will always be, the project would benefit immensely from some funding. Raising a monthly budget we help cover the development and runnig costs for servers, databases, domains, storage, and others.
+While Auuki is free software and will always be, the project would benefit immensely from some funding. Raising a monthly budget we help cover the development and runnig costs for servers, databases, domains, storage, and others.
 
-You can support the development of Flux via [Github Sponsers](https://github.com/sponsors/dvmarinoff).
+You can support the development of Auuki via [Github Sponsers](https://github.com/sponsors/dvmarinoff).
 
 ### Backers
 <div>
