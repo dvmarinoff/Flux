@@ -7,9 +7,9 @@
 import { exists, equals } from '../../functions.js';
 
 import { BaseType, BaseTypeDefinitions, } from './base-types.js';
-import global_message_definitions from './global-message-definitions.json';
-import global_type_definitions from './global-type-definitions.json';
-import global_field_definitions from './global-field-definitions.json';
+import global_message_definitions from './global-message-definitions.js';
+import global_type_definitions from './global-type-definitions.js';
+import global_field_definitions from './global-field-definitions.js';
 
 function Profiles(args = {}) {
 

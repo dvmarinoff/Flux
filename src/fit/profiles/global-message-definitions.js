@@ -1,4 +1,4 @@
-{
+export default {
     "file_id": {
         "fields": {
             "type": 0,
@@ -696,4 +696,5 @@
             "favorite": 8
         }
     }
-}
+};
+
