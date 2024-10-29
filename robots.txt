@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+Disallow: /css/
+Disallow: /ant/
+Disallow: /ble/
+Disallow: /fit/
+Disallow: /models/
+Disallow: /storage/
+
+Disallow: /manifest.webmanifest
+Disallow: /sw.js
+
+Allow: /images/
+
+Sitemap: https://auuki.com/sitemap.xml
+
