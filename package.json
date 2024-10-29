@@ -16,7 +16,6 @@
     },
     "dependencies": {
         "@babel/core": "^7.13.13",
-        "@babel/node": "^7.13.13",
-        "@vercel/analytics": "^0.1.5"
+        "@babel/node": "^7.13.13"
     }
 }
